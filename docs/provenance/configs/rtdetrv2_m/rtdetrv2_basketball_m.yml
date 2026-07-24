@@ -1,0 +1,30 @@
+__include__: ['./rtdetrv2_r34vd_120e_coco.yml']
+
+# Basketball COCO (11 categories, id0 basketball has 0 anns)
+num_classes: 11
+remap_mscoco_category: False
+output_dir: /workspace/rtdetrv2_out
+
+# --- Tiny-dataset fix (465 imgs, ~29 iter/ep at bs16) ---
+# Stock warmup_duration=2000 iters would be ~69 epochs of warmup (same trap
+# that zeroed DEIM's first run). Shorten to ~2 epochs so LR actually ramps.
+lr_warmup_scheduler:
+  type: LinearWarmup
+  warmup_duration: 50
+
+ema:
+  type: ModelEMA
+  decay: 0.9999
+  warmups: 100
+
+train_dataloader:
+  total_batch_size: 16
+  dataset:
+    img_folder: /workspace/basketball-player-detection-3/train/
+    ann_file: /workspace/basketball-player-detection-3/train/_annotations.coco.json
+
+val_dataloader:
+  total_batch_size: 32
+  dataset:
+    img_folder: /workspace/basketball-player-detection-3/valid/
+    ann_file: /workspace/basketball-player-detection-3/valid/_annotations.coco.json

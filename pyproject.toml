@@ -58,6 +58,10 @@ packages = ["src/object_detection_eval"]
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+# docs/provenance/configs/ holds frozen third-party training configs (mmdet, DAMO-YOLO,
+# rfdetr, etc.) copied verbatim as an irreplaceable historical record. They follow their
+# own upstream frameworks' style, not this repo's conventions, and must never be rewritten.
+extend-exclude = ["docs/provenance/configs"]
 
 [tool.ruff.lint]
 select = [

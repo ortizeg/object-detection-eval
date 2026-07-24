@@ -19,7 +19,10 @@ repos:
     hooks:
       - id: ruff
         args: [--fix]
+        # Frozen third-party training configs preserved verbatim as historical record.
+        exclude: ^docs/provenance/configs/
       - id: ruff-format
+        exclude: ^docs/provenance/configs/
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.18.2

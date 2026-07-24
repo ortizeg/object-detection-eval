@@ -1,0 +1,26 @@
+__include__: ['./deim_hgnetv2_m_coco.yml']
+
+num_classes: 11
+remap_mscoco_category: False
+
+output_dir: ./outputs/deim_basketball_m
+
+# --- Schedule fixed for tiny dataset (464 imgs) ---
+# flatcosine warmup is in ITERS (global). Shortened from 2000 so LR ramps.
+epoches: 120
+warmup_iter: 50        # ~3.5 epochs (bs16 -> ~29 iters/epoch), then full LR
+flat_epoch: 64         # hold init_lr through ep64, then cosine decay
+no_aug_epoch: 16       # last 16 epochs at min_lr (= 0.5 * init_lr)
+
+# --- Memory: bs32 OOMed at ep28 (mosaic batch spiked giou matrix on 40GB) ---
+train_dataloader:
+  total_batch_size: 16
+  dataset:
+    img_folder: /workspace/basketball-player-detection-3/train/
+    ann_file: /workspace/basketball-player-detection-3/train/_annotations.coco.json
+
+val_dataloader:
+  total_batch_size: 32
+  dataset:
+    img_folder: /workspace/basketball-player-detection-3/valid/
+    ann_file: /workspace/basketball-player-detection-3/valid/_annotations.coco.json
