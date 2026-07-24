@@ -1,0 +1,70 @@
+[workspace]
+name = "object-detection-eval"
+version = "0.1.0"
+description = "Reproducible evaluation harness for object detection networks on small datasets"
+authors = ["Enrique G. Ortiz <ortizeg@gmail.com>"]
+channels = ["conda-forge"]
+platforms = ["osx-arm64", "linux-64"]
+
+[tasks]
+test = "pytest"
+test-cov = "pytest --cov=src --cov-report=term --cov-report=xml -v"
+lint = "ruff check ."
+format = "ruff format ."
+format-check = "ruff format --check ."
+typecheck = "mypy src/"
+precommit = "pre-commit run --all-files"
+quality = { depends-on = ["lint", "format-check", "typecheck", "test"] }
+docs = "mkdocs serve"
+docs-build = "mkdocs build"
+
+# Core: no torch, no lightning. Must stay importable without a deep-learning stack.
+[dependencies]
+python = "3.11.*"
+numpy = "<2.0.0"
+pydantic = ">=2.0"
+hydra-core = "*"
+loguru = "*"
+pycocotools = "*"
+matplotlib = "*"
+opencv = "*"
+tqdm = "*"
+pyyaml = "*"
+httpx = "*"
+
+[pypi-dependencies]
+onnxruntime = ">=1.23.2, <2"
+supervision = "*"
+orjson = "*"
+object-detection-eval = { path = ".", editable = true }
+
+[feature.dev.dependencies]
+pytest = "*"
+pytest-cov = "*"
+ruff = "*"
+mypy = "*"
+pre-commit = "*"
+mkdocs = "*"
+mkdocs-material = "*"
+
+[feature.dev.pypi-dependencies]
+mkdocstrings = { version = "*", extras = ["python"] }
+huggingface-hub = "*"
+types-PyYAML = "*"
+
+# Zero-shot VLM inferencers. Heavy — opt in explicitly.
+[feature.vlm.dependencies]
+pytorch = "*"
+torchvision = "*"
+
+[feature.vlm.pypi-dependencies]
+transformers = ">=4.49.0, <4.52.0"
+timm = "*"
+einops = "*"
+peft = "*"
+google-genai = ">=1.63.0, <2"
+
+[environments]
+default = ["dev"]
+vlm = ["dev", "vlm"]
+prod = []

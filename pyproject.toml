@@ -1,0 +1,124 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "object-detection-eval"
+version = "0.1.0"
+description = "Reproducible evaluation harness for object detection networks on small datasets"
+authors = [{ name = "Enrique G. Ortiz", email = "ortizeg@gmail.com" }]
+license = { text = "Apache-2.0" }
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy<2.0.0",
+    "onnxruntime>=1.23.2,<2",
+    "opencv-python",
+    "pydantic>=2.0",
+    "hydra-core",
+    "loguru",
+    "supervision",
+    "pycocotools",
+    "matplotlib",
+    "tqdm",
+    "orjson",
+    "pyyaml",
+    "httpx",
+]
+
+[project.optional-dependencies]
+# Zero-shot VLM inferencers. Heavy: pulls the full torch stack.
+vlm = [
+    "torch",
+    "torchvision",
+    "transformers>=4.49.0,<4.52.0", # SmolVLM2 requires >=4.49
+    "timm",                          # OmDet-Turbo backbone (AutoBackbone)
+    "einops",                        # Florence-2
+    "peft",
+    "google-genai>=1.63.0,<2",
+]
+# TensorRT latency benchmarking. Linux-64 + NVIDIA only.
+trt = [
+    "onnxruntime-gpu",
+    "tensorrt",
+    "onnx",
+    "onnx-graphsurgeon",
+]
+
+[project.scripts]
+ode = "object_detection_eval.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/ortizeg/object-detection-eval"
+Issues = "https://github.com/ortizeg/object-detection-eval/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/object_detection_eval"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "S",   # bandit
+    "B",   # bugbear
+    "A",   # builtins shadowing
+    "C4",  # comprehensions
+    "T20", # flake8-print — loguru only, never print()
+    "SIM", # simplify
+    "RUF", # ruff-specific
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101"] # assert is the point of a test
+
+[tool.ruff.lint.isort]
+known-first-party = ["object_detection_eval"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+disallow_any_explicit = true
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = false
+
+# Third-party packages that ship no type information.
+[[tool.mypy.overrides]]
+module = [
+    "cv2.*",
+    "supervision.*",
+    "pycocotools.*",
+    "onnxruntime.*",
+    "matplotlib.*",
+    "hydra.*",
+    "omegaconf.*",
+    "tqdm.*",
+    "orjson.*",
+    "transformers.*",
+    "timm.*",
+    "einops.*",
+    "peft.*",
+    "google.genai.*",
+    "tensorrt.*",
+    "onnx_graphsurgeon.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "--cov=src --cov-report=term --cov-report=xml --cov-fail-under=80"
+markers = [
+    "vlm: requires the [vlm] optional dependency group",
+    "trt: requires a CUDA GPU and the [trt] optional dependency group",
+    "external: hits an external API (needs credentials)",
+]

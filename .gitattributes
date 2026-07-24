@@ -1,0 +1,16 @@
+# git-lfs is used ONLY for the small artifact tier: figures and compressed results.
+#
+# Model weights are deliberately NOT tracked here. They live on the Hugging Face Hub and
+# are fetched by SHA-256-verified download driven by registry/*.yaml. Putting ~1 GB of
+# ONNX in LFS would bill clone bandwidth against a GitHub LFS quota on a public repo.
+# See the fork plan §5 and docs/methodology.md.
+
+*.png      filter=lfs diff=lfs merge=lfs -text
+*.json.gz  filter=lfs diff=lfs merge=lfs -text
+
+# Keep line endings sane for text we do track.
+*.md       text
+*.yaml     text
+*.yml      text
+*.toml     text
+*.py       text

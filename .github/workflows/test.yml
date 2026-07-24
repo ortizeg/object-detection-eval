@@ -1,0 +1,37 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Job name must stay "test" — branch protection requires this exact context.
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: prefix-dev/setup-pixi@v0.8.1
+        with:
+          pixi-version: v0.41.4
+          cache: true
+
+      # Core suite only: no GPU, no [vlm] extra. Tests marked vlm/trt/external
+      # are deselected here and run manually against real hardware/credentials.
+      - name: Pytest
+        run: pixi run test-cov -m "not vlm and not trt and not external"
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage.xml
+          if-no-files-found: ignore
