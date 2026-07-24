@@ -134,7 +134,7 @@ Irreplaceable data currently exists only on one laptop, outside any git history.
 
 ### Repository
 
-- [ ] **INFRA-01**: The public GitHub repo exists with branch protection on `main`
+- [x] **INFRA-01**: The public GitHub repo exists with branch protection on `main`
       requiring the `lint` and `test` checks, squash merge, and delete-on-merge
 
 ## v2 Requirements
@@ -167,7 +167,7 @@ and success criteria.
 | SAFE-02 | Phase 1 — Provenance Rescue & Public Repo | Complete |
 | SAFE-03 | Phase 1 — Provenance Rescue & Public Repo | Complete |
 | SAFE-04 | Phase 1 — Provenance Rescue & Public Repo | Complete |
-| INFRA-01 | Phase 1 — Provenance Rescue & Public Repo | Pending |
+| INFRA-01 | Phase 1 — Provenance Rescue & Public Repo | Complete |
 | CORE-01 | Phase 2 — Harness Core | Pending |
 | CORE-02 | Phase 2 — Harness Core | Pending |
 | CORE-03 | Phase 2 — Harness Core | Pending |
