@@ -1,12 +1,19 @@
 ---
-gsd_state_version: '1.0'
-status: planning
+gsd_state_version: 1.0
+milestone: v1.0
+milestone_name: milestone
+current_phase: 01
+current_phase_name: provenance-rescue-public-repo
+status: executing
+stopped_at: Completed 01-01-PLAN.md
+last_updated: "2026-07-24T21:06:47.569Z"
+last_activity: 2026-07-24
+last_activity_desc: Phase 01 execution started
 progress:
-  total_phases: 7
+  total_phases: 1
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_plans: 3
+  completed_plans: 1
 ---
 
 # Project State
@@ -16,20 +23,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-24)
 
 **Core value:** Every number the blog posts publish must be reproducible from this repo.
-**Current focus:** Phase 1 — Provenance Rescue & Public Repo
+**Current focus:** Phase 01 — provenance-rescue-public-repo
 
 ## Current Position
 
-Phase: 1 of 7 (Provenance Rescue & Public Repo)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-07-24 — Roadmap created, 36 v1 requirements mapped across 7 phases
+Phase: 01 (provenance-rescue-public-repo) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
+Last activity: 2026-07-24 — Phase 01 execution started
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [███░░░░░░░] 33%
 
 ## Performance Metrics
 
 **Velocity:**
+
 - Total plans completed: 0
 - Average duration: —
 - Total execution time: 0.0 hours
@@ -41,10 +49,16 @@ Progress: [░░░░░░░░░░] 0%
 | - | - | - | - |
 
 **Recent Trend:**
+
 - Last 5 plans: —
 - Trend: —
 
 *Updated after each plan completion*
+**Per-Plan Metrics:**
+
+| Plan | Duration | Tasks | Files |
+|------|----------|-------|-------|
+| Phase 01 P01 | 25min | 2 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -57,6 +71,8 @@ Recent decisions affecting current work:
 - [Roadmap]: REPRO-01..03 split into their own phase (4) rather than folded into the registry phase, so the reproduction gate is an unambiguous phase boundary
 - [Roadmap]: INFRA-01 attached to Phase 1 — SAFE-01 requires committing rescued provenance *here*, so the protected public remote must exist alongside it
 - [Roadmap]: Phases 5 (VLM) and 6 (Latency) are mutually independent after the Phase 4 gate and may run in parallel
+- [Phase ?]: Excluded docs/provenance/configs/ from ruff lint/format (pyproject.toml + .pre-commit-config.yaml) — archival third-party training configs must be preserved verbatim, not auto-reformatted
+- [Phase ?]: Backfilled a missing labels_mapping.json for the PRIMARY RTMDet-M model on GCS, found during the Task 2 artifact inventory (SAFE-04 gap)
 
 ### Pending Todos
 
@@ -79,6 +95,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-24
-Stopped at: ROADMAP.md and STATE.md written; REQUIREMENTS.md traceability populated
+Last session: 2026-07-24T21:06:47.564Z
+Stopped at: Completed 01-01-PLAN.md
 Resume file: None
