@@ -14,11 +14,11 @@ Irreplaceable data currently exists only on one laptop, outside any git history.
       configs for DAMO/DEIM/RF-DETR/RTMDet/RT-DETRv2) are recovered from the source repo's
       gitignored `.deploy_comparison/` into `docs/provenance/` and committed here
 
-- [ ] **SAFE-02**: Source repo `.gitignore` excludes `eval_output/`, `inference_output/`,
+- [x] **SAFE-02**: Source repo `.gitignore` excludes `eval_output/`, `inference_output/`,
       and tool caches, so 112 MB of untracked-and-unignored artifacts cannot be committed
       as raw blobs by an accidental `git add .`
 
-- [ ] **SAFE-03**: Eval prediction JSON is re-dumped compact and gzipped, bringing the
+- [x] **SAFE-03**: Eval prediction JSON is re-dumped compact and gzipped, bringing the
       results tree from 113 MB to under ~20 MB
 
 - [x] **SAFE-04**: Every eval-target ONNX and label map is mirrored to
@@ -164,8 +164,8 @@ and success criteria.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | SAFE-01 | Phase 1 — Provenance Rescue & Public Repo | Complete |
-| SAFE-02 | Phase 1 — Provenance Rescue & Public Repo | Pending |
-| SAFE-03 | Phase 1 — Provenance Rescue & Public Repo | Pending |
+| SAFE-02 | Phase 1 — Provenance Rescue & Public Repo | Complete |
+| SAFE-03 | Phase 1 — Provenance Rescue & Public Repo | Complete |
 | SAFE-04 | Phase 1 — Provenance Rescue & Public Repo | Complete |
 | INFRA-01 | Phase 1 — Provenance Rescue & Public Repo | Pending |
 | CORE-01 | Phase 2 — Harness Core | Pending |

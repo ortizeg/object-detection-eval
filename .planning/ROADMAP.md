@@ -49,10 +49,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. The results tree is under ~20 MB after compact re-dump and gzip (from 113 MB), and the compressed prediction JSON still loads and scores to the same numbers
   5. `github.com/ortizeg/object-detection-eval` is public with `main` protected — `lint` and `test` required, squash merge, delete-on-merge — and a direct push to `main` is rejected
 
-**Plans**: 1/3 plans executed
+**Plans**: 2/3 plans executed
 
 - [x] 01-01-PLAN.md — Rescue provenance docs + configs into docs/provenance/ and verify the GCS mirror (SAFE-01, SAFE-04) [wave 1]
-- [ ] 01-02-PLAN.md — Source repo artifact hygiene: targeted .gitignore + compact-gzip results (SAFE-02, SAFE-03) [wave 1]
+- [x] 01-02-PLAN.md — Source repo artifact hygiene: targeted .gitignore + compact-gzip results (SAFE-02, SAFE-03) [wave 1]
 - [ ] 01-03-PLAN.md — Create the public GitHub repo and protect main (INFRA-01) [wave 2, depends 01-01]
 
 Notes:
@@ -186,7 +186,7 @@ Phases 5 and 6 have no dependency on each other and may execute in parallel afte
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Provenance Rescue & Public Repo | 1/3 | In Progress|  |
+| 1. Provenance Rescue & Public Repo | 2/3 | In Progress|  |
 | 2. Harness Core | 0/TBD | Not started | - |
 | 3. Model Registry | 0/TBD | Not started | - |
 | 4. Reproduction Gate | 0/TBD | Not started | - |
