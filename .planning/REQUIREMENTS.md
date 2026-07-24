@@ -131,17 +131,69 @@ Irreplaceable data currently exists only on one laptop, outside any git history.
 
 ## Traceability
 
-Populated during roadmap creation.
+Every v1 requirement maps to exactly one phase. See `.planning/ROADMAP.md` for phase goals
+and success criteria.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| _(pending roadmap)_ | — | Pending |
+| SAFE-01 | Phase 1 — Provenance Rescue & Public Repo | Pending |
+| SAFE-02 | Phase 1 — Provenance Rescue & Public Repo | Pending |
+| SAFE-03 | Phase 1 — Provenance Rescue & Public Repo | Pending |
+| SAFE-04 | Phase 1 — Provenance Rescue & Public Repo | Pending |
+| INFRA-01 | Phase 1 — Provenance Rescue & Public Repo | Pending |
+| CORE-01 | Phase 2 — Harness Core | Pending |
+| CORE-02 | Phase 2 — Harness Core | Pending |
+| CORE-03 | Phase 2 — Harness Core | Pending |
+| CORE-04 | Phase 2 — Harness Core | Pending |
+| CORE-05 | Phase 2 — Harness Core | Pending |
+| CORE-06 | Phase 2 — Harness Core | Pending |
+| CORE-07 | Phase 2 — Harness Core | Pending |
+| CORE-08 | Phase 2 — Harness Core | Pending |
+| CORE-09 | Phase 2 — Harness Core | Pending |
+| REG-01 | Phase 3 — Model Registry | Pending |
+| REG-02 | Phase 3 — Model Registry | Pending |
+| REG-03 | Phase 3 — Model Registry | Pending |
+| REG-04 | Phase 3 — Model Registry | Pending |
+| REG-05 | Phase 3 — Model Registry | Pending |
+| REG-06 | Phase 3 — Model Registry | Pending |
+| REPRO-01 | Phase 4 — Reproduction Gate | Pending |
+| REPRO-02 | Phase 4 — Reproduction Gate | Pending |
+| REPRO-03 | Phase 4 — Reproduction Gate | Pending |
+| VLM-01 | Phase 5 — Zero-Shot VLM | Pending |
+| VLM-02 | Phase 5 — Zero-Shot VLM | Pending |
+| VLM-03 | Phase 5 — Zero-Shot VLM | Pending |
+| VLM-04 | Phase 5 — Zero-Shot VLM | Pending |
+| LAT-01 | Phase 6 — Latency | Pending |
+| LAT-02 | Phase 6 — Latency | Pending |
+| LAT-03 | Phase 6 — Latency | Pending |
+| LAT-04 | Phase 6 — Latency | Pending |
+| REPORT-01 | Phase 7 — Reports & Docs | Pending |
+| REPORT-02 | Phase 7 — Reports & Docs | Pending |
+| REPORT-03 | Phase 7 — Reports & Docs | Pending |
+| REPORT-04 | Phase 7 — Reports & Docs | Pending |
+| REPORT-05 | Phase 7 — Reports & Docs | Pending |
 
 **Coverage:**
-- v1 requirements: 34 total
-- Mapped to phases: 0
-- Unmapped: 34 ⚠️
+- v1 requirements: 36 total
+- Mapped to phases: 36
+- Unmapped: 0 ✓
+
+**Note:** this section previously stated 34 v1 requirements. The enumerated count is 36
+(SAFE 4 + CORE 9 + REG 6 + REPRO 3 + VLM 4 + LAT 4 + REPORT 5 + INFRA 1); corrected during
+roadmap creation. No requirement was added or removed.
+
+**By phase:**
+
+| Phase | Requirements | Count |
+|-------|--------------|-------|
+| 1. Provenance Rescue & Public Repo | SAFE-01..04, INFRA-01 | 5 |
+| 2. Harness Core | CORE-01..09 | 9 |
+| 3. Model Registry | REG-01..06 | 6 |
+| 4. Reproduction Gate | REPRO-01..03 | 3 |
+| 5. Zero-Shot VLM | VLM-01..04 | 4 |
+| 6. Latency | LAT-01..04 | 4 |
+| 7. Reports & Docs | REPORT-01..05 | 5 |
 
 ---
 *Requirements defined: 2026-07-24*
-*Last updated: 2026-07-24 after initial definition*
+*Last updated: 2026-07-24 after roadmap creation (traceability populated, count corrected 34 -> 36)*
