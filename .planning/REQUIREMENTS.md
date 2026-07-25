@@ -26,7 +26,7 @@ Irreplaceable data currently exists only on one laptop, outside any git history.
 
 ### Harness Core
 
-- [ ] **CORE-01**: `load_coco_gt()` is a public, typed, tested function that loads COCO
+- [x] **CORE-01**: `load_coco_gt()` is a public, typed, tested function that loads COCO
       ground truth for a named split
 
 - [ ] **CORE-02**: `compute_metrics()` is public, typed, and tested, returning
@@ -38,7 +38,7 @@ Irreplaceable data currently exists only on one laptop, outside any git history.
 - [ ] **CORE-04**: A seeded, paired, image-level bootstrap produces 95% CIs for a single
       model and for pairwise differences, reproducibly across runs
 
-- [ ] **CORE-05**: Taxonomies (`merged5`, `raw10`, `identity`) load from YAML config; no
+- [x] **CORE-05**: Taxonomies (`merged5`, `raw10`, `identity`) load from YAML config; no
       basketball-specific class constants remain anywhere in `src/`
 
 - [ ] **CORE-06**: One parameterized letterbox, driven by model-card preprocessing config,
@@ -52,7 +52,7 @@ Irreplaceable data currently exists only on one laptop, outside any git history.
 - [ ] **CORE-08**: The core package imports with no torch in the import graph, enforced by
       a test
 
-- [ ] **CORE-09**: All output goes through loguru; ruff `T20` passes with no suppressions
+- [x] **CORE-09**: All output goes through loguru; ruff `T20` passes with no suppressions
 
 ### Model Registry
 
@@ -168,15 +168,15 @@ and success criteria.
 | SAFE-03 | Phase 1 — Provenance Rescue & Public Repo | Complete |
 | SAFE-04 | Phase 1 — Provenance Rescue & Public Repo | Complete |
 | INFRA-01 | Phase 1 — Provenance Rescue & Public Repo | Complete |
-| CORE-01 | Phase 2 — Harness Core | Pending |
+| CORE-01 | Phase 2 — Harness Core | Complete |
 | CORE-02 | Phase 2 — Harness Core | Pending |
 | CORE-03 | Phase 2 — Harness Core | Pending |
 | CORE-04 | Phase 2 — Harness Core | Pending |
-| CORE-05 | Phase 2 — Harness Core | Pending |
+| CORE-05 | Phase 2 — Harness Core | Complete |
 | CORE-06 | Phase 2 — Harness Core | Pending |
 | CORE-07 | Phase 2 — Harness Core | Pending |
 | CORE-08 | Phase 2 — Harness Core | Pending |
-| CORE-09 | Phase 2 — Harness Core | Pending |
+| CORE-09 | Phase 2 — Harness Core | Complete |
 | REG-01 | Phase 3 — Model Registry | Pending |
 | REG-02 | Phase 3 — Model Registry | Pending |
 | REG-03 | Phase 3 — Model Registry | Pending |
