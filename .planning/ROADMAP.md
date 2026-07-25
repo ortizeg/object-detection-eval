@@ -73,9 +73,9 @@ Notes:
   4. One parameterized `Letterbox` reproduces all five preprocessing variants (YOLOX top-left pad-114, YOLO26 centered /255 RGB, RTMDet resize+pad mean/std, DEIM square resize, DAMO square resize no-norm) from model-card config, and detections de-transform back to original-image pixels through a single tested function
   5. All 7 detectors run behind one `BaseInferencer` ABC with RT-DETRv2 as its own module; `pixi run test` passes with no torch installed and `pixi run lint` passes with `T20` and zero suppressions
 
-**Plans**: 6 plans
+**Plans**: 1/6 plans executed
 
-- [ ] 02-01-PLAN.md — Schemas (Detection/Annotation) + YAML-driven TaxonomySpec, no basketball constants in src/ (CORE-05, CORE-09) [wave 1]
+- [x] 02-01-PLAN.md — Schemas (Detection/Annotation) + YAML-driven TaxonomySpec, no basketball constants in src/ (CORE-05, CORE-09) [wave 1]
 - [ ] 02-02-PLAN.md — Data tier: public load_coco_gt, taxonomy resolve/remap/identity, ImageLoader (CORE-01, CORE-05) [wave 2]
 - [ ] 02-03-PLAN.md — Metrics: compute_metrics (mAP + per-class AP), F1 sweep, PR-curve computation (CORE-02, CORE-03) [wave 2]
 - [ ] 02-04-PLAN.md — Paired seeded bootstrap + supervision version-drift check and pin (CORE-04, CORE-02) [wave 3]
@@ -195,7 +195,7 @@ Phases 5 and 6 have no dependency on each other and may execute in parallel afte
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Provenance Rescue & Public Repo | 3/3 | In Progress|  |
-| 2. Harness Core | 0/6 | Not started | - |
+| 2. Harness Core | 1/6 | In Progress|  |
 | 3. Model Registry | 0/TBD | Not started | - |
 | 4. Reproduction Gate | 0/TBD | Not started | - |
 | 5. Zero-Shot VLM | 0/TBD | Not started | - |
