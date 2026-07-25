@@ -7188,7 +7188,7 @@ packages:
 - pypi: ./
   name: object-detection-eval
   version: 0.1.0
-  sha256: eb3cabb69ee8d34df8afe142d3019b9d9891c1a718e645af560f2ea03c5c6859
+  sha256: 23920247afc4097450fe80d10d2946ab77666d65804f3782811d446c428d9a94
   requires_dist:
   - numpy<2.0.0
   - onnxruntime>=1.23.2,<2
@@ -7196,7 +7196,7 @@ packages:
   - pydantic>=2.0
   - hydra-core
   - loguru
-  - supervision
+  - supervision==0.29.1
   - pycocotools
   - matplotlib
   - tqdm

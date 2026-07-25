@@ -34,7 +34,7 @@ httpx = "*"
 
 [pypi-dependencies]
 onnxruntime = ">=1.23.2, <2"
-supervision = "*"
+supervision = "==0.29.1"
 orjson = "*"
 object-detection-eval = { path = ".", editable = true }
 

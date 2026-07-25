@@ -17,7 +17,7 @@ dependencies = [
     "pydantic>=2.0",
     "hydra-core",
     "loguru",
-    "supervision",
+    "supervision==0.29.1",
     "pycocotools",
     "matplotlib",
     "tqdm",
