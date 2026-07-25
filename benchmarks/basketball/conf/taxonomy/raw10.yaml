@@ -1,0 +1,20 @@
+# Raw 10-class basketball taxonomy (no merging). Reproduces the legacy
+# _BASKETBALL10_NAMES tuple / _BASKETBALL10_NAME_TO_ID from the source repo.
+# Scoring is keyed by name, so the contiguous id order below only affects the
+# display order of per-class AP.
+name: raw10
+
+classes:
+  - ball
+  - ball-in-basket
+  - number
+  - player
+  - player-in-possession
+  - player-jump-shot
+  - player-layup-dunk
+  - player-shot-block
+  - referee
+  - rim
+
+merge: {}
+aliases: {}

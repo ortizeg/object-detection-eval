@@ -1,0 +1,31 @@
+# 5-class basketball eval taxonomy: the 10 training classes merged down to 5.
+# Reproduces the legacy _EVAL_LABEL_MAP / _NAME_TO_EVAL_ID from the source repo.
+name: merged5
+
+# index == eval class id
+classes:
+  - player
+  - ball
+  - referee
+  - rim
+  - number
+
+# canonical class -> source category names that collapse into it
+merge:
+  player:
+    - player-in-possession
+    - player-jump-shot
+    - player-layup-dunk
+    - player-shot-block
+  ball:
+    - ball-in-basket
+
+# COCO-vocabulary / VLM-prompt aliases -> canonical class
+aliases:
+  person: player            # COCO "person"
+  sports ball: ball         # COCO "sports ball"
+  basketball: ball
+  basketball hoop: rim
+  hoop: rim
+  jersey number: number
+  basketball player: player # OWLv2 prompt
