@@ -1,0 +1,43 @@
+"""CORE-08: the entire core import graph must stay torch-free.
+
+Torch belongs to the ``[vlm]`` optional extra (SmolVLM2, OmDet-Turbo,
+Florence-2). This walks every core submodule -- schemas, utils, data,
+metrics, inference (including all 7 detectors) -- and asserts torch never
+enters ``sys.modules``. This test is authoritative for CORE-08's pass/fail
+at phase verification (co-claimed with 02-05, which keeps its own modules
+torch-free; this test is the whole-core-graph gate).
+"""
+
+from __future__ import annotations
+
+import sys
+
+
+def test_core_import_graph_is_torch_free() -> None:
+    """Import every core submodule, then assert torch never entered sys.modules."""
+    import object_detection_eval
+    import object_detection_eval.data.coco_gt
+    import object_detection_eval.data.image
+    import object_detection_eval.data.taxonomy
+    import object_detection_eval.inference.base
+    import object_detection_eval.inference.detectors
+    import object_detection_eval.inference.detectors.damo
+    import object_detection_eval.inference.detectors.deim
+    import object_detection_eval.inference.detectors.rfdetr
+    import object_detection_eval.inference.detectors.rtdetrv2
+    import object_detection_eval.inference.detectors.rtmdet
+    import object_detection_eval.inference.detectors.yolo26
+    import object_detection_eval.inference.detectors.yolox
+    import object_detection_eval.inference.onnx
+    import object_detection_eval.inference.postprocess
+    import object_detection_eval.inference.preprocess
+    import object_detection_eval.metrics.bootstrap
+    import object_detection_eval.metrics.curves
+    import object_detection_eval.metrics.detection_map
+    import object_detection_eval.metrics.prf1
+    import object_detection_eval.schemas.annotation
+    import object_detection_eval.schemas.detection
+    import object_detection_eval.schemas.taxonomy
+    import object_detection_eval.utils.boxes  # noqa: F401
+
+    assert "torch" not in sys.modules

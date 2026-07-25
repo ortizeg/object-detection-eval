@@ -1,0 +1,9 @@
+# Identity taxonomy: score a model's native classes as-is, deriving the class
+# list from a COCO json's own categories at load time (see data.taxonomy
+# .identity_taxonomy_from_coco, Plan 02-02). Used for reference datasets such as
+# COCO val2017. `classes` is intentionally empty here; it is a runtime function
+# of the target COCO file, not a fixed list.
+name: identity
+classes: []
+merge: {}
+aliases: {}

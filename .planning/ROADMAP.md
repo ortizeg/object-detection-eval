@@ -73,11 +73,19 @@ Notes:
   4. One parameterized `Letterbox` reproduces all five preprocessing variants (YOLOX top-left pad-114, YOLO26 centered /255 RGB, RTMDet resize+pad mean/std, DEIM square resize, DAMO square resize no-norm) from model-card config, and detections de-transform back to original-image pixels through a single tested function
   5. All 7 detectors run behind one `BaseInferencer` ABC with RT-DETRv2 as its own module; `pixi run test` passes with no torch installed and `pixi run lint` passes with `T20` and zero suppressions
 
-**Plans**: TBD
+**Plans**: 6/6 plans executed
+
+- [x] 02-01-PLAN.md — Schemas (Detection/Annotation) + YAML-driven TaxonomySpec, no basketball constants in src/ (CORE-05, CORE-09) [wave 1]
+- [x] 02-02-PLAN.md — Data tier: public load_coco_gt, taxonomy resolve/remap/identity, ImageLoader (CORE-01, CORE-05) [wave 2]
+- [x] 02-03-PLAN.md — Metrics: compute_metrics (mAP + per-class AP), F1 sweep, PR-curve computation (CORE-02, CORE-03) [wave 2]
+- [x] 02-04-PLAN.md — Paired seeded bootstrap + supervision version-drift check and pin (CORE-04, CORE-02) [wave 3]
+- [x] 02-05-PLAN.md — Inference foundation: BaseInferencer ABC, ONNXInferencer, one parameterized Letterbox + single de-transform (CORE-06, CORE-08) [wave 2]
+- [x] 02-06-PLAN.md — 7 detectors behind the ABC (RT-DETRv2 own module), postprocessors, torch-free gate, public API (CORE-06, CORE-07, CORE-08) [wave 4]
 
 Notes:
 
-- This is the largest phase by requirement count and will decompose into several plans: schemas + data/taxonomy, metrics + bootstrap, preprocessing + de-transform, inferencers.
+- This is the largest phase by requirement count and decomposes into 6 plans: schemas + taxonomy (01), data (02), metrics (03), bootstrap + supervision pin (04), preprocessing/de-transform + inference foundation (05), and postprocessors + inferencers (06).
+- Wave order: 1 → {02, 03, 05} → 04 → 06. The supervision version-drift check (04) pins the reproducing version now, de-risking the Phase 4 gate.
 - Refactors are applied *during* the move, not after — porting the monolith intact and then cleaning it would double the work and lose the test coverage anchor.
 
 ### Phase 3: Model Registry
@@ -187,7 +195,7 @@ Phases 5 and 6 have no dependency on each other and may execute in parallel afte
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Provenance Rescue & Public Repo | 3/3 | In Progress|  |
-| 2. Harness Core | 0/TBD | Not started | - |
+| 2. Harness Core | 6/6 | In Progress|  |
 | 3. Model Registry | 0/TBD | Not started | - |
 | 4. Reproduction Gate | 0/TBD | Not started | - |
 | 5. Zero-Shot VLM | 0/TBD | Not started | - |

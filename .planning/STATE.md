@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 01
-current_phase_name: provenance-rescue-public-repo
-status: verifying
-stopped_at: Completed 01-03-PLAN.md
-last_updated: "2026-07-24T21:15:27.689Z"
-last_activity: 2026-07-24
-last_activity_desc: Phase 01 execution started
+current_phase: 02
+current_phase_name: harness-core
+status: executing
+stopped_at: Completed 02-06-PLAN.md
+last_updated: "2026-07-25T22:52:31.772Z"
+last_activity: 2026-07-25
+last_activity_desc: Completed 02-05-PLAN.md
 progress:
-  total_phases: 1
-  completed_phases: 1
-  total_plans: 3
-  completed_plans: 3
+  total_phases: 2
+  completed_phases: 2
+  total_plans: 9
+  completed_plans: 9
 ---
 
 # Project State
@@ -23,14 +23,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-24)
 
 **Core value:** Every number the blog posts publish must be reproducible from this repo.
-**Current focus:** Phase 01 — provenance-rescue-public-repo
+**Current focus:** Phase 02 — harness-core
 
 ## Current Position
 
-Phase: 01 (provenance-rescue-public-repo) — EXECUTING
-Plan: 3 of 3
-Status: Phase complete — ready for verification
-Last activity: 2026-07-24 — Phase 01 execution started
+Phase: 02 (harness-core) — EXECUTING
+Plan: 6 of 6
+Status: In progress — 02-01, 02-02, 02-03, 02-05 complete (02-04, 02-06 remaining)
+Last activity: 2026-07-25 — Completed 02-05-PLAN.md
 
 Progress: [██████████] 100%
 
@@ -61,6 +61,10 @@ Progress: [██████████] 100%
 | Phase 01 P01 | 25min | 2 tasks | 13 files |
 | Phase 01 P02 | 15min | 2 tasks | 1 files |
 | Phase 01 P03 | ~10min | 2 tasks | 0 files |
+| Phase 02 P02 | 40min | 3 tasks | 9 files |
+| Phase 02 P05 | 45min | 2 tasks | 7 files |
+| Phase 02 P04 | 35min | 2 tasks | 6 files |
+| Phase 02 P06 | 55min | 4 tasks | 17 files |
 
 ## Accumulated Context
 
@@ -78,6 +82,15 @@ Recent decisions affecting current work:
 - [Phase ?]: Did not pursue lossy precision reduction to force eval_output/ under the ~20MB target — preserving SAFE-03 round-trip exact-equality took priority over the approximate size target; documented the ~24MB actual size as a shortfall
 - [Phase ?]: [Phase 1] Pushed to the new public remote before applying branch protection — protecting main first would have deadlocked the push carrying the Plan 01 provenance material
 - [Phase ?]: [Phase 1] required_pull_request_reviews left null on main protection (solo maintainer, T-01-03 accepted) — required lint+test checks and squash-only merges serve as the integrity gate instead
+- [Phase ?]: [Phase 2, 02-02] Anchored .gitignore's data/ rule to /data/ (repo root) — the unanchored pattern was shadowing the new src/object_detection_eval/data/ package and tests/data/ directory
+- [Phase ?]: [Phase 2, 02-02] identity taxonomy stays a runtime function over a COCO file's categories, not YAML-backed — merged5/raw10 are the only YAML-driven taxonomies
+- [Phase ?]: [Phase 2, 02-05] ONNXInferencer.post_processor typed via a structural typing.Protocol instead of importing Plan 06's not-yet-built BasePostProcessor
+- [Phase ?]: [Phase 2, 02-05] Square-resize detransform divides by model input size directly (not orig_w/orig_h) — algebraically identical for non-aspect-preserving resize
+- [Phase ?]: [Phase 2, 02-04] Pinned supervision==0.29.1 (not the 0.27.0.post1 anchor version) after proving the two-model anchor gap is a data-provenance issue, not supervision-version drift — both versions produce byte-identical mAP deltas
+- [Phase ?]: [Phase 2, 02-04] The YOLOX-M/RTMDet-M gap vs bootstrap_5c_test_7models.json is a stale-anchor data issue (consistent with known destroyed prediction boxes); Phase 4 should compare against each model's own results.json rather than assume the 7-model anchor reproduces verbatim
+- [Phase ?]: [Phase 2, 02-06] Widened ONNXInferencer's PostProcessor Protocol with an optional transform kwarg, closing the placeholder 02-05 left for this plan
+- [Phase ?]: [Phase 2, 02-06] Pinned the mypy pre-commit hook's numpy to <2.0.0 (matching pyproject.toml) after the isolated hook env's numpy 2.4.6 disagreed with pixi run typecheck on np.maximum's return-type overload
+- [Phase ?]: [Phase 2, 02-06] RT-DETRv2 is a zero-added-code DeimDetector subclass (own importable module per CORE-07, not a config pointer); DAMO/RF-DETR accept but ignore the transform kwarg, keeping their source-verified de-transform math unchanged
 
 ### Pending Todos
 
@@ -100,6 +113,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-24T21:15:27.683Z
-Stopped at: Completed 01-03-PLAN.md
+Last session: 2026-07-25T22:52:25.741Z
+Stopped at: Completed 02-06-PLAN.md
 Resume file: None
