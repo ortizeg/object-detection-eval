@@ -32,3 +32,8 @@ repos:
         additional_dependencies:
           - pydantic>=2.0
           - types-PyYAML
+          # Must match pyproject.toml's numpy<2.0.0 pin: numpy 1.x vs 2.x
+          # resolve some np.floating/np.maximum overloads differently, which
+          # flips mypy's no-any-return / unused-ignore verdicts and makes
+          # this hook disagree with `pixi run typecheck` (the real CI gate).
+          - numpy<2.0.0
