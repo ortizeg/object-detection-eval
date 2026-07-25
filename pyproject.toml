@@ -87,9 +87,13 @@ select = [
 known-first-party = ["object_detection_eval"]
 
 [tool.mypy]
+plugins = ["pydantic.mypy"]
 python_version = "3.11"
 strict = true
-disallow_any_explicit = true
+# NOTE: disallow_any_explicit is intentionally NOT enabled. It flags every
+# `pydantic.BaseModel` subclass as explicit-Any (even with the pydantic mypy
+# plugin), and pydantic is foundational here — every schema, model card, and
+# config is a BaseModel. `strict = true` keeps the meaningful rigor.
 warn_return_any = true
 warn_unused_configs = true
 ignore_missing_imports = false
