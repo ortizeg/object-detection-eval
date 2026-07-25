@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 02
 current_phase_name: harness-core
 status: executing
-stopped_at: Completed 02-02-PLAN.md
-last_updated: "2026-07-25T21:42:19.752Z"
-last_activity: 2026-07-24
-last_activity_desc: Phase 01 execution started
+stopped_at: Completed 02-05-PLAN.md
+last_updated: "2026-07-25T22:20:39.164Z"
+last_activity: 2026-07-25
+last_activity_desc: Completed 02-05-PLAN.md
 progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 9
-  completed_plans: 5
+  completed_plans: 7
 ---
 
 # Project State
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-07-24)
 ## Current Position
 
 Phase: 02 (harness-core) — EXECUTING
-Plan: 2 of 6
-Status: In progress — 02-01 and 02-02 complete
-Last activity: 2026-07-25 — Completed 02-02-PLAN.md
+Plan: 4 of 6
+Status: In progress — 02-01, 02-02, 02-03, 02-05 complete (02-04, 02-06 remaining)
+Last activity: 2026-07-25 — Completed 02-05-PLAN.md
 
-Progress: [██████░░░░] 56%
+Progress: [████████░░] 78%
 
 ## Performance Metrics
 
@@ -62,6 +62,7 @@ Progress: [██████░░░░] 56%
 | Phase 01 P02 | 15min | 2 tasks | 1 files |
 | Phase 01 P03 | ~10min | 2 tasks | 0 files |
 | Phase 02 P02 | 40min | 3 tasks | 9 files |
+| Phase 02 P05 | 45min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -81,6 +82,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 1] required_pull_request_reviews left null on main protection (solo maintainer, T-01-03 accepted) — required lint+test checks and squash-only merges serve as the integrity gate instead
 - [Phase ?]: [Phase 2, 02-02] Anchored .gitignore's data/ rule to /data/ (repo root) — the unanchored pattern was shadowing the new src/object_detection_eval/data/ package and tests/data/ directory
 - [Phase ?]: [Phase 2, 02-02] identity taxonomy stays a runtime function over a COCO file's categories, not YAML-backed — merged5/raw10 are the only YAML-driven taxonomies
+- [Phase ?]: [Phase 2, 02-05] ONNXInferencer.post_processor typed via a structural typing.Protocol instead of importing Plan 06's not-yet-built BasePostProcessor
+- [Phase ?]: [Phase 2, 02-05] Square-resize detransform divides by model input size directly (not orig_w/orig_h) — algebraically identical for non-aspect-preserving resize
 
 ### Pending Todos
 
@@ -103,6 +106,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-25T21:42:15.173Z
-Stopped at: Completed 02-02-PLAN.md
+Last session: 2026-07-25T22:20:39.158Z
+Stopped at: Completed 02-05-PLAN.md
 Resume file: None

@@ -41,7 +41,7 @@ Irreplaceable data currently exists only on one laptop, outside any git history.
 - [x] **CORE-05**: Taxonomies (`merged5`, `raw10`, `identity`) load from YAML config; no
       basketball-specific class constants remain anywhere in `src/`
 
-- [ ] **CORE-06**: One parameterized letterbox, driven by model-card preprocessing config,
+- [x] **CORE-06**: One parameterized letterbox, driven by model-card preprocessing config,
       replaces the five hand-rolled preprocessors; the de-transform back to original-image
       pixels is a single tested function
 
@@ -49,7 +49,7 @@ Irreplaceable data currently exists only on one laptop, outside any git history.
       and RF-DETR are exposed behind one ABC, with RT-DETRv2 as its own module rather than
       piggybacking on DEIM
 
-- [ ] **CORE-08**: The core package imports with no torch in the import graph, enforced by
+- [x] **CORE-08**: The core package imports with no torch in the import graph, enforced by
       a test
 
 - [x] **CORE-09**: All output goes through loguru; ruff `T20` passes with no suppressions
@@ -173,9 +173,9 @@ and success criteria.
 | CORE-03 | Phase 2 — Harness Core | Pending |
 | CORE-04 | Phase 2 — Harness Core | Pending |
 | CORE-05 | Phase 2 — Harness Core | Complete |
-| CORE-06 | Phase 2 — Harness Core | Pending |
+| CORE-06 | Phase 2 — Harness Core | Complete |
 | CORE-07 | Phase 2 — Harness Core | Pending |
-| CORE-08 | Phase 2 — Harness Core | Pending |
+| CORE-08 | Phase 2 — Harness Core | Complete |
 | CORE-09 | Phase 2 — Harness Core | Complete |
 | REG-01 | Phase 3 — Model Registry | Pending |
 | REG-02 | Phase 3 — Model Registry | Pending |
