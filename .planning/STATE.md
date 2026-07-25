@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 02
 current_phase_name: harness-core
 status: executing
-stopped_at: Completed 02-04-PLAN.md
-last_updated: "2026-07-25T22:35:44.595Z"
+stopped_at: Completed 02-06-PLAN.md
+last_updated: "2026-07-25T22:52:31.772Z"
 last_activity: 2026-07-25
 last_activity_desc: Completed 02-05-PLAN.md
 progress:
   total_phases: 2
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 9
-  completed_plans: 8
+  completed_plans: 9
 ---
 
 # Project State
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-07-24)
 ## Current Position
 
 Phase: 02 (harness-core) — EXECUTING
-Plan: 5 of 6
+Plan: 6 of 6
 Status: In progress — 02-01, 02-02, 02-03, 02-05 complete (02-04, 02-06 remaining)
 Last activity: 2026-07-25 — Completed 02-05-PLAN.md
 
-Progress: [█████████░] 89%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -64,6 +64,7 @@ Progress: [█████████░] 89%
 | Phase 02 P02 | 40min | 3 tasks | 9 files |
 | Phase 02 P05 | 45min | 2 tasks | 7 files |
 | Phase 02 P04 | 35min | 2 tasks | 6 files |
+| Phase 02 P06 | 55min | 4 tasks | 17 files |
 
 ## Accumulated Context
 
@@ -87,6 +88,9 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 2, 02-05] Square-resize detransform divides by model input size directly (not orig_w/orig_h) — algebraically identical for non-aspect-preserving resize
 - [Phase ?]: [Phase 2, 02-04] Pinned supervision==0.29.1 (not the 0.27.0.post1 anchor version) after proving the two-model anchor gap is a data-provenance issue, not supervision-version drift — both versions produce byte-identical mAP deltas
 - [Phase ?]: [Phase 2, 02-04] The YOLOX-M/RTMDet-M gap vs bootstrap_5c_test_7models.json is a stale-anchor data issue (consistent with known destroyed prediction boxes); Phase 4 should compare against each model's own results.json rather than assume the 7-model anchor reproduces verbatim
+- [Phase ?]: [Phase 2, 02-06] Widened ONNXInferencer's PostProcessor Protocol with an optional transform kwarg, closing the placeholder 02-05 left for this plan
+- [Phase ?]: [Phase 2, 02-06] Pinned the mypy pre-commit hook's numpy to <2.0.0 (matching pyproject.toml) after the isolated hook env's numpy 2.4.6 disagreed with pixi run typecheck on np.maximum's return-type overload
+- [Phase ?]: [Phase 2, 02-06] RT-DETRv2 is a zero-added-code DeimDetector subclass (own importable module per CORE-07, not a config pointer); DAMO/RF-DETR accept but ignore the transform kwarg, keeping their source-verified de-transform math unchanged
 
 ### Pending Todos
 
@@ -109,6 +113,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-25T22:35:44.590Z
-Stopped at: Completed 02-04-PLAN.md
+Last session: 2026-07-25T22:52:25.741Z
+Stopped at: Completed 02-06-PLAN.md
 Resume file: None

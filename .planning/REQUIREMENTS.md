@@ -45,7 +45,7 @@ Irreplaceable data currently exists only on one laptop, outside any git history.
       replaces the five hand-rolled preprocessors; the de-transform back to original-image
       pixels is a single tested function
 
-- [ ] **CORE-07**: Detector inferencers for YOLOX, YOLO26, RTMDet, DEIM, RT-DETRv2, DAMO,
+- [x] **CORE-07**: Detector inferencers for YOLOX, YOLO26, RTMDet, DEIM, RT-DETRv2, DAMO,
       and RF-DETR are exposed behind one ABC, with RT-DETRv2 as its own module rather than
       piggybacking on DEIM
 
@@ -174,7 +174,7 @@ and success criteria.
 | CORE-04 | Phase 2 — Harness Core | Complete |
 | CORE-05 | Phase 2 — Harness Core | Complete |
 | CORE-06 | Phase 2 — Harness Core | Complete |
-| CORE-07 | Phase 2 — Harness Core | Pending |
+| CORE-07 | Phase 2 — Harness Core | Complete |
 | CORE-08 | Phase 2 — Harness Core | Complete |
 | CORE-09 | Phase 2 — Harness Core | Complete |
 | REG-01 | Phase 3 — Model Registry | Pending |
