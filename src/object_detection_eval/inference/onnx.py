@@ -21,15 +21,15 @@ import onnxruntime as ort
 from loguru import logger
 
 from object_detection_eval.inference.base import BaseInferencer
+from object_detection_eval.inference.preprocess import LetterboxTransform
 from object_detection_eval.schemas.detection import Detection
 
 
 class PostProcessor(Protocol):
     """Structural interface a post-processor must satisfy.
 
-    ``inference/postprocess.py`` (Plan 06) does not exist yet at this
-    plan's boundary; ``BasePostProcessor`` there will satisfy this
-    protocol structurally (via its ``__call__`` signature) without
+    ``BasePostProcessor`` (``inference/postprocess.py``, Plan 06) satisfies
+    this protocol structurally via its ``__call__`` signature, without
     ``ONNXInferencer`` needing to import that module.
     """
 
@@ -38,6 +38,7 @@ class PostProcessor(Protocol):
         outputs: list[npt.NDArray[np.floating[Any]]],
         image_width: int,
         image_height: int,
+        transform: LetterboxTransform | None = None,
     ) -> list[Detection]:
         """Convert raw ONNX outputs to a list of detections."""
         ...
