@@ -3,7 +3,15 @@
 from __future__ import annotations
 
 from object_detection_eval.data.coco_gt import load_coco_gt
+from object_detection_eval.data.taxonomy import (
+    identity_taxonomy_from_coco,
+    remap_detections,
+    resolve_taxonomy,
+)
 
 __all__ = [
+    "identity_taxonomy_from_coco",
     "load_coco_gt",
+    "remap_detections",
+    "resolve_taxonomy",
 ]
