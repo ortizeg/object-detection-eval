@@ -39,7 +39,9 @@ mlruns/
 lightning_logs/
 
 # Data — external, CC BY 4.0, fetched via manifest. Never committed.
-data/
+# Anchored to repo root so it doesn't shadow src/object_detection_eval/data/
+# or tests/data/ (the harness's data-tier package and its tests).
+/data/
 *.hdf5
 *.h5
 
