@@ -519,12 +519,13 @@ something newer.
      report-generation work (tables, markdown) to Phase 7.
 
 2. **Should `utils/boxes.py`'s `box_iou_1_to_n` be ported at all, or dropped in favor of the
-   NMS-internal IoU helpers already in `postprocess.py`?**
-   - What we know: it is functionally redundant with `YOLOXPostProcessor._iou`.
-   - What's unclear: whether anything outside the researched scope (e.g., a test file, or code not
-     read in this session) depends on `box_iou_1_to_n`'s specific signature.
-   - Recommendation: grep the full source repo (not just the files read in this research) for
-     `box_iou_1_to_n` usage before deciding to drop it during planning.
+   NMS-internal IoU helpers already in `postprocess.py`?** — **RESOLVED (Plan 02-01, Task 3).**
+   Dropped. `box_iou_1_to_n` and the two torch converters (`cxcywh_to_xyxy`/`xyxy_to_cxcywh`)
+   are not ported — no Phase-2 consumer, and the IoU is redundant with the per-class NMS IoU
+   ported into `inference.postprocess` (Plan 02-06). Only the two already-pure-Python helpers
+   `pad_and_clamp_bbox` + `pixel_xyxy_to_normalized_xywh` were ported into
+   `src/object_detection_eval/utils/boxes.py`, keeping the core torch-free (CORE-08). The
+   disposition rationale is recorded in that module's docstring.
 
 3. **What is the actual numeric drift between `supervision==0.27.0.post1` and `0.29.1` on the real
    basketball predictions?**
