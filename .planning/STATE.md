@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 02
 current_phase_name: harness-core
 status: executing
-stopped_at: Completed 02-05-PLAN.md
-last_updated: "2026-07-25T22:20:39.164Z"
+stopped_at: Completed 02-04-PLAN.md
+last_updated: "2026-07-25T22:35:44.595Z"
 last_activity: 2026-07-25
 last_activity_desc: Completed 02-05-PLAN.md
 progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 9
-  completed_plans: 7
+  completed_plans: 8
 ---
 
 # Project State
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-07-24)
 ## Current Position
 
 Phase: 02 (harness-core) — EXECUTING
-Plan: 4 of 6
+Plan: 5 of 6
 Status: In progress — 02-01, 02-02, 02-03, 02-05 complete (02-04, 02-06 remaining)
 Last activity: 2026-07-25 — Completed 02-05-PLAN.md
 
-Progress: [████████░░] 78%
+Progress: [█████████░] 89%
 
 ## Performance Metrics
 
@@ -63,6 +63,7 @@ Progress: [████████░░] 78%
 | Phase 01 P03 | ~10min | 2 tasks | 0 files |
 | Phase 02 P02 | 40min | 3 tasks | 9 files |
 | Phase 02 P05 | 45min | 2 tasks | 7 files |
+| Phase 02 P04 | 35min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -84,6 +85,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 2, 02-02] identity taxonomy stays a runtime function over a COCO file's categories, not YAML-backed — merged5/raw10 are the only YAML-driven taxonomies
 - [Phase ?]: [Phase 2, 02-05] ONNXInferencer.post_processor typed via a structural typing.Protocol instead of importing Plan 06's not-yet-built BasePostProcessor
 - [Phase ?]: [Phase 2, 02-05] Square-resize detransform divides by model input size directly (not orig_w/orig_h) — algebraically identical for non-aspect-preserving resize
+- [Phase ?]: [Phase 2, 02-04] Pinned supervision==0.29.1 (not the 0.27.0.post1 anchor version) after proving the two-model anchor gap is a data-provenance issue, not supervision-version drift — both versions produce byte-identical mAP deltas
+- [Phase ?]: [Phase 2, 02-04] The YOLOX-M/RTMDet-M gap vs bootstrap_5c_test_7models.json is a stale-anchor data issue (consistent with known destroyed prediction boxes); Phase 4 should compare against each model's own results.json rather than assume the 7-model anchor reproduces verbatim
 
 ### Pending Todos
 
@@ -106,6 +109,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-25T22:20:39.158Z
-Stopped at: Completed 02-05-PLAN.md
+Last session: 2026-07-25T22:35:44.590Z
+Stopped at: Completed 02-04-PLAN.md
 Resume file: None

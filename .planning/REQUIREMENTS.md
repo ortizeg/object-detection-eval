@@ -29,13 +29,13 @@ Irreplaceable data currently exists only on one laptop, outside any git history.
 - [x] **CORE-01**: `load_coco_gt()` is a public, typed, tested function that loads COCO
       ground truth for a named split
 
-- [ ] **CORE-02**: `compute_metrics()` is public, typed, and tested, returning
+- [x] **CORE-02**: `compute_metrics()` is public, typed, and tested, returning
       mAP@50:95 / mAP@50 / mAP@75 and per-class AP@50 via `supervision`
 
 - [ ] **CORE-03**: Operating-threshold selection (F1 sweep) and PR-curve computation are
       public functions with tests, independent of any task object
 
-- [ ] **CORE-04**: A seeded, paired, image-level bootstrap produces 95% CIs for a single
+- [x] **CORE-04**: A seeded, paired, image-level bootstrap produces 95% CIs for a single
       model and for pairwise differences, reproducibly across runs
 
 - [x] **CORE-05**: Taxonomies (`merged5`, `raw10`, `identity`) load from YAML config; no
@@ -169,9 +169,9 @@ and success criteria.
 | SAFE-04 | Phase 1 — Provenance Rescue & Public Repo | Complete |
 | INFRA-01 | Phase 1 — Provenance Rescue & Public Repo | Complete |
 | CORE-01 | Phase 2 — Harness Core | Complete |
-| CORE-02 | Phase 2 — Harness Core | Pending |
+| CORE-02 | Phase 2 — Harness Core | Complete |
 | CORE-03 | Phase 2 — Harness Core | Pending |
-| CORE-04 | Phase 2 — Harness Core | Pending |
+| CORE-04 | Phase 2 — Harness Core | Complete |
 | CORE-05 | Phase 2 — Harness Core | Complete |
 | CORE-06 | Phase 2 — Harness Core | Complete |
 | CORE-07 | Phase 2 — Harness Core | Pending |
