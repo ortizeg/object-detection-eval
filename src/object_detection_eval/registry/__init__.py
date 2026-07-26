@@ -1,12 +1,21 @@
-"""Model registry: card schema + directory-loading registry (torch-free).
+"""Model registry: card schema + directory loader + verified download (torch-free).
 
-Public API re-exports the schema tier (``model_card.py``) and the loader
-tier (``registry.py``). The download tier (Plan 02) extends ``__all__`` as
-it lands.
+Public API re-exports the schema tier (``model_card.py``), the loader tier
+(``registry.py``), and the download tier (``download.py``).
 """
 
 from __future__ import annotations
 
+from object_detection_eval.registry.download import (
+    ChecksumMismatchError,
+    Fetcher,
+    WeightsNotRedistributableError,
+    cached_path,
+    default_fetcher,
+    download_weights,
+    sha256_file,
+    verify_file,
+)
 from object_detection_eval.registry.model_card import (
     CardValidationError,
     Evaluation,
@@ -28,8 +37,10 @@ from object_detection_eval.registry.registry import (
 
 __all__ = [
     "CardValidationError",
+    "ChecksumMismatchError",
     "DuplicateModelError",
     "Evaluation",
+    "Fetcher",
     "InputSpec",
     "ModelCard",
     "ModelNotFoundError",
@@ -39,6 +50,12 @@ __all__ = [
     "RegistryError",
     "ReproductionSpec",
     "Sha256",
+    "WeightsNotRedistributableError",
     "WeightsSpec",
+    "cached_path",
+    "default_fetcher",
+    "download_weights",
     "load_registry",
+    "sha256_file",
+    "verify_file",
 ]
