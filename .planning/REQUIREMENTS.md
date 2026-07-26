@@ -56,11 +56,11 @@ Irreplaceable data currently exists only on one laptop, outside any git history.
 
 ### Model Registry
 
-- [ ] **REG-01**: A frozen, `extra="forbid"` Pydantic `ModelCard` schema validates every
+- [x] **REG-01**: A frozen, `extra="forbid"` Pydantic `ModelCard` schema validates every
       card in `registry/`, including a required `preprocessing` block (resize, alignment,
       pad value, normalization, channel order)
 
-- [ ] **REG-02**: The schema rejects a card that declares weights without a SHA-256, and
+- [x] **REG-02**: The schema rejects a card that declares weights without a SHA-256, and
       rejects a non-redistributable card that declares a weights URL or omits reproduction
       instructions
 
@@ -177,8 +177,8 @@ and success criteria.
 | CORE-07 | Phase 2 — Harness Core | Complete |
 | CORE-08 | Phase 2 — Harness Core | Complete |
 | CORE-09 | Phase 2 — Harness Core | Complete |
-| REG-01 | Phase 3 — Model Registry | Pending |
-| REG-02 | Phase 3 — Model Registry | Pending |
+| REG-01 | Phase 3 — Model Registry | Complete |
+| REG-02 | Phase 3 — Model Registry | Complete |
 | REG-03 | Phase 3 — Model Registry | Pending |
 | REG-04 | Phase 3 — Model Registry | Pending |
 | REG-05 | Phase 3 — Model Registry | Pending |
