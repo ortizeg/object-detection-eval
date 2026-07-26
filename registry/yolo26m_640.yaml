@@ -1,0 +1,53 @@
+name: yolo26m-640
+version: "1.0.0"
+task: detection
+architecture: yolo26-m
+description: >-
+  YOLO26-Medium fine-tuned on the basketball dataset at 640x640. Top
+  scorer in the harness 7-model roster (0.716 5c mAP@50:95). Licensed
+  AGPL-3.0-only, so its weights are not redistributed from this repo --
+  only reproduced from source (see the `reproduction` block below,
+  FORK_PLAN.md §11). All results, per-class AP, and CIs for this model
+  remain published; only the binary is withheld.
+license: AGPL-3.0-only
+training_dataset: basketball-player-detection-3
+num_parameters: 20400000
+inputs:
+  channels: 3
+  height: 640
+  width: 640
+  dtype: float32
+  mean: [0.0, 0.0, 0.0]
+  std: [1.0, 1.0, 1.0]
+preprocessing:
+  resize: letterbox
+  alignment: center
+  pad_value: 114
+  normalize: div255
+  channel_order: RGB
+redistributable: false
+reproduction:
+  command: "yolo detect train model=yolo26m.pt data=basketball-player-detection-3.yaml imgsz=640 device=0"
+  source_repo: https://github.com/ultralytics/ultralytics
+  notes: >-
+    Fine-tune from the Ultralytics-pretrained yolo26m.pt checkpoint on
+    basketball-player-detection-3 (CC BY 4.0, Roboflow COCO export) at
+    imgsz=640. Export to ONNX with
+    `yolo export model=<best.pt> format=onnx imgsz=640`. This reproduces
+    the AGPL-3.0-only weights this card's harness numbers were measured
+    against; per FORK_PLAN.md §11 the weights themselves are withheld
+    from this repo and scripts/publish_weights.py skips this card by
+    construction.
+evaluations:
+  - dataset: basketball-player-detection-3
+    split: test
+    metrics:
+      map5095_5c: 0.716
+      map50_5c: 0.950
+      map5095_10c: 0.638
+      map50_10c: 0.824
+tags:
+  - yolo26
+  - basketball
+  - agpl
+status: active

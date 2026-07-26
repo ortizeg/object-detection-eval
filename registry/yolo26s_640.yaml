@@ -1,0 +1,42 @@
+name: yolo26s-640
+version: "1.0.0"
+task: detection
+architecture: yolo26-s
+description: >-
+  YOLO26-Small fine-tuned on the basketball dataset at 640x640, the
+  smaller sibling of yolo26m-640. No published basketball test-set score
+  exists for this checkpoint at authoring time. Licensed AGPL-3.0-only,
+  so its weights are not redistributed from this repo -- only reproduced
+  from source (see the `reproduction` block below, FORK_PLAN.md §11).
+license: AGPL-3.0-only
+training_dataset: basketball-player-detection-3
+inputs:
+  channels: 3
+  height: 640
+  width: 640
+  dtype: float32
+  mean: [0.0, 0.0, 0.0]
+  std: [1.0, 1.0, 1.0]
+preprocessing:
+  resize: letterbox
+  alignment: center
+  pad_value: 114
+  normalize: div255
+  channel_order: RGB
+redistributable: false
+reproduction:
+  command: "yolo detect train model=yolo26s.pt data=basketball-player-detection-3.yaml imgsz=640 device=0"
+  source_repo: https://github.com/ultralytics/ultralytics
+  notes: >-
+    Fine-tune from the Ultralytics-pretrained yolo26s.pt checkpoint on
+    basketball-player-detection-3 (CC BY 4.0, Roboflow COCO export) at
+    imgsz=640. Export to ONNX with
+    `yolo export model=<best.pt> format=onnx imgsz=640`. Per
+    FORK_PLAN.md §11 the weights themselves are withheld from this repo
+    and scripts/publish_weights.py skips this card by construction.
+evaluations: []
+tags:
+  - yolo26
+  - basketball
+  - agpl
+status: active
