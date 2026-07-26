@@ -101,7 +101,11 @@ Notes:
   4. Requesting YOLO26 weights raises `WeightsNotRedistributableError` naming the reproduction doc, not a generic 404 or permission error
   5. `scripts/publish_weights.py` uploads the redistributable weights to the HF Hub, computes and refreshes the digests in their cards, and skips the non-redistributable cards by construction
 
-**Plans**: TBD
+**Plans**: 3/3 plans executed
+
+- [x] 03-01-PLAN.md — Model card schema + registry loader: frozen, extra=forbid ModelCard with a required preprocessing block and load-time redistribution validation (REG-01, REG-02) [wave 1]
+- [x] 03-02-PLAN.md — SHA-256-verified download_weights + WeightsNotRedistributableError for AGPL cards (REG-03, REG-04) [wave 2, depends 03-01]
+- [x] 03-03-PLAN.md — 10 model cards (8 with weights, 2 AGPL with reproduction) + publish_weights.py HF publisher, mocked (REG-05, REG-06) [wave 3, depends 03-01, 03-02]
 
 Notes:
 
@@ -196,7 +200,7 @@ Phases 5 and 6 have no dependency on each other and may execute in parallel afte
 |-------|----------------|--------|-----------|
 | 1. Provenance Rescue & Public Repo | 3/3 | In Progress|  |
 | 2. Harness Core | 6/6 | In Progress|  |
-| 3. Model Registry | 0/TBD | Not started | - |
+| 3. Model Registry | 3/3 | In Progress|  |
 | 4. Reproduction Gate | 0/TBD | Not started | - |
 | 5. Zero-Shot VLM | 0/TBD | Not started | - |
 | 6. Latency | 0/TBD | Not started | - |

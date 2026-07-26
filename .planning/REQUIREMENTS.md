@@ -56,25 +56,25 @@ Irreplaceable data currently exists only on one laptop, outside any git history.
 
 ### Model Registry
 
-- [ ] **REG-01**: A frozen, `extra="forbid"` Pydantic `ModelCard` schema validates every
+- [x] **REG-01**: A frozen, `extra="forbid"` Pydantic `ModelCard` schema validates every
       card in `registry/`, including a required `preprocessing` block (resize, alignment,
       pad value, normalization, channel order)
 
-- [ ] **REG-02**: The schema rejects a card that declares weights without a SHA-256, and
+- [x] **REG-02**: The schema rejects a card that declares weights without a SHA-256, and
       rejects a non-redistributable card that declares a weights URL or omits reproduction
       instructions
 
-- [ ] **REG-03**: `download_weights()` streams to a `.part` file, verifies SHA-256 before
+- [x] **REG-03**: `download_weights()` streams to a `.part` file, verifies SHA-256 before
       promoting into the cache, raises `ChecksumMismatchError` on mismatch leaving nothing
       behind, and re-fetches a corrupt cache entry
 
-- [ ] **REG-04**: Requesting weights for a non-redistributable model raises
+- [x] **REG-04**: Requesting weights for a non-redistributable model raises
       `WeightsNotRedistributableError` naming the reproduction doc, not a generic failure
 
-- [ ] **REG-05**: `scripts/publish_weights.py` uploads redistributable weights to the HF
+- [x] **REG-05**: `scripts/publish_weights.py` uploads redistributable weights to the HF
       Hub, computes digests, refreshes cards, and skips non-redistributable cards
 
-- [ ] **REG-06**: All 10 model cards load and validate — 8 with weights, 2 AGPL cards with
+- [x] **REG-06**: All 10 model cards load and validate — 8 with weights, 2 AGPL cards with
       reproduction instructions and no weights
 
 ### Reproduction
@@ -177,12 +177,12 @@ and success criteria.
 | CORE-07 | Phase 2 — Harness Core | Complete |
 | CORE-08 | Phase 2 — Harness Core | Complete |
 | CORE-09 | Phase 2 — Harness Core | Complete |
-| REG-01 | Phase 3 — Model Registry | Pending |
-| REG-02 | Phase 3 — Model Registry | Pending |
-| REG-03 | Phase 3 — Model Registry | Pending |
-| REG-04 | Phase 3 — Model Registry | Pending |
-| REG-05 | Phase 3 — Model Registry | Pending |
-| REG-06 | Phase 3 — Model Registry | Pending |
+| REG-01 | Phase 3 — Model Registry | Complete |
+| REG-02 | Phase 3 — Model Registry | Complete |
+| REG-03 | Phase 3 — Model Registry | Complete |
+| REG-04 | Phase 3 — Model Registry | Complete |
+| REG-05 | Phase 3 — Model Registry | Complete |
+| REG-06 | Phase 3 — Model Registry | Complete |
 | REPRO-01 | Phase 4 — Reproduction Gate | Pending |
 | REPRO-02 | Phase 4 — Reproduction Gate | Pending |
 | REPRO-03 | Phase 4 — Reproduction Gate | Pending |

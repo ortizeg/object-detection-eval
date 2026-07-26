@@ -1,0 +1,48 @@
+name: rtmdet-m-640
+version: "1.0.0"
+task: detection
+architecture: rtmdet-m
+description: >-
+  RTMDet-M (MMDetection) fine-tuned on the basketball dataset at 640x640,
+  the mmdet-default-warmup ("recipe warmup") training. A short-warmup
+  ablation variant exists (not registered here) and was found to be
+  statistically indistinguishable on the harness test slice.
+license: Apache-2.0
+training_dataset: basketball-player-detection-3
+num_parameters: 27300000
+inputs:
+  channels: 3
+  height: 640
+  width: 640
+  dtype: float32
+  mean: [103.53, 116.28, 123.675]
+  std: [57.375, 57.12, 58.395]
+preprocessing:
+  resize: letterbox
+  alignment: top_left
+  pad_value: 114
+  normalize: mean_std
+  channel_order: BGR
+weights:
+  url: https://huggingface.co/ortizeg/basketball-detection-eval/resolve/main/rtmdet_m/rtmdet_m_640.onnx
+  sha256: ee84af83416d90640ea350281f3708f6fc888fed697f55b96fba8bd57e21cff6
+  size_bytes: 109320641
+  weight_format: onnx
+provenance:
+  source_repo: https://github.com/open-mmlab/mmdetection
+  config: docs/provenance/configs/rtmdet_m/rtmdet_basketball.py
+  hardware: "vast.ai A100 80GB (single GPU)"
+  command: "torchrun --nproc_per_node=1 tools/train.py docs/provenance/configs/rtmdet_m/rtmdet_basketball.py --launcher pytorch"
+evaluations:
+  - dataset: basketball-player-detection-3
+    split: test
+    metrics:
+      map5095_5c: 0.628
+      map50_5c: 0.878
+      map5095_10c: 0.580
+      map50_10c: 0.779
+tags:
+  - rtmdet
+  - basketball
+status: active
+redistributable: true

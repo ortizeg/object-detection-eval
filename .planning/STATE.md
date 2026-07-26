@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 02
-current_phase_name: harness-core
+current_phase: 03
+current_phase_name: model-registry
 status: executing
-stopped_at: Completed 02-06-PLAN.md
-last_updated: "2026-07-25T22:52:31.772Z"
-last_activity: 2026-07-25
-last_activity_desc: Completed 02-05-PLAN.md
+stopped_at: Completed 03-03-PLAN.md (phase 03-model-registry complete)
+last_updated: "2026-07-26T19:26:00.247Z"
+last_activity: 2026-07-26
+last_activity_desc: Phase 03 execution started
 progress:
-  total_phases: 2
-  completed_phases: 2
-  total_plans: 9
-  completed_plans: 9
+  total_phases: 3
+  completed_phases: 3
+  total_plans: 12
+  completed_plans: 12
 ---
 
 # Project State
@@ -23,14 +23,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-24)
 
 **Core value:** Every number the blog posts publish must be reproducible from this repo.
-**Current focus:** Phase 02 — harness-core
+**Current focus:** Phase 03 — model-registry
 
 ## Current Position
 
-Phase: 02 (harness-core) — EXECUTING
-Plan: 6 of 6
-Status: In progress — 02-01, 02-02, 02-03, 02-05 complete (02-04, 02-06 remaining)
-Last activity: 2026-07-25 — Completed 02-05-PLAN.md
+Phase: 03 (model-registry) — EXECUTING
+Plan: 3 of 3
+Status: Ready to execute
+Last activity: 2026-07-26 — Phase 03 execution started
 
 Progress: [██████████] 100%
 
@@ -65,6 +65,8 @@ Progress: [██████████] 100%
 | Phase 02 P05 | 45min | 2 tasks | 7 files |
 | Phase 02 P04 | 35min | 2 tasks | 6 files |
 | Phase 02 P06 | 55min | 4 tasks | 17 files |
+| Phase 03 P01 | 30min | 2 tasks | 8 files |
+| Phase 03 P03 | 20min | 3 tasks | 14 files |
 
 ## Accumulated Context
 
@@ -91,6 +93,12 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 2, 02-06] Widened ONNXInferencer's PostProcessor Protocol with an optional transform kwarg, closing the placeholder 02-05 left for this plan
 - [Phase ?]: [Phase 2, 02-06] Pinned the mypy pre-commit hook's numpy to <2.0.0 (matching pyproject.toml) after the isolated hook env's numpy 2.4.6 disagreed with pixi run typecheck on np.maximum's return-type overload
 - [Phase ?]: [Phase 2, 02-06] RT-DETRv2 is a zero-added-code DeimDetector subclass (own importable module per CORE-07, not a config pointer); DAMO/RF-DETR accept but ignore the transform kwarg, keeping their source-verified de-transform math unchanged
+- [Phase ?]: [Phase 3, 03-01] Ported model-zoo archetype's model_card.py/registry.py near-verbatim; CardValidationError wrapping scoped to from_yaml only per plan spec, funneled through RegistryError's existing except (ValueError, yaml.YAMLError)
+- [Phase ?]: [Phase 3, 03-01] PreprocessingSpec.alignment adds a third literal "none" beyond LetterboxConfig's top_left/center for square-resize cards (DEIM/DAMO/RT-DETRv2) with no alignment concept
+- [Phase ?]: [Phase 3, 03-03] Documented all-zero placeholder sha256 for 3 no-local-ONNX cards, satisfying the Sha256 pattern; only publish_weights.py may overwrite it with a real digest
+- [Phase ?]: [Phase 3, 03-03] 5c/10c mAP stored as 4 metric keys in one Evaluation entry (map5095_5c/map50_5c/map5095_10c/map50_10c) since the schema has no class-count field
+- [Phase ?]: [Phase 3, 03-03] publish_weights.py recovers path_in_repo by parsing a card's existing weights.url rather than a re-derived subfolder convention
+- [Phase ?]: [Phase 3, 03-03] Closed a bookkeeping gap from 03-02: marked REG-03/REG-04 complete in REQUIREMENTS.md alongside REG-01/05/06 since they were implemented+tested in 03-02 but never checked off
 
 ### Pending Todos
 
@@ -113,6 +121,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-25T22:52:25.741Z
-Stopped at: Completed 02-06-PLAN.md
+Last session: 2026-07-26T19:26:00.241Z
+Stopped at: Completed 03-03-PLAN.md (phase 03-model-registry complete)
 Resume file: None
