@@ -1,0 +1,48 @@
+name: rt-detrv2-m-640
+version: "1.0.0"
+task: detection
+architecture: rt-detrv2-r34vd
+description: >-
+  RT-DETRv2-M (ResNet-34-vd backbone, r34vd) fine-tuned on the basketball
+  dataset at 640x640. Reuses the DEIM/D-FINE deploy ONNX format and
+  identical preprocessing (square resize, RGB, /255, antialias). The
+  weakest model in the 7-model roster on the harness test slice.
+license: Apache-2.0
+training_dataset: basketball-player-detection-3
+num_parameters: 31000000
+inputs:
+  channels: 3
+  height: 640
+  width: 640
+  dtype: float32
+  mean: [0.0, 0.0, 0.0]
+  std: [1.0, 1.0, 1.0]
+preprocessing:
+  resize: square
+  alignment: none
+  pad_value: null
+  normalize: div255
+  channel_order: RGB
+weights:
+  url: https://huggingface.co/ortizeg/basketball-detection-eval/resolve/main/rtdetrv2_m/rtdetrv2_m_640.onnx
+  sha256: 7704cc48849f940541d0adc0d1c600b206dbfb8a9f2925d844a4f4485a04b226
+  size_bytes: 125399801
+  weight_format: onnx
+provenance:
+  source_repo: https://github.com/lyuwenyu/RT-DETR
+  config: docs/provenance/configs/rtdetrv2_m/rtdetrv2_basketball_m.yml
+  hardware: "vast.ai RTX 3090 (single GPU)"
+  command: "python tools/train.py -c docs/provenance/configs/rtdetrv2_m/rtdetrv2_basketball_m.yml -t rtdetrv2_r34vd_120e_coco_ema.pth --use-amp --seed 0"
+evaluations:
+  - dataset: basketball-player-detection-3
+    split: test
+    metrics:
+      map5095_5c: 0.581
+      map50_5c: 0.862
+      map5095_10c: 0.501
+      map50_10c: 0.708
+tags:
+  - rt-detrv2
+  - basketball
+status: active
+redistributable: true

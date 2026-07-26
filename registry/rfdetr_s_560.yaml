@@ -1,0 +1,42 @@
+name: rfdetr-s-560
+version: "1.0.0"
+task: detection
+architecture: rf-detr-s
+description: >-
+  RF-DETR-Small (v2), a real-time transformer detector fine-tuned on the
+  basketball dataset. Its resolution is LOCKED at 560 (the official-eval
+  ONNX export is 560x560; do not rename to 640). No published basketball
+  test-set score exists for this checkpoint at authoring time.
+license: Apache-2.0
+training_dataset: basketball-player-detection-3
+inputs:
+  channels: 3
+  height: 560
+  width: 560
+  dtype: float32
+  mean: [0.485, 0.456, 0.406]
+  std: [0.229, 0.224, 0.225]
+preprocessing:
+  resize: square
+  alignment: none
+  pad_value: null
+  normalize: mean_std
+  channel_order: RGB
+weights:
+  url: https://huggingface.co/ortizeg/basketball-detection-eval/resolve/main/rfdetr_small_v2/rfdetr_small_basketball_v2.onnx
+  # Documented placeholder: the local ONNX for this model was not present
+  # under .deploy_comparison/artifacts/ at authoring time (only on GCS, see
+  # docs/provenance/gcs-manifest.md "official-eval-inputs/rfdetr_small_v2/").
+  # scripts/publish_weights.py recomputes and refreshes this digest from the
+  # real weight file before it is ever published.
+  sha256: "0000000000000000000000000000000000000000000000000000000000000000"
+  weight_format: onnx
+provenance:
+  source_repo: https://github.com/roboflow/rf-detr
+  command: "see docs/provenance/training-runs.md#rfdetr-s-560"
+evaluations: []
+tags:
+  - rfdetr
+  - basketball
+status: active
+redistributable: true
