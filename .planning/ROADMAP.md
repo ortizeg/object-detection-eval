@@ -123,11 +123,17 @@ Notes:
   2. The COCO reference check scores YOLOX-S on val2017 at 39.6 mAP against the 40.5 published, confirming the known `supervision`-vs-`pycocotools` gap and that the harness is not the source of the preprocessing swings
   3. The seeded paired bootstrap reproduces the published CIs, reporting YOLOX-M vs YOLO26m as a statistical tie (+0.73 pt, CI [−0.33, +1.90]) and every other adjacent pair as significant
 
-**Plans**: TBD
+**Plans**: 3 plans
+
+- [ ] 04-01-PLAN.md — run_benchmark.py reproduces the 7-model @640 table within tolerance + rank order; mirror the last local-only YOLOX-M @640 ONNX to GCS (REPRO-01) [wave 1]
+- [ ] 04-02-PLAN.md — COCO reference: YOLOX-S on val2017 reproduces ~39.6 vs 40.5, confirming the supervision-vs-pycocotools gap (REPRO-02) [wave 1]
+- [ ] 04-03-PLAN.md — reproduce the paired-bootstrap CIs + the YOLOX-M/YOLO26m joint-best tie; correct the methodology drift narrative (REPRO-03) [wave 2, depends 04-01]
 
 Notes:
 
 - This phase writes no new capability. It runs the harness end to end and compares against `EVAL_REPORT_FINAL.md` §2. Its only output is either a pass or a defect list against Phases 2 and 3.
+- Investigation resolved the Phase-2 "2 models don't reproduce" concern: it was a variant mix-up (the @640 table uses YOLOX-M @640 + base RTMDet-M; the drift script had fed the @800 YOLOX-M and the RTMDet rewarmup ablation into the @640 anchor). All 7 reproduce from stored artifacts; 04-03 corrects `docs/methodology.md` accordingly.
+- REPRO-02's COCO-pretrained YOLOX-S ONNX and val2017 are present locally — no artifact needs to be located or downloaded.
 - Passing this gate is also the trigger for archiving `object-detection-training` — until it passes, the source repo may still be needed.
 
 ### Phase 5: Zero-Shot VLM
@@ -201,7 +207,7 @@ Phases 5 and 6 have no dependency on each other and may execute in parallel afte
 | 1. Provenance Rescue & Public Repo | 3/3 | In Progress|  |
 | 2. Harness Core | 6/6 | In Progress|  |
 | 3. Model Registry | 3/3 | In Progress|  |
-| 4. Reproduction Gate | 0/TBD | Not started | - |
+| 4. Reproduction Gate | 0/3 | Not started | - |
 | 5. Zero-Shot VLM | 0/TBD | Not started | - |
 | 6. Latency | 0/TBD | Not started | - |
 | 7. Reports & Docs | 0/TBD | Not started | - |
