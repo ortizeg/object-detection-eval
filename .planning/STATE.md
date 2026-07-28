@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 04
-current_phase_name: reproduction-gate
+current_phase: 05
+current_phase_name: zero-shot-vlm
 status: executing
-stopped_at: "Completed 04-01-PLAN.md (REPRO-01 reproduction gate: 7-model @640 table reproduced within tolerance, exact rank order; YOLOX-M @640 mirrored to GCS)"
-last_updated: "2026-07-27T02:14:01.123Z"
-last_activity: 2026-07-26
-last_activity_desc: Phase 04 execution started
+stopped_at: Completed 05-01-PLAN.md (VLM package scaffold + OWLv2/Grounding DINO/OmDet-Turbo open-vocab inferencers, offline mocked tests under -m vlm, torch-free-core gate extended)
+last_updated: "2026-07-28T20:34:08.405Z"
+last_activity: 2026-07-28
+last_activity_desc: Phase 05 execution started
 progress:
-  total_phases: 4
-  completed_phases: 3
-  total_plans: 15
-  completed_plans: 13
+  total_phases: 5
+  completed_phases: 4
+  total_plans: 19
+  completed_plans: 16
 ---
 
 # Project State
@@ -23,16 +23,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-24)
 
 **Core value:** Every number the blog posts publish must be reproducible from this repo.
-**Current focus:** Phase 04 — reproduction-gate
+**Current focus:** Phase 05 — zero-shot-vlm
 
 ## Current Position
 
-Phase: 04 (reproduction-gate) — EXECUTING
-Plan: 2 of 3
+Phase: 05 (zero-shot-vlm) — EXECUTING
+Plan: 2 of 4
 Status: Ready to execute
-Last activity: 2026-07-26 — Phase 04 execution started
+Last activity: 2026-07-28 — Phase 05 execution started
 
-Progress: [█████████░] 87%
+Progress: [████████░░] 84%
 
 ## Performance Metrics
 
@@ -68,6 +68,7 @@ Progress: [█████████░] 87%
 | Phase 03 P01 | 30min | 2 tasks | 8 files |
 | Phase 03 P03 | 20min | 3 tasks | 14 files |
 | Phase 04 P01 | 40min | 3 tasks | 4 files |
+| Phase 05 P01 | 7min | 3 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -103,6 +104,7 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 4, 04-01] Manifest schema uses root (onnx/labels) + optional predictions_root override, not a single root field -- YOLOX-M's ONNX/labels live under the external yolox tree but its stored predictions live under source_repo
 - [Phase ?]: [Phase 4, 04-01] run_benchmark.py's --providers defaults to CPUExecutionProvider only -- onnxruntime's CoreML EP crashes on RT-DETRv2's dynamic decoder on this machine, and hardware-accelerated EPs are the wrong default for a cross-machine reproducibility gate regardless
 - [Phase ?]: [Phase 4, 04-01] Mirrored the YOLOX-M @640 ONNX to a NEW gs://.../final-comparison-640/yolox_m/ prefix rather than overwriting the pre-existing mislabeled 'YOLOX-M @640 (reuse)' entry (whose gs:// URI actually holds the @800 export) -- documented both in gcs-manifest.md
+- [Phase ?]: [Phase 5, 05-01] Added torch/torchvision/PIL to mypy ignore_missing_imports overrides -- CI's typecheck runs in the default torch-free env where they aren't installed
 
 ### Pending Todos
 
@@ -125,6 +127,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-27T02:14:01.117Z
-Stopped at: Completed 04-01-PLAN.md (REPRO-01 reproduction gate: 7-model @640 table reproduced within tolerance, exact rank order; YOLOX-M @640 mirrored to GCS)
+Last session: 2026-07-28T20:34:08.398Z
+Stopped at: Completed 05-01-PLAN.md (VLM package scaffold + OWLv2/Grounding DINO/OmDet-Turbo open-vocab inferencers, offline mocked tests under -m vlm, torch-free-core gate extended)
 Resume file: None

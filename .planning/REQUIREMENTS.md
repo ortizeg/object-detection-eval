@@ -91,14 +91,14 @@ Irreplaceable data currently exists only on one laptop, outside any git history.
 
 ### Zero-Shot VLM
 
-- [ ] **VLM-01**: Gemini, OWLv2, Grounding DINO, Florence-2, OmDet-Turbo, and SmolVLM2
+- [x] **VLM-01**: Gemini, OWLv2, Grounding DINO, Florence-2, OmDet-Turbo, and SmolVLM2
       inferencers run through the identical protocol as the fine-tuned detectors
 
 - [ ] **VLM-02**: The zero-shot results reproduce: Gemini 26.5, OWLv2 24.7,
       OmDet-Turbo 17.3, Grounding DINO 14.7, Florence-2 10.4 mAP@50:95 on test
 
 - [ ] **VLM-03**: The VLM auto-labeling task produces valid COCO annotations from images
-- [ ] **VLM-04**: All VLM code sits behind the `[vlm]` extra; its tests are marked and
+- [x] **VLM-04**: All VLM code sits behind the `[vlm]` extra; its tests are marked and
       deselected in default CI, which stays green without the extra installed
 
 ### Latency
@@ -186,10 +186,10 @@ and success criteria.
 | REPRO-01 | Phase 4 — Reproduction Gate | Complete |
 | REPRO-02 | Phase 4 — Reproduction Gate | Pending |
 | REPRO-03 | Phase 4 — Reproduction Gate | Pending |
-| VLM-01 | Phase 5 — Zero-Shot VLM | Pending |
+| VLM-01 | Phase 5 — Zero-Shot VLM | Complete |
 | VLM-02 | Phase 5 — Zero-Shot VLM | Pending |
 | VLM-03 | Phase 5 — Zero-Shot VLM | Pending |
-| VLM-04 | Phase 5 — Zero-Shot VLM | Pending |
+| VLM-04 | Phase 5 — Zero-Shot VLM | Complete |
 | LAT-01 | Phase 6 — Latency | Pending |
 | LAT-02 | Phase 6 — Latency | Pending |
 | LAT-03 | Phase 6 — Latency | Pending |
