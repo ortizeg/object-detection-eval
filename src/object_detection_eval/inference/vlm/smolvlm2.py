@@ -86,10 +86,10 @@ class SmolVLM2Inferencer(BaseInferencer):
 
         logger.info(f"Loading SmolVLM2 model {model_name} on {self._device}")
         self._processor = AutoProcessor.from_pretrained(model_name)
-        dtype = torch.float16 if self._device == "cuda" else torch.float32
+        self._dtype = torch.float16 if self._device == "cuda" else torch.float32
         self._model = AutoModelForImageTextToText.from_pretrained(
             model_name,
-            torch_dtype=dtype,
+            torch_dtype=self._dtype,
         ).to(self._device)
 
         class_list = ", ".join(self.classes) if self.classes else "all objects"
@@ -139,13 +139,16 @@ class SmolVLM2Inferencer(BaseInferencer):
                 }
             ]
 
+            # Cast float tensors (pixel_values) to the model dtype; HF's
+            # BatchFeature.to(dtype=...) leaves integer tensors (input_ids)
+            # intact, so this fixes the fp16-model / fp32-input mismatch.
             inputs = self._processor.apply_chat_template(
                 messages,
                 add_generation_prompt=True,
                 tokenize=True,
                 return_dict=True,
                 return_tensors="pt",
-            ).to(self._device)
+            ).to(self._device, dtype=self._dtype)
 
             with torch.no_grad():
                 generated_ids = self._model.generate(**inputs, max_new_tokens=1024)
