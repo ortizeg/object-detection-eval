@@ -114,7 +114,7 @@ module = [
     "timm.*",
     "einops.*",
     "peft.*",
-    "google.genai.*",
+    "google.*",
     "tensorrt.*",
     "onnx_graphsurgeon.*",
     # torch/torchvision/PIL are [vlm]-extra-only and not installed in the

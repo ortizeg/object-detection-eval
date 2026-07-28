@@ -7188,7 +7188,7 @@ packages:
 - pypi: ./
   name: object-detection-eval
   version: 0.1.0
-  sha256: 3002ff012cfaf87fe50c7af57d71fba09dabe0e7aaa45c559e347be14af842dc
+  sha256: 235d5a7afaa350d2f04e24d540666e1b756a9e66b75b0fa45b9d8b29827d5e50
   requires_dist:
   - numpy<2.0.0
   - onnxruntime>=1.23.2,<2
