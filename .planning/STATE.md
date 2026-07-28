@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 05
 current_phase_name: zero-shot-vlm
 status: executing
-stopped_at: Completed 05-02-PLAN.md (Florence-2/SmolVLM2/Gemini VLM inferencers, offline mocked tests under -m vlm and -m external, six-inferencer VLM set complete)
-last_updated: "2026-07-28T20:44:09.635Z"
+stopped_at: Completed 05-04-PLAN.md (COCO writer + VLM auto-labeling task, load_coco_gt round trip closed, Phase 5 zero-shot-vlm plans all executed)
+last_updated: "2026-07-28T20:59:19.007Z"
 last_activity: 2026-07-28
 last_activity_desc: Phase 05 execution started
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 19
-  completed_plans: 17
+  completed_plans: 18
 ---
 
 # Project State
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-07-24)
 ## Current Position
 
 Phase: 05 (zero-shot-vlm) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-07-28 — Phase 05 execution started
 
-Progress: [█████████░] 89%
+Progress: [██████████] 95%
 
 ## Performance Metrics
 
@@ -70,6 +70,7 @@ Progress: [█████████░] 89%
 | Phase 04 P01 | 40min | 3 tasks | 4 files |
 | Phase 05 P01 | 7min | 3 tasks | 10 files |
 | Phase 05 P02 | 10min | 3 tasks | 8 files |
+| Phase 05 P04 | 15min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -107,6 +108,9 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 4, 04-01] Mirrored the YOLOX-M @640 ONNX to a NEW gs://.../final-comparison-640/yolox_m/ prefix rather than overwriting the pre-existing mislabeled 'YOLOX-M @640 (reuse)' entry (whose gs:// URI actually holds the @800 export) -- documented both in gcs-manifest.md
 - [Phase ?]: [Phase 5, 05-01] Added torch/torchvision/PIL to mypy ignore_missing_imports overrides -- CI's typecheck runs in the default torch-free env where they aren't installed
 - [Phase ?]: [Phase 5, 05-02] Widened pyproject.toml mypy override google.genai.* -> google.* -- from google import genai needs the bare namespace package ignored too to type-check in the torch-free default env
+- [Phase ?]: [Phase 5, 05-04] write_coco writes Detection.class_id directly as COCO category_id (both are the same eval-class-id space) rather than minting a separate COCO-native id
+- [Phase ?]: [Phase 5, 05-04] annotate/__init__.py is a bare package marker (mirrors inference/vlm/__init__.py) -- does not re-export run_vlm_annotation, keeping the package import torch-free
+- [Phase ?]: [Phase 5, 05-04] GeminiInferencer is imported inside run_vlm_annotation's function body, not vlm_task.py's module-top imports -- one level lazier than the 05-01/05-02 module-top lazy-import convention
 
 ### Pending Todos
 
@@ -129,6 +133,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-28T20:44:09.629Z
-Stopped at: Completed 05-02-PLAN.md (Florence-2/SmolVLM2/Gemini VLM inferencers, offline mocked tests under -m vlm and -m external, six-inferencer VLM set complete)
+Last session: 2026-07-28T20:59:19.001Z
+Stopped at: Completed 05-04-PLAN.md (COCO writer + VLM auto-labeling task, load_coco_gt round trip closed, Phase 5 zero-shot-vlm plans all executed)
 Resume file: None

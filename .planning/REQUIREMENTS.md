@@ -97,7 +97,7 @@ Irreplaceable data currently exists only on one laptop, outside any git history.
 - [ ] **VLM-02**: The zero-shot results reproduce: Gemini 26.5, OWLv2 24.7,
       OmDet-Turbo 17.3, Grounding DINO 14.7, Florence-2 10.4 mAP@50:95 on test
 
-- [ ] **VLM-03**: The VLM auto-labeling task produces valid COCO annotations from images
+- [x] **VLM-03**: The VLM auto-labeling task produces valid COCO annotations from images
 - [x] **VLM-04**: All VLM code sits behind the `[vlm]` extra; its tests are marked and
       deselected in default CI, which stays green without the extra installed
 
@@ -188,7 +188,7 @@ and success criteria.
 | REPRO-03 | Phase 4 — Reproduction Gate | Pending |
 | VLM-01 | Phase 5 — Zero-Shot VLM | Complete |
 | VLM-02 | Phase 5 — Zero-Shot VLM | Pending |
-| VLM-03 | Phase 5 — Zero-Shot VLM | Pending |
+| VLM-03 | Phase 5 — Zero-Shot VLM | Complete |
 | VLM-04 | Phase 5 — Zero-Shot VLM | Complete |
 | LAT-01 | Phase 6 — Latency | Pending |
 | LAT-02 | Phase 6 — Latency | Pending |
