@@ -35,6 +35,7 @@ vlm = [
     "timm",                          # OmDet-Turbo backbone (AutoBackbone)
     "einops",                        # Florence-2
     "peft",
+    "num2words",                     # SmolVLM2 processor
     "google-genai>=1.63.0,<2",
 ]
 # TensorRT latency benchmarking. Linux-64 + NVIDIA only.

@@ -62,6 +62,7 @@ transformers = ">=4.49.0, <4.52.0"
 timm = "*"
 einops = "*"
 peft = "*"
+num2words = "*"
 google-genai = ">=1.63.0, <2"
 
 [environments]
