@@ -2,10 +2,14 @@
 
 Torch belongs to the ``[vlm]`` optional extra (SmolVLM2, OmDet-Turbo,
 Florence-2). This walks every core submodule -- schemas, utils, data,
-metrics, inference (including all 7 detectors) -- and asserts torch never
-enters ``sys.modules``. This test is authoritative for CORE-08's pass/fail
-at phase verification (co-claimed with 02-05, which keeps its own modules
-torch-free; this test is the whole-core-graph gate).
+metrics, inference (including all 7 detectors), and the bare
+``inference.vlm`` package marker -- and asserts torch never enters
+``sys.modules``. This test is authoritative for CORE-08's pass/fail at
+phase verification (co-claimed with 02-05, which keeps its own modules
+torch-free; this test is the whole-core-graph gate). Importing
+``inference.vlm`` here (WARNING fix, 05-01) makes the gate real rather than
+tautological: if a future change adds an eager torch/transformers import to
+``inference/vlm/__init__.py``, this test catches it (VLM-04).
 """
 
 from __future__ import annotations
@@ -31,6 +35,7 @@ def test_core_import_graph_is_torch_free() -> None:
     import object_detection_eval.inference.onnx
     import object_detection_eval.inference.postprocess
     import object_detection_eval.inference.preprocess
+    import object_detection_eval.inference.vlm  # bare marker; VLM-04
     import object_detection_eval.metrics.bootstrap
     import object_detection_eval.metrics.curves
     import object_detection_eval.metrics.detection_map
