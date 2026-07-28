@@ -148,12 +148,18 @@ Notes:
   3. The auto-labeling task turns a directory of unlabeled images into a COCO annotation file that loads back through `load_coco_gt()` without error
   4. Default CI stays green with the `[vlm]` extra not installed — VLM tests are marked and deselected, and Gemini's API-key tests are additionally marked external
 
-**Plans**: TBD
+**Plans**: 4 plans
+
+- [ ] 05-01-PLAN.md — VLM package + 3 open-vocab HF detectors (OWLv2, Grounding DINO, OmDet-Turbo) behind [vlm], mocked offline tests, torch-free core (VLM-01, VLM-04) [wave 1]
+- [ ] 05-02-PLAN.md — 2 generative VLMs (Florence-2, SmolVLM2) + external Gemini inferencer, mocked/external tests (VLM-01, VLM-04) [wave 2, depends 05-01]
+- [ ] 05-03-PLAN.md — VLM filters + run_vlm_benchmark.py + manifest; box-run reproduction of the zero-shot ceiling (VLM-01, VLM-02, VLM-04) [wave 3, depends 05-01, 05-02]
+- [ ] 05-04-PLAN.md — VLM auto-labeling task -> COCO round-trip through load_coco_gt (VLM-03, VLM-04) [wave 3, depends 05-02]
 
 Notes:
 
 - Independent of Phase 6; both depend only on the Phase 4 gate and can run in parallel.
 - External dependency: a Gemini API key for VLM-02's Gemini row.
+- The 5 HF VLMs run on a provisioned RTX 4090 box (rsynced repo + /root/vlmenv CUDA-wheel venv); the full VLM run is executor-run + precondition-gated, NOT CI-wired. Default CI stays green with [vlm] uninstalled (mocked/torch-free tests only).
 
 ### Phase 6: Latency
 
@@ -208,7 +214,7 @@ Phases 5 and 6 have no dependency on each other and may execute in parallel afte
 | 2. Harness Core | 6/6 | In Progress|  |
 | 3. Model Registry | 3/3 | In Progress|  |
 | 4. Reproduction Gate | 3/3 | In Progress|  |
-| 5. Zero-Shot VLM | 0/TBD | Not started | - |
+| 5. Zero-Shot VLM | 0/4 | Not started | - |
 | 6. Latency | 0/TBD | Not started | - |
 | 7. Reports & Docs | 0/TBD | Not started | - |
 
