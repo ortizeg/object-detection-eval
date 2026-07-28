@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 03
-current_phase_name: model-registry
+current_phase: 04
+current_phase_name: reproduction-gate
 status: executing
-stopped_at: Completed 03-03-PLAN.md (phase 03-model-registry complete)
-last_updated: "2026-07-26T19:26:00.247Z"
+stopped_at: "Completed 04-01-PLAN.md (REPRO-01 reproduction gate: 7-model @640 table reproduced within tolerance, exact rank order; YOLOX-M @640 mirrored to GCS)"
+last_updated: "2026-07-27T02:14:01.123Z"
 last_activity: 2026-07-26
-last_activity_desc: Phase 03 execution started
+last_activity_desc: Phase 04 execution started
 progress:
-  total_phases: 3
+  total_phases: 4
   completed_phases: 3
-  total_plans: 12
-  completed_plans: 12
+  total_plans: 15
+  completed_plans: 13
 ---
 
 # Project State
@@ -23,16 +23,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-24)
 
 **Core value:** Every number the blog posts publish must be reproducible from this repo.
-**Current focus:** Phase 03 — model-registry
+**Current focus:** Phase 04 — reproduction-gate
 
 ## Current Position
 
-Phase: 03 (model-registry) — EXECUTING
-Plan: 3 of 3
+Phase: 04 (reproduction-gate) — EXECUTING
+Plan: 2 of 3
 Status: Ready to execute
-Last activity: 2026-07-26 — Phase 03 execution started
+Last activity: 2026-07-26 — Phase 04 execution started
 
-Progress: [██████████] 100%
+Progress: [█████████░] 87%
 
 ## Performance Metrics
 
@@ -67,6 +67,7 @@ Progress: [██████████] 100%
 | Phase 02 P06 | 55min | 4 tasks | 17 files |
 | Phase 03 P01 | 30min | 2 tasks | 8 files |
 | Phase 03 P03 | 20min | 3 tasks | 14 files |
+| Phase 04 P01 | 40min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -99,6 +100,9 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 3, 03-03] 5c/10c mAP stored as 4 metric keys in one Evaluation entry (map5095_5c/map50_5c/map5095_10c/map50_10c) since the schema has no class-count field
 - [Phase ?]: [Phase 3, 03-03] publish_weights.py recovers path_in_repo by parsing a card's existing weights.url rather than a re-derived subfolder convention
 - [Phase ?]: [Phase 3, 03-03] Closed a bookkeeping gap from 03-02: marked REG-03/REG-04 complete in REQUIREMENTS.md alongside REG-01/05/06 since they were implemented+tested in 03-02 but never checked off
+- [Phase ?]: [Phase 4, 04-01] Manifest schema uses root (onnx/labels) + optional predictions_root override, not a single root field -- YOLOX-M's ONNX/labels live under the external yolox tree but its stored predictions live under source_repo
+- [Phase ?]: [Phase 4, 04-01] run_benchmark.py's --providers defaults to CPUExecutionProvider only -- onnxruntime's CoreML EP crashes on RT-DETRv2's dynamic decoder on this machine, and hardware-accelerated EPs are the wrong default for a cross-machine reproducibility gate regardless
+- [Phase ?]: [Phase 4, 04-01] Mirrored the YOLOX-M @640 ONNX to a NEW gs://.../final-comparison-640/yolox_m/ prefix rather than overwriting the pre-existing mislabeled 'YOLOX-M @640 (reuse)' entry (whose gs:// URI actually holds the @800 export) -- documented both in gcs-manifest.md
 
 ### Pending Todos
 
@@ -121,6 +125,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-26T19:26:00.241Z
-Stopped at: Completed 03-03-PLAN.md (phase 03-model-registry complete)
+Last session: 2026-07-27T02:14:01.117Z
+Stopped at: Completed 04-01-PLAN.md (REPRO-01 reproduction gate: 7-model @640 table reproduced within tolerance, exact rank order; YOLOX-M @640 mirrored to GCS)
 Resume file: None

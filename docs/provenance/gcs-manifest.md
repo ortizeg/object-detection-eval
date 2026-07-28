@@ -24,6 +24,16 @@ Every row below is a table entry in `artifact-tracker.md`'s "Harness TEST-set nu
 | DAMO-YOLO-M @640 | `damo_m/damo_m_640.onnx` | `final-comparison-640/damo_m/damo_m_640.onnx` | `final-comparison-640/damo_m/labels_mapping.json` |
 | RT-DETRv2-M @640 | `rtdetrv2_m/rtdetrv2_m_640.onnx` | `final-comparison-640/rtdetrv2_m/rtdetrv2_m_640.onnx` | `final-comparison-640/rtdetrv2_m/labels_mapping.json` |
 | DEIM-M @640 | `deim_m/deim_m_640.onnx` | `final-comparison-640/deim_m/deim_m_640.onnx` | `final-comparison-640/deim_m/labels_mapping.json` |
+| YOLOX-M @640 — **the actual @640 export** (Phase 4 / REPRO-01) | `YOLOX/training_results/basketball_m/yolox_m_basketball_640.onnx` | `final-comparison-640/yolox_m/yolox_m_basketball_640.onnx` | `final-comparison-640/yolox_m/labels_mapping.json` |
+
+**Note on the YOLOX-M row above (added 2026-07-26, Phase 4 plan 04-01):** this is
+the correct-variant @640 ONNX that `scripts/run_benchmark.py`'s reproduction
+manifest points at, mirrored here so it exists in at least two places (was
+laptop-only before this plan). It is *distinct* from the "YOLOX-M @640 (reuse)"
+entry in the "Reuse models" table below, whose `gs://` URI
+(`official-eval-inputs/yolox_m_800/yolox_m_basketball_800.onnx`) actually
+holds the **@800** export despite the "@640" label — the artifact-selection
+mix-up the Phase 4 reproduction gate exists to catch and not repeat.
 
 ## Reuse models (no training — ONNX carried over from earlier runs)
 

@@ -1,0 +1,95 @@
+# reproduction_640.yaml -- REPRO-01 hard-gate manifest.
+#
+# Pins the 7 medium @640 detectors to the exact correct-variant artifacts
+# that reproduce EVAL_REPORT_FINAL.md's published table. In file order this
+# manifest IS the published rank order (YOLO26m > DEIM-M > YOLOX-M >
+# RF-DETR-M > RTMDet-M > DAMO-YOLO-M > RT-DETRv2-M), and every
+# expected_map5095 value must stay strictly descending top to bottom.
+#
+# Two variant landmines this manifest deliberately avoids (see
+# scripts/measure_supervision_drift.py's docstring for the history):
+#   - YOLOX-M points at the @640 ONNX/predictions, NOT the @800 file that a
+#     prior comparison mixed in.
+#   - RTMDet-M points at the BASE `rtmdet_validate_out` predictions, NOT the
+#     `rtmdet_m_rewarmup` ablation variant.
+#
+# root: "source_repo" resolves against --source-repo (defaults to
+# object-detection-training/.deploy_comparison); "yolox" resolves against
+# --yolox-root (defaults to the external YOLOX training_results tree).
+# predictions_root overrides root for the `predictions` path only (used by
+# YOLOX-M, whose stored predictions live under source_repo even though its
+# ONNX/labels live under the external yolox root).
+
+models:
+  - name: YOLO26m
+    detector: yolo26
+    root: source_repo
+    onnx: reuse_onnx/yolo26m/model.onnx
+    labels: reuse_onnx/yolo26m/labels_mapping.json
+    predictions: eval_reuse/YOLO26m-640/merged5/predictions_yolo26_test.json
+    input_size: 640
+    confidence_threshold: 0.01
+    expected_map5095: 0.716
+
+  - name: DEIM-M
+    detector: deim
+    root: source_repo
+    onnx: artifacts/deim_m/deim_m_640.onnx
+    labels: artifacts/deim_m/labels_mapping.json
+    predictions: eval_new/deim_m/merged5/predictions_deim_test.json
+    input_size: 640
+    confidence_threshold: 0.01
+    expected_map5095: 0.686
+
+  - name: YOLOX-M
+    detector: yolox
+    root: yolox
+    onnx: basketball_m/yolox_m_basketball_640.onnx
+    labels: basketball_m/labels_mapping.json
+    predictions_root: source_repo
+    predictions: eval_reuse/YOLOX-M-640/merged5/predictions_yolox_test.json
+    input_size: 640
+    confidence_threshold: 0.01
+    expected_map5095: 0.672
+
+  - name: RF-DETR-M
+    detector: rfdetr
+    root: source_repo
+    onnx: artifacts/rfdetr_m/rfdetr_m_640.onnx
+    labels: artifacts/rfdetr_m/labels_mapping.json
+    predictions: eval_new/rfdetr_m/merged5/predictions_rf-detr_test.json
+    input_size: 640
+    confidence_threshold: 0.01
+    expected_map5095: 0.646
+
+  - name: RTMDet-M
+    detector: rtmdet
+    root: source_repo
+    onnx: artifacts/rtmdet_m/rtmdet_m_640.onnx
+    labels: artifacts/rtmdet_m/labels_mapping.json
+    predictions: rtmdet_validate_out/merged5/predictions_rtmdet_test.json
+    input_size: 640
+    confidence_threshold: 0.01
+    expected_map5095: 0.628
+
+  - name: DAMO-YOLO-M
+    detector: damo
+    root: source_repo
+    onnx: artifacts/damo_m/damo_m_640.onnx
+    labels: artifacts/damo_m/labels_mapping.json
+    predictions: eval_new/damo_m/merged5/predictions_damo-yolo_test.json
+    input_size: 640
+    confidence_threshold: 0.01
+    expected_map5095: 0.619
+
+  - name: RT-DETRv2-M
+    detector: rtdetrv2
+    root: source_repo
+    onnx: artifacts/rtdetrv2_m/rtdetrv2_m_640.onnx
+    labels: artifacts/rtdetrv2_m/labels_mapping.json
+    # NB: filename says "deim" but this directory holds RT-DETRv2's own
+    # stored predictions (see measure_supervision_drift.py's note).
+    predictions: eval_new/rtdetrv2_m/merged5/predictions_deim_test.json
+    input_size: 640
+    confidence_threshold: 0.01
+    expected_map5095: 0.581

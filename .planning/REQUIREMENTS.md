@@ -79,7 +79,7 @@ Irreplaceable data currently exists only on one laptop, outside any git history.
 
 ### Reproduction
 
-- [ ] **REPRO-01**: `scripts/run_benchmark.py` reproduces the 7-model @640 table within
+- [x] **REPRO-01**: `scripts/run_benchmark.py` reproduces the 7-model @640 table within
       tolerance: YOLO26m 0.716, DEIM-M 0.686, YOLOX-M 0.672, RF-DETR-M 0.646,
       RTMDet-M 0.628, DAMO-M 0.619, RT-DETRv2-M 0.581
 
@@ -183,7 +183,7 @@ and success criteria.
 | REG-04 | Phase 3 — Model Registry | Complete |
 | REG-05 | Phase 3 — Model Registry | Complete |
 | REG-06 | Phase 3 — Model Registry | Complete |
-| REPRO-01 | Phase 4 — Reproduction Gate | Pending |
+| REPRO-01 | Phase 4 — Reproduction Gate | Complete |
 | REPRO-02 | Phase 4 — Reproduction Gate | Pending |
 | REPRO-03 | Phase 4 — Reproduction Gate | Pending |
 | VLM-01 | Phase 5 — Zero-Shot VLM | Pending |
