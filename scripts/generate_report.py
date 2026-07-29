@@ -173,7 +173,7 @@ def build_registry(
 
     vlm_vs_finetuned = ReportSpec(
         report_id="vlm_vs_finetuned",
-        md_path=report_dir / "vlm_vs_finetuned.md",
+        md_path=report_dir / "VLM_VS_FINETUNED.md",
         slots=[
             Slot("vlm_summary", lambda: vlm_summary_table(vlm_metrics())),
             Slot(
