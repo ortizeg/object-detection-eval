@@ -39,11 +39,14 @@ vlm = [
     "google-genai>=1.63.0,<2",
 ]
 # TensorRT latency benchmarking. Linux-64 + NVIDIA only.
+# Versions pinned to the 06-RESEARCH.md-verified releases (2026-07-28). CRUCIALLY
+# onnx-graphsurgeon>=0.6.1: 0.5.8 calls the removed onnx.helper.float32_to_bfloat16
+# and breaks against onnx>=1.20 (06-RESEARCH.md Pitfall 2); 0.6.1 (2026-04-08) fixes it.
 trt = [
-    "onnxruntime-gpu",
-    "tensorrt",
-    "onnx",
-    "onnx-graphsurgeon",
+    "onnxruntime-gpu>=1.28.0,<2",
+    "tensorrt>=10.16,<11",
+    "onnx>=1.22,<2",
+    "onnx-graphsurgeon>=0.6.1",
 ]
 
 [project.scripts]
@@ -145,5 +148,6 @@ addopts = "--cov=src --cov-report=term --cov-report=xml --cov-fail-under=80"
 markers = [
     "vlm: requires the [vlm] optional dependency group",
     "trt: requires a CUDA GPU and the [trt] optional dependency group",
+    "graphsurgeon: requires onnx + onnx-graphsurgeon CPU graph tooling (the [trt] extra's graph-surgery subset), but NOT a CUDA GPU",
     "external: hits an external API (needs credentials)",
 ]

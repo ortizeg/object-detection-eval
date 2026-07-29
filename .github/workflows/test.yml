@@ -23,10 +23,11 @@ jobs:
           pixi-version: v0.62.2
           cache: true
 
-      # Core suite only: no GPU, no [vlm] extra. Tests marked vlm/trt/external
-      # are deselected here and run manually against real hardware/credentials.
+      # Core suite only: no GPU, no [vlm] extra. Tests marked vlm/trt/external/
+      # graphsurgeon are deselected here and run manually against real hardware/
+      # credentials (graphsurgeon needs onnx-graphsurgeon, absent from this env).
       - name: Pytest
-        run: pixi run test-cov -m "not vlm and not trt and not external"
+        run: pixi run test-cov -m "not vlm and not trt and not external and not graphsurgeon"
 
       - name: Upload coverage
         if: always()
