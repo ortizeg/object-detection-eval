@@ -140,6 +140,37 @@ def load_manifest(path: Path) -> Manifest:
     return Manifest.model_validate(raw)
 
 
+def build_accuracy_results(
+    taxonomy: str, metrics_by_name: dict[str, dict[str, Any]]
+) -> dict[str, Any]:
+    """Assemble the committed accuracy-results payload from in-memory metrics.
+
+    Pure and torch-free: given a mapping of model name to the dict
+    :func:`~object_detection_eval.metrics.detection_map.compute_metrics`
+    returns, produce the persisted shape the Phase 7 report loaders read::
+
+        {"taxonomy": taxonomy,
+         "models": {name: {"mAP_50_95", "mAP_50", "mAP_75", "per_class_ap50"}}}
+
+    Model order follows ``metrics_by_name`` insertion order (the manifest /
+    published rank order). ``per_class_ap50`` is copied through verbatim
+    (already class-name keyed, since ``main()`` passes ``id_to_name`` to
+    ``compute_metrics``); a class with zero test-set support is ABSENT from
+    that dict and is deliberately NOT back-filled with a fabricated ``0.0``,
+    so Plan 07-02 can render its AP as an em dash rather than a real zero.
+    """
+    models: dict[str, Any] = {}
+    for name, metrics in metrics_by_name.items():
+        models[name] = {
+            "mAP_50_95": float(metrics["mAP_50_95"]),
+            "mAP_50": float(metrics["mAP_50"]),
+            "mAP_75": float(metrics["mAP_75"]),
+            # Verbatim pass-through: absent classes stay absent (no fabricated 0.0).
+            "per_class_ap50": dict(metrics["per_class_ap50"]),
+        }
+    return {"taxonomy": taxonomy, "models": models}
+
+
 def within_tolerance(measured: float, expected: float, tolerance: float) -> bool:
     """True if `measured` is within `tolerance` of `expected` (boundary passes)."""
     return abs(measured - expected) <= tolerance
@@ -306,6 +337,17 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--tolerance", type=float, default=_DEFAULT_TOLERANCE)
     parser.add_argument("--taxonomy", default="merged5")
     parser.add_argument(
+        "--write-results",
+        type=Path,
+        default=None,
+        help=(
+            "If set, serialize the full per-model accuracy metrics "
+            "(mAP@50:95/@50/@75 + per_class_ap50) and the resolved taxonomy "
+            "to this JSON path after scoring. Persistence only -- does not "
+            "change the gate verdict or any scoring math."
+        ),
+    )
+    parser.add_argument(
         "--strict",
         action="store_true",
         help="from-predictions mode only: tighten tolerance to 0.001",
@@ -344,6 +386,10 @@ def main() -> None:
     )
 
     measured: dict[str, float] = {}
+    # Full per-model metrics dict in manifest (published rank) order, so
+    # --write-results can persist per_class_ap50 and the @50/@75 variants
+    # main() would otherwise discard.
+    metrics_by_name: dict[str, dict[str, Any]] = {}
     for entry in manifest.models:
         logger.info(f"Scoring {entry.name} ({entry.detector}) via {args.mode} mode")
         pred_map = (
@@ -352,9 +398,17 @@ def main() -> None:
             else _score_from_predictions(entry, args)
         )
         metrics = compute_metrics(gt_map, pred_map, id_to_name)
+        metrics_by_name[entry.name] = metrics
         measured[entry.name] = float(metrics["mAP_50_95"])
 
     passed = _print_table_and_verdict(manifest.models, measured, effective_tolerance)
+
+    if args.write_results is not None:
+        payload = build_accuracy_results(args.taxonomy, metrics_by_name)
+        args.write_results.parent.mkdir(parents=True, exist_ok=True)
+        with open(args.write_results, "w") as f:
+            json.dump(payload, f, indent=2)
+        logger.info(f"Wrote accuracy results ({args.taxonomy}) to {args.write_results}")
 
     if not passed:
         logger.error("Reproduction gate FAILED")
