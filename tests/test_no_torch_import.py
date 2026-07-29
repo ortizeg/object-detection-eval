@@ -40,6 +40,10 @@ def test_core_import_graph_is_torch_free() -> None:
     import object_detection_eval.metrics.curves
     import object_detection_eval.metrics.detection_map
     import object_detection_eval.metrics.prf1
+    import object_detection_eval.report  # REPORT-01: generator stays torch-free (T-07-07)
+    import object_detection_eval.report.inject
+    import object_detection_eval.report.loaders
+    import object_detection_eval.report.tables
     import object_detection_eval.schemas.annotation
     import object_detection_eval.schemas.detection
     import object_detection_eval.schemas.taxonomy
