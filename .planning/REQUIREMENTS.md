@@ -118,7 +118,7 @@ Irreplaceable data currently exists only on one laptop, outside any git history.
 
 ### Reporting
 
-- [ ] **REPORT-01**: Report tables are generated from results files, so a published number
+- [x] **REPORT-01**: Report tables are generated from results files, so a published number
       cannot drift from the data that produced it
 
 - [ ] **REPORT-02**: `FINAL_COMPARISON_640.md` covers the 7-model comparison with CIs,
@@ -195,7 +195,7 @@ and success criteria.
 | LAT-02 | Phase 6 — Latency | Complete |
 | LAT-03 | Phase 6 — Latency | Complete |
 | LAT-04 | Phase 6 — Latency | Complete (honest-label) |
-| REPORT-01 | Phase 7 — Reports & Docs | Pending |
+| REPORT-01 | Phase 7 — Reports & Docs | Complete |
 | REPORT-02 | Phase 7 — Reports & Docs | Pending |
 | REPORT-03 | Phase 7 — Reports & Docs | Pending |
 | REPORT-04 | Phase 7 — Reports & Docs | Pending |
