@@ -23,10 +23,12 @@ scope), so the on-GPU NMS delta = to_boxes - model_only is measurable (LAT-04).
 
 Two small numeric JSONs are written (percentiles only, no box dumps -- they fit
 the 2 MB pre-commit hook): ``trt_fp16_gpuonly.json`` (model-only) and
-``trt_fp16_toboxes.json`` (fair to-boxes + a MECHANICAL LAT-04 band check via
-``run_latency.within_band``). The final ``reproducibility`` verdict
-(reproduced-from-code vs the honest "manually measured" label) is stamped by a
-human at the Plan-06-03 checkpoint -- this script only reports the numbers.
+``trt_fp16_toboxes.json`` (fair to-boxes). Each record carries a per-model
+``build_status`` (``"ok"`` / ``"failed"`` + ``error``) and the TensorRT
+version; the build loop is CONTINUE-ON-ERROR so one model's failure never halts
+the matrix. This box runs ~2-3x slower than the source's T4 instance, so NO
+band/pass/``reproducibility`` verdict is stamped here -- the script reports raw
+GPU-compute medians + build status only; any verdict is a separate human step.
 
 **T4-ONLY.** ``trtexec`` ships with a TensorRT install; there is no macOS/CPU
 fallback. The heavy ``tensorrt`` import is deferred into a function so the module
@@ -80,32 +82,75 @@ Runner = Callable[..., Any]
 # --------------------------------------------------------------------------
 
 
-def build_engine_cmd(trtexec: str, onnx_path: Path, engine_path: Path) -> list[str]:
+def build_engine_cmd(
+    trtexec: str, onnx_path: Path, engine_path: Path, shapes: str | None = None
+) -> list[str]:
     """The fp16 BUILD command as a list (T-06-07: never a shell string).
 
-    Exactly ``[trtexec, --onnx=<onnx>, --fp16, --saveEngine=<engine>]``.
+    ``[trtexec, --onnx=<onnx>, --fp16, --saveEngine=<engine>]`` plus, when the
+    ONNX input has dynamic dims, a ``--shapes=<name>:1x3xHxW`` static profile
+    (YOLO26's ``images`` input is fully dynamic and fails to build otherwise).
     """
-    return [
+    cmd = [
         trtexec,
         f"--onnx={onnx_path}",
         "--fp16",
         f"--saveEngine={engine_path}",
     ]
+    if shapes:
+        cmd.append(f"--shapes={shapes}")
+    return cmd
 
 
-def benchmark_cmd(trtexec: str, engine_path: Path) -> list[str]:
+def benchmark_cmd(trtexec: str, engine_path: Path, shapes: str | None = None) -> list[str]:
     """The GPU-only RE-TIME command as a list (T-06-07: never a shell string).
 
-    Exactly ``[trtexec, --loadEngine=<engine>, --fp16, --noDataTransfers]`` --
+    ``[trtexec, --loadEngine=<engine>, --fp16, --noDataTransfers]`` --
     ``--noDataTransfers`` drops the H2D/D2H copies so trtexec reports a
-    GPU-compute-only latency.
+    GPU-compute-only latency. When ``shapes`` is given (a dynamic-input engine)
+    it is appended so the re-time runs at the same static shape it was built for.
     """
-    return [
+    cmd = [
         trtexec,
         f"--loadEngine={engine_path}",
         "--fp16",
         "--noDataTransfers",
     ]
+    if shapes:
+        cmd.append(f"--shapes={shapes}")
+    return cmd
+
+
+def detect_trt_shapes(onnx_path: Path, input_size: int) -> str | None:
+    """Return a ``--shapes`` value if the ONNX's first input has dynamic dims.
+
+    Reads the first graph input; if every dim is a fixed positive int the engine
+    is static and ``None`` is returned (no ``--shapes`` needed). Otherwise each
+    dynamic dim is resolved to a batch-1, ``input_size`` spatial static shape,
+    e.g. YOLO26's ``images[batch,3,height,width]`` -> ``images:1x3x640x640``.
+    The ``onnx`` import is deferred so this module still collects without onnx.
+    """
+    import onnx  # deferred: keeps the offline test importable without onnx
+
+    model = onnx.load(str(onnx_path))
+    graph_input = model.graph.input[0]
+    dims = graph_input.type.tensor_type.shape.dim
+    resolved: list[int] = []
+    dynamic = False
+    for index, dim in enumerate(dims):
+        if dim.HasField("dim_value") and dim.dim_value > 0:
+            resolved.append(dim.dim_value)
+            continue
+        dynamic = True
+        if index == 0:
+            resolved.append(1)  # batch
+        elif index == 1:
+            resolved.append(3)  # channels fallback
+        else:
+            resolved.append(input_size)  # spatial (H, W)
+    if not dynamic:
+        return None
+    return f"{graph_input.name}:{'x'.join(str(d) for d in resolved)}"
 
 
 def parse_trtexec_latency(stdout: str) -> dict[str, float]:
@@ -145,23 +190,30 @@ def nms_onnx_path(onnx_path: Path) -> Path:
 def build_result_record(
     name: str,
     engine_scope: str,
-    latency: dict[str, float],
+    latency: dict[str, float] | None,
     nms_graft: bool,
     trt_version: str,
+    build_status: str = "ok",
+    error: str | None = None,
 ) -> dict[str, Any]:
     """The committed trt_fp16 JSON record for one model+scope.
 
     Shape: ``{name, engine_scope ("model_only"|"to_boxes"), median_ms, p99_ms,
-    nms_graft, trt_version}``.
+    nms_graft, trt_version, build_status}`` (+ ``error`` when a build failed).
+    ``latency`` is ``None`` for a failed build, leaving the ms fields ``null``.
     """
-    return {
+    record: dict[str, Any] = {
         "name": name,
         "engine_scope": engine_scope,
-        "median_ms": latency["median_ms"],
-        "p99_ms": latency["p99_ms"],
+        "median_ms": latency["median_ms"] if latency else None,
+        "p99_ms": latency["p99_ms"] if latency else None,
         "nms_graft": nms_graft,
         "trt_version": trt_version,
+        "build_status": build_status,
     }
+    if error is not None:
+        record["error"] = error
+    return record
 
 
 def build_and_time(
@@ -169,6 +221,7 @@ def build_and_time(
     onnx_path: Path,
     engine_path: Path,
     *,
+    shapes: str | None = None,
     runner: Runner = subprocess.run,
 ) -> dict[str, float]:
     """Build the fp16 engine then GPU-only re-time it; return {median_ms,p99_ms}.
@@ -176,17 +229,18 @@ def build_and_time(
     Both invocations go through ``runner`` (defaults to ``subprocess.run``,
     swapped for a mock in the offline test) as
     ``runner([...], check=True, capture_output=True, text=True)`` -- list-form
-    args, never ``shell=True`` (T-06-07). Only the benchmark's stdout is parsed;
-    Python never times the subprocess itself.
+    args, never ``shell=True`` (T-06-07). ``shapes`` (when the ONNX input is
+    dynamic) is threaded into both the build and the re-time. Only the
+    benchmark's stdout is parsed; Python never times the subprocess itself.
     """
     runner(
-        build_engine_cmd(trtexec, onnx_path, engine_path),
+        build_engine_cmd(trtexec, onnx_path, engine_path, shapes),
         check=True,
         capture_output=True,
         text=True,
     )
     result = runner(
-        benchmark_cmd(trtexec, engine_path),
+        benchmark_cmd(trtexec, engine_path, shapes),
         check=True,
         capture_output=True,
         text=True,
@@ -246,48 +300,30 @@ def _resolve_onnx_path(onnx_root: Path, entry: Any) -> Path:
     return onnx_root / Path(entry.onnx).name
 
 
-def _lat04_summary(
-    toboxes_records: list[dict[str, Any]],
-    modelonly_by_name: dict[str, dict[str, Any]],
-    run_latency: types.ModuleType,
-) -> dict[str, Any]:
-    """MECHANICAL LAT-04 band check (within_band) -- an aid, not the verdict.
+def _try_build_and_time(
+    trtexec: str,
+    onnx_path: Path,
+    engine_path: Path,
+    *,
+    shapes: str | None,
+    label: str,
+) -> tuple[dict[str, float] | None, str, str | None]:
+    """Build+time one engine, CONTINUE-ON-ERROR; return (latency, status, error).
 
-    Reports, per grafted model, the on-GPU NMS delta (to_boxes - model_only) and
-    whether the to-boxes median sits in FP16_TOBOXES_BAND_MS and the delta in
-    ONGPU_NMS_DELTA_BAND_MS. The human stamps the final ``reproducibility`` field
-    at the checkpoint; the band is FIXED and must NOT be widened (T-06-08).
+    A single model's build/parse failure (a missing grafted ONNX, a plugin the
+    installed TensorRT lacks, an un-profiled dynamic input) must NOT halt the
+    whole matrix -- it is caught, logged, and recorded as ``build_status =
+    "failed"`` so the run still produces the other 6 models' numbers.
     """
-    toboxes_low, toboxes_high = run_latency.FP16_TOBOXES_BAND_MS
-    delta_low, delta_high = run_latency.ONGPU_NMS_DELTA_BAND_MS
-    per_model: list[dict[str, Any]] = []
-    for record in toboxes_records:
-        name = record["name"]
-        toboxes_median = record["median_ms"]
-        entry: dict[str, Any] = {
-            "name": name,
-            "toboxes_median_ms": toboxes_median,
-            "toboxes_in_band": run_latency.within_band(toboxes_median, toboxes_low, toboxes_high),
-        }
-        if record["nms_graft"] and name in modelonly_by_name:
-            model_only_median = modelonly_by_name[name]["median_ms"]
-            nms_delta = toboxes_median - model_only_median
-            entry["nms_delta_ms"] = nms_delta
-            entry["nms_delta_in_band"] = run_latency.within_band(nms_delta, delta_low, delta_high)
-        per_model.append(entry)
-    all_in_band = all(m["toboxes_in_band"] and m.get("nms_delta_in_band", True) for m in per_model)
-    return {
-        "fp16_toboxes_band_ms": list(run_latency.FP16_TOBOXES_BAND_MS),
-        "ongpu_nms_delta_band_ms": list(run_latency.ONGPU_NMS_DELTA_BAND_MS),
-        "per_model": per_model,
-        "all_in_band": all_in_band,
-        "note": (
-            "MECHANICAL within_band check only. The final `reproducibility` "
-            "verdict (reproduced vs the honest 'manually measured' label) is a "
-            "human decision at the Plan-06-03 checkpoint. Do NOT widen the band "
-            "to force the in-band path (T-06-08)."
-        ),
-    }
+    if not onnx_path.exists():
+        logger.error(f"[{label}] ONNX not found: {onnx_path}")
+        return None, "failed", f"onnx not found: {onnx_path}"
+    try:
+        latency = build_and_time(trtexec, onnx_path, engine_path, shapes=shapes)
+        return latency, "ok", None
+    except Exception as exc:  # continue-on-error is the point of this wrapper
+        logger.error(f"[{label}] build/time failed: {exc}")
+        return None, "failed", str(exc)
 
 
 def _write_json(path: Path, payload: dict[str, Any]) -> None:
@@ -335,39 +371,66 @@ def main() -> None:
 
     gpuonly_records: list[dict[str, Any]] = []
     toboxes_records: list[dict[str, Any]] = []
-    modelonly_by_name: dict[str, dict[str, Any]] = {}
 
     for entry in manifest.models:
         base_onnx = _resolve_onnx_path(args.onnx_root, entry)
+        # Static --shapes profile only when the ONNX input has dynamic dims
+        # (YOLO26's fully-dynamic `images` fails to build without one).
+        base_shapes = detect_trt_shapes(base_onnx, entry.input_size) if base_onnx.exists() else None
+        if base_shapes:
+            logger.info(f"[{entry.name}] dynamic input -> building with --shapes={base_shapes}")
 
         # model-only scope: the raw (ungrafted) head / NMS-free / in-graph-decode
         # model. This is the trtexec `--fp16` build over the base ONNX.
         logger.info(f"[{entry.name}] model_only: building from {base_onnx.name}")
         model_engine = engine_dir / f"{base_onnx.stem}_model.engine"
-        model_latency = build_and_time(args.trtexec, base_onnx, model_engine)
-        model_record = build_result_record(
-            entry.name, "model_only", model_latency, entry.nms_graft, trt_version
+        model_latency, model_status, model_error = _try_build_and_time(
+            args.trtexec,
+            base_onnx,
+            model_engine,
+            shapes=base_shapes,
+            label=f"{entry.name} model_only",
         )
-        gpuonly_records.append(model_record)
-        modelonly_by_name[entry.name] = model_record
+        gpuonly_records.append(
+            build_result_record(
+                entry.name,
+                "model_only",
+                model_latency,
+                entry.nms_graft,
+                trt_version,
+                build_status=model_status,
+                error=model_error,
+            )
+        )
 
-        # to-boxes scope: for a dense-head model the grafted *_nms.onnx; for the
-        # 4 end-to-end models the same engine already emits boxes, so reuse it.
+        # to-boxes scope: for a dense-head model the grafted *_nms.onnx (a static
+        # head, no --shapes); for the 4 end-to-end models the same engine already
+        # emits boxes, so reuse the model-only build result.
         if entry.nms_graft:
             grafted_onnx = nms_onnx_path(base_onnx)
             logger.info(f"[{entry.name}] to_boxes: building grafted {grafted_onnx.name}")
             grafted_engine = engine_dir / f"{grafted_onnx.stem}.engine"
-            toboxes_latency = build_and_time(args.trtexec, grafted_onnx, grafted_engine)
+            tb_latency, tb_status, tb_error = _try_build_and_time(
+                args.trtexec,
+                grafted_onnx,
+                grafted_engine,
+                shapes=None,
+                label=f"{entry.name} to_boxes",
+            )
         else:
             logger.info(f"[{entry.name}] to_boxes: end-to-end model, reusing model engine")
-            toboxes_latency = model_latency
+            tb_latency, tb_status, tb_error = model_latency, model_status, model_error
         toboxes_records.append(
             build_result_record(
-                entry.name, "to_boxes", toboxes_latency, entry.nms_graft, trt_version
+                entry.name,
+                "to_boxes",
+                tb_latency,
+                entry.nms_graft,
+                trt_version,
+                build_status=tb_status,
+                error=tb_error,
             )
         )
-
-    lat04 = _lat04_summary(toboxes_records, modelonly_by_name, run_latency)
 
     _write_json(
         args.out_dir / _GPUONLY_FILENAME,
@@ -375,12 +438,12 @@ def main() -> None:
     )
     _write_json(
         args.out_dir / _TOBOXES_FILENAME,
-        {"trt_version": trt_version, "models": toboxes_records, "lat04": lat04},
+        {"trt_version": trt_version, "models": toboxes_records},
     )
+    built = sum(1 for r in toboxes_records if r["build_status"] == "ok")
     logger.info(
-        "LAT-04 mechanical band check: all_in_band="
-        f"{lat04['all_in_band']}. Stamp the final `reproducibility` field at the "
-        "checkpoint (reproduced vs honest label) -- do NOT widen the band."
+        f"to-boxes matrix: {built}/{len(toboxes_records)} engines built. "
+        "Raw GPU-compute medians + per-model build_status written; no verdict stamped."
     )
 
 

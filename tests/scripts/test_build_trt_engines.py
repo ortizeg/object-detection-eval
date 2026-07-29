@@ -91,6 +91,27 @@ def test_benchmark_cmd_is_exact_list_form() -> None:
     ]
 
 
+def test_build_engine_cmd_appends_shapes_when_given() -> None:
+    # A dynamic-input ONNX (e.g. YOLO26) needs a static --shapes profile to build.
+    cmd = build_trt_engines.build_engine_cmd(
+        "trtexec",
+        Path("/root/onnx/model.onnx"),
+        Path("/root/engines/yolo26.engine"),
+        "images:1x3x640x640",
+    )
+    assert cmd[-1] == "--shapes=images:1x3x640x640"
+    # Static builds (shapes=None) must NOT carry a --shapes arg.
+    static = build_trt_engines.build_engine_cmd("trtexec", Path("a.onnx"), Path("a.engine"))
+    assert not any(a.startswith("--shapes=") for a in static)
+
+
+def test_benchmark_cmd_appends_shapes_when_given() -> None:
+    cmd = build_trt_engines.benchmark_cmd(
+        "trtexec", Path("/root/engines/yolo26.engine"), "images:1x3x640x640"
+    )
+    assert cmd[-1] == "--shapes=images:1x3x640x640"
+
+
 def test_command_lists_are_str_lists_no_shell_string() -> None:
     # Every arg is a plain str (subprocess.run gets a list, never a shell
     # string / interpolation) -- the T-06-07 injection mitigation.
@@ -153,6 +174,35 @@ def test_build_result_record_has_documented_shape() -> None:
     assert record["p99_ms"] == 6.5
     assert record["nms_graft"] is True
     assert record["trt_version"] == "10.3.0"
+
+
+def test_build_result_record_marks_failed_build_with_null_latency() -> None:
+    # Continue-on-error: a failed build is recorded (null ms) rather than halting.
+    record = build_trt_engines.build_result_record(
+        name="RTMDet-M",
+        engine_scope="to_boxes",
+        latency=None,
+        nms_graft=True,
+        trt_version="10.3.0",
+        build_status="failed",
+        error="EfficientNMS_TRT plugin not found",
+    )
+    assert record["build_status"] == "failed"
+    assert record["median_ms"] is None
+    assert record["p99_ms"] is None
+    assert record["error"] == "EfficientNMS_TRT plugin not found"
+
+
+def test_build_result_record_defaults_to_ok_status() -> None:
+    record = build_trt_engines.build_result_record(
+        name="m",
+        engine_scope="model_only",
+        latency={"median_ms": 1.0, "p99_ms": 2.0},
+        nms_graft=False,
+        trt_version="10.3.0",
+    )
+    assert record["build_status"] == "ok"
+    assert "error" not in record
 
 
 def test_engine_scope_is_model_only_or_to_boxes() -> None:
