@@ -1,0 +1,83 @@
+{
+  "reproducibility": {
+    "status": "manually_measured",
+    "label": "manually measured 2026-07-21, not reproducible from this repo",
+    "measured_date": "2026-07-21",
+    "source_band_ms_2026_07_21": [
+      4.0,
+      7.1
+    ],
+    "second_run": {
+      "date": "2026-07-29",
+      "gpu": "Tesla T4 (vast.ai, shared instance)",
+      "trt_version": "10.3.0",
+      "outcome": "METHOD reproduced: all 7 to-boxes fp16 TRT engines build from committed code (YOLOX fused-head split + RTMDet end2end-strip + DAMO EfficientNMS grafts; YOLO26 NMS-free via static --shapes; the 3 DETRs decode in-graph). ABSOLUTE latency is ~2-6x higher and noisier than the source T4 (e.g. YOLOX 4.02 -> 14.76 ms, DAMO 4.24 -> 11.75 ms, DEIM 6.56 -> 43.0 ms load-artifact), so the 4.0-7.1 ms fp16 band is NOT portable across T4 instances. LAT-04 resolves to the honest-label outcome by design; the band is not tuned to fit."
+    }
+  },
+  "trt_version": "10.3.0",
+  "models": [
+    {
+      "name": "YOLO26m",
+      "engine_scope": "to_boxes",
+      "median_ms": 12.9875,
+      "p99_ms": 15.0153,
+      "nms_graft": false,
+      "trt_version": "10.3.0",
+      "build_status": "ok"
+    },
+    {
+      "name": "DEIM-M",
+      "engine_scope": "to_boxes",
+      "median_ms": 43.0035,
+      "p99_ms": 43.106,
+      "nms_graft": false,
+      "trt_version": "10.3.0",
+      "build_status": "ok"
+    },
+    {
+      "name": "YOLOX-M",
+      "engine_scope": "to_boxes",
+      "median_ms": 14.7627,
+      "p99_ms": 15.3548,
+      "nms_graft": true,
+      "trt_version": "10.3.0",
+      "build_status": "ok"
+    },
+    {
+      "name": "RF-DETR-M",
+      "engine_scope": "to_boxes",
+      "median_ms": 9.33453,
+      "p99_ms": 9.66504,
+      "nms_graft": false,
+      "trt_version": "10.3.0",
+      "build_status": "ok"
+    },
+    {
+      "name": "RTMDet-M",
+      "engine_scope": "to_boxes",
+      "median_ms": 17.0149,
+      "p99_ms": 19.4363,
+      "nms_graft": true,
+      "trt_version": "10.3.0",
+      "build_status": "ok"
+    },
+    {
+      "name": "DAMO-YOLO-M",
+      "engine_scope": "to_boxes",
+      "median_ms": 11.751,
+      "p99_ms": 12.6809,
+      "nms_graft": true,
+      "trt_version": "10.3.0",
+      "build_status": "ok"
+    },
+    {
+      "name": "RT-DETRv2-M",
+      "engine_scope": "to_boxes",
+      "median_ms": 9.54736,
+      "p99_ms": 9.69189,
+      "nms_graft": false,
+      "trt_version": "10.3.0",
+      "build_status": "ok"
+    }
+  ]
+}

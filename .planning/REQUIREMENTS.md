@@ -104,16 +104,16 @@ Irreplaceable data currently exists only on one laptop, outside any git history.
 
 ### Latency
 
-- [ ] **LAT-01**: The ONNX Runtime latency harness times full preprocess → infer →
+- [x] **LAT-01**: The ONNX Runtime latency harness times full preprocess → infer →
       postprocess → boxes through the same inferencers used for accuracy
 
-- [ ] **LAT-02**: TensorRT fp16 engines are built and benchmarked from committed code, not
+- [x] **LAT-02**: TensorRT fp16 engines are built and benchmarked from committed code, not
       ad-hoc shell history
 
 - [x] **LAT-03**: `EfficientNMS_TRT` is grafted onto the YOLO/CNN graphs by a committed
       script, making the "fair to-boxes" comparison reproducible
 
-- [ ] **LAT-04**: Published latency either reproduces the §6 fp16 band (4.0–7.1 ms) from
+- [x] **LAT-04**: Published latency either reproduces the §6 fp16 band (4.0–7.1 ms) from
       code, or is explicitly labeled in the report as manually measured and not reproducible
 
 ### Reporting
@@ -191,10 +191,10 @@ and success criteria.
 | VLM-02 | Phase 5 — Zero-Shot VLM | Complete |
 | VLM-03 | Phase 5 — Zero-Shot VLM | Complete |
 | VLM-04 | Phase 5 — Zero-Shot VLM | Complete |
-| LAT-01 | Phase 6 — Latency | Pending |
-| LAT-02 | Phase 6 — Latency | Pending |
+| LAT-01 | Phase 6 — Latency | Complete |
+| LAT-02 | Phase 6 — Latency | Complete |
 | LAT-03 | Phase 6 — Latency | Complete |
-| LAT-04 | Phase 6 — Latency | Pending |
+| LAT-04 | Phase 6 — Latency | Complete (honest-label) |
 | REPORT-01 | Phase 7 — Reports & Docs | Pending |
 | REPORT-02 | Phase 7 — Reports & Docs | Pending |
 | REPORT-03 | Phase 7 — Reports & Docs | Pending |
