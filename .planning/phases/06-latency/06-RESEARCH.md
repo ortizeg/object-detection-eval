@@ -354,17 +354,17 @@ Wrap both invocations (build, then GPU-only re-time) in `subprocess.run([...], c
 
 ## Open Questions
 
-1. **Exact `EfficientNMS_TRT` plugin schema for the installed TensorRT version**
+1. **Exact `EfficientNMS_TRT` plugin schema for the installed TensorRT version** (RESOLVED — carried forward to 06-02 graft-script docstring caveat + 06-03 T4-checkpoint `tensorrt.get_plugin_registry()` validation)
    - What we know: general attribute names (`background_class`, `max_output_boxes`, `score_threshold`, `iou_threshold`, `score_activation`, `box_coding`) from aggregated web search over NVIDIA TensorRT-OSS references.
    - What's unclear: exact default values, whether `score_bits` or other newer-TRT-version attributes are required, and the precise input tensor shape conventions expected by TRT 10.16 specifically (vs. the 10.3 the source numbers used).
    - Recommendation: have the LAT-03 plan's first task be a `trtexec --onnx=<grafted>.onnx --verbose` dry run against a real TensorRT install (even the Python `tensorrt` package's plugin registry can be introspected without a GPU: `tensorrt.get_plugin_registry()`) before writing the graft logic as fact rather than best-effort.
 
-2. **How `pixi.toml` should structure the new `trt` feature/environment**
+2. **How `pixi.toml` should structure the new `trt` feature/environment** (RESOLVED — carried forward to 06-02 Task 1, which routes the pixi env-composition syntax through the `pixi` skill before editing)
    - What we know: no `trt` feature exists today; `onnxruntime` (CPU) is an unconditional core dependency that conflicts with `onnxruntime-gpu`; `platforms = ["osx-arm64", "linux-64"]` at the workspace level would need the `trt` feature scoped to `linux-64` only (mirroring `pyproject.toml`'s own comment: `"TensorRT latency benchmarking. Linux-64 + NVIDIA only."`).
    - What's unclear: the exact `pixi.toml` syntax (`no-default-feature`, per-feature `platforms`) to cleanly express "linux-64-only, onnxruntime-gpu instead of onnxruntime, everything else from default" — not verified via a `pixi` docs fetch this session.
    - Recommendation: route this specific question through the `pixi` skill/docs before authoring the `pixi.toml` diff; don't guess at syntax for something CI/reproducibility depends on.
 
-3. **Whether the T4 rental should run a fixed container image pinned near TRT 10.3, or accept whatever a current vast.ai T4 template ships**
+3. **Whether the T4 rental should run a fixed container image pinned near TRT 10.3, or accept whatever a current vast.ai T4 template ships** (RESOLVED — carried forward to 06-03 `user_setup`, which pins a near-10.3 TRT image; version drift is an expected LAT-04 honest-label fallback)
    - What we know: version drift risk is real and documented (Pitfall 6); the source numbers are the reproduction target.
    - What's unclear: current vast.ai template availability for older CUDA/TensorRT combos (image "vast.ai T4 template + TensorRT 10.3" availability was not checked this session — no vast.ai-specific research was performed, matching scope: this research focused on the harness/graft/build code, not infra provisioning specifics already covered by Phase 5's precedent).
    - Recommendation: reuse Phase 5's `05-03-PLAN.md` `user_setup` block pattern (provision box → rsync repo → build env) but budget explicit time to select/verify a TRT version near 10.3 rather than accepting a template's default.
