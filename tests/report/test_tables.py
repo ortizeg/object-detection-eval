@@ -33,9 +33,7 @@ _ACCURACY = _FIXTURES / "accuracy_merged5.json"
 _ACCURACY_RAW10 = _FIXTURES / "accuracy_raw10.json"
 _BOOTSTRAP = _FIXTURES / "bootstrap_7models.json"
 _LATENCY = _FIXTURES / "latency_toboxes.json"
-_VLM_PRED = _FIXTURES / "vlm_pred.json"
-_VLM_GT = _FIXTURES / "vlm_gt.coco.json"
-_TAX_DIR = Path(__file__).resolve().parents[2] / "benchmarks" / "basketball" / "conf" / "taxonomy"
+_VLM_METRICS = _FIXTURES / "vlm_metrics_merged5.json"
 
 _MERGED5 = TaxonomySpec(name="merged5", classes=["player", "ball", "referee", "rim", "number"])
 _RAW10 = TaxonomySpec(
@@ -191,26 +189,43 @@ def test_latency_section_does_not_present_second_t4_as_reproduced() -> None:
 
 
 # --------------------------------------------------------------------------- #
-# VLM tables: recomputed per-class AP keyed by class name
+# VLM tables: per-class AP keyed by class name, read from the committed file
 # --------------------------------------------------------------------------- #
 
 
 def test_vlm_summary_table_renders_overall_map() -> None:
-    metrics = load_vlm_metrics(_VLM_PRED, _VLM_GT, "merged5", _TAX_DIR)
-    table = vlm_summary_table({"gemini": metrics})
-    row = next(line for line in table.splitlines() if line.startswith("| gemini "))
+    by_model = load_vlm_metrics(_VLM_METRICS)
+    table = vlm_summary_table(by_model)
+    row = next(line for line in table.splitlines() if line.startswith("| Gemini "))
     cells = [c.strip() for c in row.strip("|").split("|")]
-    assert cells[2] == f"{metrics['mAP_50']:.3f}"
+    assert cells[2] == f"{by_model['Gemini']['mAP_50']:.3f}"
 
 
 def test_vlm_per_class_table_surfaces_rim_and_zero_ap() -> None:
-    metrics = load_vlm_metrics(_VLM_PRED, _VLM_GT, "merged5", _TAX_DIR)
-    table = vlm_per_class_table({"gemini": metrics}, _MERGED5.classes)
-    row = next(line for line in table.splitlines() if line.startswith("| gemini "))
+    by_model = load_vlm_metrics(_VLM_METRICS)
+    table = vlm_per_class_table(by_model, _MERGED5.classes)
+    row = next(line for line in table.splitlines() if line.startswith("| Gemini "))
     cells = [c.strip() for c in row.strip("|").split("|")]
     # header: Model | player | ball | referee | rim | number
-    assert cells[1] == "1.000"  # player
-    assert cells[2] == "0.000"  # ball (zero-AP)
-    assert cells[3] == "0.000"  # referee (zero-AP)
-    assert cells[4] == "1.000"  # rim (surfaced)
+    assert cells[1] == "0.923"  # player
+    assert cells[4] == "0.036"  # rim surfaced with a small nonzero value
+    # SmolVLM2 is the zero-AP floor: rim (and every class) present as 0.000.
+    smol_row = next(line for line in table.splitlines() if line.startswith("| SmolVLM2 "))
+    smol_cells = [c.strip() for c in smol_row.strip("|").split("|")]
+    assert smol_cells[4] == "0.000"
+
+
+def test_vlm_per_class_table_absent_class_is_em_dash() -> None:
+    # A class missing from a model's per-class dict renders an em dash, never 0.
+    partial = {
+        "Partial": {
+            "mAP_50_95": 0.1,
+            "mAP_50": 0.2,
+            "mAP_75": 0.1,
+            "per_class_ap50": {"player": 0.5},
+        }
+    }
+    table = vlm_per_class_table(partial, _MERGED5.classes)
+    cells = [c.strip() for c in table.splitlines()[-1].strip("|").split("|")]
+    assert cells[1] == "0.500"  # player present
     assert cells[5] == _EM_DASH  # number absent -> em dash

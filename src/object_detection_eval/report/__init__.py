@@ -4,8 +4,8 @@ This package is the machine that makes REPORT-01 real: every table in every
 Phase 7 report is emitted here from a committed results file, and the
 ``scripts/generate_report.py`` ``--check`` mode fails if a report ever drifts
 from its data. The whole package imports and runs under the default torch-free
-CI selection (it only reads JSON and, for the VLM path, recomputes AP through
-the torch-free ``supervision`` stack).
+CI selection: it only reads committed JSON results files (including the
+precomputed VLM metrics file) and never touches ground truth at render time.
 """
 
 from __future__ import annotations
@@ -23,6 +23,7 @@ from object_detection_eval.report.loaders import (
     ReportLoadError,
     Reproducibility,
     SecondRun,
+    VlmModelEntry,
     load_accuracy_results,
     load_bootstrap_report,
     load_latency_results,
@@ -49,6 +50,7 @@ __all__ = [
     "ReportLoadError",
     "Reproducibility",
     "SecondRun",
+    "VlmModelEntry",
     "ci_table",
     "inject_table",
     "latency_section",

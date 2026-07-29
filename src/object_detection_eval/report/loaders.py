@@ -4,8 +4,9 @@ Every published report table is emitted from one of these loaded models, never
 from a hand-typed number (REPORT-01). The models mirror ``ModelCard``'s strict
 convention (``extra="forbid"``, ``frozen=True``): an unexpected or missing field
 fails loudly at load time (T-07-04) instead of silently rendering a wrong or
-blank cell. The whole module is torch-free — it reads JSON and, for the VLM
-path, recomputes AP through the torch-free ``supervision`` metrics stack only.
+blank cell. The whole module is torch-free — it reads committed JSON results
+files only (the VLM table reads a precomputed metrics file; scoring against
+ground truth happens once, offline, in ``scripts/write_vlm_metrics.py``).
 """
 
 from __future__ import annotations
@@ -14,8 +15,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from loguru import logger
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, ValidationError
 
 _STRICT = ConfigDict(extra="forbid", frozen=True, populate_by_name=True)
 
@@ -197,52 +197,51 @@ def load_latency_results(path: Path | str) -> LatencyResult:
 
 
 # --------------------------------------------------------------------------- #
-# VLM: recompute per-class AP from a prediction dump — never transcribe
+# VLM: read the committed precomputed metrics file — never recompute at render
 # --------------------------------------------------------------------------- #
 
 
-def load_vlm_metrics(
-    vlm_json_path: Path | str,
-    gt_path: Path | str,
-    taxonomy_name: str = "merged5",
-    taxonomy_dir: Path | None = None,
-) -> dict[str, Any]:
-    """Recompute a VLM's mAP + per-class AP@50 from its prediction dump.
+class VlmModelEntry(BaseModel):
+    """One VLM's precomputed metrics as written by ``write_vlm_metrics.py``.
 
     The per-class keys are CLASS NAMES (player/ball/referee/rim/number), not
-    raw ids, because ``id_to_name`` from ``resolve_taxonomy(taxonomy_name)`` is
-    passed into ``compute_metrics`` (Pitfall 2). Nothing is transcribed: the
-    numbers are recomputed from the committed prediction JSON and ground truth
-    through the torch-free ``supervision`` stack (REPORT-01, T-07-07).
+    raw ids — the scoring step passes ``id_to_name`` into ``compute_metrics``
+    (Pitfall 2) before writing this file.
+    """
+
+    model_config = _STRICT
+
+    map_50_95: float = Field(alias="mAP_50_95")
+    map_50: float = Field(alias="mAP_50")
+    map_75: float = Field(alias="mAP_75")
+    per_class_ap50: dict[str, float]
+
+
+#: The committed VLM metrics file is a bare ``{model_label: VlmModelEntry}`` map.
+_VLM_METRICS_ADAPTER = TypeAdapter(dict[str, VlmModelEntry])
+
+
+def load_vlm_metrics(path: Path | str) -> dict[str, dict[str, Any]]:
+    """Load the committed precomputed VLM metrics file.
+
+    The report VLM tables are rendered from THIS committed file, never
+    recomputed from a prediction dump + ground truth at render/check time — so
+    the drift gate runs GT-free (the raw dataset is absent in CI). The sole
+    place that scores predictions against ground truth is
+    ``scripts/write_vlm_metrics.py``, which produces this file (REPORT-01).
 
     Args:
-        vlm_json_path: A ``results/vlm/*.json`` per-image prediction dump.
-        gt_path: The COCO ground-truth annotations JSON.
-        taxonomy_name: Taxonomy to score against (default ``"merged5"``).
-        taxonomy_dir: Optional override for the taxonomy YAML directory.
+        path: The committed ``results/vlm/vlm_metrics_{taxonomy}.json`` file.
 
     Returns:
-        The ``compute_metrics`` dict: ``mAP_50_95``, ``mAP_50``, ``mAP_75``,
-        and ``per_class_ap50`` keyed by class name.
+        ``{model_label: {mAP_50_95, mAP_50, mAP_75, per_class_ap50}}`` — plain
+        dicts (aliased keys) keyed by class name, ready for the table renderers.
+
+    Raises:
+        ReportLoadError: the file has an unexpected/missing key or wrong type.
     """
-    # Imported lazily so ``import object_detection_eval.report`` stays a
-    # pydantic/stdlib-only cost; these deps are all torch-free.
-    from object_detection_eval.data.coco_gt import load_coco_gt
-    from object_detection_eval.data.taxonomy import resolve_taxonomy
-    from object_detection_eval.metrics.bootstrap import load_predictions
-    from object_detection_eval.metrics.detection_map import compute_metrics
-
-    if taxonomy_dir is None:
-        name_to_id, id_to_name = resolve_taxonomy(taxonomy_name)
-    else:
-        name_to_id, id_to_name = resolve_taxonomy(taxonomy_name, taxonomy_dir=taxonomy_dir)
-
-    gt_map = load_coco_gt(Path(gt_path), name_to_id)
-    pred_map = load_predictions(Path(vlm_json_path))
-    metrics = compute_metrics(gt_map, pred_map, id_to_name=id_to_name)
-    logger.debug(
-        "load_vlm_metrics: {} -> mAP_50={:.4f}",
-        Path(vlm_json_path).name,
-        metrics["mAP_50"],
-    )
-    return metrics
+    try:
+        models = _VLM_METRICS_ADAPTER.validate_python(_read_json(path))
+    except ValidationError as exc:
+        raise ReportLoadError(f"{path}: {exc}") from exc
+    return {label: entry.model_dump(by_alias=True) for label, entry in models.items()}
