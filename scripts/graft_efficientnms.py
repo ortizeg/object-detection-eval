@@ -10,15 +10,26 @@ Only the **3 dense-head models** are grafted -- those whose ONNX ends at a raw,
 un-suppressed prediction set and whose NMS runs in numpy today
 (``src/object_detection_eval/inference/postprocess.py``):
 
-* ``yolox``  -- YOLOXPostProcessor: score = obj_conf * class_conf (already
-  activated -> ``score_activation=False``); boxes decoded cxcywh -> xyxy corner
-  (``box_coding=0``); NMS IoU 0.45.
-* ``damo``   -- DamoPostProcessor: per-class sigmoid scores
-  (``score_activation=False``); bboxes xyxy corner (``box_coding=0``); NMS IoU 0.7.
+* ``yolox``  -- YOLOXPostProcessor: single FUSED output ``[1, N, 5 + C]`` =
+  ``[cx, cy, w, h, obj, cls_0..cls_{C-1}]`` in model-input pixels. There are NO
+  separate box/score tensors to attach to, so :func:`split_fused_head` slices
+  boxes ``[..., 0:4]``, objectness ``[..., 4:5]`` and per-class scores
+  ``[..., 5:]`` out of the fused tensor and computes ``scores = obj * cls``
+  (``score_activation=False`` -- both factors are already activated). The boxes
+  stay center-size ``cxcywh`` and are fed with ``box_coding=1`` (center-size),
+  which lets the plugin do the cxcywh->xyxy decode itself and avoids grafting an
+  extra decode subgraph; NMS IoU 0.45.
+* ``damo``   -- DamoPostProcessor: separate ``[1, N, 4]`` boxes + ``[1, N, C]``
+  per-class sigmoid scores (``score_activation=False``); bboxes xyxy corner
+  (``box_coding=0``); NMS IoU 0.7.
 * ``rtmdet`` -- RTMDet's mmdeploy ``end2end`` export runs NMS **in-graph** via a
   pre-NMS ``TopK`` node whose ``K`` exceeds TensorRT's hard ``K>3840`` limit.
-  That ``TopK`` (and the downstream in-graph NMS/gather chain) is stripped FIRST
-  (:func:`strip_pre_nms_topk`) to re-expose the raw dense head, then grafted;
+  :func:`strip_pre_nms_topk` anchors on the in-graph ``NonMaxSuppression`` node
+  and traces each of its box/score inputs BACKWARD through the reshaping tail
+  (``Gather`` / ``Transpose`` / ``Reshape`` / ``Squeeze`` ...) to the first
+  non-passthrough producer -- the raw dense head (``[1, N, 4]`` xyxy boxes +
+  ``[1, N, C]`` sigmoid scores). Those two tensors are re-exposed as the graph
+  outputs (the TopK/NMS/gather tail is dropped by ``cleanup``), then grafted;
   boxes xyxy corner (``box_coding=0``), sigmoid cls scores
   (``score_activation=False``), mmdet default NMS IoU 0.65.
 
@@ -59,7 +70,27 @@ import numpy as np
 import onnx
 import onnx_graphsurgeon as gs
 from loguru import logger
+from onnx import shape_inference
 from pydantic import BaseModel, ConfigDict
+
+# Reshaping / gather ops the RTMDet strip walks THROUGH (following input[0]) when
+# tracing an in-graph NMS input backward to the raw dense head. They only permute
+# / index / reshape data, so the tensor semantics (a box or a score) are
+# preserved across them; the trace stops at the first producer NOT in this set.
+_PASSTHROUGH_OPS: frozenset[str] = frozenset(
+    {
+        "Gather",
+        "GatherND",
+        "Transpose",
+        "Reshape",
+        "Squeeze",
+        "Unsqueeze",
+        "Cast",
+        "Flatten",
+        "Identity",
+        "Slice",
+    }
+)
 
 # Models whose ONNX already emits final, suppressed detections -- grafting an
 # EfficientNMS node onto them would corrupt their output semantics (T-06-05).
@@ -86,6 +117,7 @@ class GraftConfig(BaseModel):
     background_class: int = -1
     plugin_version: str = "1"
     strip_topk_first: bool = False  # RTMDet: strip the pre-NMS TopK before grafting
+    fused_split: bool = False  # YOLOX: split a single fused [1,N,5+C] head first
 
 
 # Per-model graft attributes, sourced from postprocess.py (Pitfall 7).
@@ -94,8 +126,9 @@ PER_MODEL_CONFIGS: dict[str, GraftConfig] = {
         model="yolox",
         iou_threshold=0.45,  # YOLOXPostProcessor.nms_iou_threshold default
         score_threshold=0.25,  # YOLOXPostProcessor confidence_threshold default
-        box_coding=0,  # cxcywh decoded to xyxy corner before NMS
-        score_activation=False,  # obj_conf * class_conf already activated
+        box_coding=1,  # fused head emits center-size cxcywh -> feed as center-size
+        score_activation=False,  # scores = obj_conf * class_conf, already activated
+        fused_split=True,  # single fused [1,N,5+C] output -> slice + obj*cls first
     ),
     "damo": GraftConfig(
         model="damo",
@@ -155,54 +188,141 @@ def _is_scores(tensor: gs.Variable) -> bool:
     return tensor.shape is not None and len(tensor.shape) == 3 and tensor.shape[-1] != 4
 
 
-def strip_pre_nms_topk(graph: gs.Graph) -> gs.Graph:
-    """Remove RTMDet's mmdeploy pre-NMS ``TopK`` (and any in-graph NMS chain).
+def _trace_back_to_dense_head(tensor: gs.Variable, producers: dict[str, gs.Node]) -> gs.Variable:
+    """Walk an in-graph NMS input BACK to the raw dense-head tensor feeding it.
 
-    RTMDet's mmdeploy ``end2end`` export runs NMS in-graph via a pre-NMS
-    ``TopK`` node whose ``K`` exceeds TensorRT's hard ``K>3840`` limit, blocking a
-    naive fp16 build (Pitfall 3). Deleting the ``TopK`` / ``NonMaxSuppression`` /
-    ``GatherND`` chain re-exposes the raw dense head (the rank-3 boxes/scores
-    tensors feeding the TopK) as graph outputs so :func:`graft_efficient_nms` can
-    attach a TensorRT-buildable ``EfficientNMS_TRT`` node instead.
+    Follows the ``input[0]`` (data) edge through purely reshaping/indexing ops
+    (:data:`_PASSTHROUGH_OPS`: ``Gather`` / ``Transpose`` / ``Reshape`` ...) and
+    stops at the first producer that is NOT one of them -- i.e. the node that
+    actually *computes* the boxes (``Concat`` of the decoded per-level boxes) or
+    the scores (``Sigmoid``). Graph inputs / initializers (no producer) also
+    stop the walk. The returned tensor is the full-resolution ``[1, N, *]`` dense
+    head, before the pre-NMS ``TopK`` reduced ``N`` to a ``K>3840`` subset.
+
+    ``producers`` maps each tensor name to the node that produces it.
     """
-    strip_ops = {"TopK", "NonMaxSuppression", "GatherND"}
-    strip_nodes = [n for n in graph.nodes if n.op in strip_ops]
-    if not strip_nodes:
-        logger.warning("strip_pre_nms_topk: no TopK/NMS node found -- graph left unchanged")
+    current = tensor
+    # Bound the walk by the node count so a pathological cycle can't loop forever.
+    for _ in range(len(producers) + 1):
+        producer = producers.get(current.name)
+        if producer is None or producer.op not in _PASSTHROUGH_OPS or not producer.inputs:
+            return current
+        nxt = producer.inputs[0]
+        if not isinstance(nxt, gs.Variable):
+            return current
+        current = nxt
+    return current
+
+
+def strip_pre_nms_topk(graph: gs.Graph) -> gs.Graph:
+    """Remove RTMDet's mmdeploy in-graph NMS tail, re-exposing the raw dense head.
+
+    RTMDet's mmdeploy ``end2end`` export runs NMS in-graph, preceded by a
+    ``TopK`` whose ``K`` (here 5000) exceeds TensorRT's hard ``K>3840`` limit,
+    blocking a naive fp16 build (Pitfall 3). This anchors on the
+    ``NonMaxSuppression`` node and traces its boxes input (``inputs[0]``) and
+    scores input (``inputs[1]``) backward via :func:`_trace_back_to_dense_head`
+    to the raw ``[1, N, 4]`` boxes and ``[1, N, C]`` scores tensors, re-exposes
+    those two as the graph outputs, and lets ``cleanup`` drop the now-orphaned
+    ``TopK`` / ``NonMaxSuppression`` / ``Gather`` tail so
+    :func:`graft_efficient_nms` can attach a TensorRT-buildable
+    ``EfficientNMS_TRT`` node onto the full-resolution head instead.
+    """
+    nms_nodes = [n for n in graph.nodes if n.op == "NonMaxSuppression"]
+    if not nms_nodes:
+        logger.warning("strip_pre_nms_topk: no NonMaxSuppression node found -- graph unchanged")
         return graph
 
-    # Capture the raw rank-3 dense-head tensors feeding the strip chain BEFORE
-    # removing the nodes, so we can re-expose them as graph outputs.
-    raw_head: list[gs.Variable] = []
-    for node in strip_nodes:
-        for tensor in node.inputs:
-            if (
-                isinstance(tensor, gs.Variable)
-                and tensor.shape is not None
-                and len(tensor.shape) == 3
-                and tensor not in raw_head
-            ):
-                raw_head.append(tensor)
+    nms = nms_nodes[0]
+    producers: dict[str, gs.Node] = {
+        out.name: node for node in graph.nodes for out in node.outputs if out.name
+    }
+    boxes = _trace_back_to_dense_head(nms.inputs[0], producers)
+    scores = _trace_back_to_dense_head(nms.inputs[1], producers)
+    # NMS convention is (boxes, scores); swap if shape inference tells us the
+    # trace landed the other way round (boxes := trailing-dim-4 tensor).
+    if _is_scores(boxes) and _is_boxes(scores):
+        boxes, scores = scores, boxes
 
-    kept = [n for n in graph.nodes if n.op not in strip_ops]
-    removed = len(graph.nodes) - len(kept)
-    graph.nodes = kept
-    graph.outputs = raw_head
+    graph.outputs = [boxes, scores]
     graph.cleanup().toposort()
-    logger.info(f"strip_pre_nms_topk: removed {removed} pre-NMS node(s); re-exposed raw head")
+    logger.info(
+        f"strip_pre_nms_topk: re-exposed raw dense head boxes='{boxes.name}' "
+        f"scores='{scores.name}' (dropped the in-graph TopK/NMS tail)"
+    )
     return graph
 
 
-def graft_efficient_nms(graph: gs.Graph, cfg: GraftConfig) -> gs.Graph:
+def split_fused_head(graph: gs.Graph) -> tuple[gs.Variable, gs.Variable]:
+    """Split a single fused YOLOX head ``[1, N, 5 + C]`` into boxes + scores.
+
+    The YOLOX ONNX has ONE output ``[cx, cy, w, h, obj, cls_0..cls_{C-1}]`` (no
+    separate box/score tensors to graft onto). This slices it into center-size
+    boxes ``[..., 0:4]``, objectness ``[..., 4:5]`` and per-class scores
+    ``[..., 5:]``, then multiplies ``scores = obj * cls`` -- exactly the
+    ``YOLOXPostProcessor`` convention -- and returns ``(boxes, scores)`` for
+    :func:`graft_efficient_nms` (fed with ``box_coding=1`` so the plugin decodes
+    the cxcywh boxes itself).
+    """
+    fused = graph.outputs[0]
+    if fused.shape is None or len(fused.shape) != 3:
+        msg = f"split_fused_head: expected a single rank-3 fused output, got shape {fused.shape}"
+        raise ValueError(msg)
+    batch, num_anchors, channels = fused.shape
+    num_classes = int(channels) - 5
+    if num_classes <= 0:
+        msg = f"split_fused_head: fused channel dim {channels} is not 5 + C (C>0)"
+        raise ValueError(msg)
+
+    def _slice(name: str, start: int, stop: int, out_c: int | str) -> gs.Variable:
+        out = gs.Variable(name, dtype=np.float32, shape=[batch, num_anchors, out_c])
+        node = gs.Node(
+            op="Slice",
+            name=f"{name}_slice",
+            inputs=[
+                fused,
+                gs.Constant(f"{name}_starts", np.array([start], dtype=np.int64)),
+                gs.Constant(f"{name}_ends", np.array([stop], dtype=np.int64)),
+                gs.Constant(f"{name}_axes", np.array([2], dtype=np.int64)),
+                gs.Constant(f"{name}_steps", np.array([1], dtype=np.int64)),
+            ],
+            outputs=[out],
+        )
+        graph.nodes.append(node)
+        return out
+
+    boxes = _slice("yolox_boxes", 0, 4, 4)
+    obj = _slice("yolox_obj", 4, 5, 1)
+    cls = _slice("yolox_cls", 5, int(channels), num_classes)
+
+    scores = gs.Variable("yolox_scores", dtype=np.float32, shape=[batch, num_anchors, num_classes])
+    graph.nodes.append(
+        gs.Node(op="Mul", name="yolox_obj_times_cls", inputs=[obj, cls], outputs=[scores])
+    )
+    logger.info(
+        f"split_fused_head: sliced fused YOLOX head -> boxes[..,4] + scores[..,{num_classes}]"
+    )
+    return boxes, scores
+
+
+def graft_efficient_nms(
+    graph: gs.Graph,
+    cfg: GraftConfig,
+    boxes: gs.Variable | None = None,
+    scores: gs.Variable | None = None,
+) -> gs.Graph:
     """Append one ``EfficientNMS_TRT`` node onto the graph's dense head.
 
-    Locates the raw boxes/scores tensors, appends a single ``EfficientNMS_TRT``
+    Uses the explicit ``boxes`` / ``scores`` tensors when given (the YOLOX
+    fused-split path supplies them directly); otherwise locates the raw
+    boxes/scores tensors from the graph. Appends a single ``EfficientNMS_TRT``
     node with attributes from ``cfg`` (each sourced from the model's own
     postprocessor convention, Pitfall 7), rewires the graph's outputs to the
     plugin's 4 typed outputs, and toposorts. Structure only -- plugin semantics
     are T4-validated (Open Question 1).
     """
-    boxes, scores = _find_box_and_score_tensors(graph)
+    if boxes is None or scores is None:
+        boxes, scores = _find_box_and_score_tensors(graph)
 
     nms_outputs = [
         gs.Variable("num_detections", dtype=np.int32, shape=[1, 1]),
@@ -256,12 +376,25 @@ def graft_model(model: str, in_path: Path, out_path: Path) -> Path:
         sys.exit(1)
 
     logger.info(f"loading raw ONNX: {in_path}")
-    graph = gs.import_onnx(onnx.load(str(in_path)))
+    model_proto = onnx.load(str(in_path))
+    # Populate tensor shapes so the strip's trace and the fused split can read
+    # rank/last-dim (mmdeploy/YOLOX exports omit intermediate value_info).
+    if cfg.strip_topk_first or cfg.fused_split:
+        try:
+            model_proto = shape_inference.infer_shapes(model_proto)
+        except Exception as exc:  # pragma: no cover - defensive, rare
+            logger.warning(f"shape inference failed ({exc}); proceeding without inferred shapes")
+    graph = gs.import_onnx(model_proto)
 
     if cfg.strip_topk_first:
         graph = strip_pre_nms_topk(graph)
 
-    graph = graft_efficient_nms(graph, cfg)
+    boxes: gs.Variable | None = None
+    scores: gs.Variable | None = None
+    if cfg.fused_split:
+        boxes, scores = split_fused_head(graph)
+
+    graph = graft_efficient_nms(graph, cfg, boxes, scores)
 
     onnx.save(gs.export_onnx(graph), str(out_path))
     logger.info(f"wrote grafted ONNX: {out_path}")
