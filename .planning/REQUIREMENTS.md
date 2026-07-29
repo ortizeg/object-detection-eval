@@ -32,7 +32,7 @@ Irreplaceable data currently exists only on one laptop, outside any git history.
 - [x] **CORE-02**: `compute_metrics()` is public, typed, and tested, returning
       mAP@50:95 / mAP@50 / mAP@75 and per-class AP@50 via `supervision`
 
-- [ ] **CORE-03**: Operating-threshold selection (F1 sweep) and PR-curve computation are
+- [x] **CORE-03**: Operating-threshold selection (F1 sweep) and PR-curve computation are
       public functions with tests, independent of any task object
 
 - [x] **CORE-04**: A seeded, paired, image-level bootstrap produces 95% CIs for a single
@@ -83,10 +83,10 @@ Irreplaceable data currently exists only on one laptop, outside any git history.
       tolerance: YOLO26m 0.716, DEIM-M 0.686, YOLOX-M 0.672, RF-DETR-M 0.646,
       RTMDet-M 0.628, DAMO-M 0.619, RT-DETRv2-M 0.581
 
-- [ ] **REPRO-02**: The COCO reference check reproduces YOLOX-S on val2017 at 39.6 vs 40.5
+- [x] **REPRO-02**: The COCO reference check reproduces YOLOX-S on val2017 at 39.6 vs 40.5
       published, confirming the harness is not the source of accuracy swings
 
-- [ ] **REPRO-03**: The bootstrap reproduces the published CIs, including YOLOX-M vs
+- [x] **REPRO-03**: The bootstrap reproduces the published CIs, including YOLOX-M vs
       YOLO26m as a statistical tie
 
 ### Zero-Shot VLM
@@ -171,7 +171,7 @@ and success criteria.
 | INFRA-01 | Phase 1 — Provenance Rescue & Public Repo | Complete |
 | CORE-01 | Phase 2 — Harness Core | Complete |
 | CORE-02 | Phase 2 — Harness Core | Complete |
-| CORE-03 | Phase 2 — Harness Core | Pending |
+| CORE-03 | Phase 2 — Harness Core | Complete |
 | CORE-04 | Phase 2 — Harness Core | Complete |
 | CORE-05 | Phase 2 — Harness Core | Complete |
 | CORE-06 | Phase 2 — Harness Core | Complete |
@@ -185,8 +185,8 @@ and success criteria.
 | REG-05 | Phase 3 — Model Registry | Complete |
 | REG-06 | Phase 3 — Model Registry | Complete |
 | REPRO-01 | Phase 4 — Reproduction Gate | Complete |
-| REPRO-02 | Phase 4 — Reproduction Gate | Pending |
-| REPRO-03 | Phase 4 — Reproduction Gate | Pending |
+| REPRO-02 | Phase 4 — Reproduction Gate | Complete |
+| REPRO-03 | Phase 4 — Reproduction Gate | Complete |
 | VLM-01 | Phase 5 — Zero-Shot VLM | Complete |
 | VLM-02 | Phase 5 — Zero-Shot VLM | Complete |
 | VLM-03 | Phase 5 — Zero-Shot VLM | Complete |
