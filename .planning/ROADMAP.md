@@ -175,11 +175,12 @@ Notes:
   3. A committed graph-surgery script grafts `EfficientNMS_TRT` onto the YOLO/CNN graphs, making the "fair to-boxes" comparison reproducible rather than ad-hoc
   4. Published latency either lands inside the §6 fp16 band (4.0–7.1 ms) from committed code and confirms on-GPU NMS costs 0.05–0.2 ms, or the report carries an explicit "manually measured 2026-07-21, not reproducible from this repo" label
 
-**Plans**: 3 plans
+**Plans**: 2/3 plans executed
 
 Plans:
-- [ ] 06-01-PLAN.md — LAT-01 uniform e2e latency harness (run_latency.py + manifest + LAT-04 band helpers), CPU-developable [Wave 1]
-- [ ] 06-02-PLAN.md — LAT-03 EfficientNMS_TRT graft + RTMDet TopK strip + pixi graphsurgeon/trt envs + pinned [trt] extra, CPU-developable [Wave 1]
+
+- [x] 06-01-PLAN.md — LAT-01 uniform e2e latency harness (run_latency.py + manifest + LAT-04 band helpers), CPU-developable [Wave 1]
+- [x] 06-02-PLAN.md — LAT-03 EfficientNMS_TRT graft + RTMDet TopK strip + pixi graphsurgeon/trt envs + pinned [trt] extra, CPU-developable [Wave 1]
 - [ ] 06-03-PLAN.md — LAT-02 trtexec fp16 build/benchmark + LAT-04 verdict (publish-or-honest-label), T4 checkpoint [Wave 2, depends on 06-01 + 06-02]
 
 Notes:
@@ -222,7 +223,7 @@ Phases 5 and 6 have no dependency on each other and may execute in parallel afte
 | 3. Model Registry | 3/3 | In Progress|  |
 | 4. Reproduction Gate | 3/3 | In Progress|  |
 | 5. Zero-Shot VLM | 4/4 | Complete | 2026-07-28 |
-| 6. Latency | 0/TBD | Not started | - |
+| 6. Latency | 2/3 | In Progress|  |
 | 7. Reports & Docs | 0/TBD | Not started | - |
 
 ## Coverage
