@@ -197,6 +197,58 @@ def load_latency_results(path: Path | str) -> LatencyResult:
 
 
 # --------------------------------------------------------------------------- #
+# CPU / edge latency (LAT-05): results/latency/cpu_e2e_conf{025,001}.json
+# --------------------------------------------------------------------------- #
+
+
+class CpuLatencyModelEntry(BaseModel):
+    """One model's measured CPU end-to-end latency, as ``run_latency.py`` writes it.
+
+    This is the plain ``build_record`` shape (``+ suspect`` from
+    ``_flag_suspects``) — deliberately distinct from ``LatencyModelEntry``: no
+    ``engine_scope`` / ``trt_version`` / ``build_status``, because these are
+    measured CPU numbers, not honest-labelled TRT ones. ``suspect`` defaults to
+    ``False`` so both a pre- and post-``_flag_suspects`` record validate.
+    """
+
+    model_config = _STRICT
+
+    name: str
+    median_ms: float
+    p90_ms: float
+    fps: float
+    provider: str
+    nms_graft: bool
+    suspect: bool = False
+
+
+class CpuLatencyResult(BaseModel):
+    """The bare ``{"models": [...]}`` CPU-latency payload (NO reproducibility block).
+
+    Distinct from ``LatencyResult``, whose schema REQUIRES a ``reproducibility``
+    record: the CPU files are plain measured numbers with no honest-label
+    provenance, so reusing ``LatencyResult`` would reject them (missing key).
+    """
+
+    model_config = _STRICT
+
+    models: list[CpuLatencyModelEntry]
+
+
+def load_cpu_latency_results(path: Path | str) -> CpuLatencyResult:
+    """Load and validate a CPU end-to-end latency results JSON (LAT-05).
+
+    Raises:
+        ReportLoadError: the file has an unexpected/missing key or wrong type
+            (e.g. a ``reproducibility`` block, which this shape forbids).
+    """
+    try:
+        return CpuLatencyResult.model_validate(_read_json(path))
+    except ValidationError as exc:
+        raise ReportLoadError(f"{path}: {exc}") from exc
+
+
+# --------------------------------------------------------------------------- #
 # VLM: read the committed precomputed metrics file — never recompute at render
 # --------------------------------------------------------------------------- #
 

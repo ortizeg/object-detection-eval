@@ -16,6 +16,8 @@ from typing import Any
 from object_detection_eval.report.loaders import (
     AccuracyResult,
     BootstrapReport,
+    CpuLatencyModelEntry,
+    CpuLatencyResult,
     LatencyResult,
 )
 from object_detection_eval.schemas.taxonomy import TaxonomySpec
@@ -168,6 +170,72 @@ def latency_section(result: LatencyResult) -> str:
     )
     lines.append(table)
     return "\n".join(lines)
+
+
+# --------------------------------------------------------------------------- #
+# CPU / edge latency (LAT-05): where the NMS-free advantage shows up on CPU
+# --------------------------------------------------------------------------- #
+
+#: Head-type label per model, driving the "head" column. The 3 dense-head
+#: detectors pay a Python/numpy NMS cost that balloons at low confidence; the
+#: NMS-free YOLO26 and the in-graph-decode DETRs do not.
+_CPU_HEAD_DENSE = "dense + Python NMS"
+_CPU_HEAD_NMS_FREE = "NMS-free"
+_CPU_HEAD_DETR = "DETR decode"
+
+
+def _cpu_head(entry: CpuLatencyModelEntry) -> str:
+    """Classify a model's detection head for the CPU-latency table.
+
+    ``nms_graft`` marks the dense heads (YOLOX / DAMO-YOLO / RTMDet) that run a
+    Python NMS on CPU; ``YOLO26m`` is the sole NMS-free head; everything else in
+    the fleet is one of the three in-graph-decode DETRs.
+    """
+    if entry.nms_graft:
+        return _CPU_HEAD_DENSE
+    if entry.name == "YOLO26m":
+        return _CPU_HEAD_NMS_FREE
+    return _CPU_HEAD_DETR
+
+
+def cpu_latency_section(conf025: CpuLatencyResult, conf001: CpuLatencyResult) -> str:
+    """Render the CPU end-to-end latency table joining the two conf runs (LAT-05).
+
+    Columns: ``Model | CPU e2e @conf0.25 (ms) | CPU e2e @conf0.01 (ms) |
+    Δ (NMS blow-up) | head``. ``Δ`` is ``median@0.01 - median@0.25`` — near zero
+    for the NMS-free and DETR-decode heads, but large and positive for the dense
+    heads whose Python/numpy NMS cost explodes at low confidence. Rows are sorted
+    by the conf=0.25 median (the deployment-realistic threshold).
+
+    Raises:
+        ValueError: a model timed at conf=0.25 is absent from the conf=0.01 run
+            (the two files must cover the same fleet to join).
+    """
+    by_name_001 = {m.name: m for m in conf001.models}
+    rows: list[list[str]] = []
+    for entry in sorted(conf025.models, key=lambda m: m.median_ms):
+        other = by_name_001.get(entry.name)
+        if other is None:
+            msg = f"conf=0.01 run is missing model {entry.name!r} present at conf=0.25"
+            raise ValueError(msg)
+        delta = other.median_ms - entry.median_ms
+        rows.append(
+            [
+                entry.name,
+                f"{entry.median_ms:.1f}",
+                f"{other.median_ms:.1f}",
+                f"{delta:+.1f}",
+                _cpu_head(entry),
+            ]
+        )
+    header = [
+        "Model",
+        "CPU e2e @conf0.25 (ms)",
+        "CPU e2e @conf0.01 (ms)",
+        "Δ (NMS blow-up)",
+        "head",
+    ]
+    return _table(header, rows)
 
 
 def vlm_summary_table(metrics_by_model: Mapping[str, Mapping[str, Any]]) -> str:

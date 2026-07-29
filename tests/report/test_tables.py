@@ -16,9 +16,11 @@ from pydantic import ValidationError
 from object_detection_eval.report import (
     ReportLoadError,
     ci_table,
+    cpu_latency_section,
     latency_section,
     load_accuracy_results,
     load_bootstrap_report,
+    load_cpu_latency_results,
     load_latency_results,
     load_vlm_metrics,
     per_class_table,
@@ -33,6 +35,8 @@ _ACCURACY = _FIXTURES / "accuracy_merged5.json"
 _ACCURACY_RAW10 = _FIXTURES / "accuracy_raw10.json"
 _BOOTSTRAP = _FIXTURES / "bootstrap_7models.json"
 _LATENCY = _FIXTURES / "latency_toboxes.json"
+_CPU_LATENCY_025 = _FIXTURES / "cpu_e2e_conf025.json"
+_CPU_LATENCY_001 = _FIXTURES / "cpu_e2e_conf001.json"
 _VLM_METRICS = _FIXTURES / "vlm_metrics_merged5.json"
 
 _MERGED5 = TaxonomySpec(name="merged5", classes=["player", "ball", "referee", "rim", "number"])
@@ -186,6 +190,56 @@ def test_latency_section_does_not_present_second_t4_as_reproduced() -> None:
     # The second-T4 medians must be labelled as a cross-check, not "reproduced".
     assert "not" in section.lower()
     assert "reproduced source band" not in section.lower()
+
+
+# --------------------------------------------------------------------------- #
+# cpu_latency_section: joins the two conf runs, Δ column + head labels (LAT-05)
+# --------------------------------------------------------------------------- #
+
+
+def test_cpu_latency_section_delta_and_head_labels() -> None:
+    conf025 = load_cpu_latency_results(_CPU_LATENCY_025)
+    conf001 = load_cpu_latency_results(_CPU_LATENCY_001)
+    table = cpu_latency_section(conf025, conf001)
+
+    # header: Model | CPU e2e @conf0.25 (ms) | CPU e2e @conf0.01 (ms) | Δ (NMS blow-up) | head
+    yolox = _row_cells(table, "YOLOX-M")
+    assert yolox[1] == "100.0"
+    assert yolox[2] == "240.0"
+    assert yolox[3] == "+140.0"  # dense-head Python NMS blow-up at low conf
+    assert yolox[4] == "dense + Python NMS"
+
+    yolo26 = _row_cells(table, "YOLO26m")
+    assert yolo26[3] == "+1.0"  # NMS-free: essentially flat across the sweep
+    assert yolo26[4] == "NMS-free"
+
+    rfdetr = _row_cells(table, "RF-DETR-M")
+    assert rfdetr[3] == "+0.5"  # DETR in-graph decode: unaffected
+    assert rfdetr[4] == "DETR decode"
+
+
+def test_cpu_latency_section_sorted_by_conf025_median() -> None:
+    conf025 = load_cpu_latency_results(_CPU_LATENCY_025)
+    conf001 = load_cpu_latency_results(_CPU_LATENCY_001)
+    table = cpu_latency_section(conf025, conf001)
+    data_rows = [
+        line
+        for line in table.splitlines()
+        if line.startswith("| ") and "Model" not in line and "---" not in line
+    ]
+    models = [line.strip("|").split("|")[0].strip() for line in data_rows]
+    # RF-DETR-M (80) < YOLO26m (90) < YOLOX-M (100).
+    assert models == ["RF-DETR-M", "YOLO26m", "YOLOX-M"]
+
+
+def test_cpu_latency_section_raises_on_missing_model() -> None:
+    conf025 = load_cpu_latency_results(_CPU_LATENCY_025)
+    # A conf=0.01 run missing a model present at conf=0.25 cannot be joined.
+    partial = load_cpu_latency_results(_CPU_LATENCY_001).model_copy(
+        update={"models": load_cpu_latency_results(_CPU_LATENCY_001).models[:1]}
+    )
+    with pytest.raises(ValueError, match="missing model"):
+        cpu_latency_section(conf025, partial)
 
 
 # --------------------------------------------------------------------------- #

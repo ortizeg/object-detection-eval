@@ -31,10 +31,12 @@ from loguru import logger
 
 from object_detection_eval.report import (
     ci_table,
+    cpu_latency_section,
     inject_table,
     latency_section,
     load_accuracy_results,
     load_bootstrap_report,
+    load_cpu_latency_results,
     load_latency_results,
     load_vlm_metrics,
     per_class_table,
@@ -48,6 +50,39 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 _DEFAULT_RESULTS_DIR = _REPO_ROOT / "benchmarks" / "basketball" / "results"
 _DEFAULT_REPORT_DIR = _REPO_ROOT / "benchmarks" / "basketball" / "reports"
 _DEFAULT_TAXONOMY_DIR = _REPO_ROOT / "benchmarks" / "basketball" / "conf" / "taxonomy"
+
+#: Injected in place of the CPU-latency table while the two measured CPU results
+#: files are not yet committed. The section renders GT-free from committed JSON
+#: only, so ``--check`` passes both BEFORE the CPU run lands (this notice) and
+#: AFTER (the real table): a deterministic string, never fabricated numbers.
+_CPU_LATENCY_ABSENT_NOTICE = (
+    "_CPU / edge latency results are not committed yet; this table populates once "
+    "`results/latency/cpu_e2e_conf025.json` and `cpu_e2e_conf001.json` land "
+    "(run `scripts/run_latency.py --conf ...` on a CPU host, then "
+    "`generate_report.py --write`)._"
+)
+
+
+def _render_cpu_latency(conf025_path: Path, conf001_path: Path) -> str:
+    """Render the CPU-latency table, or a notice while its results are absent.
+
+    The section is gated on the two measured CPU results files existing so the
+    drift gate stays GT-free and green both before and after the orchestrator
+    commits them: absent -> a fixed notice (logged); present -> the joined
+    conf=0.25 / conf=0.01 table (LAT-05).
+    """
+    if not (conf025_path.is_file() and conf001_path.is_file()):
+        logger.info(
+            "CPU/edge latency (LAT-05): {} and/or {} not committed yet; "
+            "injecting placeholder notice.",
+            conf025_path,
+            conf001_path,
+        )
+        return _CPU_LATENCY_ABSENT_NOTICE
+    return cpu_latency_section(
+        load_cpu_latency_results(conf025_path),
+        load_cpu_latency_results(conf001_path),
+    )
 
 
 @dataclass(frozen=True)
@@ -118,6 +153,8 @@ def build_registry(
     acc_raw10 = results_dir / "accuracy" / "reproduction_640_raw10.json"
     bootstrap = results_dir / "bootstrap" / "bootstrap_7models.json"
     latency = results_dir / "latency" / "trt_fp16_toboxes.json"
+    cpu_latency_conf025 = results_dir / "latency" / "cpu_e2e_conf025.json"
+    cpu_latency_conf001 = results_dir / "latency" / "cpu_e2e_conf001.json"
     vlm_metrics_path = results_dir / "vlm" / "vlm_metrics_merged5.json"
 
     # Load the precomputed VLM metrics once per render and share them across the
@@ -154,6 +191,10 @@ def build_registry(
                 ),
             ),
             Slot("latency_section", lambda: latency_section(load_latency_results(latency))),
+            Slot(
+                "cpu_latency",
+                lambda: _render_cpu_latency(cpu_latency_conf025, cpu_latency_conf001),
+            ),
         ],
     )
 

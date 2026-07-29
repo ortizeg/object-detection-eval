@@ -249,6 +249,25 @@ method is reproducible; the specific milliseconds are hardware-bound. This is th
 correction Phase 6 landed (LAT-04), carried forward here rather than presenting
 the second-T4 numbers as a fresh reproduction of the source band.
 
+### CPU / edge latency (LAT-05)
+
+On a T4 the on-GPU NMS is nearly free (Phase 6), so the dense-head and NMS-free
+models rank together. On **CPU** — the edge/no-accelerator regime — that changes:
+the dense heads (YOLOX-M, DAMO-YOLO-M, RTMDet-M) run their NMS in Python/numpy,
+and its cost **balloons as the confidence threshold drops** and more candidate
+boxes survive into the sort/IoU loop (the source repo saw DAMO-YOLO go from
+~23 ms @ conf=0.25 to ~155 ms @ conf=0.01). The NMS-free YOLO26m and the three
+in-graph-decode DETRs (RF-DETR-M, DEIM-M, RT-DETRv2-M) decode boxes inside the
+graph, so they are essentially flat across the sweep. The table below times the
+identical fleet on CPU at the deployment-realistic conf=0.25 and the
+accuracy-gate conf=0.01; the **Δ (NMS blow-up)** column is the CPU cost each head
+pays for dropping the threshold. Emitted from
+`results/latency/cpu_e2e_conf025.json` and `cpu_e2e_conf001.json`:
+
+<!-- TABLE:cpu_latency START -->
+_CPU / edge latency results are not committed yet; this table populates once `results/latency/cpu_e2e_conf025.json` and `cpu_e2e_conf001.json` land (run `scripts/run_latency.py --conf ...` on a CPU host, then `generate_report.py --write`)._
+<!-- TABLE:cpu_latency END -->
+
 ## Reproducing every table in this report
 
 No number in any table above is typed by hand — each is injected from a committed

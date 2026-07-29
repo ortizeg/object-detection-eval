@@ -123,6 +123,43 @@ def test_main_unknown_report_id_errors(tmp_path: Path) -> None:
     assert exit_code == 2
 
 
+_CPU_FIXTURE_DIR = _REPO_ROOT / "tests" / "report" / "fixtures"
+
+
+def test_render_cpu_latency_absent_returns_notice(tmp_path: Path) -> None:
+    # Both files missing -> the section renders the deterministic notice, so the
+    # drift gate passes GT-free before the orchestrator commits the real CPU run.
+    out = generate_report._render_cpu_latency(
+        tmp_path / "cpu_e2e_conf025.json", tmp_path / "cpu_e2e_conf001.json"
+    )
+    assert out == generate_report._CPU_LATENCY_ABSENT_NOTICE
+    assert "not committed yet" in out
+
+
+def test_render_cpu_latency_present_returns_table() -> None:
+    out = generate_report._render_cpu_latency(
+        _CPU_FIXTURE_DIR / "cpu_e2e_conf025.json",
+        _CPU_FIXTURE_DIR / "cpu_e2e_conf001.json",
+    )
+    assert "Δ (NMS blow-up)" in out
+    assert "dense + Python NMS" in out
+    assert "not committed yet" not in out
+
+
+def test_check_passes_with_cpu_results_absent() -> None:
+    # The critical CI invariant: --check on the committed reports exits 0 with the
+    # real CPU results files ABSENT (they are not committed until the orchestrator
+    # runs the CPU benchmark). Simulate CI by pointing at the real results dir.
+    results_dir = _REPO_ROOT / "benchmarks" / "basketball" / "results"
+    assert not (results_dir / "latency" / "cpu_e2e_conf025.json").exists()
+    report_dir = _REPO_ROOT / "benchmarks" / "basketball" / "reports"
+    specs = generate_report.build_registry(results_dir, report_dir)
+    present = [s for s in specs if s.md_path.is_file()]
+    if not present:
+        pytest.skip("no committed reports yet")
+    assert generate_report._run(present, check=True, write=False) == 0
+
+
 def test_committed_reports_are_not_drifted() -> None:
     """Dormant REPORT-01 CI gate: enforced once the Wave-2 reports exist."""
     report_dir = _REPO_ROOT / "benchmarks" / "basketball" / "reports"
