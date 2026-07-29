@@ -1,0 +1,114 @@
+# vlm_zeroshot.yaml -- VLM-01/VLM-02 zero-shot VLM run-and-reproduce manifest.
+#
+# Six zero-shot VLMs, scored over the 94-image basketball test split through
+# the identical load_coco_gt -> predict -> remap_detections(merged5) ->
+# filters.area_outliers -> filters.single_best_per_class -> compute_metrics
+# path as the ONNX detectors in reproduction_640.yaml.
+#
+# `classes` is each model's own prompt/label vocabulary (index = the raw
+# label id passed to remap_detections as that model's label_map). COCO/
+# VLM-prompt vocabulary ("person", "sports ball", "basketball hoop", ...) is
+# resolved into the merged5 canonical classes via merged5.yaml's `aliases`
+# block -- no code edit needed per model. Gemini and SmolVLM2 are prompted
+# directly with the canonical class names, so no alias resolution applies to
+# their rows.
+#
+# `tolerance` (0.02 absolute mAP@50:95) is wider than the 7-detector
+# reproduction gate's 0.01 (reproduction_640.yaml) -- VLM inference is
+# noisier (HF post-processing version drift across transformers releases,
+# non-deterministic generation for the two generative models). A divergence
+# beyond it is a defect to investigate (prompt/threshold/preprocessing), NOT
+# a tolerance to widen.
+#
+# `expected_map5095` is the published test mAP@50:95 for each row. `smolvlm2`
+# intentionally has NO expected value (null): it runs and emits a results
+# file, but no target is asserted (VLM-02) -- it establishes a zero-shot
+# baseline for future fine-tuning, not a reproduction target.
+
+tolerance: 0.02
+
+models:
+  - name: gemini
+    inferencer: gemini
+    model_name: gemini-3.1-pro-preview
+    classes:
+      - ball
+      - number
+      - player
+      - referee
+      - rim
+    prompt_template: >
+      Detect all basketball players, referees, the rim, the basketball, and
+      visible jersey numbers in this basketball game image.
+      Constraints:
+      - At most 10 players, 3 referees, 1 rim, and 1 ball per image.
+      - Each person gets exactly ONE bounding box with the most specific label.
+      Use EXACTLY these labels:
+      - "player" for any basketball player on the court
+      - "referee" for game officials
+      - "ball" for the basketball (only when NOT going through the rim)
+      - "rim" for the basketball hoop rim
+      - "number" for visible jersey numbers (tight box around the digits only)
+    expected_map5095: 0.265
+
+  - name: owlv2
+    inferencer: owlv2
+    model_name: google/owlv2-large-patch14-ensemble
+    classes:
+      - basketball player
+      - basketball
+      - referee
+      - basketball hoop
+      - jersey number
+    box_threshold: 0.01
+    nms_iou_threshold: 0.3
+    expected_map5095: 0.247
+
+  - name: omdet_turbo
+    inferencer: omdet_turbo
+    model_name: omlab/omdet-turbo-swin-tiny-hf
+    classes:
+      - person
+      - sports ball
+      - referee
+      - basketball hoop
+      - jersey number
+    box_threshold: 0.01
+    expected_map5095: 0.173
+
+  - name: grounding_dino
+    inferencer: grounding_dino
+    model_name: IDEA-Research/grounding-dino-base
+    classes:
+      - person
+      - sports ball
+      - referee
+      - basketball hoop
+      - jersey number
+    box_threshold: 0.01
+    text_threshold: 0.01
+    nms_iou_threshold: 0.5
+    expected_map5095: 0.147
+
+  - name: florence2
+    inferencer: florence2
+    model_name: microsoft/Florence-2-large-ft
+    classes:
+      - person
+      - sports ball
+      - referee
+      - basketball hoop
+      - jersey number
+    task: "<OD>"
+    expected_map5095: 0.104
+
+  - name: smolvlm2
+    inferencer: smolvlm2
+    model_name: HuggingFaceTB/SmolVLM2-2.2B-Instruct
+    classes:
+      - player
+      - ball
+      - referee
+      - rim
+      - number
+    expected_map5095: null

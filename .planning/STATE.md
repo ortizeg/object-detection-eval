@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 04
-current_phase_name: reproduction-gate
+current_phase: 05
+current_phase_name: zero-shot-vlm
 status: executing
-stopped_at: "Completed 04-01-PLAN.md (REPRO-01 reproduction gate: 7-model @640 table reproduced within tolerance, exact rank order; YOLOX-M @640 mirrored to GCS)"
-last_updated: "2026-07-27T02:14:01.123Z"
-last_activity: 2026-07-26
-last_activity_desc: Phase 04 execution started
+stopped_at: Completed 05-03-PLAN.md box-run reproduction (six VLMs reproduced within tol 0.02 on RTX 4090; gate PASSED). Phase 5 zero-shot-vlm COMPLETE — VLM-01..04 all satisfied.
+last_updated: "2026-07-28T23:55:00.000Z"
+last_activity: 2026-07-28
+last_activity_desc: Phase 05 complete — VLM zero-shot reproduction gate PASSED
 progress:
-  total_phases: 4
-  completed_phases: 3
-  total_plans: 15
-  completed_plans: 13
+  total_phases: 7
+  completed_phases: 5
+  total_plans: 19
+  completed_plans: 19
 ---
 
 # Project State
@@ -23,16 +23,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-24)
 
 **Core value:** Every number the blog posts publish must be reproducible from this repo.
-**Current focus:** Phase 04 — reproduction-gate
+**Current focus:** Phase 05 — zero-shot-vlm
 
 ## Current Position
 
-Phase: 04 (reproduction-gate) — EXECUTING
-Plan: 2 of 3
-Status: Ready to execute
-Last activity: 2026-07-26 — Phase 04 execution started
+Phase: 05 (zero-shot-vlm) — COMPLETE
+Plan: 4 of 4 executed
+Status: Phase 5 done — VLM zero-shot reproduction gate PASSED. Next: Phase 6 (Latency, needs a T4) or Phase 7 (Reports).
+Last activity: 2026-07-28 — Phase 05 complete
 
-Progress: [█████████░] 87%
+Progress: [██████████] 100% (Phase 5 of 7)
 
 ## Performance Metrics
 
@@ -68,6 +68,9 @@ Progress: [█████████░] 87%
 | Phase 03 P01 | 30min | 2 tasks | 8 files |
 | Phase 03 P03 | 20min | 3 tasks | 14 files |
 | Phase 04 P01 | 40min | 3 tasks | 4 files |
+| Phase 05 P01 | 7min | 3 tasks | 10 files |
+| Phase 05 P02 | 10min | 3 tasks | 8 files |
+| Phase 05 P04 | 15min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -103,6 +106,11 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 4, 04-01] Manifest schema uses root (onnx/labels) + optional predictions_root override, not a single root field -- YOLOX-M's ONNX/labels live under the external yolox tree but its stored predictions live under source_repo
 - [Phase ?]: [Phase 4, 04-01] run_benchmark.py's --providers defaults to CPUExecutionProvider only -- onnxruntime's CoreML EP crashes on RT-DETRv2's dynamic decoder on this machine, and hardware-accelerated EPs are the wrong default for a cross-machine reproducibility gate regardless
 - [Phase ?]: [Phase 4, 04-01] Mirrored the YOLOX-M @640 ONNX to a NEW gs://.../final-comparison-640/yolox_m/ prefix rather than overwriting the pre-existing mislabeled 'YOLOX-M @640 (reuse)' entry (whose gs:// URI actually holds the @800 export) -- documented both in gcs-manifest.md
+- [Phase ?]: [Phase 5, 05-01] Added torch/torchvision/PIL to mypy ignore_missing_imports overrides -- CI's typecheck runs in the default torch-free env where they aren't installed
+- [Phase ?]: [Phase 5, 05-02] Widened pyproject.toml mypy override google.genai.* -> google.* -- from google import genai needs the bare namespace package ignored too to type-check in the torch-free default env
+- [Phase ?]: [Phase 5, 05-04] write_coco writes Detection.class_id directly as COCO category_id (both are the same eval-class-id space) rather than minting a separate COCO-native id
+- [Phase ?]: [Phase 5, 05-04] annotate/__init__.py is a bare package marker (mirrors inference/vlm/__init__.py) -- does not re-export run_vlm_annotation, keeping the package import torch-free
+- [Phase ?]: [Phase 5, 05-04] GeminiInferencer is imported inside run_vlm_annotation's function body, not vlm_task.py's module-top imports -- one level lazier than the 05-01/05-02 module-top lazy-import convention
 
 ### Pending Todos
 
@@ -125,6 +133,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-27T02:14:01.117Z
-Stopped at: Completed 04-01-PLAN.md (REPRO-01 reproduction gate: 7-model @640 table reproduced within tolerance, exact rank order; YOLOX-M @640 mirrored to GCS)
+Last session: 2026-07-28T20:59:19.001Z
+Stopped at: Completed 05-04-PLAN.md (COCO writer + VLM auto-labeling task, load_coco_gt round trip closed, Phase 5 zero-shot-vlm plans all executed)
 Resume file: None

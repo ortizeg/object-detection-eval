@@ -1,0 +1,11913 @@
+{
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0142_png.rf.2f5c547dd2619327e0022d74ec31a30b.jpg": [],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0200_png.rf.20682efab8089e32f548bb45a4d9291a.jpg": [
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0215_png.rf.766bac59defe0ab43fe08ffcde26687d.jpg": [
+    {
+      "bbox_xyxy": [
+        2181.1201171875,
+        146.8800048828125,
+        261.1199951171875,
+        260.2799987792969
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        2181.1201171875,
+        146.8800048828125,
+        261.1199951171875,
+        260.2799987792969
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        2181.1201171875,
+        146.8800048828125,
+        261.1199951171875,
+        260.2799987792969
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        2181.1201171875,
+        146.8800048828125,
+        261.1199951171875,
+        260.2799987792969
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        2181.1201171875,
+        146.8800048828125,
+        261.1199951171875,
+        260.2799987792969
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        2181.1201171875,
+        146.8800048828125,
+        261.1199951171875,
+        260.2799987792969
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        2181.1201171875,
+        146.8800048828125,
+        261.1199951171875,
+        260.2799987792969
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        2181.1201171875,
+        146.8800048828125,
+        261.1199951171875,
+        260.2799987792969
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        2181.1201171875,
+        146.8800048828125,
+        261.1199951171875,
+        260.2799987792969
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        2181.1201171875,
+        146.8800048828125,
+        261.1199951171875,
+        260.2799987792969
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        2181.1201171875,
+        146.8800048828125,
+        261.1199951171875,
+        260.2799987792969
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        2181.1201171875,
+        146.8800048828125,
+        261.1199951171875,
+        260.2799987792969
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        2181.1201171875,
+        146.8800048828125,
+        261.1199951171875,
+        260.2799987792969
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        2181.1201171875,
+        146.8800048828125,
+        261.1199951171875,
+        260.2799987792969
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        2181.1201171875,
+        146.8800048828125,
+        261.1199951171875,
+        260.2799987792969
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        2181.1201171875,
+        146.8800048828125,
+        261.1199951171875,
+        260.2799987792969
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    }
+  ],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0000_png.rf.ce4d8becfea33db02bbf4c5620ea5bd0.jpg": [],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0030_png.rf.55d0c788a6c247914f626cb3375e1509.jpg": [],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0203_png.rf.3c59e676d0c4870bac13fc7e727dd3b1.jpg": [
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0146_png.rf.7748fcd9a4bfaed157c04882600bfe64.jpg": [],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0221_png.rf.0dc8de8fedacc970cc81e1d05247a37b.jpg": [
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0134_png.rf.a4eca0ef3fc4485d9b9c742072bddeb8.jpg": [],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0182_png.rf.e7f2ae769475e1e779a3fa5fbc478907.jpg": [
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0206_png.rf.a506f2aed965f9a90216abe1d930574e.jpg": [
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0030_png.rf.c3bdae8d1f433c2b04d6fb4d453487d6.jpg": [
+    {
+      "bbox_xyxy": [
+        274.55999755859375,
+        154.44000244140625,
+        274.55999755859375,
+        154.44000244140625
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        274.55999755859375,
+        154.44000244140625,
+        274.55999755859375,
+        154.44000244140625
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        274.55999755859375,
+        154.44000244140625,
+        274.55999755859375,
+        154.44000244140625
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        274.55999755859375,
+        154.44000244140625,
+        274.55999755859375,
+        154.44000244140625
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        274.55999755859375,
+        154.44000244140625,
+        274.55999755859375,
+        154.44000244140625
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        274.55999755859375,
+        154.44000244140625,
+        274.55999755859375,
+        154.44000244140625
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        274.55999755859375,
+        154.44000244140625,
+        274.55999755859375,
+        154.44000244140625
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        274.55999755859375,
+        154.44000244140625,
+        274.55999755859375,
+        154.44000244140625
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        274.55999755859375,
+        154.44000244140625,
+        274.55999755859375,
+        154.44000244140625
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        274.55999755859375,
+        154.44000244140625,
+        274.55999755859375,
+        154.44000244140625
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        274.55999755859375,
+        154.44000244140625,
+        274.55999755859375,
+        154.44000244140625
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        274.55999755859375,
+        154.44000244140625,
+        274.55999755859375,
+        154.44000244140625
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        274.55999755859375,
+        154.44000244140625,
+        274.55999755859375,
+        154.44000244140625
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        274.55999755859375,
+        154.44000244140625,
+        274.55999755859375,
+        154.44000244140625
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        274.55999755859375,
+        154.44000244140625,
+        274.55999755859375,
+        154.44000244140625
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        274.55999755859375,
+        154.44000244140625,
+        274.55999755859375,
+        154.44000244140625
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        274.55999755859375,
+        154.44000244140625,
+        274.55999755859375,
+        154.44000244140625
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        274.55999755859375,
+        154.44000244140625,
+        274.55999755859375,
+        154.44000244140625
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        274.55999755859375,
+        154.44000244140625,
+        274.55999755859375,
+        154.44000244140625
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0101_png.rf.f15023d7ef5e2ae3d9371307c6bbf696.jpg": [
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    }
+  ],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0191_png.rf.277ecd1a22cdc7e02d052c0c8dd82346.jpg": [
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0170_png.rf.0d8ae66f463bd9cf530dea96db0873ce.jpg": [
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0140_png.rf.9332d6f9cc22df61de2c5e29eb7ab0b8.jpg": [],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0133_png.rf.a071ab29f969f20189db719ee45824d5.jpg": [],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0095_png.rf.0a60990d8a540def0fdabe9c8770a8d1.jpg": [
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0183_png.rf.82e10f97df453dfeb7a727684e5765bf.jpg": [
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0173_png.rf.66126b7f0fd0713b9cc7676567b701a8.jpg": [],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0086_png.rf.4c8bfc39e651e069cb056f7edf832d08.jpg": [],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0185_png.rf.42a48f90237142689f97b23449b5e481.jpg": [
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    }
+  ],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0167_png.rf.84971c08a98e115ddc6b69d3619c8c9f.jpg": [
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0030_png.rf.0c8232e8e0db8239e51f7177eec3fe51.jpg": [
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0137_png.rf.94bcf6a45e2f9c0d44509cd6d6d4f4e1.jpg": [],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0145_png.rf.1d661caf0b3ad0ec44301b532becb89b.jpg": [],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0113_png.rf.28a079c7a1cc1814bd119108a047b179.jpg": [],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0180_png.rf.977f6c10482016e6f651b30a1d2e03fb.jpg": [
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0119_png.rf.a25aa1d2f26ae272b305d8d555a3172b.jpg": [],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0153_png.rf.e88689547398568a880ca0e05fa3aa6a.jpg": [
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0120_png.rf.b7b59f44fcf16f58d133c537d100da23.jpg": [
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0104_png.rf.7d15b9a36218acefba2dba2bd9099104.jpg": [
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    }
+  ],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0210_png.rf.36130babdfb8e3bd25c1ebcc60211a2d.jpg": [
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0218_png.rf.1292c06c27fee18f2b6d4918572db638.jpg": [],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0206_png.rf.e6c72d925f148e5a858b7cc3bb2d9f76.jpg": [
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0080_png.rf.a5d0e4cce669bfd57351ff9ec59c6722.jpg": [],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0176_png.rf.03fe919dcc165a493051a72cdbce9a7e.jpg": [
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0159_png.rf.7fa8e40222414590bd74ddc9b3b17564.jpg": [
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0060_png.rf.b52417ab61bd5bd22096afd8fe7b957d.jpg": [],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0110_png.rf.be408f0a50ebef82a2dd7e7c9a1c678a.jpg": [],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0130_png.rf.8d3977b356ef5daa3c863fc725d0a404.jpg": [],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0170_png.rf.e48c2c54a648937248a728de2323cac5.jpg": [
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    }
+  ],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0150_png.rf.6a9d7c346afa90be847e31913a61606e.jpg": [],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0135_png.rf.7ffa562e5577260d74fc8653358cb148.jpg": [],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0165_png.rf.e5b87613df4475a5b65da0084c2ebe84.jpg": [
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0122_png.rf.153528945773aa2f7c508baeb084f55f.jpg": [],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0212_png.rf.9e1739801151aff479f5b00a34a72987.jpg": [
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0092_png.rf.455e298139482698071e2dba98b0342e.jpg": [],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0162_png.rf.82c1f4bdc5e63348291ccde6826b5efe.jpg": [
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0189_png.rf.5cd501943742c19ae597eed34cf3e409.jpg": [
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0174_png.rf.6463c264da730575fa9848e6c6e8318d.jpg": [
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0188_png.rf.8e6877c307bb2b1a2f36fd6dff7fbf02.jpg": [
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0198_png.rf.f588b3ea487d106d8a5047c5a5f257a2.jpg": [
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0195_png.rf.74fca6c81e9116359881effc06288fb7.jpg": [
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0203_png.rf.1077cbfb1e724ef8fc9f07a8556d7706.jpg": [
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0207_png.rf.69194bfbdf754c31f8f4cb60c1a8d1c3.jpg": [
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0136_png.rf.d1162c48c10b80b190b2d2890414223d.jpg": [],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0204_png.rf.1f036982eedaf42956e5a0e5d8994d9a.jpg": [
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0098_png.rf.26f3119463210ea43f730c89a6405416.jpg": [],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0155_png.rf.be30a81828e82dbba7367dc834ddc929.jpg": [],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0161_png.rf.f056f273663d1a3c86bfe013610ed6c0.jpg": [],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0168_png.rf.238603d5db7b6bb387092db0ba351e31.jpg": [
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0060_png.rf.69a5accc9bbe3aa26757b3d1c67af9de.jpg": [
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0090_png.rf.7995fb6908fc7fd17df8de18ee6b4010.jpg": [
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0180_png.rf.15e407e2ac411b9bea8683454ec1e366.jpg": [
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0200_png.rf.04fb1d2190128edbea2daccd3cb4a70e.jpg": [
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0171_png.rf.d31a30c84c75e942c69effded2f1dc1a.jpg": [
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0060_png.rf.16c42a4a9401bb0bcc23e4f0e5fa1c9b.jpg": [],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0107_png.rf.bb5eb5ac14d81f32f733f06c71dfb4b5.jpg": [],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0156_png.rf.f45a21f9d7a4b44a80d8300d01aced2c.jpg": [
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0177_png.rf.931a468402759b963bccb3884abe7d80.jpg": [
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0143_png.rf.d3ddea72f3d72237e8ba960b5f04c54a.jpg": [],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0131_png.rf.c815823e82c74f7e5a354cc11ec0a70e.jpg": [],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0125_png.rf.4d011abd8c033d8d4d70c317d9fb1aa3.jpg": [],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0201_png.rf.7cce37d6dbac5b4fb6414ddd7ae08c8c.jpg": [
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0090_png.rf.7138c33a0144ce184b5fcbb4d4a9e372.jpg": [
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0209_png.rf.fd12a28df6cb6eb25c30144bc83298cb.jpg": [
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0116_png.rf.496bc4637e5f47e27b2a1d688d8802bd.jpg": [],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0186_png.rf.9fd3625d81dad5657f7dad5b609b0110.jpg": [
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    }
+  ],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0194_png.rf.898a495bd09c62133f4b9d94b6d768c5.jpg": [
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0205_png.rf.c981c0246b6b2cff601bca1903b6ee09.jpg": [
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0128_png.rf.05a890fd77d51563fb6bbf7f4727ed71.jpg": [],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0197_png.rf.56da90a433e6eb106fa1dbf4131062d6.jpg": [
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0000_png.rf.32dd1c1dbe40f3554e200734c8fc0630.jpg": [
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0089_png.rf.55036a6fef94388ff0d0777d07a46be9.jpg": [],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0150_png.rf.50bb327d1db48f95b9fc17f27ad98c33.jpg": [
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    }
+  ],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0179_png.rf.29f529c3f27668432872a3aa8cd618d5.jpg": [
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0083_png.rf.3b3aaf97744d5292b5948d6de8728600.jpg": [],
+  "boston-celtics-new-york-knicks-game-4-q1-05_06-05_01-0139_png.rf.cea6a4f474cee36d5a3dacdbc310f5de.jpg": [],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0192_png.rf.59dc6f6f3d1ff3be1f8578bbab64628a.jpg": [
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    },
+    {
+      "bbox_xyxy": [
+        1920.0,
+        1080.0,
+        1920.0,
+        1080.0
+      ],
+      "class_id": 0,
+      "confidence": 0.0
+    }
+  ],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0164_png.rf.ac3cc52a003f755fc336db3e27d53ce8.jpg": [
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0120_png.rf.60019e6da798db934fb3755fbbed6ec4.jpg": [
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 0.5
+    }
+  ],
+  "boston-celtics-new-york-knicks-game-1-q1-07_41-07_34-0000_png.rf.2c5dcc6a770680bd7aca5744e5d30884.jpg": [
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    },
+    {
+      "bbox_xyxy": [
+        192.0,
+        108.0,
+        192.0,
+        108.0
+      ],
+      "class_id": 0,
+      "confidence": 1.0
+    }
+  ],
+  "boston-celtics-orlando-magic-game-4-q1-11_44-11_36-0158_png.rf.200fedb0928dc63b55486e6db391f24e.jpg": []
+}
