@@ -183,6 +183,61 @@ class TestRunBootstrapDeterminism:
         assert np.array_equal(boot["model_a::mAP_50_95"], boot["model_b::mAP_50_95"])
 
 
+class TestParallelBootstrapIsByteIdentical:
+    """Parallelizing the per-iteration scoring must not move any digit.
+
+    The draws are precomputed serially from one rng stream and executor.map
+    preserves order, so run_bootstrap must return byte-identical arrays (and
+    hence CIs) for max_workers=1 vs 4 vs 10. These cases pass max_workers
+    EXPLICITLY (>1) so they actually spawn processes -- exercising the macOS
+    'spawn' pickling path (module-level worker fn + initializer) -- rather than
+    falling back to the small-n_boot serial auto-mode.
+    """
+
+    def test_arrays_identical_across_worker_counts(
+        self,
+        gt_map: dict[str, sv.Detections],
+        pred_maps: dict[str, dict[str, sv.Detections]],
+    ) -> None:
+        serial = run_bootstrap(gt_map, pred_maps, n_boot=40, seed=0, max_workers=1)
+        par4 = run_bootstrap(gt_map, pred_maps, n_boot=40, seed=0, max_workers=4)
+        par10 = run_bootstrap(gt_map, pred_maps, n_boot=40, seed=0, max_workers=10)
+
+        assert set(serial) == set(par4) == set(par10)
+        for key in serial:
+            # Byte-identical: exact array equality, not approximate.
+            assert np.array_equal(serial[key], par4[key])
+            assert np.array_equal(serial[key], par10[key])
+
+    def test_report_cis_identical_across_worker_counts(
+        self,
+        gt_map: dict[str, sv.Detections],
+        pred_maps: dict[str, dict[str, sv.Detections]],
+    ) -> None:
+        serial = run_bootstrap(gt_map, pred_maps, n_boot=40, seed=0, max_workers=1)
+        par = run_bootstrap(gt_map, pred_maps, n_boot=40, seed=0, max_workers=4)
+        report_serial = build_report(gt_map, pred_maps, serial, n_boot=40, seed=0)
+        report_par = build_report(gt_map, pred_maps, par, n_boot=40, seed=0)
+
+        for model in pred_maps:
+            for metric in ("mAP_50_95", "mAP_50"):
+                s = report_serial["per_model"][model][metric]
+                p = report_par["per_model"][model][metric]
+                assert s["ci_2.5"] == p["ci_2.5"]
+                assert s["ci_97.5"] == p["ci_97.5"]
+                assert s["bootstrap_mean"] == p["bootstrap_mean"]
+                assert s["bootstrap_std"] == p["bootstrap_std"]
+
+        pair_key = "model_a minus model_b"
+        for metric in ("mAP_50_95", "mAP_50"):
+            s = report_serial["pairwise"][pair_key][metric]
+            p = report_par["pairwise"][pair_key][metric]
+            assert s["ci_2.5"] == p["ci_2.5"]
+            assert s["ci_97.5"] == p["ci_97.5"]
+            assert s["point_diff"] == p["point_diff"]
+            assert s["ci_excludes_zero"] == p["ci_excludes_zero"]
+
+
 class TestBuildReport:
     """Structural tests for build_report's output shape."""
 

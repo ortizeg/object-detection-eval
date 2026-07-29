@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 06
-current_phase_name: latency
+current_phase: 07
+current_phase_name: reports-docs
 status: executing
-stopped_at: Completed 06-03-PLAN.md (full to-boxes graft matrix built on T4; LAT-04 honest-label, band not portable across T4 instances). Phase 6 latency COMPLETE -- LAT-01..04 all satisfied.
-last_updated: "2026-07-29T03:28:11.343Z"
+stopped_at: Completed all Phase 7 plans (07-01..04). Reports generator + FINAL_COMPARISON_640.md + VLM_VS_FINETUNED.md + methodology + README, every table generator-emitted. REPORT-01..05 done. ALL 7 PHASES COMPLETE.
+last_updated: "2026-07-29T18:32:26.024Z"
 last_activity: 2026-07-28
 last_activity_desc: Phase 05 complete
 progress:
-  total_phases: 6
-  completed_phases: 6
-  total_plans: 22
-  completed_plans: 22
+  total_phases: 7
+  completed_phases: 7
+  total_plans: 26
+  completed_plans: 26
 ---
 
 # Project State
@@ -32,7 +32,7 @@ Plan: 4 of 4 executed
 Status: Phase 5 done — VLM zero-shot reproduction gate PASSED. Next: Phase 6 (Latency, needs a T4) or Phase 7 (Reports).
 Last activity: 2026-07-28 — Phase 05 complete
 
-Progress: [██████████] 95% (Phase 5 of 7)
+Progress: [█████████░] 88% (Phase 5 of 7)
 
 ## Performance Metrics
 
@@ -72,6 +72,7 @@ Progress: [██████████] 95% (Phase 5 of 7)
 | Phase 05 P02 | 10min | 3 tasks | 8 files |
 | Phase 05 P04 | 15min | 2 tasks | 6 files |
 | Phase 06 P02 | 30min | 3 tasks | 6 files |
+| Phase 07 P02 | ~35m | 3 tasks | 17 files |
 
 ## Accumulated Context
 
@@ -114,6 +115,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 5, 05-04] GeminiInferencer is imported inside run_vlm_annotation's function body, not vlm_task.py's module-top imports -- one level lazier than the 05-01/05-02 module-top lazy-import convention
 - [Phase ?]: 06-02: trt pixi feature left uncomposed on macOS (linux-only sdist/gpu deps unbuildable cross-platform); documented one-line T4 activation
 - [Phase ?]: 06-02: EfficientNMS_TRT graft attrs sourced from postprocessors; plugin schema LOW-confidence, T4-validated in 06-03 (Open Question 1)
+- [Phase ?]: Report generator built hermetically against synthetic fixtures (bootstrap file still generating); loaders read the real results files when present
+- [Phase ?]: per_class_table renders an em dash for a class absent from per_class_ap50 (raw10 player-layup-dunk zero support), never 0.000
 
 ### Pending Todos
 
@@ -136,6 +139,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-29T03:28:04.403Z
-Stopped at: Completed 06-02-PLAN.md
+Last session: 2026-07-29T18:32:26.014Z
+Stopped at: Completed 07-02-PLAN.md
 Resume file: None

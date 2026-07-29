@@ -1,0 +1,228 @@
+{
+  "config": {
+    "n_boot": 100,
+    "seed": 42,
+    "n_images": 94,
+    "models": [
+      "YOLO26m",
+      "DEIM-M",
+      "YOLOX-M",
+      "RF-DETR-M",
+      "RTMDet-M",
+      "DAMO-YOLO-M",
+      "RT-DETRv2-M"
+    ]
+  },
+  "per_model": {
+    "YOLO26m": {
+      "mAP_50_95": {
+        "point_estimate": 0.716,
+        "bootstrap_mean": 0.716,
+        "bootstrap_std": 0.01,
+        "ci_2.5": 0.696,
+        "ci_97.5": 0.736
+      },
+      "mAP_50": {
+        "point_estimate": 0.916,
+        "bootstrap_mean": 0.916,
+        "bootstrap_std": 0.01,
+        "ci_2.5": 0.896,
+        "ci_97.5": 0.936
+      }
+    },
+    "DEIM-M": {
+      "mAP_50_95": {
+        "point_estimate": 0.686,
+        "bootstrap_mean": 0.686,
+        "bootstrap_std": 0.01,
+        "ci_2.5": 0.666,
+        "ci_97.5": 0.706
+      },
+      "mAP_50": {
+        "point_estimate": 0.886,
+        "bootstrap_mean": 0.886,
+        "bootstrap_std": 0.01,
+        "ci_2.5": 0.866,
+        "ci_97.5": 0.906
+      }
+    },
+    "YOLOX-M": {
+      "mAP_50_95": {
+        "point_estimate": 0.672,
+        "bootstrap_mean": 0.672,
+        "bootstrap_std": 0.01,
+        "ci_2.5": 0.652,
+        "ci_97.5": 0.692
+      },
+      "mAP_50": {
+        "point_estimate": 0.872,
+        "bootstrap_mean": 0.872,
+        "bootstrap_std": 0.01,
+        "ci_2.5": 0.852,
+        "ci_97.5": 0.892
+      }
+    },
+    "RF-DETR-M": {
+      "mAP_50_95": {
+        "point_estimate": 0.646,
+        "bootstrap_mean": 0.646,
+        "bootstrap_std": 0.01,
+        "ci_2.5": 0.626,
+        "ci_97.5": 0.666
+      },
+      "mAP_50": {
+        "point_estimate": 0.846,
+        "bootstrap_mean": 0.846,
+        "bootstrap_std": 0.01,
+        "ci_2.5": 0.826,
+        "ci_97.5": 0.866
+      }
+    },
+    "RTMDet-M": {
+      "mAP_50_95": {
+        "point_estimate": 0.628,
+        "bootstrap_mean": 0.628,
+        "bootstrap_std": 0.01,
+        "ci_2.5": 0.608,
+        "ci_97.5": 0.648
+      },
+      "mAP_50": {
+        "point_estimate": 0.828,
+        "bootstrap_mean": 0.828,
+        "bootstrap_std": 0.01,
+        "ci_2.5": 0.808,
+        "ci_97.5": 0.848
+      }
+    },
+    "DAMO-YOLO-M": {
+      "mAP_50_95": {
+        "point_estimate": 0.619,
+        "bootstrap_mean": 0.619,
+        "bootstrap_std": 0.01,
+        "ci_2.5": 0.599,
+        "ci_97.5": 0.639
+      },
+      "mAP_50": {
+        "point_estimate": 0.819,
+        "bootstrap_mean": 0.819,
+        "bootstrap_std": 0.01,
+        "ci_2.5": 0.799,
+        "ci_97.5": 0.839
+      }
+    },
+    "RT-DETRv2-M": {
+      "mAP_50_95": {
+        "point_estimate": 0.581,
+        "bootstrap_mean": 0.581,
+        "bootstrap_std": 0.01,
+        "ci_2.5": 0.561,
+        "ci_97.5": 0.601
+      },
+      "mAP_50": {
+        "point_estimate": 0.781,
+        "bootstrap_mean": 0.781,
+        "bootstrap_std": 0.01,
+        "ci_2.5": 0.761,
+        "ci_97.5": 0.801
+      }
+    }
+  },
+  "pairwise": {
+    "YOLO26m minus DEIM-M": {
+      "mAP_50_95": {
+        "point_diff": 0.03,
+        "mean_diff": 0.03,
+        "ci_2.5": 0.02,
+        "ci_97.5": 0.04,
+        "ci_excludes_zero": true
+      },
+      "mAP_50": {
+        "point_diff": 0.03,
+        "mean_diff": 0.03,
+        "ci_2.5": 0.02,
+        "ci_97.5": 0.04,
+        "ci_excludes_zero": true
+      }
+    },
+    "DEIM-M minus YOLOX-M": {
+      "mAP_50_95": {
+        "point_diff": 0.014,
+        "mean_diff": 0.014,
+        "ci_2.5": 0.004,
+        "ci_97.5": 0.024,
+        "ci_excludes_zero": true
+      },
+      "mAP_50": {
+        "point_diff": 0.014,
+        "mean_diff": 0.014,
+        "ci_2.5": 0.004,
+        "ci_97.5": 0.024,
+        "ci_excludes_zero": true
+      }
+    },
+    "YOLOX-M minus RF-DETR-M": {
+      "mAP_50_95": {
+        "point_diff": 0.026,
+        "mean_diff": 0.026,
+        "ci_2.5": 0.016,
+        "ci_97.5": 0.036,
+        "ci_excludes_zero": true
+      },
+      "mAP_50": {
+        "point_diff": 0.026,
+        "mean_diff": 0.026,
+        "ci_2.5": 0.016,
+        "ci_97.5": 0.036,
+        "ci_excludes_zero": true
+      }
+    },
+    "RF-DETR-M minus RTMDet-M": {
+      "mAP_50_95": {
+        "point_diff": 0.018,
+        "mean_diff": 0.018,
+        "ci_2.5": 0.008,
+        "ci_97.5": 0.028,
+        "ci_excludes_zero": true
+      },
+      "mAP_50": {
+        "point_diff": 0.018,
+        "mean_diff": 0.018,
+        "ci_2.5": 0.008,
+        "ci_97.5": 0.028,
+        "ci_excludes_zero": true
+      }
+    },
+    "RTMDet-M minus DAMO-YOLO-M": {
+      "mAP_50_95": {
+        "point_diff": 0.009,
+        "mean_diff": 0.009,
+        "ci_2.5": -0.006,
+        "ci_97.5": 0.03,
+        "ci_excludes_zero": false
+      },
+      "mAP_50": {
+        "point_diff": 0.009,
+        "mean_diff": 0.009,
+        "ci_2.5": -0.006,
+        "ci_97.5": 0.03,
+        "ci_excludes_zero": false
+      }
+    },
+    "DAMO-YOLO-M minus RT-DETRv2-M": {
+      "mAP_50_95": {
+        "point_diff": 0.038,
+        "mean_diff": 0.038,
+        "ci_2.5": 0.028,
+        "ci_97.5": 0.048,
+        "ci_excludes_zero": true
+      },
+      "mAP_50": {
+        "point_diff": 0.038,
+        "mean_diff": 0.038,
+        "ci_2.5": 0.028,
+        "ci_97.5": 0.048,
+        "ci_excludes_zero": true
+      }
+    }
+  }
+}

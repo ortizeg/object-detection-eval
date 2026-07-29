@@ -13,6 +13,7 @@ whole suite stays green offline.
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
 import types
 from itertools import pairwise
@@ -107,3 +108,61 @@ def test_rank_order_fails_on_adjacent_swap() -> None:
     # DEIM-M and YOLOX-M swapped relative to the published order.
     swapped = [0.716, 0.672, 0.686, 0.646, 0.628, 0.619, 0.581]
     assert not run_benchmark.rank_order_matches(swapped)
+
+
+# --- build_accuracy_results: the --write-results payload assembler (offline) ---
+
+
+def _synthetic_metrics(map5095: float, per_class: dict[str, float]) -> dict[str, object]:
+    """Mimic the dict compute_metrics returns (four keys)."""
+    return {
+        "mAP_50_95": map5095,
+        "mAP_50": map5095 + 0.10,
+        "mAP_75": map5095 - 0.05,
+        "per_class_ap50": per_class,
+    }
+
+
+def test_build_accuracy_results_nests_payload_and_preserves_order() -> None:
+    metrics_by_name = {
+        "YOLO26m": _synthetic_metrics(0.716, {"player": 0.80, "ball": 0.55}),
+        "DEIM-M": _synthetic_metrics(0.686, {"player": 0.78, "ball": 0.50}),
+    }
+
+    payload = run_benchmark.build_accuracy_results("merged5", metrics_by_name)
+
+    assert payload["taxonomy"] == "merged5"
+    # Model order follows the input (manifest / published rank) order.
+    assert list(payload["models"]) == ["YOLO26m", "DEIM-M"]
+    yolo = payload["models"]["YOLO26m"]
+    assert set(yolo) == {"mAP_50_95", "mAP_50", "mAP_75", "per_class_ap50"}
+    assert yolo["mAP_50_95"] == 0.716
+    assert yolo["mAP_50"] == 0.716 + 0.10
+    assert yolo["mAP_75"] == 0.716 - 0.05
+    assert yolo["per_class_ap50"] == {"player": 0.80, "ball": 0.55}
+
+
+def test_build_accuracy_results_omits_absent_class_not_zero() -> None:
+    # raw10's player-layup-dunk has zero test-set support: compute_metrics
+    # simply omits it -- the payload must preserve the ABSENCE, not fabricate 0.0.
+    metrics_by_name = {
+        "YOLO26m": _synthetic_metrics(0.716, {"player": 0.80}),  # no player-layup-dunk key
+    }
+
+    payload = run_benchmark.build_accuracy_results("raw10", metrics_by_name)
+    per_class = payload["models"]["YOLO26m"]["per_class_ap50"]
+
+    assert "player-layup-dunk" not in per_class
+    assert per_class == {"player": 0.80}
+
+
+def test_build_accuracy_results_json_round_trips_unchanged() -> None:
+    metrics_by_name = {
+        "YOLO26m": _synthetic_metrics(0.716, {"player": 0.80, "ball": 0.55}),
+        "DEIM-M": _synthetic_metrics(0.686, {"player": 0.78}),
+    }
+
+    payload = run_benchmark.build_accuracy_results("merged5", metrics_by_name)
+    round_tripped = json.loads(json.dumps(payload))
+
+    assert round_tripped == payload

@@ -32,7 +32,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 4: Reproduction Gate** - Prove the refactored harness reproduces every published number before any further work proceeds
 - [ ] **Phase 5: Zero-Shot VLM** - Run 6 zero-shot VLMs through the identical protocol behind the `[vlm]` extra, reproducing the published ceiling
 - [x] **Phase 6: Latency** - Back the latency table with committed ORT + TensorRT code on a fresh T4, or label it honestly as not reproducible
-- [ ] **Phase 7: Reports & Docs** - Generate every published table from results files and ship both blog-companion reports plus the methodology doc
+- [x] **Phase 7: Reports & Docs** - Generate every published table from results files and ship both blog-companion reports plus the methodology doc
 
 ## Phase Details
 
@@ -202,7 +202,12 @@ Notes:
   4. `docs/methodology.md` documents train-matched preprocessing, protocol parity, the de-transform, and the 94-image statistical limitation
   5. A reader landing on the README can follow a stated path from clone → fetch weights from the registry → run the benchmark → reproduce the published table
 
-**Plans**: TBD
+**Plans**: 4/4 plans executed
+
+- [x] 07-01-PLAN.md — Close the accuracy-data gap: --write-results on run_benchmark.py + run_bootstrap_gate.py, run + commit the 3 accuracy JSONs (REPORT-01) [wave 1]
+- [x] 07-02-PLAN.md — Torch-free report/ generator (loaders + renderers + inject) + generate_report.py --check/--write + golden tests (REPORT-01) [wave 1]
+- [x] 07-03-PLAN.md — FINAL_COMPARISON_640.md: preprocessing lede, 7-model table + CIs + per-class AP, fairness audit, honest-labeled latency (REPORT-02) [wave 2, depends 07-01, 07-02]
+- [x] 07-04-PLAN.md — VLM_VS_FINETUNED.md + docs/methodology.md + README.md reproduction path (REPORT-03, REPORT-04, REPORT-05) [wave 2, depends 07-01, 07-02]
 
 Notes:
 
@@ -224,7 +229,7 @@ Phases 5 and 6 have no dependency on each other and may execute in parallel afte
 | 4. Reproduction Gate | 3/3 | In Progress|  |
 | 5. Zero-Shot VLM | 4/4 | Complete | 2026-07-28 |
 | 6. Latency | 3/3 | Complete | 2026-07-29 |
-| 7. Reports & Docs | 0/TBD | Not started | - |
+| 7. Reports & Docs | 4/4 | Complete | 2026-07-29 |
 
 ## Coverage
 
