@@ -1,0 +1,63 @@
+site_name: object-detection-eval
+site_description: >-
+  Reproducible evaluation harness for object detection networks on small
+  datasets — fine-tuned detectors and zero-shot VLMs under one protocol.
+site_url: https://ortizeg.github.io/object-detection-eval/
+repo_url: https://github.com/ortizeg/object-detection-eval
+repo_name: ortizeg/object-detection-eval
+edit_uri: ""
+
+# site_src/ is assembled by `scripts/stage_docs.py` (run via the `docs-stage`
+# pixi task) from README.md, the generated reports, and docs/ — it is not a
+# committed directory. Run `pixi run docs-build` (stages, then builds).
+docs_dir: site_src
+site_dir: site
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.instant
+    - navigation.tracking
+    - content.code.copy
+    - toc.follow
+    - search.highlight
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+
+nav:
+  - Home: index.md
+  - Reports:
+      - Fine-tuned comparison (@640): reports/FINAL_COMPARISON_640.md
+      - Zero-shot VLM vs fine-tuned: reports/VLM_VS_FINETUNED.md
+  - Methodology: methodology.md
+  - Provenance:
+      - Training runs: provenance/training-runs.md
+      - Artifact tracker: provenance/artifact-tracker.md
+      - GCS manifest: provenance/gcs-manifest.md
