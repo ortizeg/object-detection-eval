@@ -11,8 +11,13 @@ repos:
       - id: trailing-whitespace
       - id: detect-private-key
       # Model weights belong on the HF Hub, not in git. This is the backstop.
+      # Committed evaluation/latency results under benchmarks/**/results/ are a
+      # deliberate reproducibility archive (so a published number can be
+      # compared/re-scored without re-running inference) and are exempt from the
+      # size guard; every other path keeps the 2 MB weights backstop.
       - id: check-added-large-files
         args: [--maxkb=2048]
+        exclude: ^benchmarks/.*/results/
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.22
