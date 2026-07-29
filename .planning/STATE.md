@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 05
-current_phase_name: zero-shot-vlm
+current_phase: 06
+current_phase_name: latency
 status: executing
-stopped_at: Completed 05-03-PLAN.md box-run reproduction (six VLMs reproduced within tol 0.02 on RTX 4090; gate PASSED). Phase 5 zero-shot-vlm COMPLETE — VLM-01..04 all satisfied.
-last_updated: "2026-07-28T23:55:00.000Z"
+stopped_at: Completed 06-03-PLAN.md (full to-boxes graft matrix built on T4; LAT-04 honest-label, band not portable across T4 instances). Phase 6 latency COMPLETE -- LAT-01..04 all satisfied.
+last_updated: "2026-07-29T03:28:11.343Z"
 last_activity: 2026-07-28
-last_activity_desc: Phase 05 complete — VLM zero-shot reproduction gate PASSED
+last_activity_desc: Phase 05 complete
 progress:
-  total_phases: 7
-  completed_phases: 5
-  total_plans: 19
-  completed_plans: 19
+  total_phases: 6
+  completed_phases: 6
+  total_plans: 22
+  completed_plans: 22
 ---
 
 # Project State
@@ -32,7 +32,7 @@ Plan: 4 of 4 executed
 Status: Phase 5 done — VLM zero-shot reproduction gate PASSED. Next: Phase 6 (Latency, needs a T4) or Phase 7 (Reports).
 Last activity: 2026-07-28 — Phase 05 complete
 
-Progress: [██████████] 100% (Phase 5 of 7)
+Progress: [██████████] 95% (Phase 5 of 7)
 
 ## Performance Metrics
 
@@ -71,6 +71,7 @@ Progress: [██████████] 100% (Phase 5 of 7)
 | Phase 05 P01 | 7min | 3 tasks | 10 files |
 | Phase 05 P02 | 10min | 3 tasks | 8 files |
 | Phase 05 P04 | 15min | 2 tasks | 6 files |
+| Phase 06 P02 | 30min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -111,6 +112,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 5, 05-04] write_coco writes Detection.class_id directly as COCO category_id (both are the same eval-class-id space) rather than minting a separate COCO-native id
 - [Phase ?]: [Phase 5, 05-04] annotate/__init__.py is a bare package marker (mirrors inference/vlm/__init__.py) -- does not re-export run_vlm_annotation, keeping the package import torch-free
 - [Phase ?]: [Phase 5, 05-04] GeminiInferencer is imported inside run_vlm_annotation's function body, not vlm_task.py's module-top imports -- one level lazier than the 05-01/05-02 module-top lazy-import convention
+- [Phase ?]: 06-02: trt pixi feature left uncomposed on macOS (linux-only sdist/gpu deps unbuildable cross-platform); documented one-line T4 activation
+- [Phase ?]: 06-02: EfficientNMS_TRT graft attrs sourced from postprocessors; plugin schema LOW-confidence, T4-validated in 06-03 (Open Question 1)
 
 ### Pending Todos
 
@@ -133,6 +136,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-28T20:59:19.001Z
-Stopped at: Completed 05-04-PLAN.md (COCO writer + VLM auto-labeling task, load_coco_gt round trip closed, Phase 5 zero-shot-vlm plans all executed)
+Last session: 2026-07-29T03:28:04.403Z
+Stopped at: Completed 06-02-PLAN.md
 Resume file: None

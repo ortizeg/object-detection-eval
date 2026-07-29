@@ -1,0 +1,92 @@
+# latency_640.yaml -- LAT-01 uniform end-to-end latency manifest.
+#
+# Pins the SAME 7 medium @640 detectors as reproduction_640.yaml, in the SAME
+# published rank order (YOLO26m > DEIM-M > YOLOX-M > RF-DETR-M > RTMDet-M >
+# DAMO-YOLO-M > RT-DETRv2-M), but for TIMING the full
+# preprocess -> session.run -> postprocess/NMS -> to-boxes path rather than
+# scoring accuracy. It carries the same onnx/labels/root fields, but:
+#
+#   - confidence_threshold: 0.25 (deployment-realistic), DELIBERATELY DISTINCT
+#     from reproduction_640.yaml's 0.01. conf=0.01 is correct for an accuracy
+#     gate (it keeps low-score boxes alive so mAP integrates the full PR
+#     curve), but it is WRONG for latency: it leaves thousands of sub-0.25
+#     boxes alive into the numpy NMS of the dense-head models (YOLOX / DAMO /
+#     RTMDet), inflating their measured latency by an order of magnitude
+#     (06-RESEARCH.md Pitfall 4). A deployed detector runs at ~0.25, so that
+#     is what we time.
+#   - NO expected_map5095 and NO predictions field: latency never scores
+#     accuracy, so there is nothing to compare against here.
+#   - a per-model nms_graft flag: true ONLY for the 3 dense-head models
+#     (YOLOX / DAMO / RTMDet) that Plan 06-03 grafts a TensorRT EfficientNMS
+#     plugin onto for the on-GPU NMS-delta measurement; false for the other 4
+#     (YOLO26 is already NMS-free; the 3 DETRs -- RF-DETR / DEIM / RT-DETRv2 --
+#     decode their boxes in-graph, so there is no separable NMS to graft).
+#
+# root: "source_repo" resolves against --source-repo (defaults to
+# object-detection-training/.deploy_comparison); "yolox" resolves against
+# --yolox-root (defaults to the external YOLOX training_results tree). onnx and
+# labels reuse the exact correct-variant values from reproduction_640.yaml.
+
+models:
+  - name: YOLO26m
+    detector: yolo26
+    root: source_repo
+    onnx: reuse_onnx/yolo26m/model.onnx
+    labels: reuse_onnx/yolo26m/labels_mapping.json
+    input_size: 640
+    confidence_threshold: 0.25
+    nms_graft: false  # already NMS-free (in-graph decode, no NMS to graft)
+
+  - name: DEIM-M
+    detector: deim
+    root: source_repo
+    onnx: artifacts/deim_m/deim_m_640.onnx
+    labels: artifacts/deim_m/labels_mapping.json
+    input_size: 640
+    confidence_threshold: 0.25
+    nms_graft: false  # DETR: decodes boxes in-graph, no separable NMS
+
+  - name: YOLOX-M
+    detector: yolox
+    root: yolox
+    onnx: basketball_m/yolox_m_basketball_640.onnx
+    labels: basketball_m/labels_mapping.json
+    input_size: 640
+    confidence_threshold: 0.25
+    nms_graft: true  # dense head: EfficientNMS grafted for on-GPU NMS delta
+
+  - name: RF-DETR-M
+    detector: rfdetr
+    root: source_repo
+    onnx: artifacts/rfdetr_m/rfdetr_m_640.onnx
+    labels: artifacts/rfdetr_m/labels_mapping.json
+    input_size: 640
+    confidence_threshold: 0.25
+    nms_graft: false  # DETR: decodes boxes in-graph, no separable NMS
+
+  - name: RTMDet-M
+    detector: rtmdet
+    root: source_repo
+    onnx: artifacts/rtmdet_m/rtmdet_m_640.onnx
+    labels: artifacts/rtmdet_m/labels_mapping.json
+    input_size: 640
+    confidence_threshold: 0.25
+    nms_graft: true  # dense head: EfficientNMS grafted for on-GPU NMS delta
+
+  - name: DAMO-YOLO-M
+    detector: damo
+    root: source_repo
+    onnx: artifacts/damo_m/damo_m_640.onnx
+    labels: artifacts/damo_m/labels_mapping.json
+    input_size: 640
+    confidence_threshold: 0.25
+    nms_graft: true  # dense head: EfficientNMS grafted for on-GPU NMS delta
+
+  - name: RT-DETRv2-M
+    detector: rtdetrv2
+    root: source_repo
+    onnx: artifacts/rtdetrv2_m/rtdetrv2_m_640.onnx
+    labels: artifacts/rtdetrv2_m/labels_mapping.json
+    input_size: 640
+    confidence_threshold: 0.25
+    nms_graft: false  # DETR: decodes boxes in-graph, no separable NMS

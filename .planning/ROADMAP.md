@@ -31,7 +31,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 3: Model Registry** - Publish 10 SHA-256-verified model cards; 8 with weights on the HF Hub, 2 AGPL cards that cannot leak binaries
 - [ ] **Phase 4: Reproduction Gate** - Prove the refactored harness reproduces every published number before any further work proceeds
 - [ ] **Phase 5: Zero-Shot VLM** - Run 6 zero-shot VLMs through the identical protocol behind the `[vlm]` extra, reproducing the published ceiling
-- [ ] **Phase 6: Latency** - Back the latency table with committed ORT + TensorRT code on a fresh T4, or label it honestly as not reproducible
+- [x] **Phase 6: Latency** - Back the latency table with committed ORT + TensorRT code on a fresh T4, or label it honestly as not reproducible
 - [ ] **Phase 7: Reports & Docs** - Generate every published table from results files and ship both blog-companion reports plus the methodology doc
 
 ## Phase Details
@@ -175,7 +175,13 @@ Notes:
   3. A committed graph-surgery script grafts `EfficientNMS_TRT` onto the YOLO/CNN graphs, making the "fair to-boxes" comparison reproducible rather than ad-hoc
   4. Published latency either lands inside the §6 fp16 band (4.0–7.1 ms) from committed code and confirms on-GPU NMS costs 0.05–0.2 ms, or the report carries an explicit "manually measured 2026-07-21, not reproducible from this repo" label
 
-**Plans**: TBD
+**Plans**: 3/3 plans executed
+
+Plans:
+
+- [x] 06-01-PLAN.md — LAT-01 uniform e2e latency harness (run_latency.py + manifest + LAT-04 band helpers), CPU-developable [Wave 1]
+- [x] 06-02-PLAN.md — LAT-03 EfficientNMS_TRT graft + RTMDet TopK strip + pixi graphsurgeon/trt envs + pinned [trt] extra, CPU-developable [Wave 1]
+- [x] 06-03-PLAN.md — LAT-02 trtexec fp16 build/benchmark + full EfficientNMS graft matrix + LAT-04 honest-label verdict, T4 checkpoint [Wave 2, depends on 06-01 + 06-02]
 
 Notes:
 
@@ -217,7 +223,7 @@ Phases 5 and 6 have no dependency on each other and may execute in parallel afte
 | 3. Model Registry | 3/3 | In Progress|  |
 | 4. Reproduction Gate | 3/3 | In Progress|  |
 | 5. Zero-Shot VLM | 4/4 | Complete | 2026-07-28 |
-| 6. Latency | 0/TBD | Not started | - |
+| 6. Latency | 3/3 | Complete | 2026-07-29 |
 | 7. Reports & Docs | 0/TBD | Not started | - |
 
 ## Coverage

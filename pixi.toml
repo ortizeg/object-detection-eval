@@ -65,7 +65,80 @@ peft = "*"
 num2words = "*"
 google-genai = ">=1.63.0, <2"
 
+# Cross-platform ONNX graph-surgery tooling (LAT-03). onnx + onnx-graphsurgeon
+# both ship osx-arm64 AND linux-64 wheels (onnx-graphsurgeon is a pure-Python
+# universal wheel), so the EfficientNMS_TRT graft script develops and CPU-unit-
+# tests on this macOS machine with NO GPU. This feature deliberately does NOT
+# pull onnxruntime-gpu, so it never conflicts with the core CPU onnxruntime.
+[feature.graphsurgeon.pypi-dependencies]
+onnx = ">=1.22,<2"
+onnx-graphsurgeon = ">=0.6.1"
+
+# TensorRT engine build + benchmark (LAT-02) + graph tooling. Linux-64 + NVIDIA
+# T4 only. This feature is fully specified but INTENTIONALLY NOT composed into
+# [environments] below on this repo's default (macOS) host — see the long note
+# at [environments] for why. On the T4 (a linux-64 host) it is activated via
+# `no-default-feature = true` so it EXCLUDES the core CPU `onnxruntime` pypi-
+# dependency and installs `onnxruntime-gpu` instead — the two cannot coexist in
+# one env (06-RESEARCH.md Pitfall 1). The core conda deps + the non-onnxruntime
+# core pypi deps are re-listed here because no-default-feature drops the default
+# feature entirely.
+[feature.trt]
+platforms = ["linux-64"]
+
+[feature.trt.dependencies]
+python = "3.11.*"
+numpy = "<2.0.0"
+pydantic = ">=2.0"
+hydra-core = "*"
+loguru = "*"
+pycocotools = "*"
+matplotlib = "*"
+opencv = "*"
+tqdm = "*"
+pyyaml = "*"
+httpx = "*"
+
+[feature.trt.pypi-dependencies]
+# Core pypi deps EXCEPT onnxruntime (replaced by onnxruntime-gpu below).
+# NOTE: the editable `object-detection-eval` path dep is intentionally NOT
+# re-listed here. pixi cannot build a path/editable dependency for a linux-64-
+# ONLY environment from a non-linux (osx-arm64) host — there is no linux Python
+# interpreter available to run the build backend, so the lock solve fails. The
+# graft script (graft_efficientnms.py) and the trtexec wrapper never import
+# object_detection_eval, so trt does not need it. For LAT-01's on-T4 e2e latency
+# run (Plan 06-03), install the package into this env ON the linux box after
+# creation:  `pixi run -e trt pip install -e . --no-deps`.
+supervision = "==0.29.1"
+orjson = "*"
+# TensorRT stack — pinned to the 06-RESEARCH.md-verified versions.
+onnxruntime-gpu = ">=1.28.0,<2"
+tensorrt = ">=10.16,<11"
+onnx = ">=1.22,<2"
+onnx-graphsurgeon = ">=0.6.1"
+
 [environments]
 default = ["dev"]
 vlm = ["dev", "vlm"]
+# Cross-platform: core (CPU onnxruntime) + dev + the graph-surgery tooling.
+# This is the env the LAT-03 graft script + its graphsurgeon-marked test use on
+# THIS macOS machine (no GPU needed for offline graph surgery).
+graphsurgeon = ["dev", "graphsurgeon"]
 prod = []
+
+# NOTE — the `trt` environment is DELIBERATELY not declared here. pixi locks
+# every declared environment across its platforms on `pixi install`, and it
+# cannot solve a linux-64-ONLY environment whose PyPI deps require a build
+# dispatch (`tensorrt` is an sdist stub; `onnxruntime-gpu` needs a build backend)
+# from a non-linux host — there is no osx-arm64 interpreter for the linux-only
+# env, so the solve aborts ("no compatible Python interpreter for 'osx-arm64'").
+# The [feature.trt] block above is the ready-to-use recipe. On the T4 (a
+# linux-64 host, Plan 06-03), activate it by adding this line and running
+# `pixi install -e trt` — the lock solves natively there:
+#
+#   trt = { features = ["trt", "dev"], no-default-feature = true }
+#
+# Then install the editable package (not lockable cross-platform, see the
+# [feature.trt.pypi-dependencies] note):  `pixi run -e trt pip install -e . --no-deps`
+# `no-default-feature = true` is what keeps the core CPU `onnxruntime` OUT of the
+# env so it cannot conflict with `onnxruntime-gpu` (06-RESEARCH.md Pitfall 1).

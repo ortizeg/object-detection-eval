@@ -1,0 +1,72 @@
+{
+  "reproducibility": {
+    "status": "manually_measured",
+    "label": "manually measured 2026-07-21, not reproducible from this repo",
+    "note": "ORT-CUDA-EP e2e path; second-run 2026-07-29 on a different T4 gives different absolute numbers (YOLO26m flagged suspect via CPU-fallback ops). Method reproduces; absolute latency is instance-specific."
+  },
+  "models": [
+    {
+      "name": "YOLO26m",
+      "median_ms": 705.0387095659971,
+      "p90_ms": 766.4486359804869,
+      "fps": 1.4183618380550667,
+      "provider": "CUDAExecutionProvider",
+      "nms_graft": false,
+      "suspect": true
+    },
+    {
+      "name": "DEIM-M",
+      "median_ms": 49.31209795176983,
+      "p90_ms": 55.27317188680172,
+      "fps": 20.278999303133677,
+      "provider": "CUDAExecutionProvider",
+      "nms_graft": false,
+      "suspect": false
+    },
+    {
+      "name": "YOLOX-M",
+      "median_ms": 29.265709221363068,
+      "p90_ms": 32.75768719613552,
+      "fps": 34.16968276545408,
+      "provider": "CUDAExecutionProvider",
+      "nms_graft": true,
+      "suspect": false
+    },
+    {
+      "name": "RF-DETR-M",
+      "median_ms": 55.875590071082115,
+      "p90_ms": 59.931354597210884,
+      "fps": 17.896902721346663,
+      "provider": "CUDAExecutionProvider",
+      "nms_graft": false,
+      "suspect": false
+    },
+    {
+      "name": "RTMDet-M",
+      "median_ms": 47.80236631631851,
+      "p90_ms": 51.143474876880646,
+      "fps": 20.919466483788387,
+      "provider": "CUDAExecutionProvider",
+      "nms_graft": true,
+      "suspect": false
+    },
+    {
+      "name": "DAMO-YOLO-M",
+      "median_ms": 29.685480520129204,
+      "p90_ms": 34.38644893467426,
+      "fps": 33.68650203664103,
+      "provider": "CUDAExecutionProvider",
+      "nms_graft": true,
+      "suspect": false
+    },
+    {
+      "name": "RT-DETRv2-M",
+      "median_ms": 58.42909216880798,
+      "p90_ms": 74.66569170355797,
+      "fps": 17.114761891403198,
+      "provider": "CUDAExecutionProvider",
+      "nms_graft": false,
+      "suspect": false
+    }
+  ]
+}
