@@ -15,12 +15,45 @@ from pydantic import ValidationError
 
 from object_detection_eval.report import (
     ReportLoadError,
+    ci_table,
+    latency_section,
     load_accuracy_results,
+    load_bootstrap_report,
+    load_latency_results,
+    load_vlm_metrics,
+    per_class_table,
     primary_7model_table,
+    vlm_per_class_table,
+    vlm_summary_table,
 )
+from object_detection_eval.schemas.taxonomy import TaxonomySpec
 
 _FIXTURES = Path(__file__).parent / "fixtures"
 _ACCURACY = _FIXTURES / "accuracy_merged5.json"
+_ACCURACY_RAW10 = _FIXTURES / "accuracy_raw10.json"
+_BOOTSTRAP = _FIXTURES / "bootstrap_7models.json"
+_LATENCY = _FIXTURES / "latency_toboxes.json"
+_VLM_PRED = _FIXTURES / "vlm_pred.json"
+_VLM_GT = _FIXTURES / "vlm_gt.coco.json"
+_TAX_DIR = Path(__file__).resolve().parents[2] / "benchmarks" / "basketball" / "conf" / "taxonomy"
+
+_MERGED5 = TaxonomySpec(name="merged5", classes=["player", "ball", "referee", "rim", "number"])
+_RAW10 = TaxonomySpec(
+    name="raw10",
+    classes=[
+        "ball",
+        "ball-in-basket",
+        "number",
+        "player",
+        "player-in-possession",
+        "player-jump-shot",
+        "player-layup-dunk",
+        "player-shot-block",
+        "referee",
+        "rim",
+    ],
+)
+_EM_DASH = "—"
 
 
 def _row_cells(table: str, model: str) -> list[str]:
@@ -83,3 +116,101 @@ def test_primary_table_row_order_follows_loader() -> None:
     ]
     models = [line.strip("|").split("|")[0].strip() for line in data_rows]
     assert models == list(acc.models.keys())
+
+
+# --------------------------------------------------------------------------- #
+# ci_table: adjacent-pair significance derived from ci_excludes_zero (Pitfall 4)
+# --------------------------------------------------------------------------- #
+
+
+def test_ci_table_reports_five_of_six_significant() -> None:
+    report = load_bootstrap_report(_BOOTSTRAP)
+    table = ci_table(report)
+    assert "5 of 6 adjacent pairs significant" in table
+
+
+def test_ci_table_marks_rtmdet_damo_pair_as_tie() -> None:
+    report = load_bootstrap_report(_BOOTSTRAP)
+    table = ci_table(report)
+    tie_row = next(
+        line for line in table.splitlines() if "RTMDet-M" in line and "DAMO-YOLO-M" in line
+    )
+    assert "tie" in tie_row
+    assert "significant" not in tie_row
+
+
+# --------------------------------------------------------------------------- #
+# per_class_table: absent class -> em dash, never 0.000 (Pitfall 3)
+# --------------------------------------------------------------------------- #
+
+
+def test_per_class_5c_renders_five_class_columns() -> None:
+    acc = load_accuracy_results(_ACCURACY)
+    table = per_class_table(acc, _MERGED5)
+    header = table.splitlines()[0]
+    for cls in _MERGED5.classes:
+        assert cls in header
+
+
+def test_per_class_10c_absent_class_is_em_dash_not_zero() -> None:
+    acc = load_accuracy_results(_ACCURACY_RAW10)
+    table = per_class_table(acc, _RAW10)
+    # player-layup-dunk is absent from every model's per_class_ap50.
+    idx = ["Model", *_RAW10.classes].index("player-layup-dunk")
+    for line in table.splitlines():
+        if line.startswith("| YOLO26m ") or line.startswith("| DEIM-M "):
+            cells = [c.strip() for c in line.strip("|").split("|")]
+            assert cells[idx] == _EM_DASH
+            assert cells[idx] != "0.000"
+
+
+# --------------------------------------------------------------------------- #
+# latency_section: verbatim honest-label + source band headline (Pitfall 1)
+# --------------------------------------------------------------------------- #
+
+
+def test_latency_section_carries_verbatim_honest_label() -> None:
+    result = load_latency_results(_LATENCY)
+    section = latency_section(result)
+    assert "manually measured 2026-07-21, not reproducible from this repo" in section
+
+
+def test_latency_section_headlines_source_band() -> None:
+    result = load_latency_results(_LATENCY)
+    section = latency_section(result)
+    assert "4.0" in section
+    assert "7.1" in section
+
+
+def test_latency_section_does_not_present_second_t4_as_reproduced() -> None:
+    result = load_latency_results(_LATENCY)
+    section = latency_section(result)
+    # The second-T4 medians must be labelled as a cross-check, not "reproduced".
+    assert "not" in section.lower()
+    assert "reproduced source band" not in section.lower()
+
+
+# --------------------------------------------------------------------------- #
+# VLM tables: recomputed per-class AP keyed by class name
+# --------------------------------------------------------------------------- #
+
+
+def test_vlm_summary_table_renders_overall_map() -> None:
+    metrics = load_vlm_metrics(_VLM_PRED, _VLM_GT, "merged5", _TAX_DIR)
+    table = vlm_summary_table({"gemini": metrics})
+    row = next(line for line in table.splitlines() if line.startswith("| gemini "))
+    cells = [c.strip() for c in row.strip("|").split("|")]
+    assert cells[2] == f"{metrics['mAP_50']:.3f}"
+
+
+def test_vlm_per_class_table_surfaces_rim_and_zero_ap() -> None:
+    metrics = load_vlm_metrics(_VLM_PRED, _VLM_GT, "merged5", _TAX_DIR)
+    table = vlm_per_class_table({"gemini": metrics}, _MERGED5.classes)
+    row = next(line for line in table.splitlines() if line.startswith("| gemini "))
+    cells = [c.strip() for c in row.strip("|").split("|")]
+    # header: Model | player | ball | referee | rim | number
+    assert cells[1] == "1.000"  # player
+    assert cells[2] == "0.000"  # ball (zero-AP)
+    assert cells[3] == "0.000"  # referee (zero-AP)
+    assert cells[4] == "1.000"  # rim (surfaced)
+    assert cells[5] == _EM_DASH  # number absent -> em dash

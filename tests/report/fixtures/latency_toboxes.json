@@ -1,0 +1,38 @@
+{
+  "reproducibility": {
+    "status": "manually_measured",
+    "label": "manually measured 2026-07-21, not reproducible from this repo",
+    "measured_date": "2026-07-21",
+    "source_band_ms_2026_07_21": [
+      4.0,
+      7.1
+    ],
+    "second_run": {
+      "date": "2026-07-29",
+      "gpu": "Tesla T4 (vast.ai, shared instance)",
+      "trt_version": "10.3.0",
+      "outcome": "METHOD reproduced; absolute latency ~2-6x higher and not portable."
+    }
+  },
+  "trt_version": "10.3.0",
+  "models": [
+    {
+      "name": "RF-DETR-M",
+      "engine_scope": "to_boxes",
+      "median_ms": 9.33453,
+      "p99_ms": 9.66504,
+      "nms_graft": false,
+      "trt_version": "10.3.0",
+      "build_status": "ok"
+    },
+    {
+      "name": "YOLOX-M",
+      "engine_scope": "to_boxes",
+      "median_ms": 14.7627,
+      "p99_ms": 15.3548,
+      "nms_graft": true,
+      "trt_version": "10.3.0",
+      "build_status": "ok"
+    }
+  ]
+}

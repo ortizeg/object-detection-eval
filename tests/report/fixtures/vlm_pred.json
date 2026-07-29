@@ -1,0 +1,36 @@
+{
+  "img1.jpg": [
+    {
+      "bbox_xyxy": [
+        10,
+        10,
+        30,
+        50
+      ],
+      "class_id": 0,
+      "confidence": 0.95
+    },
+    {
+      "bbox_xyxy": [
+        40,
+        5,
+        60,
+        20
+      ],
+      "class_id": 3,
+      "confidence": 0.9
+    }
+  ],
+  "img2.jpg": [
+    {
+      "bbox_xyxy": [
+        20,
+        20,
+        40,
+        60
+      ],
+      "class_id": 0,
+      "confidence": 0.92
+    }
+  ]
+}

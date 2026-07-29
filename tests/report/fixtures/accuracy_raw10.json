@@ -1,0 +1,37 @@
+{
+  "taxonomy": "raw10",
+  "models": {
+    "YOLO26m": {
+      "mAP_50_95": 0.639,
+      "mAP_50": 0.819,
+      "mAP_75": 0.749,
+      "per_class_ap50": {
+        "ball": 0.739,
+        "ball-in-basket": 0.739,
+        "number": 0.739,
+        "player": 0.739,
+        "player-in-possession": 0.739,
+        "player-jump-shot": 0.739,
+        "player-shot-block": 0.739,
+        "referee": 0.739,
+        "rim": 0.739
+      }
+    },
+    "DEIM-M": {
+      "mAP_50_95": 0.642,
+      "mAP_50": 0.822,
+      "mAP_75": 0.752,
+      "per_class_ap50": {
+        "ball": 0.742,
+        "ball-in-basket": 0.742,
+        "number": 0.742,
+        "player": 0.742,
+        "player-in-possession": 0.742,
+        "player-jump-shot": 0.742,
+        "player-shot-block": 0.742,
+        "referee": 0.742,
+        "rim": 0.742
+      }
+    }
+  }
+}
