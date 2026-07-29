@@ -146,18 +146,20 @@ def test_render_cpu_latency_present_returns_table() -> None:
     assert "not committed yet" not in out
 
 
-def test_check_passes_with_cpu_results_absent() -> None:
-    # The critical CI invariant: --check on the committed reports exits 0 with the
-    # real CPU results files ABSENT (they are not committed until the orchestrator
-    # runs the CPU benchmark). Simulate CI by pointing at the real results dir.
-    results_dir = _REPO_ROOT / "benchmarks" / "basketball" / "results"
-    assert not (results_dir / "latency" / "cpu_e2e_conf025.json").exists()
-    report_dir = _REPO_ROOT / "benchmarks" / "basketball" / "reports"
-    specs = generate_report.build_registry(results_dir, report_dir)
-    present = [s for s in specs if s.md_path.is_file()]
-    if not present:
-        pytest.skip("no committed reports yet")
-    assert generate_report._run(present, check=True, write=False) == 0
+def test_cpu_latency_section_skips_gracefully_when_results_absent(
+    tmp_path: Path,
+) -> None:
+    # Robustness invariant (repo-state-independent): with the measured CPU
+    # results files absent, the CPU/edge section renders the fixed notice rather
+    # than a table and never raises, so --check stays green before those files
+    # are committed. The present-case (real CPU table) is covered by
+    # test_committed_reports_are_not_drifted. Tested hermetically against a tmp
+    # dir so it holds whether or not the CPU results are committed.
+    rendered = generate_report._render_cpu_latency(
+        tmp_path / "cpu_e2e_conf025.json",
+        tmp_path / "cpu_e2e_conf001.json",
+    )
+    assert rendered == generate_report._CPU_LATENCY_ABSENT_NOTICE
 
 
 def test_committed_reports_are_not_drifted() -> None:
