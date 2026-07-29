@@ -146,7 +146,7 @@ def build_registry(
 
     final_comparison = ReportSpec(
         report_id="final_comparison",
-        md_path=report_dir / "final_comparison.md",
+        md_path=report_dir / "FINAL_COMPARISON_640.md",
         slots=[
             Slot(
                 "primary_7model",
