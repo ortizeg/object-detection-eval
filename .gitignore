@@ -49,4 +49,6 @@ lightning_logs/
 outputs/
 multirun/
 site/
+# MkDocs staging tree, assembled by scripts/stage_docs.py from README + reports + docs
+site_src/
 .env

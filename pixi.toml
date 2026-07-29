@@ -15,8 +15,9 @@ format-check = "ruff format --check ."
 typecheck = "mypy src/"
 precommit = "pre-commit run --all-files"
 quality = { depends-on = ["lint", "format-check", "typecheck", "test"] }
-docs = "mkdocs serve"
-docs-build = "mkdocs build"
+docs-stage = "python scripts/stage_docs.py"
+docs = { cmd = "mkdocs serve", depends-on = ["docs-stage"] }
+docs-build = { cmd = "mkdocs build", depends-on = ["docs-stage"] }
 
 # Core: no torch, no lightning. Must stay importable without a deep-learning stack.
 [dependencies]
