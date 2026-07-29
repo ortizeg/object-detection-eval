@@ -121,16 +121,16 @@ Irreplaceable data currently exists only on one laptop, outside any git history.
 - [x] **REPORT-01**: Report tables are generated from results files, so a published number
       cannot drift from the data that produced it
 
-- [ ] **REPORT-02**: `FINAL_COMPARISON_640.md` covers the 7-model comparison with CIs,
+- [x] **REPORT-02**: `FINAL_COMPARISON_640.md` covers the 7-model comparison with CIs,
       per-class AP, the fairness audit, and latency — leading with the preprocessing finding
 
-- [ ] **REPORT-03**: `VLM_VS_FINETUNED.md` covers zero-shot vs fine-tuned under the shared
+- [x] **REPORT-03**: `VLM_VS_FINETUNED.md` covers zero-shot vs fine-tuned under the shared
       protocol, including per-class failure analysis
 
-- [ ] **REPORT-04**: `docs/methodology.md` documents train-matched preprocessing, protocol
+- [x] **REPORT-04**: `docs/methodology.md` documents train-matched preprocessing, protocol
       parity, the de-transform, and the 94-image statistical limitation
 
-- [ ] **REPORT-05**: README describes the harness, the reproduction path, and the weight
+- [x] **REPORT-05**: README describes the harness, the reproduction path, and the weight
       registry
 
 ### Repository
@@ -196,10 +196,10 @@ and success criteria.
 | LAT-03 | Phase 6 — Latency | Complete |
 | LAT-04 | Phase 6 — Latency | Complete (honest-label) |
 | REPORT-01 | Phase 7 — Reports & Docs | Complete |
-| REPORT-02 | Phase 7 — Reports & Docs | Pending |
-| REPORT-03 | Phase 7 — Reports & Docs | Pending |
-| REPORT-04 | Phase 7 — Reports & Docs | Pending |
-| REPORT-05 | Phase 7 — Reports & Docs | Pending |
+| REPORT-02 | Phase 7 — Reports & Docs | Complete |
+| REPORT-03 | Phase 7 — Reports & Docs | Complete |
+| REPORT-04 | Phase 7 — Reports & Docs | Complete |
+| REPORT-05 | Phase 7 — Reports & Docs | Complete |
 
 **Coverage:**
 
