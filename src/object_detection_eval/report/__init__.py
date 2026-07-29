@@ -28,7 +28,14 @@ from object_detection_eval.report.loaders import (
     load_latency_results,
     load_vlm_metrics,
 )
-from object_detection_eval.report.tables import primary_7model_table
+from object_detection_eval.report.tables import (
+    ci_table,
+    latency_section,
+    per_class_table,
+    primary_7model_table,
+    vlm_per_class_table,
+    vlm_summary_table,
+)
 
 __all__ = [
     "AccuracyModelEntry",
@@ -42,10 +49,15 @@ __all__ = [
     "ReportLoadError",
     "Reproducibility",
     "SecondRun",
+    "ci_table",
     "inject_table",
+    "latency_section",
     "load_accuracy_results",
     "load_bootstrap_report",
     "load_latency_results",
     "load_vlm_metrics",
+    "per_class_table",
     "primary_7model_table",
+    "vlm_per_class_table",
+    "vlm_summary_table",
 ]
