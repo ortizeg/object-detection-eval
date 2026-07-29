@@ -148,12 +148,14 @@ Notes:
   3. The auto-labeling task turns a directory of unlabeled images into a COCO annotation file that loads back through `load_coco_gt()` without error
   4. Default CI stays green with the `[vlm]` extra not installed — VLM tests are marked and deselected, and Gemini's API-key tests are additionally marked external
 
-**Plans**: 3/4 plans executed
+**Plans**: 4/4 plans executed
 
 - [x] 05-01-PLAN.md — VLM package + 3 open-vocab HF detectors (OWLv2, Grounding DINO, OmDet-Turbo) behind [vlm], mocked offline tests, torch-free core (VLM-01, VLM-04) [wave 1]
 - [x] 05-02-PLAN.md — 2 generative VLMs (Florence-2, SmolVLM2) + external Gemini inferencer, mocked/external tests (VLM-01, VLM-04) [wave 2, depends 05-01]
-- [ ] 05-03-PLAN.md — VLM filters + run_vlm_benchmark.py + manifest; box-run reproduction of the zero-shot ceiling (VLM-01, VLM-02, VLM-04) [wave 3, depends 05-01, 05-02]
+- [x] 05-03-PLAN.md — VLM filters + run_vlm_benchmark.py + manifest; box-run reproduction of the zero-shot ceiling (VLM-01, VLM-02, VLM-04) [wave 3, depends 05-01, 05-02]
 - [x] 05-04-PLAN.md — VLM auto-labeling task -> COCO round-trip through load_coco_gt (VLM-03, VLM-04) [wave 3, depends 05-02]
+
+Box-run reproduction (2026-07-28, RTX 4090, tolerance 0.02 mAP@50:95): Gemini 0.2497 (exp 0.265), OWLv2 0.2324 (0.247), OmDet-Turbo 0.1724 (0.173), Grounding DINO 0.1471 (0.147), Florence-2 0.1056 (0.104) — all within tolerance; SmolVLM2 0.0000 (no target). Gate PASSED.
 
 Notes:
 
@@ -214,7 +216,7 @@ Phases 5 and 6 have no dependency on each other and may execute in parallel afte
 | 2. Harness Core | 6/6 | In Progress|  |
 | 3. Model Registry | 3/3 | In Progress|  |
 | 4. Reproduction Gate | 3/3 | In Progress|  |
-| 5. Zero-Shot VLM | 3/4 | In Progress|  |
+| 5. Zero-Shot VLM | 4/4 | Complete | 2026-07-28 |
 | 6. Latency | 0/TBD | Not started | - |
 | 7. Reports & Docs | 0/TBD | Not started | - |
 

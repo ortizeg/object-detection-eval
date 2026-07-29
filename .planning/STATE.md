@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 05
 current_phase_name: zero-shot-vlm
 status: executing
-stopped_at: Completed 05-04-PLAN.md (COCO writer + VLM auto-labeling task, load_coco_gt round trip closed, Phase 5 zero-shot-vlm plans all executed)
-last_updated: "2026-07-28T20:59:19.007Z"
+stopped_at: Completed 05-03-PLAN.md box-run reproduction (six VLMs reproduced within tol 0.02 on RTX 4090; gate PASSED). Phase 5 zero-shot-vlm COMPLETE — VLM-01..04 all satisfied.
+last_updated: "2026-07-28T23:55:00.000Z"
 last_activity: 2026-07-28
-last_activity_desc: Phase 05 execution started
+last_activity_desc: Phase 05 complete — VLM zero-shot reproduction gate PASSED
 progress:
-  total_phases: 5
-  completed_phases: 4
+  total_phases: 7
+  completed_phases: 5
   total_plans: 19
-  completed_plans: 18
+  completed_plans: 19
 ---
 
 # Project State
@@ -27,12 +27,12 @@ See: .planning/PROJECT.md (updated 2026-07-24)
 
 ## Current Position
 
-Phase: 05 (zero-shot-vlm) — EXECUTING
-Plan: 4 of 4
-Status: Ready to execute
-Last activity: 2026-07-28 — Phase 05 execution started
+Phase: 05 (zero-shot-vlm) — COMPLETE
+Plan: 4 of 4 executed
+Status: Phase 5 done — VLM zero-shot reproduction gate PASSED. Next: Phase 6 (Latency, needs a T4) or Phase 7 (Reports).
+Last activity: 2026-07-28 — Phase 05 complete
 
-Progress: [██████████] 95%
+Progress: [██████████] 100% (Phase 5 of 7)
 
 ## Performance Metrics
 

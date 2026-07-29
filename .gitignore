@@ -50,3 +50,12 @@ outputs/
 multirun/
 site/
 .env
+
+# VLM prediction dumps for the free open-vocab HF models exceed the 2 MB
+# large-file pre-commit hook and are free to regenerate on a GPU box via
+# `scripts/run_vlm_benchmark.py --only <name>` (same as the ONNX detector
+# results, which are also not committed). The billed Gemini row and the two
+# small generative rows (florence2, smolvlm2) ARE committed as provenance.
+benchmarks/basketball/results/vlm/owlv2.json
+benchmarks/basketball/results/vlm/grounding_dino.json
+benchmarks/basketball/results/vlm/omdet_turbo.json

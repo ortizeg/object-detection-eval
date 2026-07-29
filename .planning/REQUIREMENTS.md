@@ -94,8 +94,9 @@ Irreplaceable data currently exists only on one laptop, outside any git history.
 - [x] **VLM-01**: Gemini, OWLv2, Grounding DINO, Florence-2, OmDet-Turbo, and SmolVLM2
       inferencers run through the identical protocol as the fine-tuned detectors
 
-- [ ] **VLM-02**: The zero-shot results reproduce: Gemini 26.5, OWLv2 24.7,
+- [x] **VLM-02**: The zero-shot results reproduce: Gemini 26.5, OWLv2 24.7,
       OmDet-Turbo 17.3, Grounding DINO 14.7, Florence-2 10.4 mAP@50:95 on test
+      (box run 2026-07-28: 0.2497 / 0.2324 / 0.1724 / 0.1471 / 0.1056, all within tol 0.02; SmolVLM2 0.0 no-target)
 
 - [x] **VLM-03**: The VLM auto-labeling task produces valid COCO annotations from images
 - [x] **VLM-04**: All VLM code sits behind the `[vlm]` extra; its tests are marked and
@@ -187,7 +188,7 @@ and success criteria.
 | REPRO-02 | Phase 4 — Reproduction Gate | Pending |
 | REPRO-03 | Phase 4 — Reproduction Gate | Pending |
 | VLM-01 | Phase 5 — Zero-Shot VLM | Complete |
-| VLM-02 | Phase 5 — Zero-Shot VLM | Pending |
+| VLM-02 | Phase 5 — Zero-Shot VLM | Complete |
 | VLM-03 | Phase 5 — Zero-Shot VLM | Complete |
 | VLM-04 | Phase 5 — Zero-Shot VLM | Complete |
 | LAT-01 | Phase 6 — Latency | Pending |
