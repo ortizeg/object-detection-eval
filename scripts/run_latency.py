@@ -120,6 +120,32 @@ def load_manifest(path: Path | str) -> LatencyManifest:
     return LatencyManifest.model_validate(raw)
 
 
+def apply_conf_override(manifest: LatencyManifest, conf: float | None) -> LatencyManifest:
+    """Return a manifest with every entry's ``confidence_threshold`` set to ``conf``.
+
+    When ``conf`` is ``None`` the manifest is returned unchanged (each entry
+    keeps its committed value, preserving the pre-LAT-05 behaviour). Otherwise
+    every entry is copied with ``confidence_threshold`` replaced so the SAME
+    committed manifest can be timed at conf=0.25 and conf=0.01 -- the LAT-05
+    CPU sweep that exposes the Python/numpy NMS blow-up dense heads pay at low
+    thresholds (source repo: DAMO 155 ms @ conf=0.01 -> 23 ms @ conf=0.25),
+    while NMS-free YOLO26 and the in-graph-decode DETRs are unaffected.
+
+    Raises:
+        ValueError: ``conf`` is outside the ``[0.0, 1.0]`` inclusive range
+            (``model_copy(update=...)`` does not re-run field validation, so the
+            bound is enforced here explicitly).
+    """
+    if conf is None:
+        return manifest
+    if not 0.0 <= conf <= 1.0:
+        msg = f"--conf must be in [0.0, 1.0]; got {conf}"
+        raise ValueError(msg)
+    return LatencyManifest(
+        models=[m.model_copy(update={"confidence_threshold": conf}) for m in manifest.models]
+    )
+
+
 # --------------------------------------------------------------------------
 # LAT-04 gate bands (source: EVAL_REPORT_FINAL.md §6). Plan 06-03's T4
 # checkpoint applies within_band() to the measured numbers; this harness only
@@ -372,12 +398,25 @@ def parse_args() -> argparse.Namespace:
         default=_DEFAULT_PROVIDERS,
         help="onnxruntime execution providers (default: CPU-only, for CPU dev).",
     )
+    parser.add_argument(
+        "--conf",
+        type=float,
+        default=None,
+        help=(
+            "Override EVERY manifest entry's confidence_threshold for this run "
+            "(0.0-1.0). Omit to use each entry's committed value (unchanged "
+            "behaviour). Lets the same manifest be timed at conf=0.25 and "
+            "conf=0.01 for the LAT-05 CPU NMS sweep."
+        ),
+    )
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
-    manifest = load_manifest(args.manifest)
+    manifest = apply_conf_override(load_manifest(args.manifest), args.conf)
+    if args.conf is not None:
+        logger.info(f"Overriding every model's confidence_threshold to {args.conf} (--conf)")
 
     _assert_preconditions(args, manifest)
 

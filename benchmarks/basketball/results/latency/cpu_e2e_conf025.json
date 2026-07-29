@@ -1,0 +1,67 @@
+{
+  "models": [
+    {
+      "name": "YOLO26m",
+      "median_ms": 117.70695797167718,
+      "p90_ms": 124.48362493887544,
+      "fps": 8.495674488849007,
+      "provider": "CPUExecutionProvider",
+      "nms_graft": false,
+      "suspect": false
+    },
+    {
+      "name": "DEIM-M",
+      "median_ms": 113.13218693248928,
+      "p90_ms": 120.28981244657189,
+      "fps": 8.839217442130257,
+      "provider": "CPUExecutionProvider",
+      "nms_graft": false,
+      "suspect": false
+    },
+    {
+      "name": "YOLOX-M",
+      "median_ms": 124.12793736439198,
+      "p90_ms": 134.10337490495294,
+      "fps": 8.056204116760467,
+      "provider": "CPUExecutionProvider",
+      "nms_graft": true,
+      "suspect": false
+    },
+    {
+      "name": "RF-DETR-M",
+      "median_ms": 175.69312453269958,
+      "p90_ms": 181.18381197564304,
+      "fps": 5.691742364191846,
+      "provider": "CPUExecutionProvider",
+      "nms_graft": false,
+      "suspect": false
+    },
+    {
+      "name": "RTMDet-M",
+      "median_ms": 141.05608349200338,
+      "p90_ms": 149.5586249511689,
+      "fps": 7.089378743857517,
+      "provider": "CPUExecutionProvider",
+      "nms_graft": true,
+      "suspect": false
+    },
+    {
+      "name": "DAMO-YOLO-M",
+      "median_ms": 108.73404191806912,
+      "p90_ms": 111.1255205469206,
+      "fps": 9.19675183925838,
+      "provider": "CPUExecutionProvider",
+      "nms_graft": true,
+      "suspect": false
+    },
+    {
+      "name": "RT-DETRv2-M",
+      "median_ms": 163.3617915213108,
+      "p90_ms": 167.35383309423923,
+      "fps": 6.121382427846039,
+      "provider": "CPUExecutionProvider",
+      "nms_graft": false,
+      "suspect": false
+    }
+  ]
+}

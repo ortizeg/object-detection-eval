@@ -123,6 +123,45 @@ def test_main_unknown_report_id_errors(tmp_path: Path) -> None:
     assert exit_code == 2
 
 
+_CPU_FIXTURE_DIR = _REPO_ROOT / "tests" / "report" / "fixtures"
+
+
+def test_render_cpu_latency_absent_returns_notice(tmp_path: Path) -> None:
+    # Both files missing -> the section renders the deterministic notice, so the
+    # drift gate passes GT-free before the orchestrator commits the real CPU run.
+    out = generate_report._render_cpu_latency(
+        tmp_path / "cpu_e2e_conf025.json", tmp_path / "cpu_e2e_conf001.json"
+    )
+    assert out == generate_report._CPU_LATENCY_ABSENT_NOTICE
+    assert "not committed yet" in out
+
+
+def test_render_cpu_latency_present_returns_table() -> None:
+    out = generate_report._render_cpu_latency(
+        _CPU_FIXTURE_DIR / "cpu_e2e_conf025.json",
+        _CPU_FIXTURE_DIR / "cpu_e2e_conf001.json",
+    )
+    assert "Δ (NMS blow-up)" in out
+    assert "dense + Python NMS" in out
+    assert "not committed yet" not in out
+
+
+def test_cpu_latency_section_skips_gracefully_when_results_absent(
+    tmp_path: Path,
+) -> None:
+    # Robustness invariant (repo-state-independent): with the measured CPU
+    # results files absent, the CPU/edge section renders the fixed notice rather
+    # than a table and never raises, so --check stays green before those files
+    # are committed. The present-case (real CPU table) is covered by
+    # test_committed_reports_are_not_drifted. Tested hermetically against a tmp
+    # dir so it holds whether or not the CPU results are committed.
+    rendered = generate_report._render_cpu_latency(
+        tmp_path / "cpu_e2e_conf025.json",
+        tmp_path / "cpu_e2e_conf001.json",
+    )
+    assert rendered == generate_report._CPU_LATENCY_ABSENT_NOTICE
+
+
 def test_committed_reports_are_not_drifted() -> None:
     """Dormant REPORT-01 CI gate: enforced once the Wave-2 reports exist."""
     report_dir = _REPO_ROOT / "benchmarks" / "basketball" / "reports"

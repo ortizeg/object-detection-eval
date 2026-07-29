@@ -1,0 +1,31 @@
+{
+  "models": [
+    {
+      "name": "YOLO26m",
+      "median_ms": 91.0,
+      "p90_ms": 96.0,
+      "fps": 10.989010989010989,
+      "provider": "CPUExecutionProvider",
+      "nms_graft": false,
+      "suspect": false
+    },
+    {
+      "name": "YOLOX-M",
+      "median_ms": 240.0,
+      "p90_ms": 265.0,
+      "fps": 4.166666666666667,
+      "provider": "CPUExecutionProvider",
+      "nms_graft": true,
+      "suspect": false
+    },
+    {
+      "name": "RF-DETR-M",
+      "median_ms": 80.5,
+      "p90_ms": 84.6,
+      "fps": 12.422360248447205,
+      "provider": "CPUExecutionProvider",
+      "nms_graft": false,
+      "suspect": false
+    }
+  ]
+}

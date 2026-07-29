@@ -18,6 +18,8 @@ import sys
 import types
 from pathlib import Path
 
+import pytest
+
 _SCRIPT_PATH = Path(__file__).resolve().parents[2] / "scripts" / "run_latency.py"
 _MANIFEST_PATH = (
     Path(__file__).resolve().parents[2] / "benchmarks" / "basketball" / "conf" / "latency_640.yaml"
@@ -76,6 +78,31 @@ def test_manifest_matches_reproduction_rank_order() -> None:
         "DAMO-YOLO-M",
         "RT-DETRv2-M",
     ]
+
+
+# --------------------------------------------------------------------------
+# --conf override (LAT-05): the same manifest timed at conf=0.25 and conf=0.01
+# --------------------------------------------------------------------------
+
+
+def test_conf_override_reaches_every_entry() -> None:
+    manifest = run_latency.load_manifest(_MANIFEST_PATH)
+    overridden = run_latency.apply_conf_override(manifest, 0.01)
+    assert all(m.confidence_threshold == 0.01 for m in overridden.models)
+    # Names / order / nms_graft flags are untouched -- only the threshold moved.
+    assert [m.name for m in overridden.models] == [m.name for m in manifest.models]
+    assert [m.nms_graft for m in overridden.models] == [m.nms_graft for m in manifest.models]
+
+
+def test_conf_override_none_is_identity() -> None:
+    manifest = run_latency.load_manifest(_MANIFEST_PATH)
+    assert run_latency.apply_conf_override(manifest, None) is manifest
+
+
+def test_conf_override_rejects_out_of_range() -> None:
+    manifest = run_latency.load_manifest(_MANIFEST_PATH)
+    with pytest.raises(ValueError, match=r"\[0.0, 1.0\]"):
+        run_latency.apply_conf_override(manifest, 1.5)
 
 
 # --------------------------------------------------------------------------

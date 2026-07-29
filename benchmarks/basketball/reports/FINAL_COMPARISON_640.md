@@ -249,6 +249,41 @@ method is reproducible; the specific milliseconds are hardware-bound. This is th
 correction Phase 6 landed (LAT-04), carried forward here rather than presenting
 the second-T4 numbers as a fresh reproduction of the source band.
 
+### CPU / edge latency (LAT-05)
+
+On a T4 the on-GPU NMS is nearly free (Phase 6), so dense-head and NMS-free
+models rank together. On **CPU** — the edge/no-accelerator regime — a dense head
+runs its NMS in Python/numpy, and that cost scales with how many candidate boxes
+survive the confidence threshold into the sort/IoU loop. The effect is
+**strongly model-dependent, not a uniform dense-head penalty**: **DAMO-YOLO-M**
+reproduces the source repo's blow-up almost exactly (108.7 ms @ conf=0.25 →
+155.7 ms @ conf=0.01, **+46.9 ms**) because its head floods NMS with low-score
+boxes at the low threshold, whereas **YOLOX-M (+2.6 ms)** and **RTMDet-M
+(+1.9 ms)** emit far fewer survivors here and pay only a modest Python-NMS cost.
+The NMS-free **YOLO26m (+1.1 ms)** and the three in-graph-decode DETRs
+(RF-DETR-M, DEIM-M, RT-DETRv2-M) never run a separable NMS, so they are flat
+across the sweep by construction. So the NMS-free / edge advantage is real but
+concentrated in the models whose heads flood NMS at low thresholds (here,
+DAMO-YOLO) — it is not a blanket win for NMS-free architectures. Note the
+absolute CPU end-to-end latencies (~110–180 ms) are ~20–40× the native
+TensorRT-fp16 GPU numbers above, the expected gap for a no-accelerator baseline.
+The table times the identical fleet on CPU at the deployment-realistic conf=0.25
+and the accuracy-gate conf=0.01; **Δ (NMS blow-up)** is the CPU cost each head
+pays for dropping the threshold. Emitted from
+`results/latency/cpu_e2e_conf025.json` and `cpu_e2e_conf001.json`:
+
+<!-- TABLE:cpu_latency START -->
+| Model | CPU e2e @conf0.25 (ms) | CPU e2e @conf0.01 (ms) | Δ (NMS blow-up) | head |
+| --- | --- | --- | --- | --- |
+| DAMO-YOLO-M | 108.7 | 155.7 | +46.9 | dense + Python NMS |
+| DEIM-M | 113.1 | 115.8 | +2.7 | DETR decode |
+| YOLO26m | 117.7 | 118.8 | +1.1 | NMS-free |
+| YOLOX-M | 124.1 | 126.7 | +2.6 | dense + Python NMS |
+| RTMDet-M | 141.1 | 143.0 | +1.9 | dense + Python NMS |
+| RT-DETRv2-M | 163.4 | 163.2 | -0.2 | DETR decode |
+| RF-DETR-M | 175.7 | 180.5 | +4.9 | DETR decode |
+<!-- TABLE:cpu_latency END -->
+
 ## Reproducing every table in this report
 
 No number in any table above is typed by hand — each is injected from a committed
