@@ -168,3 +168,97 @@ pixi run python scripts/measure_supervision_drift.py \
 Not wired into `pytest` — it reads source-repo-only artifacts
 (`eval_output/`, `.deploy_comparison/`) that are absent from CI and this
 repo's own history.
+
+## The evaluation protocol
+
+The sections above are about keeping the *scorer* stable across versions. This
+section documents the protocol the scorer is applied within — the design that
+makes a fine-tuned detector's mAP and a zero-shot VLM's mAP directly comparable,
+and that keeps cross-model gaps attributable to the models rather than to how
+each one was fed and read out. The concrete tables produced under this protocol
+live in the two reports, not here, so there is exactly one generated copy of
+every number:
+
+- [`../benchmarks/basketball/reports/FINAL_COMPARISON_640.md`](../benchmarks/basketball/reports/FINAL_COMPARISON_640.md)
+  — the 7 fine-tuned detectors @640, with paired-bootstrap CIs and latency.
+- [`../benchmarks/basketball/reports/VLM_VS_FINETUNED.md`](../benchmarks/basketball/reports/VLM_VS_FINETUNED.md)
+  — the 6 zero-shot VLMs against the same protocol, with the per-class failure
+  analysis.
+
+This document deliberately carries **no data tables** — every number is emitted
+by `scripts/generate_report.py` into those reports from the committed results
+files, and drift is caught by `generate_report.py --check` in CI (REPORT-01).
+
+### Train-matched preprocessing
+
+Each model is evaluated with the **letterbox geometry, normalization, and
+channel order it was trained with**, read from that model's card preprocessing
+block — not a single house preprocessing pipeline applied uniformly. There are
+five distinct letterbox variants across the evaluated detectors (padding colour,
+stride alignment, resize interpolation, and normalization differ by training
+recipe), and each model gets its own.
+
+This matters because **preprocessing mismatch, not architecture, drives the
+headline accuracy swings** in casual cross-model comparisons. Feeding a model an
+input preprocessed the way *a different* model expects silently shifts every box
+by a few pixels and rescales confidences, and the resulting mAP drop looks like
+an architectural deficit when it is really a plumbing bug. Evaluating each model
+train-matched removes that confound: the remaining differences between models are
+differences between the models, measured on the inputs they were built for. (The
+magnitude of this effect — tens of mAP points on identical weights — is quantified
+in the README's overview and the final comparison report.)
+
+### Protocol parity across detectors and VLMs
+
+Fine-tuned detectors and zero-shot VLMs are scored through the **same four fixed
+points**:
+
+1. the **same ground truth** — the 94-image basketball test split
+   (`test/_annotations.coco.json`);
+2. the **same taxonomy** — `merged5` (`player`, `ball`, `referee`, `rim`,
+   `number`), with each model's native vocabulary mapped onto those five classes
+   through the taxonomy's alias table (e.g. COCO `person` → `player`, a VLM's
+   `basketball hoop` prompt → `rim`);
+3. the **same de-transform** back to original-image pixels (below); and
+4. the **same scorer** — the pinned `supervision` `MeanAveragePrecision`.
+
+Only the model and its train-matched preprocessing vary; every downstream stage
+is shared. That parity is what licenses the central comparison in
+`VLM_VS_FINETUNED.md`: the zero-shot-vs-fine-tuned gap is a real capability gap,
+not an artifact of scoring the two families differently.
+
+### The single de-transform
+
+Every model predicts in its **own** preprocessed input space (its letterboxed,
+resized, padded frame). Before scoring, each prediction is mapped back to
+**original-image pixel coordinates** through exactly **one** tested de-transform
+function that inverts that model's letterbox — undoing the pad offset and the
+resize scale. Ground truth is never transformed; predictions are always brought
+back to it. Because every model funnels through the same single, tested inverse,
+a localisation error is the model's, not an accumulation of per-model coordinate
+bookkeeping, and the IoU matching that the scorer performs is done in one common
+coordinate frame for all models.
+
+### The 94-image statistical limitation
+
+The test split is **94 images**. That is small, and single-number rankings on 94
+images are noisier than the three-decimal mAP values suggest. Two consequences
+shape how the results are read:
+
+1. **Paired image-level bootstrap CIs are the primary evidence, not point
+   estimates.** Rankings are reported with 95% confidence intervals resampled at
+   the image level (paired, so each bootstrap replicate scores every model on the
+   same resampled images). A gap is only called real when the paired difference's
+   CI excludes zero.
+2. **Some adjacent pairs are ties.** On 94 images, not every ranked-consecutive
+   pair separates: **5 of the 6** adjacent pairs in the @640 comparison are
+   significant, and **RTMDet-M vs DAMO-YOLO-M is a statistical tie** (its paired
+   CI includes zero). The reports state this explicitly rather than implying a
+   fully-ordered leaderboard — correcting the earlier over-claim that "every
+   adjacent pair is significant" (see the variant-selection section above).
+
+The same small-sample caution applies to latency: the source-T4 to-boxes band is
+the honest headline, and the second-T4 medians are labelled a cross-check that
+does **not** reproduce that band across instances rather than a portable absolute
+number. The exact CIs, tie verdicts, and latency band are all in
+[`FINAL_COMPARISON_640.md`](../benchmarks/basketball/reports/FINAL_COMPARISON_640.md).
