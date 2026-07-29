@@ -27,10 +27,29 @@ from pathlib import Path
 from loguru import logger
 
 from object_detection_eval.report import (
+    ci_table,
     inject_table,
+    latency_section,
     load_accuracy_results,
+    load_bootstrap_report,
+    load_latency_results,
+    load_vlm_metrics,
+    per_class_table,
     primary_7model_table,
+    vlm_per_class_table,
+    vlm_summary_table,
 )
+from object_detection_eval.schemas.taxonomy import load_taxonomy_spec
+
+#: Zero-shot VLM prediction dumps, in the order they appear in the comparison.
+_VLM_FILES: dict[str, str] = {
+    "Gemini": "gemini.json",
+    "OWLv2": "owlv2.json",
+    "Grounding-DINO": "grounding_dino.json",
+    "OmDet-Turbo": "omdet_turbo.json",
+    "Florence-2": "florence2.json",
+    "SmolVLM2": "smolvlm2.json",
+}
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 _DEFAULT_RESULTS_DIR = _REPO_ROOT / "benchmarks" / "basketball" / "results"
@@ -106,6 +125,24 @@ def build_registry(
     require every results file to exist.
     """
     acc_merged5 = results_dir / "accuracy" / "reproduction_640_merged5.json"
+    acc_raw10 = results_dir / "accuracy" / "reproduction_640_raw10.json"
+    bootstrap = results_dir / "bootstrap" / "bootstrap_7models.json"
+    latency = results_dir / "latency" / "trt_fp16_toboxes.json"
+    vlm_dir = results_dir / "vlm"
+    gt_path = data_root / "test" / "_annotations.coco.json"
+
+    # Compute the (heavy) VLM metrics once per render and share them across the
+    # summary + per-class slots. Lazy: only evaluated if the VLM report is
+    # actually rendered (i.e. its .md exists).
+    vlm_cache: dict[str, dict[str, object]] = {}
+
+    def vlm_metrics() -> dict[str, dict[str, object]]:
+        if not vlm_cache:
+            for label, filename in _VLM_FILES.items():
+                vlm_cache[label] = load_vlm_metrics(
+                    vlm_dir / filename, gt_path, "merged5", taxonomy_dir
+                )
+        return vlm_cache
 
     final_comparison = ReportSpec(
         report_id="final_comparison",
@@ -115,10 +152,41 @@ def build_registry(
                 "primary_7model",
                 lambda: primary_7model_table(load_accuracy_results(acc_merged5)),
             ),
+            Slot("ci_table", lambda: ci_table(load_bootstrap_report(bootstrap))),
+            Slot(
+                "per_class_5c",
+                lambda: per_class_table(
+                    load_accuracy_results(acc_merged5),
+                    load_taxonomy_spec(taxonomy_dir / "merged5.yaml"),
+                ),
+            ),
+            Slot(
+                "per_class_10c",
+                lambda: per_class_table(
+                    load_accuracy_results(acc_raw10),
+                    load_taxonomy_spec(taxonomy_dir / "raw10.yaml"),
+                ),
+            ),
+            Slot("latency_section", lambda: latency_section(load_latency_results(latency))),
         ],
     )
 
-    return [final_comparison]
+    vlm_vs_finetuned = ReportSpec(
+        report_id="vlm_vs_finetuned",
+        md_path=report_dir / "vlm_vs_finetuned.md",
+        slots=[
+            Slot("vlm_summary", lambda: vlm_summary_table(vlm_metrics())),
+            Slot(
+                "vlm_per_class",
+                lambda: vlm_per_class_table(
+                    vlm_metrics(),
+                    load_taxonomy_spec(taxonomy_dir / "merged5.yaml").classes,
+                ),
+            ),
+        ],
+    )
+
+    return [final_comparison, vlm_vs_finetuned]
 
 
 def _run(specs: list[ReportSpec], *, check: bool, write: bool) -> int:
