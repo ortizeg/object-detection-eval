@@ -127,6 +127,22 @@ def is_tie(ci_lower: float, ci_upper: float) -> bool:
     return not ci_excludes_zero(ci_lower, ci_upper)
 
 
+def write_bootstrap_results(path: Path, report: dict[str, Any]) -> None:
+    """Persist Check A's build_report() dict to ``path`` as indented JSON.
+
+    Pure and numpy-free: ``build_report`` already returns plain Python
+    floats/bools/strings, so ``report`` (config + per_model + pairwise,
+    including each pair's ``ci_excludes_zero`` bool) round-trips through
+    ``json.dump`` / ``json.load`` unchanged. Creates parent dirs and logs
+    the written path. This is the ONLY writer of the committed @640 bootstrap
+    accuracy file -- Check B's @800 comparison is never written here.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w") as f:
+        json.dump(report, f, indent=2)
+    logger.info(f"Wrote bootstrap results (Check A @640 anchor) to {path}")
+
+
 def anchor_matches(measured: dict[str, float], anchor: dict[str, float], tolerance: float) -> bool:
     """True if point_estimate, ci_2.5, and ci_97.5 all fall within `tolerance` of `anchor`."""
     return all(
@@ -204,8 +220,17 @@ def _run_check_a(
     n_boot: int,
     seed: int,
     tolerance: float,
-) -> bool:
-    """Reproduce the 7-model @640 anchor: per-model CIs + adjacent-pair significance."""
+) -> tuple[bool, dict[str, Any]]:
+    """Reproduce the 7-model @640 anchor: per-model CIs + adjacent-pair significance.
+
+    Returns ``(passed, report)`` where ``report`` is the full
+    :func:`~object_detection_eval.metrics.bootstrap.build_report` dict for
+    the 7-model @640 anchor -- surfaced so ``main()`` can persist it behind
+    ``--write-results`` (the @640 per_model CIs + pairwise significance,
+    including the RTMDet-M vs DAMO-YOLO-M tie; 5 of 6 adjacent pairs
+    significant). The joint-best headline tie is a SEPARATE Check B (@800
+    YOLOX-M vs @640 YOLO26m) and is not part of this report.
+    """
     pred_maps: dict[str, dict[str, sv.Detections]] = {}
     for entry in manifest.models:
         pred_path = _manifest_predictions_path(entry, source_repo)
@@ -266,7 +291,7 @@ def _run_check_a(
 
     passed = all_within and all_pairs_match
     logger.info(f"Check A {'PASSED' if passed else 'FAILED'}")
-    return passed
+    return passed, report
 
 
 def _run_check_b(
@@ -340,6 +365,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--n-boot", type=int, default=_DEFAULT_N_BOOT)
     parser.add_argument("--seed", type=int, default=_DEFAULT_SEED)
     parser.add_argument("--tolerance", type=float, default=_DEFAULT_TOLERANCE)
+    parser.add_argument(
+        "--write-results",
+        type=Path,
+        default=None,
+        help=(
+            "If set, serialize Check A's 7-model @640 build_report() output "
+            "(config + per_model CIs + pairwise significance) to this JSON "
+            "path. Only Check A's @640 report is written; Check B's @800 "
+            "joint-best comparison is never persisted here. Persistence only "
+            "-- does not change the gate verdict, tolerances, seed, or n_boot."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -354,9 +391,12 @@ def main() -> None:
     gt_map = load_coco_gt(gt_path, name_to_id)
     logger.info(f"Loaded {len(gt_map)} ground-truth images from {gt_path}")
 
-    check_a_passed = _run_check_a(
+    check_a_passed, check_a_report = _run_check_a(
         manifest, args.source_repo, gt_map, args.n_boot, args.seed, args.tolerance
     )
+
+    if args.write_results is not None:
+        write_bootstrap_results(args.write_results, check_a_report)
 
     with tempfile.TemporaryDirectory(prefix="run_bootstrap_gate_") as tmp:
         check_b_passed = _run_check_b(

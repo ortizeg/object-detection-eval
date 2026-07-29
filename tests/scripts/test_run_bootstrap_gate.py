@@ -14,6 +14,7 @@ run_bootstrap_gate needs at runtime, so the whole suite stays green offline.
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
 import types
 from pathlib import Path
@@ -102,6 +103,57 @@ class TestBootstrapDeterminismLocksTheGate:
         assert pair_1["ci_2.5"] == pair_2["ci_2.5"]
         assert pair_1["ci_97.5"] == pair_2["ci_97.5"]
         assert pair_1["point_diff"] == pair_2["point_diff"]
+
+
+class TestWriteBootstrapResults:
+    """The --write-results helper round-trips build_report's dict on disk."""
+
+    @staticmethod
+    def _minimal_report() -> dict:
+        """A minimal build_report()-shaped dict (plain floats/bools)."""
+        return {
+            "config": {"n_boot": 1000, "seed": 0, "n_images": 94, "models": ["A", "B"]},
+            "per_model": {
+                "A": {"mAP_50_95": {"point_estimate": 0.716, "ci_2.5": 0.704, "ci_97.5": 0.729}},
+                "B": {"mAP_50_95": {"point_estimate": 0.628, "ci_2.5": 0.615, "ci_97.5": 0.641}},
+            },
+            "pairwise": {
+                "A minus B": {
+                    "mAP_50_95": {
+                        "point_diff": 0.088,
+                        "ci_2.5": 0.070,
+                        "ci_97.5": 0.106,
+                        "ci_excludes_zero": True,
+                    }
+                },
+            },
+        }
+
+    def test_round_trip_preserves_per_model_and_pairwise(self, tmp_path: Path) -> None:
+        report = self._minimal_report()
+        out = tmp_path / "nested" / "bootstrap.json"
+
+        run_bootstrap_gate.write_bootstrap_results(out, report)
+
+        assert out.is_file()  # parent dirs created
+        reloaded = json.loads(out.read_text())
+        assert reloaded == report
+        assert reloaded["per_model"]["A"]["mAP_50_95"]["ci_2.5"] == 0.704
+        assert reloaded["pairwise"]["A minus B"]["mAP_50_95"]["point_diff"] == 0.088
+
+    def test_round_trip_preserves_ci_excludes_zero_bool(self, tmp_path: Path) -> None:
+        # A downstream reader must derive significance from this bool, never a
+        # hand-typed "all significant" sentence -- so it must survive as a bool.
+        report = self._minimal_report()
+        report["pairwise"]["A minus B"]["mAP_50_95"]["ci_excludes_zero"] = False
+        out = tmp_path / "bootstrap.json"
+
+        run_bootstrap_gate.write_bootstrap_results(out, report)
+
+        reloaded = json.loads(out.read_text())
+        value = reloaded["pairwise"]["A minus B"]["mAP_50_95"]["ci_excludes_zero"]
+        assert value is False
+        assert isinstance(value, bool)
 
 
 class TestTieClassifier:
