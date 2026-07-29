@@ -1,5 +1,7 @@
 # object-detection-eval
 
+📖 **Browse the docs & reports: <https://ortizeg.github.io/object-detection-eval/>**
+
 Reproducible evaluation harness for object detection networks on small datasets.
 
 One evaluation protocol, applied to **fine-tuned detectors and zero-shot VLMs

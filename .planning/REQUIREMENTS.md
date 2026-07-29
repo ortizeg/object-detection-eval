@@ -143,7 +143,7 @@ Irreplaceable data currently exists only on one laptop, outside any git history.
 - **GEN-01**: A second dataset proves the harness is genuinely dataset-agnostic
 - **GEN-02**: Model cards published to the HF Hub render as proper model cards
 - **LAT-05**: CPU/edge latency, where the NMS-free advantage should actually appear
-- **REPORT-06**: mkdocs site published via GitHub Pages
+- **REPORT-06**: mkdocs site published via GitHub Pages — ✅ SHIPPED 2026-07-29 (https://ortizeg.github.io/object-detection-eval/)
 
 ## Out of Scope
 
