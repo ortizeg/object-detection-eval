@@ -120,6 +120,70 @@ def load_manifest(path: Path | str) -> LatencyManifest:
     return LatencyManifest.model_validate(raw)
 
 
+# --------------------------------------------------------------------------
+# LAT-04 gate bands (source: EVAL_REPORT_FINAL.md §6). Plan 06-03's T4
+# checkpoint applies within_band() to the measured numbers; this harness only
+# REPORTS the numbers, it does not assert the verdict itself.
+# --------------------------------------------------------------------------
+
+# The §6 native-TensorRT-fp16 to-boxes band: a fair fp16 to-boxes latency for
+# the fleet should land in [4.0, 7.1] ms.
+FP16_TOBOXES_BAND_MS: tuple[float, float] = (4.0, 7.1)
+
+# The §6 on-GPU NMS cost: grafting EfficientNMS onto a dense head adds only
+# ~0.05-0.2 ms, so a fair to-boxes number is barely above the to-logits one.
+ONGPU_NMS_DELTA_BAND_MS: tuple[float, float] = (0.05, 0.2)
+
+
+def median_ms(times: list[float]) -> float:
+    """Median of the per-call timings; a single-element list returns it."""
+    return statistics.median(times)
+
+
+def p90_ms(times: list[float]) -> float:
+    """p90 of the per-call timings via ``quantiles(..., n=10)[8]``.
+
+    A single-element list has no deciles to cut, so it returns that element
+    (mirrors median_ms for the degenerate case).
+    """
+    if len(times) < 2:
+        return times[0]
+    return statistics.quantiles(times, n=10)[8]
+
+
+def within_band(value: float, low: float, high: float) -> bool:
+    """True iff ``low <= value <= high`` (both boundaries inclusive).
+
+    Drives LAT-04's fp16 to-boxes check (FP16_TOBOXES_BAND_MS) and NMS-delta
+    check (ONGPU_NMS_DELTA_BAND_MS) at Plan 06-03's checkpoint.
+    """
+    return low <= value <= high
+
+
+def build_record(
+    name: str,
+    times_ms: list[float],
+    provider: str,
+    nms_graft: bool,
+) -> dict[str, Any]:
+    """Reduce raw per-call timings to the documented results-JSON record.
+
+    Shape: ``{name, median_ms, p90_ms, fps, provider, nms_graft}`` where
+    ``fps = 1000 / median_ms``. ``provider`` is the session's resolved
+    execution provider so a silent CPU fallback is visible (Pitfall 5), not
+    baked into a headline number.
+    """
+    median = median_ms(times_ms)
+    return {
+        "name": name,
+        "median_ms": median,
+        "p90_ms": p90_ms(times_ms),
+        "fps": 1000.0 / median,
+        "provider": provider,
+        "nms_graft": nms_graft,
+    }
+
+
 def _resolve_root(root: str, source_repo: Path, yolox_root: Path) -> Path:
     if root == "source_repo":
         return source_repo
@@ -202,19 +266,13 @@ def _time_model(
             times_ms.append((time.perf_counter() - start) * 1000.0)
 
     provider = detector._session.get_providers()[0]
-    median = statistics.median(times_ms)
-    p90 = statistics.quantiles(times_ms, n=10)[8] if len(times_ms) > 1 else times_ms[0]
+    record = build_record(entry.name, times_ms, provider, entry.nms_graft)
     logger.info(
-        f"{entry.name}: median={median:.3f} ms p90={p90:.3f} ms "
-        f"provider={provider} ({len(times_ms)} timed calls)"
+        f"{entry.name}: median={record['median_ms']:.3f} ms "
+        f"p90={record['p90_ms']:.3f} ms provider={provider} "
+        f"({len(times_ms)} timed calls)"
     )
-    return {
-        "name": entry.name,
-        "median_ms": median,
-        "p90_ms": p90,
-        "provider": provider,
-        "nms_graft": entry.nms_graft,
-    }
+    return record
 
 
 def _load_images(args: argparse.Namespace, filenames: list[str]) -> list[tuple[Any, int, int]]:
@@ -225,6 +283,61 @@ def _load_images(args: argparse.Namespace, filenames: list[str]) -> list[tuple[A
         loader = ImageLoader(test_dir / filename)
         images.append((loader.read(), loader.width, loader.height))
     return images
+
+
+# Any model whose median is more than this multiple of the fleet minimum is
+# flagged suspect: the classic silent-CPU-fallback tell (Pitfall 5) where one
+# model quietly runs an order of magnitude slower than its peers.
+_SUSPECT_MEDIAN_MULTIPLE = 3.0
+
+
+def _flag_suspects(records: list[dict[str, Any]]) -> None:
+    """Mark + WARN any model whose median is >3x the fleet minimum (Pitfall 5).
+
+    Mutates each record in place to carry a boolean ``suspect`` flag so the
+    silent-CPU-fallback tell travels with the number into the results JSON,
+    rather than being lost as a transient log line.
+    """
+    fleet_min = min(r["median_ms"] for r in records)
+    threshold = _SUSPECT_MEDIAN_MULTIPLE * fleet_min
+    for record in records:
+        suspect = record["median_ms"] > threshold
+        record["suspect"] = suspect
+        if suspect:
+            logger.warning(
+                f"{record['name']}: median {record['median_ms']:.3f} ms is "
+                f">{_SUSPECT_MEDIAN_MULTIPLE:g}x the fleet minimum "
+                f"({fleet_min:.3f} ms) on provider {record['provider']} -- "
+                f"possible silent CPU fallback (Pitfall 5); do not publish as a "
+                f"headline number without checking the resolved provider."
+            )
+
+
+def _print_table(records: list[dict[str, Any]]) -> None:
+    """Loguru table of the per-model latency records (mirrors run_benchmark)."""
+    header = (
+        f"{'Model':<14} | {'Median ms':>10} | {'p90 ms':>10} | {'FPS':>8} | "
+        f"{'NMS graft':>9} | {'Provider':<22} | {'Suspect':>7}"
+    )
+    logger.info("=" * len(header))
+    logger.info("Uniform end-to-end latency (batch 1, conf 0.25)")
+    logger.info(header)
+    logger.info("-" * len(header))
+    for r in records:
+        logger.info(
+            f"{r['name']:<14} | {r['median_ms']:>10.3f} | {r['p90_ms']:>10.3f} | "
+            f"{r['fps']:>8.1f} | {'yes' if r['nms_graft'] else 'no':>9} | "
+            f"{r['provider']:<22} | {'YES' if r.get('suspect') else 'no':>7}"
+        )
+    logger.info("=" * len(header))
+
+
+def _write_results(out: Path, records: list[dict[str, Any]]) -> None:
+    """Write the small numeric results JSON (committed; fits the 2 MB hook)."""
+    out.parent.mkdir(parents=True, exist_ok=True)
+    with open(out, "w") as f:
+        json.dump({"models": records}, f, indent=2)
+    logger.info(f"Wrote {len(records)} latency records to {out}")
 
 
 def parse_args() -> argparse.Namespace:
@@ -276,13 +389,15 @@ def main() -> None:
 
     images = _load_images(args, filenames)
 
-    # Tracer: prove ONE model times end-to-end through predict() and yields a
-    # median/p90/provider triple. Task 2 loops over all 7 and writes the JSON.
-    first = manifest.models[0]
-    logger.info(f"Timing {first.name} ({first.detector}) via predict()")
-    detector = _build_detector(first, args)
-    record = _time_model(first, detector, images, args.warmup, args.passes)
-    logger.info(f"Tracer record: {record}")
+    records: list[dict[str, Any]] = []
+    for entry in manifest.models:
+        logger.info(f"Timing {entry.name} ({entry.detector}) via predict()")
+        detector = _build_detector(entry, args)
+        records.append(_time_model(entry, detector, images, args.warmup, args.passes))
+
+    _flag_suspects(records)
+    _print_table(records)
+    _write_results(args.out, records)
 
 
 if __name__ == "__main__":
