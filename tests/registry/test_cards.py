@@ -33,7 +33,7 @@ REGISTRY_DIR = Path("registry")
 
 #: The 8 redistributable (Apache-2.0) cards this plan ships.
 REDISTRIBUTABLE_CARDS = [
-    "yolox-m-800",
+    "yolox-m-640",
     "yolox-s-800",
     "rfdetr-s-560",
     "deim-m-640",
@@ -51,7 +51,7 @@ AGPL_CARDS = ["yolo26m-640", "yolo26s-640"]
 #: is not derivable by simple substitution alone (e.g. damo-yolo-m-640 ->
 #: damo_m_640.yaml, rfdetr-s-560 -> rfdetr_s_560.yaml).
 _NAME_TO_FILE_STEM: dict[str, str] = {
-    "yolox-m-800": "yolox_m_800",
+    "yolox-m-640": "yolox_m_640",
     "yolox-s-800": "yolox_s_800",
     "rfdetr-s-560": "rfdetr_s_560",
     "deim-m-640": "deim_m_640",
@@ -82,7 +82,7 @@ def _write_payload(tmp_path: Path, payload: dict[str, Any]) -> Path:
 #: RT-DETRv2 subclasses DeimDetector (identical D-FINE deploy preprocessing),
 #: so it is coupled against LetterboxConfig.deim() too.
 _FACTORY_BACKED: dict[str, LetterboxConfig] = {
-    "yolox-m-800": LetterboxConfig.yolox(),
+    "yolox-m-640": LetterboxConfig.yolox(),
     "yolox-s-800": LetterboxConfig.yolox(),
     "deim-m-640": LetterboxConfig.deim(),
     "rtmdet-m-640": LetterboxConfig.rtmdet(),
@@ -178,7 +178,7 @@ def test_redistributable_cards_carry_real_sha256(registry: ModelRegistry) -> Non
         "rt-detrv2-m-640": "7704cc48849f940541d0adc0d1c600b206dbfb8a9f2925d844a4f4485a04b226",
         "rf-detr-m-640": "708789b50c42b5265cced64276a8beb1b7f294d324f954d359fd8a2d01f5a939",
         "rfdetr-s-560": "d1301dd9f80770518ab0529f9490ee6b82d4efb33df6a914dd69a5031984d8a2",
-        "yolox-m-800": "60e72a5920308c55ccbf6413a598bc45225ca162674b30f74dd7eb5d311331e2",
+        "yolox-m-640": "5f2f05c6890f513a06e6c94154363b351c1eefde0c57b2c9b16c2d48557d5c77",
         "yolox-s-800": "dc5a5afe11ac75ba9c80f1975cb1f7dc8bc738a6a37a8a4ecfb78fa196b3b425",
     }
     for name, digest in real_digest_cards.items():

@@ -182,7 +182,7 @@ every number:
 - [`../benchmarks/basketball/reports/FINAL_COMPARISON_640.md`](../benchmarks/basketball/reports/FINAL_COMPARISON_640.md)
   — the 7 fine-tuned detectors @640, with paired-bootstrap CIs and latency.
 - [`../benchmarks/basketball/reports/VLM_VS_FINETUNED.md`](../benchmarks/basketball/reports/VLM_VS_FINETUNED.md)
-  — the 6 zero-shot VLMs against the same protocol, with the per-class failure
+  — the 5 zero-shot VLMs against the same protocol, with the per-class failure
   analysis.
 
 This document deliberately carries **no data tables** — every number is emitted

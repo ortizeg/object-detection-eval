@@ -290,10 +290,13 @@ def test_vlm_per_class_table_surfaces_rim_and_zero_ap() -> None:
     # header: Model | player | ball | referee | rim | number
     assert cells[1] == "0.923"  # player
     assert cells[4] == "0.036"  # rim surfaced with a small nonzero value
-    # SmolVLM2 is the zero-AP floor: rim (and every class) present as 0.000.
-    smol_row = next(line for line in table.splitlines() if line.startswith("| SmolVLM2 "))
-    smol_cells = [c.strip() for c in smol_row.strip("|").split("|")]
-    assert smol_cells[4] == "0.000"
+    # Grounding-DINO is the zero-AP floor: a class the model genuinely scored
+    # 0.0 on must render "0.000", NOT the em dash reserved for an absent class.
+    gd_row = next(line for line in table.splitlines() if line.startswith("| Grounding-DINO "))
+    gd_cells = [c.strip() for c in gd_row.strip("|").split("|")]
+    assert gd_cells[4] == "0.000"  # rim
+    assert gd_cells[2] == "0.000"  # ball
+    assert gd_cells[1] == "0.849"  # player carries the score
 
 
 def test_vlm_per_class_table_absent_class_is_em_dash() -> None:

@@ -69,7 +69,7 @@ object-detection-eval/
 ├── pyproject.toml
 │
 ├── registry/                       # model cards — version controlled, no weights
-│   ├── yolox_m_800.yaml
+│   ├── yolox_m_640.yaml
 │   ├── yolox_s_800.yaml
 │   ├── yolo26m_640.yaml            # ⚠ AGPL — see §11
 │   ├── yolo26s_640.yaml
@@ -106,7 +106,7 @@ object-detection-eval/
 │   │   │   ├── deim.py   rtdetrv2.py   damo.py   rfdetr.py
 │   │   └── vlm/                    # [vlm] extra
 │   │       ├── gemini.py  owlv2.py  grounding_dino.py
-│   │       ├── florence2.py  omdet_turbo.py  smolvlm2.py
+│   │       ├── florence2.py  omdet_turbo.py
 │   ├── metrics/
 │   │   ├── detection_map.py        # public compute_metrics() via supervision
 │   │   ├── prf1.py                 # threshold sweep, operating point
@@ -177,7 +177,7 @@ provenance:
   commit: 64c55e2
   config: benchmarks/basketball/... | docs/provenance/configs/...
   hardware: "vast.ai A100 80GB ×1"
-  command: "see docs/provenance/training-runs.md#yolox-m-800"
+  command: "see docs/provenance/training-runs.md#yolox-m-640"
 preprocessing:
   resize: letterbox
   alignment: top_left | center
@@ -323,7 +323,7 @@ project before (format-check oscillation).
 `pydantic>=2`, `hydra-core`, `loguru`, `supervision`, `pycocotools`, `matplotlib`,
 `tqdm`, `orjson`, `pyyaml`, `httpx`.
 
-**`[vlm]` extra:** `torch`, `torchvision`, `transformers>=4.49,<4.52` (SmolVLM2 pin),
+**`[vlm]` extra:** `torch`, `torchvision`, `transformers>=4.49,<4.52` (pin retained after the 2026-07-30 SmolVLM2 removal; not revalidated),
 `timm` (OmDet-Turbo backbone), `einops` (Florence-2), `peft`, `google-genai`.
 
 **`[trt]` extra:** `onnxruntime-gpu`, `tensorrt`, `onnx-graphsurgeon`. Linux-64 only.

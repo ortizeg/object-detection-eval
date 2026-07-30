@@ -26,7 +26,7 @@ and drift-checked in CI, so nothing below is hand-typed:
   — 7 fine-tuned medium detectors @640, with paired-bootstrap 95% CIs (5 of 6
   adjacent pairs significant; RTMDet-M vs DAMO-YOLO-M a tie) and to-boxes latency.
 - **[benchmarks/basketball/reports/VLM_VS_FINETUNED.md](benchmarks/basketball/reports/VLM_VS_FINETUNED.md)**
-  — 6 zero-shot VLMs against the same protocol, with the per-class failure
+  — 5 zero-shot VLMs against the same protocol, with the per-class failure
   analysis (the `rim` collapse; zero-AP `ball`/`referee` for the weaker methods).
 
 The methodology behind the protocol — train-matched preprocessing, detector/VLM

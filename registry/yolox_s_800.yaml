@@ -2,11 +2,12 @@ name: yolox-s-800
 version: 1.0.0
 task: detection
 architecture: yolox-s
-description: YOLOX-S anchor-free detector, the smaller sibling of yolox-m-800, at
-  an 800x800 input resolution. No published basketball test-set score exists for this
+description: YOLOX-S anchor-free detector at an 800x800 input resolution. Not part
+  of the 7-model @640 final-comparison roster and it has no @640 counterpart, so it is
+  retained as a standalone card. No published basketball test-set score exists for this
   checkpoint; instead it carries the harness's COCO val2017 sanity check (see docs/methodology.md),
-  which establishes the harness itself is not the source of the cross-model preprocessing
-  swings documented for yolox-m-800.
+  which establishes that the harness itself is not the source of cross-model scoring
+  differences.
 license: Apache-2.0
 training_dataset: basketball-player-detection-3
 num_parameters: null

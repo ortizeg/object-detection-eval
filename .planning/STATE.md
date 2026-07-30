@@ -8,7 +8,7 @@ status: executing
 stopped_at: Completed all Phase 7 plans (07-01..04). Reports generator + FINAL_COMPARISON_640.md + VLM_VS_FINETUNED.md + methodology + README, every table generator-emitted. REPORT-01..05 done. ALL 7 PHASES COMPLETE.
 last_updated: "2026-07-29T18:32:26.024Z"
 last_activity: 2026-07-30
-last_activity_desc: "Quick 260730-a01: dedicated-T4 latency re-measurement + 3 TRT-workflow defect fixes"
+last_activity_desc: "Quick 260730-b01: SmolVLM2 purge + registry yolox-m-800 -> yolox-m-640"
 progress:
   total_phases: 7
   completed_phases: 7
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-24)
 Phase: 05 (zero-shot-vlm) — COMPLETE
 Plan: 4 of 4 executed
 Status: Phase 5 done — VLM zero-shot reproduction gate PASSED. Next: Phase 6 (Latency, needs a T4) or Phase 7 (Reports).
-Last activity: 2026-07-30 — Completed quick task 260730-a01: dedicated-T4 latency re-measurement + 3 TRT-workflow defect fixes
+Last activity: 2026-07-30 — Completed quick task 260730-b01: SmolVLM2 purge + registry @800 -> @640
 
 Progress: [█████████░] 88% (Phase 5 of 7)
 
@@ -129,6 +129,9 @@ None yet.
 - **[Phase 6] RTMDet-M on-GPU NMS delta unavailable:** its ungrafted mmdeploy `end2end` graph cannot build under TensorRT (pre-NMS `TopK`, K > 3840). Expected and reproduced on both machines; only `to_boxes − model_only` is affected.
 - **[Phase 6] CPU latency not re-measured:** `cpu_e2e_conf*.json` still carries pre-dedicated-T4 numbers, so the LAT-05 NMS blow-up table has not been revalidated on clean hardware.
 - **[Phase 5] External credential dependency:** VLM-02's Gemini row needs an API key; those tests are marked external.
+- **[Phase 5] Two VLM rows are not trustworthy as capability measurements (found 2026-07-30, quick 260730-b01):** Grounding-DINO emits 533 dets/image at 99.7% `person` (label-resolution collapse at `text_threshold: 0.01`), and Florence-2 ran with the closed-vocabulary `<OD>` task token. Both need re-running on a GPU before their numbers can be published as findings. Prompt effort was also unequal across the 5 VLMs.
+- **[Phase 5] transformers/num2words pins retained unrevalidated:** both were justified by SmolVLM2 (removed 2026-07-30). Dropping them needs a GPU re-run of the VLM gate.
+- **[Registry] yolox-m-640 weights are NOT published:** the card's `weights.url` points at a HF repo that does not exist yet; `basketball-yolox-m-800` is still the live public repo and should be taken down when the 640 is published.
 - **[Requirements] Count correction:** REQUIREMENTS.md stated 34 v1 requirements; the actual enumerated count is 36 (SAFE 4 + CORE 9 + REG 6 + REPRO 3 + VLM 4 + LAT 4 + REPORT 5 + INFRA 1). Traceability now reflects 36.
 - **[Phase 1] Time sensitivity:** irreplaceable provenance for all 7 models currently exists only on one laptop, outside any git history. Nothing else in this roadmap matters if it is lost.
 
@@ -137,6 +140,7 @@ None yet.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260730-a01 | Dedicated-T4 latency re-measurement + 3 TRT-workflow defect fixes | 2026-07-30 | 662a89e | [260730-a01-latency-t4-and-trt-defects](./quick/260730-a01-latency-t4-and-trt-defects/) |
+| 260730-b01 | SmolVLM2 purge + registry yolox-m-800 -> yolox-m-640 | 2026-07-30 | 720a17c | [260730-b01-smolvlm2-purge-and-registry](./quick/260730-b01-smolvlm2-purge-and-registry/) |
 
 ## Deferred Items
 

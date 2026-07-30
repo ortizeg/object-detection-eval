@@ -58,17 +58,5 @@
       "rim": 0.0,
       "number": 0.0
     }
-  },
-  "SmolVLM2": {
-    "mAP_50_95": 0.0,
-    "mAP_50": 0.0,
-    "mAP_75": 0.0,
-    "per_class_ap50": {
-      "player": 0.0,
-      "ball": 0.0,
-      "referee": 0.0,
-      "rim": 0.0,
-      "number": 0.0
-    }
   }
 }
