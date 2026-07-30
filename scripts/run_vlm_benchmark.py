@@ -1,7 +1,7 @@
-"""VLM-01/VLM-02: run and reproduce the six-VLM zero-shot ceiling.
+"""VLM-01/VLM-02: run and reproduce the five-VLM zero-shot ceiling.
 
-Runs each of the six committed zero-shot VLMs (Gemini, OWLv2, OmDet-Turbo,
-Grounding DINO, Florence-2, SmolVLM2) over the 94-image basketball test
+Runs each of the five committed zero-shot VLMs (Gemini, OWLv2, OmDet-Turbo,
+Grounding DINO, Florence-2) over the 94-image basketball test
 split through the SAME scorer as the ONNX detectors (``run_benchmark.py``):
 ``load_coco_gt`` -> per-image ``predict`` -> ``remap_detections`` (merged5)
 -> ``filters.area_outliers`` -> ``filters.single_best_per_class`` ->
@@ -163,15 +163,6 @@ def _florence2_factory(entry: ManifestEntry) -> BaseInferencer:
     )
 
 
-def _smolvlm2_factory(entry: ManifestEntry) -> BaseInferencer:
-    from object_detection_eval.inference.vlm.smolvlm2 import SmolVLM2Inferencer
-
-    return SmolVLM2Inferencer(
-        model_name=entry.model_name,
-        classes=entry.classes,
-    )
-
-
 def _gemini_factory(entry: ManifestEntry) -> BaseInferencer:
     from object_detection_eval.inference.vlm.gemini import GeminiInferencer
 
@@ -188,7 +179,6 @@ _INFERENCER_FACTORIES: dict[str, Callable[[ManifestEntry], BaseInferencer]] = {
     "omdet_turbo": _omdet_turbo_factory,
     "grounding_dino": _grounding_dino_factory,
     "florence2": _florence2_factory,
-    "smolvlm2": _smolvlm2_factory,
 }
 
 
@@ -280,8 +270,9 @@ def _write_results(
 def _print_result(entry: ManifestEntry, measured: float, tolerance: float) -> bool:
     """Log one row's verdict and return whether it passes the gate.
 
-    A `None` expected_map5095 (SmolVLM2, VLM-02) is informational-only: it
-    always passes -- there is no published target to reproduce.
+    A `None` expected_map5095 (VLM-02) is informational-only: it always passes
+    -- there is no published target to reproduce. No committed row currently
+    uses this, but the manifest still permits it for an exploratory model.
     """
     if entry.expected_map5095 is None:
         logger.info(f"{entry.name:<16} | measured={measured:.4f} | no target (informational)")
@@ -299,9 +290,9 @@ def _print_result(entry: ManifestEntry, measured: float, tolerance: float) -> bo
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "VLM-01/VLM-02: run the six zero-shot VLMs over the 94-image "
+            "VLM-01/VLM-02: run the five zero-shot VLMs over the 94-image "
             "basketball test split and assert the published zero-shot "
-            "ceiling within tolerance (SmolVLM2 runs without a target)."
+            "ceiling within tolerance."
         )
     )
     parser.add_argument("--data-root", type=Path, default=_DEFAULT_DATA_ROOT)

@@ -31,11 +31,19 @@ dependencies = [
 vlm = [
     "torch",
     "torchvision",
-    "transformers>=4.49.0,<4.52.0", # SmolVLM2 requires >=4.49
+    # Lower bound was justified by SmolVLM2, removed 2026-07-30. Pin RETAINED
+    # unrevalidated: the 4 remaining VLMs may need it, and <4.52 guards the
+    # HF post-processing drift the VLM gate is sensitive to. Relaxing it
+    # requires re-running the VLM reproduction gate on a GPU.
+    "transformers>=4.49.0,<4.52.0",
     "timm",                          # OmDet-Turbo backbone (AutoBackbone)
     "einops",                        # Florence-2
     "peft",
-    "num2words",                     # SmolVLM2 processor
+    # num2words was SmolVLM2's processor dep (removed 2026-07-30) and nothing in
+    # this repo imports it. RETAINED unrevalidated: it is pulled in by HF
+    # processor code paths at runtime, not by our imports, so dropping it needs
+    # a GPU re-run of the VLM gate to prove the other 4 models still load.
+    "num2words",
     "google-genai>=1.63.0,<2",
 ]
 # TensorRT latency benchmarking. Linux-64 + NVIDIA only.

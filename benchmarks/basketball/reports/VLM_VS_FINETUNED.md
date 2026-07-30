@@ -25,7 +25,7 @@ this parity is documented in [../../../docs/methodology.md](../../../docs/method
 
 ## The zero-shot ceiling
 
-Six zero-shot VLMs, scored on the merged-5 test split. The table is recomputed
+Five zero-shot VLMs, scored on the merged-5 test split. The table is recomputed
 from the committed prediction dumps in `results/vlm/*.json` (never transcribed):
 
 <!-- TABLE:vlm_summary START -->
@@ -36,7 +36,6 @@ from the committed prediction dumps in `results/vlm/*.json` (never transcribed):
 | Grounding-DINO | 0.147 | 0.171 | 0.159 |
 | OmDet-Turbo | 0.172 | 0.253 | 0.188 |
 | Florence-2 | 0.106 | 0.140 | 0.128 |
-| SmolVLM2 | 0.000 | 0.000 | 0.000 |
 <!-- TABLE:vlm_summary END -->
 
 The strongest zero-shot model in the table above still sits **below half** the
@@ -63,7 +62,6 @@ makes the pattern unmistakable:
 | Grounding-DINO | 0.849 | 0.000 | 0.000 | 0.000 | 0.005 |
 | OmDet-Turbo | 0.843 | 0.085 | 0.334 | 0.000 | 0.002 |
 | Florence-2 | 0.679 | 0.020 | 0.000 | 0.000 | 0.000 |
-| SmolVLM2 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 |
 <!-- TABLE:vlm_per_class END -->
 
 Read down the columns and one story emerges: **open-vocabulary VLMs recognise
@@ -72,30 +70,49 @@ COCO's `person`) and collapse on the small, domain-specific classes.**
 
 - **The `rim` collapse.** `rim` (the basketball hoop) is the class every model
   fails hardest on. Even the two strongest models score only a sliver of AP on
-  it, and the remaining four score **exactly 0.000** — no usable detection of
+  it, and the remaining three score **exactly 0.000** — no usable detection of
   the hoop at all. A rim is small, thin, often partially occluded, and not a
   salient "object" in a general model's prior; the open-vocabulary prompts
   ("basketball hoop", "rim") do not localise it. This is the single clearest
   domain gap in the comparison.
 
 - **Zero-AP `ball` and `referee` for the weaker methods.** Grounding-DINO scores
-  **0.000 on both `ball` and `referee`**, and SmolVLM2 scores 0.000 on every
-  class. Florence-2 additionally collapses to **0.000 on `referee`**. The ball
-  is tiny and fast-moving; the referee is visually a `player` under this
-  vocabulary (a person on court) and the models cannot separate the officiating
-  role from the players around them. Where a class demands either fine spatial
-  resolution (`ball`) or in-domain role semantics (`referee`), zero-shot AP
-  falls to the floor.
+  **0.000 on both `ball` and `referee`**; Florence-2 additionally collapses to
+  **0.000 on `referee`**. The ball is tiny and fast-moving; the referee is
+  visually a `player` under this vocabulary (a person on court) and the models
+  cannot separate the officiating role from the players around them. **But see
+  the caveat below before reading either row as a capability limit.**
 
 - **`player` carries the score.** Every non-degenerate model scores strongly on
   `player` — this is the one class that overlaps a general detector's prior, and
   it is almost entirely responsible for the non-trivial overall mAP the leaders
   post. Strip `player` out and the zero-shot ceiling would be far lower still.
 
-- **SmolVLM2 produced no on-target detections.** It scores 0.000 across every
-  class (overall mAP 0.000). Its outputs did not resolve into detections that
-  survive the shared protocol's de-transform and matching; it is included for
-  completeness as the floor of the comparison, not as a competitive method.
+> **⚠️ Two of these five rows are not yet trustworthy as capability
+> measurements.** Auditing the committed prediction dumps turned up harness
+> problems that plausibly account for their scores:
+>
+> - **Grounding-DINO emits 533 detections per image, 99.7% of them labelled
+>   `person`** (49,935 of 50,103), and finds the basketball exactly **once
+>   across all 94 images**. That is not how a state-of-the-art open-vocabulary
+>   detector behaves. `_resolve_label` resolves a concatenated multi-phrase
+>   label by picking the class name appearing *earliest in the string*, and at
+>   `text_threshold: 0.01` nearly every text token activates — so the label spans
+>   the whole caption and the tiebreak returns whichever class is listed first in
+>   the manifest. Its near-zero non-`player` rows are consistent with that bug,
+>   not with a measured capability floor.
+> - **Florence-2 was run with `task: "<OD>"`**, Florence-2's *closed*-vocabulary
+>   mode, which cannot return custom classes. 923 of its 924 detections are
+>   `person`. The correct token for this protocol is
+>   `<OPEN_VOCABULARY_DETECTION>`.
+>
+> Prompt effort was also unequal: Gemini received a hand-tuned prompt with
+> per-class definitions and count constraints, and OWLv2 a tuned vocabulary,
+> while Grounding-DINO, OmDet-Turbo and Florence-2 were all given the same
+> generic COCO list. This report applies the "tuning effort is itself an
+> unfairness" principle to the detectors but not, so far, to the VLMs. Until
+> these are re-run, treat **Gemini and OWLv2** as the meaningful zero-shot
+> ceiling and the lower three as provisional.
 
 ### Interpretation
 

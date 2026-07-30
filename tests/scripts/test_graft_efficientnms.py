@@ -13,7 +13,7 @@ runs BEFORE any onnx / onnx_graphsurgeon import and before the graft-script load
 ``-m`` filter, so a bare top-level ``import onnx_graphsurgeon`` here would raise
 ImportError during collection and break the whole default-env ``pixi run
 test-cov`` run even under ``-m "not graphsurgeon"``. Mirrors the precedent in
-tests/scripts/test_run_vlm_benchmark.py and tests/inference/vlm/test_smolvlm2.py.
+tests/scripts/test_run_vlm_benchmark.py.
 Marked ``graphsurgeon`` (needs onnx-graphsurgeon, NOT a GPU); deselected in
 default CI, run via ``pixi run -e graphsurgeon pytest -m graphsurgeon``.
 """
