@@ -73,6 +73,31 @@ _LATENCY_RE = re.compile(r"median\s*=\s*([\d.]+)\s*ms.*?percentile\(99%\)\s*=\s*
 # back to the summary "Latency" line if a trtexec build omits the compute line.
 _METRIC_LABELS = ("GPU Compute Time", "Latency")
 
+# trtexec's explicit dotted version, e.g. "NVIDIA TensorRT Version 10.3.0".
+# Anchored on the literal word "Version" so it cannot drift onto an unrelated
+# number: a bare `TensorRT[^\d]*([\d.]+)` matches the NGC *container tag*
+# ("NVIDIA Release 24.08") because the first "TensorRT" in that banner is the
+# ASCII art, and the next digits belong to the release line rather than to
+# TensorRT itself.
+_TRT_VERSION_RE = re.compile(r"TensorRT\s+Version\s+(\d+(?:\.\d+)+)", re.IGNORECASE)
+
+# trtexec's packed build token, e.g. "[TensorRT v100300]" -> 10.3.0. Present in
+# every trtexec invocation banner, so it is the reliable fallback when the
+# dotted "Version" line is absent.
+_TRT_PACKED_RE = re.compile(r"TensorRT\s+v(\d{4,8})\b", re.IGNORECASE)
+
+
+def _decode_packed_trt_version(packed: str) -> str:
+    """Decode trtexec's packed version token (``100300`` -> ``10.3.0``).
+
+    The token is ``MMmmpp`` (major/minor/patch, 2 digits each), left-padded for
+    single-digit majors. Returns the dotted form with leading zeros stripped.
+    """
+    digits = packed.zfill(6)
+    major, minor, patch = digits[:-4], digits[-4:-2], digits[-2:]
+    return f"{int(major)}.{int(minor)}.{int(patch)}"
+
+
 # Type alias for an injectable subprocess.run (mocked in the offline test).
 Runner = Callable[..., Any]
 
@@ -251,24 +276,37 @@ def build_and_time(
 def resolve_trt_version(trtexec: str, *, runner: Runner = subprocess.run) -> str:
     """Best-effort TensorRT version for provenance (Pitfall 6: TRT drift).
 
-    Prefers the ``tensorrt`` Python binding's ``__version__`` (deferred import so
-    this module loads without TensorRT), falling back to ``trtexec --version``
-    output, then ``"unknown"``.
-    """
-    try:
-        import tensorrt
+    Interrogates **the ``--trtexec`` binary that actually builds the engines**
+    first, and only falls back to the ``tensorrt`` Python binding's
+    ``__version__`` (deferred import, so this module loads without TensorRT).
 
-        return str(tensorrt.__version__)
-    except Exception:
-        logger.debug("tensorrt Python binding unavailable; trying `trtexec --version`")
+    The order matters: the binding and the binary can legitimately differ. The
+    2026-07-30 dedicated-T4 run resolved its env's binding to 10.16.1.11 while
+    every engine was built by a containerised ``trtexec`` 10.3.0 — binding-first
+    stamped provenance onto results it did not produce. The builder is the only
+    version that describes the artifacts, so it wins.
+    """
     try:
         result = runner([trtexec, "--version"], check=False, capture_output=True, text=True)
         text = f"{getattr(result, 'stdout', '')}{getattr(result, 'stderr', '')}"
-        match = re.search(r"TensorRT[^\d]*([\d.]+)", text)
+        match = _TRT_VERSION_RE.search(text)
         if match:
             return match.group(1)
+        packed = _TRT_PACKED_RE.search(text)
+        if packed:
+            return _decode_packed_trt_version(packed.group(1))
     except Exception:
-        logger.debug("`trtexec --version` failed; recording TRT version as unknown")
+        logger.debug("`trtexec --version` failed; trying the tensorrt Python binding")
+    try:
+        import tensorrt
+
+        logger.warning(
+            "TRT version came from the `tensorrt` Python binding, not from "
+            f"{trtexec!r}; verify it describes the binary that built these engines."
+        )
+        return str(tensorrt.__version__)
+    except Exception:
+        logger.debug("tensorrt Python binding unavailable; recording TRT version as unknown")
     return "unknown"
 
 
