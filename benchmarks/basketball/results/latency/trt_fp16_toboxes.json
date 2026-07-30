@@ -1,17 +1,17 @@
 {
   "reproducibility": {
-    "status": "manually_measured",
-    "label": "manually measured 2026-07-21, not reproducible from this repo",
-    "measured_date": "2026-07-21",
+    "status": "dedicated_instance_measured",
+    "label": "measured 2026-07-30 on a dedicated GCP T4 (n1-standard-8, us-central1-a, sole tenant, persistence mode on, SM clock locked to 1590 MHz), TensorRT 10.3.0",
+    "measured_date": "2026-07-30",
     "source_band_ms_2026_07_21": [
       4.0,
       7.1
     ],
     "second_run": {
       "date": "2026-07-29",
-      "gpu": "Tesla T4 (vast.ai, shared instance)",
+      "gpu": "Tesla T4 (vast.ai, SHARED instance) \u2014 SUPERSEDED",
       "trt_version": "10.3.0",
-      "outcome": "METHOD reproduced: all 7 to-boxes fp16 TRT engines build from committed code (YOLOX fused-head split + RTMDet end2end-strip + DAMO EfficientNMS grafts; YOLO26 NMS-free via static --shapes; the 3 DETRs decode in-graph). ABSOLUTE latency is ~2-6x higher and noisier than the source T4 (e.g. YOLOX 4.02 -> 14.76 ms, DAMO 4.24 -> 11.75 ms, DEIM 6.56 -> 43.0 ms load-artifact), so the 4.0-7.1 ms fp16 band is NOT portable across T4 instances. LAT-04 resolves to the honest-label outcome by design; the band is not tuned to fit."
+      "outcome": "SUPERSEDED by the 2026-07-30 dedicated-T4 run in this file. This shared vast.ai instance measured every model 17-85% slower and concluded the 4.0-7.1 ms source band was 'NOT portable across T4 instances'. That conclusion was WRONG: it was neighbour contention, not hardware variation. Re-measuring the md5-identical ONNX on a sole-tenant T4 with locked clocks and the SAME TensorRT 10.3.0 moved DEIM-M 43.00 -> 6.61 ms (the source T4 recorded 6.56), YOLOX-M 14.76 -> 5.70, YOLO26m 12.99 -> 5.85, RTMDet-M 17.01 -> 8.19, DAMO-YOLO-M 11.75 -> 6.70. The two in-graph-decode DETRs moved least (RF-DETR 9.33 -> 7.71, RT-DETRv2 9.55 -> 7.93, both -17%), consistent with contention penalising the multi-kernel dense-head/NMS paths hardest. Retained as evidence of the contention effect, not as a competing measurement."
     }
   },
   "trt_version": "10.3.0",
@@ -19,8 +19,8 @@
     {
       "name": "YOLO26m",
       "engine_scope": "to_boxes",
-      "median_ms": 12.9875,
-      "p99_ms": 15.0153,
+      "median_ms": 5.84912,
+      "p99_ms": 6.00391,
       "nms_graft": false,
       "trt_version": "10.3.0",
       "build_status": "ok"
@@ -28,8 +28,8 @@
     {
       "name": "DEIM-M",
       "engine_scope": "to_boxes",
-      "median_ms": 43.0035,
-      "p99_ms": 43.106,
+      "median_ms": 6.61182,
+      "p99_ms": 7.15572,
       "nms_graft": false,
       "trt_version": "10.3.0",
       "build_status": "ok"
@@ -37,8 +37,8 @@
     {
       "name": "YOLOX-M",
       "engine_scope": "to_boxes",
-      "median_ms": 14.7627,
-      "p99_ms": 15.3548,
+      "median_ms": 5.6958,
+      "p99_ms": 5.85193,
       "nms_graft": true,
       "trt_version": "10.3.0",
       "build_status": "ok"
@@ -46,8 +46,8 @@
     {
       "name": "RF-DETR-M",
       "engine_scope": "to_boxes",
-      "median_ms": 9.33453,
-      "p99_ms": 9.66504,
+      "median_ms": 7.70679,
+      "p99_ms": 7.90735,
       "nms_graft": false,
       "trt_version": "10.3.0",
       "build_status": "ok"
@@ -55,8 +55,8 @@
     {
       "name": "RTMDet-M",
       "engine_scope": "to_boxes",
-      "median_ms": 17.0149,
-      "p99_ms": 19.4363,
+      "median_ms": 8.18799,
+      "p99_ms": 8.53589,
       "nms_graft": true,
       "trt_version": "10.3.0",
       "build_status": "ok"
@@ -64,8 +64,8 @@
     {
       "name": "DAMO-YOLO-M",
       "engine_scope": "to_boxes",
-      "median_ms": 11.751,
-      "p99_ms": 12.6809,
+      "median_ms": 6.70044,
+      "p99_ms": 6.83228,
       "nms_graft": true,
       "trt_version": "10.3.0",
       "build_status": "ok"
@@ -73,8 +73,8 @@
     {
       "name": "RT-DETRv2-M",
       "engine_scope": "to_boxes",
-      "median_ms": 9.54736,
-      "p99_ms": 9.69189,
+      "median_ms": 7.93237,
+      "p99_ms": 8.09985,
       "nms_graft": false,
       "trt_version": "10.3.0",
       "build_status": "ok"
