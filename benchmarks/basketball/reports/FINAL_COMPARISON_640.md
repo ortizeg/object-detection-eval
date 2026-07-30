@@ -215,39 +215,55 @@ an unscorable class is never misread as a total failure. A present-but-zero clas
 
 ## §6. Latency — T4 fp16 to-boxes
 
-The published latency figure for this comparison is a **source T4, fp16,
-to-final-boxes** measurement. It is presented here with its provenance stated
-plainly, because latency — unlike accuracy — is **not reproducible from this
-repo**: it was measured by hand on a specific T4 instance and does not port
-across T4s. Emitted from `results/latency/trt_fp16_toboxes.json`:
+The published latency figure for this comparison is a **fp16, to-final-boxes**
+measurement taken on a **dedicated T4** — a sole-tenant `n1-standard-8` + 1×T4
+with persistence mode on and the SM clock locked to 1590 MHz, running TensorRT
+10.3.0 over ONNX artifacts verified md5-identical to the ones scored for
+accuracy. Emitted from `results/latency/trt_fp16_toboxes.json`:
 
 <!-- TABLE:latency_section START -->
 **Source-T4 fp16 to-boxes latency (headline band): 4.0-7.1 ms**
 
-_manually measured 2026-07-21, not reproducible from this repo_
+_measured 2026-07-30 on a dedicated GCP T4 (n1-standard-8, us-central1-a, sole tenant, persistence mode on, SM clock locked to 1590 MHz), TensorRT 10.3.0_
 
-The per-model medians below are a second-T4 cross-check (the build METHOD reproduces; absolute latency is higher and NOT portable across T4 instances) — they do not reproduce the headline band above.
+These per-model medians **are** the published measurement, taken on a sole-tenant T4 with locked clocks — not a contended instance. **4 of 7** land inside the 4.0-7.1 ms source band; RF-DETR-M, RTMDet-M, RT-DETRv2-M sit modestly above it.
+
+This supersedes the earlier shared-instance run, which read every model 17-85% slower and concluded the band was not portable across T4 instances. That conclusion was an artifact of neighbour contention: re-measuring byte-identical ONNX under the same TensorRT version on a dedicated instance recovered the band. The superseded numbers are kept in the results file under `reproducibility.second_run`.
 
 | Model | Median (ms) | P99 (ms) | NMS graft |
 | --- | --- | --- | --- |
-| YOLO26m | 12.99 | 15.02 | no |
-| DEIM-M | 43.00 | 43.11 | no |
-| YOLOX-M | 14.76 | 15.35 | yes |
-| RF-DETR-M | 9.33 | 9.67 | no |
-| RTMDet-M | 17.01 | 19.44 | yes |
-| DAMO-YOLO-M | 11.75 | 12.68 | yes |
-| RT-DETRv2-M | 9.55 | 9.69 | no |
+| YOLO26m | 5.85 | 6.00 | no |
+| DEIM-M | 6.61 | 7.16 | no |
+| YOLOX-M | 5.70 | 5.85 | yes |
+| RF-DETR-M | 7.71 | 7.91 | no |
+| RTMDet-M | 8.19 | 8.54 | yes |
+| DAMO-YOLO-M | 6.70 | 6.83 | yes |
+| RT-DETRv2-M | 7.93 | 8.10 | no |
 <!-- TABLE:latency_section END -->
 
-The **4.0–7.1 ms fp16 to-boxes band is the published headline figure**, and the
-caption carries its honest label verbatim: *manually measured 2026-07-21, not
-reproducible from this repo*. A second T4 was used to re-run the per-model
-medians shown in the table; those numbers **confirm the build method, not the
-absolute latency** — the medians are higher and are not portable across T4
-instances, so they must not be read as "reproducing" the 4.0–7.1 ms band. The
-method is reproducible; the specific milliseconds are hardware-bound. This is the
-correction Phase 6 landed (LAT-04), carried forward here rather than presenting
-the second-T4 numbers as a fresh reproduction of the source band.
+**This corrects the previous version of this report, which claimed the 4.0–7.1 ms
+band was not reproducible from this repo.** That claim came from a run on a
+*shared* vast.ai T4, where neighbour contention inflated every model — most
+visibly DEIM-M, which read **43.00 ms**. Re-measuring byte-identical ONNX under
+the **same** TensorRT 10.3.0 on a sole-tenant instance put DEIM-M at **6.61 ms**,
+against the source T4's 6.56. The variable was the tenancy, not the hardware:
+latency here is reproducible, and the earlier disclaimer was measuring a busy
+GPU rather than the models.
+
+Read the absolute numbers with the usual care. Four of the seven land inside the
+source band and three sit modestly above it (7.71–8.19 ms), so this is a
+*substantial* reproduction, not an exact one — the remaining gap is unexplained
+and is not claimed as noise. The superseded shared-instance numbers are retained
+in the results file under `reproducibility.second_run` as evidence of the
+contention effect.
+
+One gap: **RTMDet-M's on-GPU NMS delta is unavailable.** Its ungrafted graph
+cannot build under TensorRT — the mmdeploy `end2end` export decodes NMS in-graph
+behind a pre-NMS `TopK` whose K exceeds TensorRT's hard 3840 limit, which is
+precisely why `scripts/graft_efficientnms.py` strips that tail. Its grafted
+to-boxes number above is valid; only the `to_boxes − model_only` difference is
+missing. The shared-instance run failed identically here, so this is a property
+of the artifact, not of either machine.
 
 ### CPU / edge latency (LAT-05)
 

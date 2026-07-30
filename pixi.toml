@@ -89,6 +89,11 @@ platforms = ["linux-64"]
 
 [feature.trt.dependencies]
 python = "3.11.*"
+# `pip` is REQUIRED here, not incidental: the editable install documented at
+# [environments] below (`pixi run -e trt pip install -e . --no-deps`) fails with
+# `pip: command not found` without it, because no other dependency in this
+# feature pulls pip in. Verified on the 2026-07-30 dedicated-T4 run.
+pip = "*"
 numpy = "<2.0.0"
 pydantic = ">=2.0"
 hydra-core = "*"
@@ -113,6 +118,20 @@ httpx = "*"
 supervision = "==0.29.1"
 orjson = "*"
 # TensorRT stack — pinned to the 06-RESEARCH.md-verified versions.
+#
+# ⚠ `tensorrt` ships the PYTHON BINDING ONLY — it does NOT install the
+# `trtexec` CLI. scripts/build_trt_engines.py shells out to `trtexec`
+# (`--trtexec`, default `"trtexec"` on PATH), so this environment ALONE cannot
+# run LAT-02: `trtexec` is absent from the solved env entirely. Supply it
+# externally on the T4 — either the NGC container
+# (`nvcr.io/nvidia/tensorrt:24.08-py3` ships trtexec 10.3.0) or a TensorRT
+# tarball — and pass its path via `--trtexec`.
+#
+# ⚠ The binding version below and the `trtexec` you supply CAN DIFFER, and the
+# builder is what describes the artifacts. resolve_trt_version() therefore reads
+# the `--trtexec` binary first (the 2026-07-30 run had binding 10.16.1.11 vs
+# builder 10.3.0), so keep `--trtexec` pointed at the binary you actually want
+# recorded in the results file.
 onnxruntime-gpu = ">=1.28.0,<2"
 tensorrt = ">=10.16,<11"
 onnx = ">=1.22,<2"

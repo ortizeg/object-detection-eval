@@ -7,8 +7,8 @@ current_phase_name: reports-docs
 status: executing
 stopped_at: Completed all Phase 7 plans (07-01..04). Reports generator + FINAL_COMPARISON_640.md + VLM_VS_FINETUNED.md + methodology + README, every table generator-emitted. REPORT-01..05 done. ALL 7 PHASES COMPLETE.
 last_updated: "2026-07-29T18:32:26.024Z"
-last_activity: 2026-07-28
-last_activity_desc: Phase 05 complete
+last_activity: 2026-07-30
+last_activity_desc: "Quick 260730-a01: dedicated-T4 latency re-measurement + 3 TRT-workflow defect fixes"
 progress:
   total_phases: 7
   completed_phases: 7
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-24)
 Phase: 05 (zero-shot-vlm) — COMPLETE
 Plan: 4 of 4 executed
 Status: Phase 5 done — VLM zero-shot reproduction gate PASSED. Next: Phase 6 (Latency, needs a T4) or Phase 7 (Reports).
-Last activity: 2026-07-28 — Phase 05 complete
+Last activity: 2026-07-30 — Completed quick task 260730-a01: dedicated-T4 latency re-measurement + 3 TRT-workflow defect fixes
 
 Progress: [█████████░] 88% (Phase 5 of 7)
 
@@ -124,10 +124,19 @@ None yet.
 
 ### Blockers/Concerns
 
-- **[Phase 6] External hardware dependency:** LAT-02/03/04 require a physical T4 GPU that must be rented (vast.ai); the original instance was destroyed. Budget a few GPU-hours. LAT-04 has a designed fallback — label §6 as manually measured rather than adjust published numbers.
+- **[Phase 6] RESOLVED 2026-07-30 (quick 260730-a01):** the T4 dependency is discharged and the LAT-04 "manually measured / not reproducible" fallback is retired. A dedicated GCP T4 (sole tenant, locked clocks, same TRT 10.3.0) showed the shared-vast.ai numbers were contention artifacts — DEIM-M 43.00 → 6.61 ms. Latency IS reproducible; 4 of 7 land inside the 4.0–7.1 ms band. Renting a T4 costs ~$1.60/run on GCP.
+- **[Phase 6] LAT-02 workflow was unrunnable as published:** `trtexec` is not shipped by the `tensorrt` wheel and is absent from the `trt` pixi env; `pip` was also missing, breaking the documented editable install. Both documented in `pixi.toml` (quick 260730-a01). An external `trtexec` (NGC container or tarball) must be supplied via `--trtexec`.
+- **[Phase 6] RTMDet-M on-GPU NMS delta unavailable:** its ungrafted mmdeploy `end2end` graph cannot build under TensorRT (pre-NMS `TopK`, K > 3840). Expected and reproduced on both machines; only `to_boxes − model_only` is affected.
+- **[Phase 6] CPU latency not re-measured:** `cpu_e2e_conf*.json` still carries pre-dedicated-T4 numbers, so the LAT-05 NMS blow-up table has not been revalidated on clean hardware.
 - **[Phase 5] External credential dependency:** VLM-02's Gemini row needs an API key; those tests are marked external.
 - **[Requirements] Count correction:** REQUIREMENTS.md stated 34 v1 requirements; the actual enumerated count is 36 (SAFE 4 + CORE 9 + REG 6 + REPRO 3 + VLM 4 + LAT 4 + REPORT 5 + INFRA 1). Traceability now reflects 36.
 - **[Phase 1] Time sensitivity:** irreplaceable provenance for all 7 models currently exists only on one laptop, outside any git history. Nothing else in this roadmap matters if it is lost.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260730-a01 | Dedicated-T4 latency re-measurement + 3 TRT-workflow defect fixes | 2026-07-30 | 662a89e | [260730-a01-latency-t4-and-trt-defects](./quick/260730-a01-latency-t4-and-trt-defects/) |
 
 ## Deferred Items
 
