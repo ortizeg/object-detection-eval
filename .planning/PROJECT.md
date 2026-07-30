@@ -38,7 +38,7 @@ Everything else — genericity, VLM coverage, latency tables — is secondary to
       letterbox driven by model-card config
 - [ ] Make the basketball taxonomy (`merged5` / `raw10` / `identity`) config-driven rather
       than hardcoded module constants
-- [ ] Publish a SHA-256-verified model registry: 8 cards with weights on the HF Hub, 2
+- [x] Publish a SHA-256-verified model registry: 8 cards with weights on the HF Hub, 2
       AGPL cards with reproduction instructions and no weights
 - [ ] Reproduce `EVAL_REPORT_FINAL.md` §2 end to end through the refactored harness
 - [ ] Port the 6 zero-shot VLM inferencers and the VLM auto-labeling task behind `[vlm]`

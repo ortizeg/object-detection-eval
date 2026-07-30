@@ -1,14 +1,12 @@
 name: yolox-m-800
-version: "1.0.0"
+version: 1.0.0
 task: detection
 architecture: yolox-m
-description: >-
-  YOLOX-M anchor-free detector fine-tuned on the basketball dataset at an
-  800x800 input resolution. Reused from an earlier training run (not part
-  of the @640 final-comparison retrain batch); its harness test-set score
-  came from correcting the preprocessing (top-left pad-114 letterbox, BGR,
-  no normalization) to match training, which alone moved its mAP@50:95 from
-  30.8 to 72.3.
+description: YOLOX-M anchor-free detector fine-tuned on the basketball dataset at
+  an 800x800 input resolution. Reused from an earlier training run (not part of the
+  @640 final-comparison retrain batch); its harness test-set score came from correcting
+  the preprocessing (top-left pad-114 letterbox, BGR, no normalization) to match training,
+  which alone moved its mAP@50:95 from 30.8 to 72.3.
 license: Apache-2.0
 training_dataset: basketball-player-detection-3
 num_parameters: 25300000
@@ -17,8 +15,14 @@ inputs:
   height: 800
   width: 800
   dtype: float32
-  mean: [0.0, 0.0, 0.0]
-  std: [1.0, 1.0, 1.0]
+  mean:
+  - 0.0
+  - 0.0
+  - 0.0
+  std:
+  - 1.0
+  - 1.0
+  - 1.0
 preprocessing:
   resize: letterbox
   alignment: top_left
@@ -26,25 +30,26 @@ preprocessing:
   normalize: none
   channel_order: BGR
 weights:
-  url: https://huggingface.co/ortizeg/basketball-detection-eval/resolve/main/yolox_m_800/yolox_m_basketball_800.onnx
-  # Documented placeholder: the local ONNX for this model was not present
-  # under .deploy_comparison/artifacts/ at authoring time (only on GCS, see
-  # docs/provenance/gcs-manifest.md "official-eval-inputs/yolox_m_800/").
-  # scripts/publish_weights.py recomputes and refreshes this digest from the
-  # real weight file before it is ever published.
-  sha256: "0000000000000000000000000000000000000000000000000000000000000000"
+  url: https://huggingface.co/ortizeg/basketball-yolox-m-800/resolve/main/yolox_m_basketball_800.onnx
+  sha256: 60e72a5920308c55ccbf6413a598bc45225ca162674b30f74dd7eb5d311331e2
+  size_bytes: 101261586
   weight_format: onnx
 provenance:
   source_repo: https://github.com/ortizeg/YOLOX
-  command: "see docs/provenance/training-runs.md#yolox-m-800"
-evaluations:
-  - dataset: basketball-player-detection-3
-    split: test
-    metrics:
-      map5095_5c: 0.672
-      map50_5c: 0.934
-tags:
-  - yolox
-  - basketball
-status: active
+  commit: null
+  config: null
+  hardware: null
+  command: see docs/provenance/training-runs.md#yolox-m-800
+reproduction: null
 redistributable: true
+evaluations:
+- dataset: basketball-player-detection-3
+  split: test
+  metrics:
+    map5095_5c: 0.672
+    map50_5c: 0.934
+  hardware: null
+tags:
+- yolox
+- basketball
+status: active

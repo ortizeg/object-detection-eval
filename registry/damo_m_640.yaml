@@ -1,12 +1,10 @@
 name: damo-yolo-m-640
-version: "1.0.0"
+version: 1.0.0
 task: detection
 architecture: damo-yolo-m
-description: >-
-  DAMO-YOLO-M (tinynasL35_M backbone) fine-tuned on the basketball dataset
-  at 640x640. Apache-2.0 CNN detector; underperformed its COCO pedigree
-  (49.2 mAP@50:95) on this 465-image basketball set relative to the
-  transformer models in the roster.
+description: DAMO-YOLO-M (tinynasL35_M backbone) fine-tuned on the basketball dataset
+  at 640x640. Apache-2.0 CNN detector; underperformed its COCO pedigree (49.2 mAP@50:95)
+  on this 465-image basketball set relative to the transformer models in the roster.
 license: Apache-2.0
 training_dataset: basketball-player-detection-3
 num_parameters: 28000000
@@ -15,8 +13,14 @@ inputs:
   height: 640
   width: 640
   dtype: float32
-  mean: [0.0, 0.0, 0.0]
-  std: [1.0, 1.0, 1.0]
+  mean:
+  - 0.0
+  - 0.0
+  - 0.0
+  std:
+  - 1.0
+  - 1.0
+  - 1.0
 preprocessing:
   resize: square
   alignment: none
@@ -24,25 +28,29 @@ preprocessing:
   normalize: none
   channel_order: RGB
 weights:
-  url: https://huggingface.co/ortizeg/basketball-detection-eval/resolve/main/damo_m/damo_m_640.onnx
+  url: https://huggingface.co/ortizeg/basketball-damo-yolo-m-640/resolve/main/damo_m_640.onnx
   sha256: 8d6ba4a7cd079293684214f9f96550fd8d863a34e52ad34ff09e28a88ea9eef0
   size_bytes: 110704920
   weight_format: onnx
 provenance:
   source_repo: https://github.com/tinyvision/DAMO-YOLO
+  commit: null
   config: docs/provenance/configs/damo_m/damoyolo_basketball_m.py
-  hardware: "vast.ai RTX 3090 (single GPU)"
-  command: "PYTHONPATH=. python -m torch.distributed.launch --nproc_per_node=1 tools/train.py -f docs/provenance/configs/damo_m/damoyolo_basketball_m.py"
-evaluations:
-  - dataset: basketball-player-detection-3
-    split: test
-    metrics:
-      map5095_5c: 0.619
-      map50_5c: 0.890
-      map5095_10c: 0.541
-      map50_10c: 0.787
-tags:
-  - damo-yolo
-  - basketball
-status: active
+  hardware: vast.ai RTX 3090 (single GPU)
+  command: PYTHONPATH=. python -m torch.distributed.launch --nproc_per_node=1 tools/train.py
+    -f docs/provenance/configs/damo_m/damoyolo_basketball_m.py
+reproduction: null
 redistributable: true
+evaluations:
+- dataset: basketball-player-detection-3
+  split: test
+  metrics:
+    map5095_5c: 0.619
+    map50_5c: 0.89
+    map5095_10c: 0.541
+    map50_10c: 0.787
+  hardware: null
+tags:
+- damo-yolo
+- basketball
+status: active
