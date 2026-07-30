@@ -69,7 +69,7 @@ object-detection-eval/
 ├── pyproject.toml
 │
 ├── registry/                       # model cards — version controlled, no weights
-│   ├── yolox_m_800.yaml
+│   ├── yolox_m_640.yaml
 │   ├── yolox_s_800.yaml
 │   ├── yolo26m_640.yaml            # ⚠ AGPL — see §11
 │   ├── yolo26s_640.yaml
@@ -177,7 +177,7 @@ provenance:
   commit: 64c55e2
   config: benchmarks/basketball/... | docs/provenance/configs/...
   hardware: "vast.ai A100 80GB ×1"
-  command: "see docs/provenance/training-runs.md#yolox-m-800"
+  command: "see docs/provenance/training-runs.md#yolox-m-640"
 preprocessing:
   resize: letterbox
   alignment: top_left | center
