@@ -163,29 +163,44 @@ def test_rfdetr_preprocessing_is_generic_imagenet_square(
     assert card.inputs.std == pytest.approx(_IMAGENET_STD)
 
 
-def test_local_onnx_backed_cards_carry_real_sha256(registry: ModelRegistry) -> None:
-    """The 5 models with a local ONNX under the source repo carry a real digest."""
+def test_redistributable_cards_carry_real_sha256(registry: ModelRegistry) -> None:
+    """GEN-02: all 8 published cards carry a real (non-placeholder) digest.
+
+    All 8 redistributable weights were published to their own HF Hub repos
+    (``ortizeg/basketball-<name>``, ``scripts/publish_weights.py``); none is
+    still on the pre-publish all-zero placeholder.
+    """
+    placeholder = "0" * 64
     real_digest_cards = {
         "deim-m-640": "29f575c8127e5eadde6da60cd66c3d0a5873adc0cbfd4e2af9ee35fde339fac7",
         "rtmdet-m-640": "ee84af83416d90640ea350281f3708f6fc888fed697f55b96fba8bd57e21cff6",
         "damo-yolo-m-640": "8d6ba4a7cd079293684214f9f96550fd8d863a34e52ad34ff09e28a88ea9eef0",
         "rt-detrv2-m-640": "7704cc48849f940541d0adc0d1c600b206dbfb8a9f2925d844a4f4485a04b226",
         "rf-detr-m-640": "708789b50c42b5265cced64276a8beb1b7f294d324f954d359fd8a2d01f5a939",
+        "rfdetr-s-560": "d1301dd9f80770518ab0529f9490ee6b82d4efb33df6a914dd69a5031984d8a2",
+        "yolox-m-800": "60e72a5920308c55ccbf6413a598bc45225ca162674b30f74dd7eb5d311331e2",
+        "yolox-s-800": "dc5a5afe11ac75ba9c80f1975cb1f7dc8bc738a6a37a8a4ecfb78fa196b3b425",
     }
     for name, digest in real_digest_cards.items():
         card = registry.get(name)
         assert card.weights is not None
         assert card.weights.sha256 == digest
+        assert card.weights.sha256 != placeholder
         assert card.weights.size_bytes is not None
 
 
-def test_missing_onnx_cards_carry_placeholder_sha256(registry: ModelRegistry) -> None:
-    """The 3 models with no local ONNX carry the documented all-zero placeholder."""
-    placeholder = "0" * 64
-    for name in ("yolox-m-800", "yolox-s-800", "rfdetr-s-560"):
-        card = registry.get(name)
+def test_redistributable_cards_each_have_their_own_hf_repo(registry: ModelRegistry) -> None:
+    """GEN-02: each redistributable card publishes to its own per-model HF repo."""
+    urls = []
+    for card in registry:
+        if not card.redistributable:
+            continue
         assert card.weights is not None
-        assert card.weights.sha256 == placeholder
+        assert card.weights.url.startswith(
+            f"https://huggingface.co/ortizeg/basketball-{card.name}/"
+        )
+        urls.append(card.weights.url)
+    assert len(urls) == len(set(urls)) == 8
 
 
 # ----------------------------------------------------------------------

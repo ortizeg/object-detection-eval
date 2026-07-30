@@ -49,10 +49,12 @@ parity, the single de-transform, and the 94-image statistical limitation — is 
 in git. Each card carries the model's preprocessing block, provenance, and either
 its downloadable weights or reproduction instructions:
 
-- **8 cards ship SHA-256-verified weights** on the Hugging Face Hub (Apache-2.0):
-  the DAMO-YOLO, DEIM, RF-DETR (M and S), RT-DETRv2, RTMDet, and YOLOX (M and S)
-  detectors. `download_weights(card)` fetches and hash-verifies the binary into a
-  local cache; a checksum mismatch raises `ChecksumMismatchError` and leaves no
+- **8 cards ship SHA-256-verified weights**, each in its own model repo on the
+  [Hugging Face Hub](https://huggingface.co/ortizeg) (Apache-2.0) with a proper
+  model card (metrics, preprocessing, provenance): the DAMO-YOLO, DEIM, RF-DETR
+  (M and S), RT-DETRv2, RTMDet, and YOLOX (M and S) detectors.
+  `download_weights(card)` fetches and hash-verifies the binary into a local
+  cache; a checksum mismatch raises `ChecksumMismatchError` and leaves no
   partial file behind.
 - **2 cards are AGPL, reproduction-only** (YOLO26 M and S): their binaries are
   **not** redistributed from this repo. `download_weights()` raises

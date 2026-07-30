@@ -1,11 +1,10 @@
 name: rf-detr-m-640
-version: "1.0.0"
+version: 1.0.0
 task: detection
 architecture: rf-detr-m
-description: >-
-  RF-DETR-Medium, a real-time transformer detector fine-tuned on the
-  basketball dataset at 640x640, using the rfdetr-standard top-k=300
-  multi-label decode required to match its native COCOeval score.
+description: RF-DETR-Medium, a real-time transformer detector fine-tuned on the basketball
+  dataset at 640x640, using the rfdetr-standard top-k=300 multi-label decode required
+  to match its native COCOeval score.
 license: Apache-2.0
 training_dataset: basketball-player-detection-3
 num_parameters: 30200000
@@ -14,8 +13,14 @@ inputs:
   height: 640
   width: 640
   dtype: float32
-  mean: [0.485, 0.456, 0.406]
-  std: [0.229, 0.224, 0.225]
+  mean:
+  - 0.485
+  - 0.456
+  - 0.406
+  std:
+  - 0.229
+  - 0.224
+  - 0.225
 preprocessing:
   resize: square
   alignment: none
@@ -23,25 +28,28 @@ preprocessing:
   normalize: mean_std
   channel_order: RGB
 weights:
-  url: https://huggingface.co/ortizeg/basketball-detection-eval/resolve/main/rfdetr_m/rfdetr_m_640.onnx
+  url: https://huggingface.co/ortizeg/basketball-rf-detr-m-640/resolve/main/rfdetr_m_640.onnx
   sha256: 708789b50c42b5265cced64276a8beb1b7f294d324f954d359fd8a2d01f5a939
   size_bytes: 127837167
   weight_format: onnx
 provenance:
   source_repo: https://github.com/roboflow/rf-detr
+  commit: null
   config: docs/provenance/configs/rfdetr_m/train_rfdetr.py
-  hardware: "vast.ai A100 80GB (single GPU)"
-  command: "python train_rfdetr.py (rfdetr==1.5.2, RFDETRMedium.train(); see docs/provenance/configs/rfdetr_m/train_rfdetr.py)"
-evaluations:
-  - dataset: basketball-player-detection-3
-    split: test
-    metrics:
-      map5095_5c: 0.646
-      map50_5c: 0.937
-      map5095_10c: 0.590
-      map50_10c: 0.812
-tags:
-  - rfdetr
-  - basketball
-status: active
+  hardware: vast.ai A100 80GB (single GPU)
+  command: python train_rfdetr.py (rfdetr==1.5.2, RFDETRMedium.train(); see docs/provenance/configs/rfdetr_m/train_rfdetr.py)
+reproduction: null
 redistributable: true
+evaluations:
+- dataset: basketball-player-detection-3
+  split: test
+  metrics:
+    map5095_5c: 0.646
+    map50_5c: 0.937
+    map5095_10c: 0.59
+    map50_10c: 0.812
+  hardware: null
+tags:
+- rfdetr
+- basketball
+status: active

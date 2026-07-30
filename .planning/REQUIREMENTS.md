@@ -141,7 +141,7 @@ Irreplaceable data currently exists only on one laptop, outside any git history.
 ## v2 Requirements
 
 - **GEN-01**: A second dataset proves the harness is genuinely dataset-agnostic
-- **GEN-02**: Model cards published to the HF Hub render as proper model cards
+- **GEN-02**: Model cards published to the HF Hub render as proper model cards — ✅ SHIPPED 2026-07-29 (8 redistributable weights each published to their own HF Hub repo under `ortizeg/basketball-<name>` with a generated model card: license, pipeline_tag, metrics, preprocessing, provenance)
 - **LAT-05**: CPU/edge latency, where the NMS-free advantage should actually appear — ✅ SHIPPED 2026-07-29 (CPU conf-sweep in FINAL_COMPARISON_640.md §6; DAMO-YOLO reproduces the 155 ms @conf0.01 blow-up, NMS-free/DETRs flat)
 - **REPORT-06**: mkdocs site published via GitHub Pages — ✅ SHIPPED 2026-07-29 (https://ortizeg.github.io/object-detection-eval/)
 

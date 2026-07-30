@@ -1,12 +1,10 @@
 name: deim-m-640
-version: "1.0.0"
+version: 1.0.0
 task: detection
 architecture: deim-dfine-m
-description: >-
-  DEIM (D-FINE variant) medium transformer detector fine-tuned on the
-  basketball dataset at 640x640. Smallest of the 7-model final-comparison
-  roster (19.3M params) and the top Apache-2.0 scorer on the harness
-  10-class test slice.
+description: DEIM (D-FINE variant) medium transformer detector fine-tuned on the basketball
+  dataset at 640x640. Smallest of the 7-model final-comparison roster (19.3M params)
+  and the top Apache-2.0 scorer on the harness 10-class test slice.
 license: Apache-2.0
 training_dataset: basketball-player-detection-3
 num_parameters: 19300000
@@ -15,8 +13,14 @@ inputs:
   height: 640
   width: 640
   dtype: float32
-  mean: [0.0, 0.0, 0.0]
-  std: [1.0, 1.0, 1.0]
+  mean:
+  - 0.0
+  - 0.0
+  - 0.0
+  std:
+  - 1.0
+  - 1.0
+  - 1.0
 preprocessing:
   resize: square
   alignment: none
@@ -24,26 +28,29 @@ preprocessing:
   normalize: div255
   channel_order: RGB
 weights:
-  url: https://huggingface.co/ortizeg/basketball-detection-eval/resolve/main/deim_m/deim_m_640.onnx
+  url: https://huggingface.co/ortizeg/basketball-deim-m-640/resolve/main/deim_m_640.onnx
   sha256: 29f575c8127e5eadde6da60cd66c3d0a5873adc0cbfd4e2af9ee35fde339fac7
   size_bytes: 77722583
   weight_format: onnx
 provenance:
   source_repo: https://github.com/Intellindust-AI-Lab/DEIM
+  commit: null
   config: docs/provenance/configs/deim_m/deim_basketball_m.yml
-  hardware: "vast.ai A100 80GB (single GPU)"
-  command: "see docs/provenance/training-runs.md (DEIM-D-FINE-M @640 row); ckpt best_stg1.pth"
-evaluations:
-  - dataset: basketball-player-detection-3
-    split: test
-    metrics:
-      map5095_5c: 0.686
-      map50_5c: 0.942
-      map5095_10c: 0.643
-      map50_10c: 0.858
-tags:
-  - deim
-  - d-fine
-  - basketball
-status: active
+  hardware: vast.ai A100 80GB (single GPU)
+  command: see docs/provenance/training-runs.md (DEIM-D-FINE-M @640 row); ckpt best_stg1.pth
+reproduction: null
 redistributable: true
+evaluations:
+- dataset: basketball-player-detection-3
+  split: test
+  metrics:
+    map5095_5c: 0.686
+    map50_5c: 0.942
+    map5095_10c: 0.643
+    map50_10c: 0.858
+  hardware: null
+tags:
+- deim
+- d-fine
+- basketball
+status: active
