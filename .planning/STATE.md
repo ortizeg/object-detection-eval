@@ -7,8 +7,8 @@ current_phase_name: reports-docs
 status: executing
 stopped_at: Completed all Phase 7 plans (07-01..04). Reports generator + FINAL_COMPARISON_640.md + VLM_VS_FINETUNED.md + methodology + README, every table generator-emitted. REPORT-01..05 done. ALL 7 PHASES COMPLETE.
 last_updated: "2026-07-29T18:32:26.024Z"
-last_activity: 2026-07-30
-last_activity_desc: "Quick 260730-c01: report rewrite + clip-clustered bootstrap"
+last_activity: 2026-07-31
+last_activity_desc: "Quick 260731-d01: VLM harness fixes (Grounding-DINO label collapse, Florence-2 task token)"
 progress:
   total_phases: 7
   completed_phases: 7
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-24)
 Phase: 05 (zero-shot-vlm) — COMPLETE
 Plan: 4 of 4 executed
 Status: Phase 5 done — VLM zero-shot reproduction gate PASSED. Next: Phase 6 (Latency, needs a T4) or Phase 7 (Reports).
-Last activity: 2026-07-30 — Completed quick task 260730-c01: report rewrite + clip-clustered bootstrap
+Last activity: 2026-07-31 — Completed quick task 260731-d01: VLM harness fixes (Grounding-DINO + Florence-2)
 
 Progress: [█████████░] 88% (Phase 5 of 7)
 
@@ -131,7 +131,8 @@ None yet.
 - **[Stats] The 94-image test set is 3 video clips (found 2026-07-30):** clip-disjoint across splits (no leakage), but frame-level resampling is pseudo-replication. Clip-clustered CIs are 1.4-3.9x wider and cut significant adjacent pairs 5/6 -> 2/6. Any future ranking claim must use `scripts/run_clustered_bootstrap.py`, not the frame-level anchor.
 - **[Stats] Training-seed variance is entirely unmeasured** and is plausibly larger than the test-set sampling uncertainty that is quantified.
 - **[Phase 5] External credential dependency:** VLM-02's Gemini row needs an API key; those tests are marked external.
-- **[Phase 5] Two VLM rows are not trustworthy as capability measurements (found 2026-07-30, quick 260730-b01):** Grounding-DINO emits 533 dets/image at 99.7% `person` (label-resolution collapse at `text_threshold: 0.01`), and Florence-2 ran with the closed-vocabulary `<OD>` task token. Both need re-running on a GPU before their numbers can be published as findings. Prompt effort was also unequal across the 5 VLMs.
+- **[Phase 5] VLM harness FIXED but results STALE (quick 260731-d01):** the Grounding-DINO label collapse (text_threshold + ambiguous-label guessing) and the Florence-2 `<OD>` closed-vocabulary task token are both fixed in code/config. The committed prediction dumps still predate the fixes, so both report tables are stale and `expected_map5095` is null for those rows. **Needs a GPU re-run.** OmDet-Turbo still runs the generic COCO prompt (not equalised).
+- **[Phase 5] YOLO-World is the notable open-weights omission** (Apache-2.0, real-time, open-vocabulary). The stronger DINO-X / Grounding DINO 1.5-1.6 Pro are API-only and would make a row non-reproducible.
 - **[Phase 5] transformers/num2words pins retained unrevalidated:** both were justified by SmolVLM2 (removed 2026-07-30). Dropping them needs a GPU re-run of the VLM gate.
 - **[Registry] yolox-m-640 weights are NOT published:** the card's `weights.url` points at a HF repo that does not exist yet; `basketball-yolox-m-800` is still the live public repo and should be taken down when the 640 is published.
 - **[Requirements] Count correction:** REQUIREMENTS.md stated 34 v1 requirements; the actual enumerated count is 36 (SAFE 4 + CORE 9 + REG 6 + REPRO 3 + VLM 4 + LAT 4 + REPORT 5 + INFRA 1). Traceability now reflects 36.
@@ -144,6 +145,7 @@ None yet.
 | 260730-a01 | Dedicated-T4 latency re-measurement + 3 TRT-workflow defect fixes | 2026-07-30 | 662a89e | [260730-a01-latency-t4-and-trt-defects](./quick/260730-a01-latency-t4-and-trt-defects/) |
 | 260730-b01 | SmolVLM2 purge + registry yolox-m-800 -> yolox-m-640 | 2026-07-30 | 720a17c | [260730-b01-smolvlm2-purge-and-registry](./quick/260730-b01-smolvlm2-purge-and-registry/) |
 | 260730-c01 | Report rewrite + clip-clustered bootstrap (test set is 3 clips) | 2026-07-30 | effa610 | [260730-c01-report-rewrite](./quick/260730-c01-report-rewrite/) |
+| 260731-d01 | VLM harness fixes: Grounding-DINO label collapse + Florence-2 task token | 2026-07-31 | 90c5c1d | [260731-d01-vlm-harness-fixes](./quick/260731-d01-vlm-harness-fixes/) |
 
 ## Deferred Items
 
