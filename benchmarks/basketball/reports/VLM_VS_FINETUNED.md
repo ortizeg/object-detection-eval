@@ -88,31 +88,53 @@ COCO's `person`) and collapse on the small, domain-specific classes.**
   it is almost entirely responsible for the non-trivial overall mAP the leaders
   post. Strip `player` out and the zero-shot ceiling would be far lower still.
 
-> **⚠️ Two of these five rows are not yet trustworthy as capability
-> measurements.** Auditing the committed prediction dumps turned up harness
-> problems that plausibly account for their scores:
+> **⚠️ Two of these five rows measure a broken harness, not the model.** The
+> defects are **fixed in the harness as of 2026-07-30**, but the committed
+> prediction dumps these tables are computed from **predate the fix** and need a
+> GPU re-run. Until then the Grounding-DINO and Florence-2 rows above are stale.
 >
-> - **Grounding-DINO emits 533 detections per image, 99.7% of them labelled
->   `person`** (49,935 of 50,103), and finds the basketball exactly **once
->   across all 94 images**. That is not how a state-of-the-art open-vocabulary
->   detector behaves. `_resolve_label` resolves a concatenated multi-phrase
->   label by picking the class name appearing *earliest in the string*, and at
->   `text_threshold: 0.01` nearly every text token activates — so the label spans
->   the whole caption and the tiebreak returns whichever class is listed first in
->   the manifest. Its near-zero non-`player` rows are consistent with that bug,
->   not with a measured capability floor.
-> - **Florence-2 was run with `task: "<OD>"`**, Florence-2's *closed*-vocabulary
->   mode, which cannot return custom classes. 923 of its 924 detections are
->   `person`. The correct token for this protocol is
->   `<OPEN_VOCABULARY_DETECTION>`.
+> - **Grounding-DINO emitted 533 detections per image, 99.7% labelled `person`**
+>   (49,935 of 50,103), and found the basketball exactly **once across all 94
+>   images**. Two causes, both now fixed: `text_threshold` was `0.01`, so nearly
+>   every text token activated and the returned label spanned the entire caption;
+>   and `_resolve_label` broke such a label by taking the class name appearing
+>   *earliest in the string* — which is the prompt's **ordering**, not the
+>   model's opinion. Every ambiguous box therefore became whichever class was
+>   listed first. The threshold is now Grounding DINO's published `0.25`, and an
+>   ambiguous label is **dropped rather than guessed**.
+> - **Florence-2 was run with `task: "<OD>"`** — Florence-2's *closed*-vocabulary
+>   mode, which can only emit its own pretrained label set and cannot be steered
+>   by `classes` at all. 923 of its 924 detections were `person`. Now
+>   `<CAPTION_TO_PHRASE_GROUNDING>`, which actually grounds the class vocabulary.
 >
-> Prompt effort was also unequal: Gemini received a hand-tuned prompt with
-> per-class definitions and count constraints, and OWLv2 a tuned vocabulary,
-> while Grounding-DINO, OmDet-Turbo and Florence-2 were all given the same
-> generic COCO list. This report applies the "tuning effort is itself an
-> unfairness" principle to the detectors but not, so far, to the VLMs. Until
-> these are re-run, treat **Gemini and OWLv2** as the meaningful zero-shot
-> ceiling and the lower three as provisional.
+> **Prompt effort was also unequal**, and that is the same unfairness this
+> project refuses to tolerate for training recipes. Gemini received a hand-tuned
+> prompt with per-class definitions and count constraints; OWLv2 got a
+> domain-specific vocabulary; Grounding-DINO, OmDet-Turbo and Florence-2 were
+> handed a generic COCO list. Grounding-DINO and Florence-2 now use the same
+> domain vocabulary as OWLv2. **OmDet-Turbo has not been equalised** and still
+> runs the generic list.
+>
+> Both re-configured rows have had their reproduction targets set to `null` in
+> `vlm_zeroshot.yaml` — their old published numbers came from the broken setup
+> and are not worth reproducing. Treat **Gemini and OWLv2** as the only
+> meaningful zero-shot ceiling here.
+
+### Methods this comparison does not cover
+
+Surveyed 2026-07-30. The strongest open-vocabulary detectors available now are
+**API-only**, which puts them in Gemini's category rather than the open-weights
+one: **DINO-X Pro** (59.8 AP LVIS-minival) and **Grounding DINO 1.5/1.6 Pro**
+(55.7 AP) both substantially exceed the `grounding-dino-base` checkpoint tested
+here. Using them would cost money per run and make the row non-reproducible
+without a key.
+
+The more interesting omission is open-weights: **YOLO-World** (Apache-2.0,
+~35.4 AP zero-shot LVIS at real-time speed) and **YOLOE** are directly
+comparable to this roster and absent from it. YOLO-World in particular is the
+gap worth closing — permissively licensed, fast, and open-vocabulary. Note that
+**YOLOE-26 builds on the YOLO26 architecture and likely inherits its AGPL
+terms**, so its licence needs checking before adoption.
 
 ### Interpretation
 

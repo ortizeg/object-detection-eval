@@ -41,13 +41,16 @@ _MANIFEST_PATH = (
 )
 
 _EXPECTED_NAMES = ["gemini", "owlv2", "omdet_turbo", "grounding_dino", "florence2"]
+#: Rows whose published target is still valid. grounding_dino and florence2 are
+#: absent ON PURPOSE: their 2026-07-30 configuration fixes (label-collapse
+#: threshold, and <OD> -> <CAPTION_TO_PHRASE_GROUNDING>) invalidated the numbers
+#: those rows used to reproduce, and new targets need a GPU re-run.
 _EXPECTED_TARGETS = {
     "gemini": 0.265,
     "owlv2": 0.247,
     "omdet_turbo": 0.173,
-    "grounding_dino": 0.147,
-    "florence2": 0.104,
 }
+_UNTARGETED = {"grounding_dino", "florence2"}
 
 
 def _load_run_vlm_benchmark_module() -> types.ModuleType:
@@ -81,16 +84,37 @@ def test_manifest_has_six_models_in_documented_order() -> None:
 def test_manifest_five_models_carry_published_targets() -> None:
     manifest = run_vlm_benchmark.load_manifest(_MANIFEST_PATH)
 
-    targeted = {m.name: m.expected_map5095 for m in manifest.models}
+    targeted = {
+        m.name: m.expected_map5095 for m in manifest.models if m.expected_map5095 is not None
+    }
     assert targeted == _EXPECTED_TARGETS
 
 
-def test_manifest_every_committed_row_carries_a_target() -> None:
-    """No committed row may run untargeted -- the gate must cover all five."""
+def test_manifest_untargeted_rows_are_exactly_the_reconfigured_ones() -> None:
+    """Only rows whose config changed may run untargeted -- nothing else drifts."""
     manifest = run_vlm_benchmark.load_manifest(_MANIFEST_PATH)
 
     assert [m.name for m in manifest.models] == _EXPECTED_NAMES
-    assert all(m.expected_map5095 is not None for m in manifest.models)
+    untargeted = {m.name for m in manifest.models if m.expected_map5095 is None}
+    assert untargeted == _UNTARGETED
+
+
+def test_grounding_dino_text_threshold_is_not_the_collapse_value() -> None:
+    """0.01 let the label span the whole caption and collapsed every class."""
+    manifest = run_vlm_benchmark.load_manifest(_MANIFEST_PATH)
+    gd = next(m for m in manifest.models if m.name == "grounding_dino")
+
+    assert gd.text_threshold is not None
+    assert gd.text_threshold >= 0.2
+
+
+def test_florence2_uses_an_open_vocabulary_task_token() -> None:
+    """`<OD>` is closed-vocabulary and ignores `classes` entirely."""
+    manifest = run_vlm_benchmark.load_manifest(_MANIFEST_PATH)
+    f2 = next(m for m in manifest.models if m.name == "florence2")
+
+    assert f2.task != "<OD>"
+    assert f2.caption
 
 
 def test_manifest_declares_a_positive_tolerance() -> None:
@@ -130,7 +154,7 @@ def test_within_tolerance_just_outside() -> None:
 
 
 def test_rank_order_matches_published_descending_order() -> None:
-    values = [_EXPECTED_TARGETS[name] for name in _EXPECTED_NAMES]
+    values = [_EXPECTED_TARGETS[n] for n in _EXPECTED_NAMES if n in _EXPECTED_TARGETS]
     assert run_vlm_benchmark.rank_order_matches(values)
     assert list(pairwise(values))  # sanity: more than one adjacent pair compared
 

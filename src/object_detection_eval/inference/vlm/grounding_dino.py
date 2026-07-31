@@ -48,7 +48,13 @@ class GroundingDINOInferencer(BaseInferencer):
         model_name: str = "IDEA-Research/grounding-dino-base",
         classes: list[str] | None = None,
         box_threshold: float = 0.01,
-        text_threshold: float = 0.01,
+        # 0.25 is Grounding DINO's own published default. The previous 0.01 let
+        # essentially every text token activate, so the processor returned a
+        # label spanning the WHOLE caption for nearly every box -- which is what
+        # fed the label collapse documented in _resolve_label. A low BOX
+        # threshold is still correct (mAP integrates the full PR curve); a low
+        # TEXT threshold is not, because it destroys class assignment.
+        text_threshold: float = 0.25,
         nms_iou_threshold: float = 0.5,
         device: str = "auto",
     ) -> None:
@@ -159,23 +165,40 @@ class GroundingDINOInferencer(BaseInferencer):
                 return None
             return exact
 
-        # Find all class names contained in the label, sorted by position
+        # Find every class name contained in the label.
         matches: list[tuple[int, str, int]] = []  # (position, name, class_id)
         for name, class_id in self._name_to_id.items():
             pos = normalized.find(name)
             if pos != -1:
                 matches.append((pos, name, class_id))
-        matches.sort()
 
-        # Return the first match that passes the size sanity check
-        for _pos, name, class_id in matches:
-            if (
-                name in self._SMALL_OBJECT_CLASSES
-                and box_area_fraction > self._SMALL_OBJECT_MAX_AREA
-            ):
-                continue
-            return class_id
-        return None
+        # AMBIGUITY GUARD. A label naming two or more classes means the phrase
+        # grounding did not commit to one, so there is no defensible way to pick
+        # -- drop the box.
+        #
+        # The previous behaviour ("take whichever class name appears earliest")
+        # silently assigned every such box to whichever class the caller happened
+        # to list FIRST. Combined with a low text_threshold, where nearly every
+        # text token activates and the returned label spans the whole caption,
+        # that produced a total collapse: on the 94-image basketball test split
+        # it emitted 533 detections per image, 99.7% of them `person`, and found
+        # the ball exactly once in the entire split. Guessing here does not
+        # degrade gracefully -- it manufactures a class distribution out of the
+        # prompt ordering.
+        if len(matches) > 1:
+            logger.debug(
+                f"ambiguous label {label!r} matched {len(matches)} classes "
+                f"({[m[1] for m in matches]}) - dropping rather than guessing"
+            )
+            return None
+
+        if not matches:
+            return None
+
+        _pos, name, class_id = matches[0]
+        if name in self._SMALL_OBJECT_CLASSES and box_area_fraction > self._SMALL_OBJECT_MAX_AREA:
+            return None
+        return class_id
 
     def _convert_results(
         self,
