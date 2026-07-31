@@ -81,6 +81,7 @@ class ManifestEntry(BaseModel, frozen=True):
     text_threshold: float | None = Field(default=None, ge=0.0, le=1.0)
     nms_iou_threshold: float | None = Field(default=None, ge=0.0, le=1.0)
     task: str | None = None
+    caption: str | None = None
     prompt_template: str | None = None
     expected_map5095: float | None = Field(default=None, ge=0.0, le=1.0)
 
@@ -160,6 +161,7 @@ def _florence2_factory(entry: ManifestEntry) -> BaseInferencer:
         model_name=entry.model_name,
         classes=entry.classes,
         task=entry.task or "<OD>",
+        **({"caption": entry.caption} if entry.caption else {}),
     )
 
 

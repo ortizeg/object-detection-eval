@@ -251,8 +251,16 @@ class TestResolveLabelConcatenated:
         assert inferencer._resolve_label("jersey number") == 4
 
     @pytest.mark.usefixtures("_mock_transformers")
-    def test_concatenated_label_picks_first_match(self) -> None:
-        """'person referee jersey number' should resolve to person (first)."""
+    def test_ambiguous_label_is_dropped_not_guessed(self) -> None:
+        """A label naming 2+ classes must resolve to None.
+
+        BEHAVIOUR CHANGE (2026-07-30). This previously returned "whichever class
+        name appears earliest", which is the prompt's ORDERING, not the model's
+        opinion. With a low text_threshold the processor returns a label
+        spanning the whole caption for nearly every box, so that rule assigned
+        essentially everything to the first-listed class: on the 94-image
+        basketball split, 533 detections per image and 99.7% `person`.
+        """
         inferencer = GroundingDINOInferencer(
             classes=[
                 "person",
@@ -263,12 +271,13 @@ class TestResolveLabelConcatenated:
             ],
             device="cpu",
         )
-        assert inferencer._resolve_label("person referee jersey number") == 0
-        assert inferencer._resolve_label("person referee basketball hoop") == 0
+        assert inferencer._resolve_label("person referee jersey number") is None
+        assert inferencer._resolve_label("person referee basketball hoop") is None
+        assert inferencer._resolve_label("basketball hoop jersey number") is None
 
     @pytest.mark.usefixtures("_mock_transformers")
-    def test_concatenated_label_without_person(self) -> None:
-        """'basketball hoop jersey number' should resolve to basketball hoop."""
+    def test_whole_caption_label_does_not_become_the_first_class(self) -> None:
+        """The exact collapse mode: a label spanning the entire prompt."""
         inferencer = GroundingDINOInferencer(
             classes=[
                 "person",
@@ -279,8 +288,25 @@ class TestResolveLabelConcatenated:
             ],
             device="cpu",
         )
-        # basketball hoop appears at position 0, jersey number at position 16
-        assert inferencer._resolve_label("basketball hoop jersey number") == 3
+        whole_caption = "person sports ball referee basketball hoop jersey number"
+        assert inferencer._resolve_label(whole_caption) is None
+
+    @pytest.mark.usefixtures("_mock_transformers")
+    def test_single_class_substring_still_resolves(self) -> None:
+        """Dropping ambiguity must not break the unambiguous partial match."""
+        inferencer = GroundingDINOInferencer(
+            classes=[
+                "person",
+                "sports ball",
+                "referee",
+                "basketball hoop",
+                "jersey number",
+            ],
+            device="cpu",
+        )
+        # only one class name occurs -> still resolvable
+        assert inferencer._resolve_label("a person") == 0
+        assert inferencer._resolve_label("the basketball hoop") == 3
 
     @pytest.mark.usefixtures("_mock_transformers")
     def test_no_match_returns_none(self) -> None:
@@ -336,8 +362,13 @@ class TestResolveLabelSizeCheck:
         assert inferencer._resolve_label("jersey number", box_area_fraction=0.02) is None
 
     @pytest.mark.usefixtures("_mock_transformers")
-    def test_large_box_concatenated_falls_through_to_person(self) -> None:
-        """A large box with 'person referee jersey number' skips jersey number."""
+    def test_large_box_concatenated_is_dropped_not_fallen_through(self) -> None:
+        """BEHAVIOUR CHANGE (2026-07-30): ambiguity outranks the size fallback.
+
+        This previously "fell through" a size-rejected small-object class to the
+        next name in the label. But a label naming two classes is unresolved
+        regardless of box size -- falling through just relocates the guess.
+        """
         inferencer = GroundingDINOInferencer(
             classes=[
                 "person",
@@ -348,9 +379,9 @@ class TestResolveLabelSizeCheck:
             ],
             device="cpu",
         )
-        # Large box: jersey number is skipped, falls through to person
+        # Two class names present -> unresolved, dropped (was: fell through to person)
         result = inferencer._resolve_label("jersey number person", box_area_fraction=0.02)
-        assert result == 0  # person
+        assert result is None
 
     @pytest.mark.usefixtures("_mock_transformers")
     def test_person_not_affected_by_size_check(self) -> None:

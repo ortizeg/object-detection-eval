@@ -152,7 +152,9 @@ class Florence2Inferencer(BaseInferencer):
             return []
 
         boxes = task_result.get("bboxes", [])
-        labels = task_result.get("labels", [])
+        # <OD> and <CAPTION_TO_PHRASE_GROUNDING> return "labels";
+        # <OPEN_VOCABULARY_DETECTION> returns "bboxes_labels" for the same thing.
+        labels = task_result.get("labels") or task_result.get("bboxes_labels", [])
 
         detections: list[Detection] = []
         for box, label in zip(boxes, labels, strict=False):
