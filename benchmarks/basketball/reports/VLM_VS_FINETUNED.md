@@ -129,12 +129,24 @@ one: **DINO-X Pro** (59.8 AP LVIS-minival) and **Grounding DINO 1.5/1.6 Pro**
 here. Using them would cost money per run and make the row non-reproducible
 without a key.
 
-The more interesting omission is open-weights: **YOLO-World** (Apache-2.0,
-~35.4 AP zero-shot LVIS at real-time speed) and **YOLOE** are directly
-comparable to this roster and absent from it. YOLO-World in particular is the
-gap worth closing — permissively licensed, fast, and open-vocabulary. Note that
-**YOLOE-26 builds on the YOLO26 architecture and likely inherits its AGPL
-terms**, so its licence needs checking before adoption.
+The more interesting omission is open-weights: **YOLO-World** (~35.4 AP
+zero-shot LVIS at real-time speed) is directly comparable to this roster and
+absent from it. It is the gap worth closing — fast, open-vocabulary, and
+released with weights.
+
+**Licence, verified against the upstream `LICENSE` files rather than assumed:**
+
+| Model | Licence | Verified |
+| --- | --- | --- |
+| YOLO-World (`AILab-CVC/YOLO-World`) | **GPL-3.0** | 2026-08-01 |
+| YOLOE (`THU-MIG/yoloe`) | **AGPL-3.0**, built on ultralytics | 2026-08-01 |
+
+An earlier revision of this report described YOLO-World as Apache-2.0. That was
+wrong: it is GPL-3.0. Evaluating it here is still consistent with this repo's
+licensing posture — the harness *scores* third-party weights and never
+redistributes them, which is the same treatment the AGPL-licensed YOLO26 already
+receives. YOLOE is left out: it is AGPL-3.0, which is not permissive, and it
+pulls the ultralytics stack into the evaluation path.
 
 ### Interpretation
 
