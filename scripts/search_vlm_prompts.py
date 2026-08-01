@@ -194,6 +194,17 @@ def _build_inferencer(model: SearchModel, classes: list[str]) -> SupportsPredict
             task=model.task or "<CAPTION_TO_PHRASE_GROUNDING>",
             caption=". ".join(classes) + ".",
         )
+    if model.inferencer == "yolo_world":
+        from object_detection_eval.inference.vlm.yolo_world import YOLOWorldInferencer
+
+        return YOLOWorldInferencer(
+            model_name=model.model_name,
+            classes=classes,
+            box_threshold=model.box_threshold if model.box_threshold is not None else 0.01,
+            nms_iou_threshold=(
+                model.nms_iou_threshold if model.nms_iou_threshold is not None else 0.5
+            ),
+        )
     msg = f"unknown inferencer {model.inferencer!r}"
     raise ValueError(msg)
 

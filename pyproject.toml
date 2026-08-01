@@ -45,6 +45,16 @@ vlm = [
     # a GPU re-run of the VLM gate to prove the other 4 models still load.
     "num2words",
     "google-genai>=1.63.0,<2",
+    # YOLO-World (open-vocabulary, real-time). AGPL-3.0 — a copyleft runtime
+    # dependency, confined to this OPTIONAL extra and never redistributed with
+    # the Apache-2.0 package. The YOLO-World weights themselves are GPL-3.0
+    # and are auto-downloaded by ultralytics rather than vendored here, which
+    # is the same posture this repo already takes toward AGPL YOLO26 weights.
+    "ultralytics>=8.3,<9",
+    # YOLO-World encodes its class vocabulary with CLIP, which ultralytics does
+    # not vendor — without this, set_classes() pip-installs CLIP from a git URL
+    # at runtime and mutates the environment. MIT.
+    "clip-anytorch",
 ]
 # TensorRT latency benchmarking. Linux-64 + NVIDIA only.
 # Versions pinned to the 06-RESEARCH.md-verified releases (2026-07-28). CRUCIALLY
@@ -134,6 +144,8 @@ module = [
     "torch.*",
     "torchvision.*",
     "PIL.*",
+    # ultralytics (YOLO-World) is [vlm]-extra-only, same as the above.
+    "ultralytics.*",
 ]
 ignore_missing_imports = true
 

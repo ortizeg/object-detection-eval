@@ -65,6 +65,14 @@ einops = "*"
 peft = "*"
 num2words = "*"
 google-genai = ">=1.63.0, <2"
+# YOLO-World. AGPL-3.0, optional-extra-only — see pyproject's [vlm] note.
+ultralytics = ">=8.3, <9"
+# YOLO-World's prompt-then-detect encodes the class vocabulary with CLIP.
+# ultralytics does NOT vendor it: set_classes() falls back to pip-installing
+# `git+https://github.com/ultralytics/CLIP.git` AT RUNTIME, which silently
+# mutates a pixi-locked environment and is not reproducible. Declaring the
+# PyPI packaging (MIT) here keeps the env solved and locked.
+clip-anytorch = "*"
 
 # Cross-platform ONNX graph-surgery tooling (LAT-03). onnx + onnx-graphsurgeon
 # both ship osx-arm64 AND linux-64 wheels (onnx-graphsurgeon is a pure-Python

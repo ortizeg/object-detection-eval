@@ -164,6 +164,17 @@ def _florence2_factory(entry: ManifestEntry) -> BaseInferencer:
     )
 
 
+def _yolo_world_factory(entry: ManifestEntry) -> BaseInferencer:
+    from object_detection_eval.inference.vlm.yolo_world import YOLOWorldInferencer
+
+    return YOLOWorldInferencer(
+        model_name=entry.model_name,
+        classes=entry.classes,
+        box_threshold=entry.box_threshold if entry.box_threshold is not None else 0.01,
+        nms_iou_threshold=(entry.nms_iou_threshold if entry.nms_iou_threshold is not None else 0.5),
+    )
+
+
 def _gemini_factory(entry: ManifestEntry) -> BaseInferencer:
     from object_detection_eval.inference.vlm.gemini import GeminiInferencer
 
@@ -180,6 +191,7 @@ _INFERENCER_FACTORIES: dict[str, Callable[[ManifestEntry], BaseInferencer]] = {
     "omdet_turbo": _omdet_turbo_factory,
     "grounding_dino": _grounding_dino_factory,
     "florence2": _florence2_factory,
+    "yolo_world": _yolo_world_factory,
 }
 
 

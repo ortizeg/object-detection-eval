@@ -128,3 +128,12 @@ models:
     inferencer: florence2
     model_name: microsoft/Florence-2-large-ft
     task: "<CAPTION_TO_PHRASE_GROUNDING>"
+
+  # YOLO-World. Prompt-then-detect: the candidate vocabulary is CLIP-encoded
+  # once into the model by set_classes(), so it receives the same six
+  # candidates as every other model despite a very different mechanism.
+  - name: yolo_world
+    inferencer: yolo_world
+    model_name: yolov8x-worldv2.pt
+    box_threshold: 0.01
+    nms_iou_threshold: 0.5
