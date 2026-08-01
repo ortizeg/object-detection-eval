@@ -82,9 +82,9 @@ models:
   # candidates in vlm_prompt_search.yaml scored best for it on the VAL split:
   # c5_bare_canonical (val mAP 0.1804, vs 0.1705 for the COCO list it replaces).
   #
-  # expected_map5095 is NULL pending the test-split run under this vocabulary.
-  # The old 0.173 was measured with the COCO list and no longer describes this
-  # configuration.
+  # Target restored from the 2026-08-01 CUDA (RTX A4000) test-split run under
+  # this vocabulary: 0.1791. The previous 0.173 was measured with the generic
+  # COCO list and described a different configuration.
   - name: omdet_turbo
     inferencer: omdet_turbo
     model_name: omlab/omdet-turbo-swin-tiny-hf
@@ -95,7 +95,7 @@ models:
       - rim
       - number
     box_threshold: 0.01
-    expected_map5095: null
+    expected_map5095: 0.179
 
   # PROMPT PARITY (2026-07-30): given the same domain-specific vocabulary
   # OWLv2 already had. Previously it received a generic COCO list while Gemini
@@ -108,9 +108,12 @@ models:
   # caption, and label resolution collapsed: 533 detections/image, 99.7%
   # `person`, and the ball found ONCE in 94 images.
   #
-  # expected_map5095 is deliberately NULL: the published 0.147 was produced by
-  # the broken configuration and is not a target worth reproducing. Restore a
-  # target only after a GPU re-run under this configuration.
+  # Target restored from the 2026-08-01 CUDA (RTX A4000) re-run: 0.2323. The
+  # previously published 0.147 came from the broken configuration. The repair is
+  # dramatic and worth recording: detections fell from 533/image to ~15, the
+  # dump shrank 10.5 MB -> 260 KB, `ball` went 0.000 -> 0.304 and `referee`
+  # 0.000 -> 0.237. This row is now tied with OWLv2 for the best open-weights
+  # score, having previously looked like the second-worst model in the table.
   - name: grounding_dino
     inferencer: grounding_dino
     model_name: IDEA-Research/grounding-dino-base
@@ -123,7 +126,7 @@ models:
     box_threshold: 0.01
     text_threshold: 0.25
     nms_iou_threshold: 0.5
-    expected_map5095: null
+    expected_map5095: 0.232
 
   # TASK TOKEN FIXED (2026-07-30). This ran with `<OD>` -- Florence-2's CLOSED
   # -vocabulary mode, which can only emit its own pretrained label set and
@@ -135,8 +138,8 @@ models:
   # phrases in `caption`, so the class vocabulary actually reaches the model.
   # Same domain vocabulary as OWLv2 and Grounding DINO (prompt parity).
   #
-  # expected_map5095 NULL for the same reason as grounding_dino: 0.104 came from
-  # the wrong mode. Restore a target after a GPU re-run.
+  # Target restored from the 2026-08-01 CUDA (RTX A4000) re-run: 0.1079. The
+  # old 0.104 came from the closed-vocabulary <OD> mode.
   - name: florence2
     inferencer: florence2
     model_name: microsoft/Florence-2-large-ft
@@ -148,7 +151,7 @@ models:
       - number
     task: "<CAPTION_TO_PHRASE_GROUNDING>"
     caption: "player. ball. referee. rim. number."
-    expected_map5095: null
+    expected_map5095: 0.108
 
   # YOLO-World (added 2026-08-01) -- the open-weights gap this comparison had.
   # Open-vocabulary and real-time, but licensed GPL-3.0 (weights) / AGPL-3.0
@@ -173,7 +176,8 @@ models:
       - jersey number
     box_threshold: 0.01
     nms_iou_threshold: 0.5
-    expected_map5095: null
+    # From the 2026-08-01 CUDA (RTX A4000) run: 0.1448.
+    expected_map5095: 0.145
 
 # SmolVLM2 was removed 2026-07-30. It has no bounding-box grounding head: it was
 # prompted for JSON boxes, emitted 1176 detections across the 94 test images all
