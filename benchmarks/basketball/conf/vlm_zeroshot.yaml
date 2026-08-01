@@ -24,6 +24,19 @@
 # without asserting a target. No current row uses that, but the capability is
 # retained for adding an exploratory model without gating the reproduction run.
 
+# PROMPT SELECTION (2026-08-01). Each open-weights row's `classes` is no longer
+# hand-chosen: it is whichever of the six shared candidates in
+# vlm_prompt_search.yaml scored best FOR THAT MODEL on the 96-image VAL split.
+# Every model faced the identical candidate set, so "equal tuning effort" is a
+# property of the config rather than a claim. The winners differ by model --
+# bare canonical names for OmDet-Turbo and Florence-2, domain vocabulary for
+# OWLv2 and Grounding-DINO, the generic COCO list for YOLO-World -- which is
+# precisely why one shared vocabulary would NOT have been the fair choice.
+#
+# Gemini is excluded from the search: billed API, and its prompt is a free-text
+# instruction rather than a class vocabulary. It keeps its hand-tuned prompt and
+# the report says so.
+
 tolerance: 0.02
 
 models:
@@ -63,17 +76,26 @@ models:
     nms_iou_threshold: 0.3
     expected_map5095: 0.247
 
+  # PROMPT EQUALISED (2026-08-01). This row ran the generic COCO list while
+  # OWLv2/Grounding-DINO/Florence-2 had domain vocabulary -- the last known
+  # fairness gap in this table. It now uses whichever of the SIX shared
+  # candidates in vlm_prompt_search.yaml scored best for it on the VAL split:
+  # c5_bare_canonical (val mAP 0.1804, vs 0.1705 for the COCO list it replaces).
+  #
+  # expected_map5095 is NULL pending the test-split run under this vocabulary.
+  # The old 0.173 was measured with the COCO list and no longer describes this
+  # configuration.
   - name: omdet_turbo
     inferencer: omdet_turbo
     model_name: omlab/omdet-turbo-swin-tiny-hf
     classes:
-      - person
-      - sports ball
+      - player
+      - ball
       - referee
-      - basketball hoop
-      - jersey number
+      - rim
+      - number
     box_threshold: 0.01
-    expected_map5095: 0.173
+    expected_map5095: null
 
   # PROMPT PARITY (2026-07-30): given the same domain-specific vocabulary
   # OWLv2 already had. Previously it received a generic COCO list while Gemini
@@ -119,13 +141,38 @@ models:
     inferencer: florence2
     model_name: microsoft/Florence-2-large-ft
     classes:
-      - basketball player
-      - basketball
+      - player
+      - ball
+      - referee
+      - rim
+      - number
+    task: "<CAPTION_TO_PHRASE_GROUNDING>"
+    caption: "player. ball. referee. rim. number."
+    expected_map5095: null
+
+  # YOLO-World (added 2026-08-01) -- the open-weights gap this comparison had.
+  # Open-vocabulary and real-time, but licensed GPL-3.0 (weights) / AGPL-3.0
+  # (ultralytics runtime); neither is redistributed here.
+  #
+  # It runs the GENERIC COCO vocabulary, and that is a measured result, not an
+  # oversight: c0_coco_control won its search at val mAP 0.1312 against 0.0445
+  # for the same domain vocabulary the other models use. YOLO-World encodes its
+  # vocabulary once with CLIP ("prompt-then-detect"), and the compound phrase
+  # "basketball player" makes it emit essentially NO people (0 across 5 images,
+  # vs 101 for "person") while `basketball hoop` is unchanged. Forcing one
+  # shared vocabulary on every model for the look of fairness would have
+  # published this row at a third of its real score.
+  - name: yolo_world
+    inferencer: yolo_world
+    model_name: yolov8x-worldv2.pt
+    classes:
+      - person
+      - sports ball
       - referee
       - basketball hoop
       - jersey number
-    task: "<CAPTION_TO_PHRASE_GROUNDING>"
-    caption: "basketball player. basketball. referee. basketball hoop. jersey number."
+    box_threshold: 0.01
+    nms_iou_threshold: 0.5
     expected_map5095: null
 
 # SmolVLM2 was removed 2026-07-30. It has no bounding-box grounding head: it was
