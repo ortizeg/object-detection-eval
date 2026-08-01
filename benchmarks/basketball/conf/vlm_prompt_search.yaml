@@ -1,0 +1,130 @@
+# vlm_prompt_search.yaml -- the equal-effort prompt/vocabulary search.
+#
+# WHY THIS FILE EXISTS
+#
+# VLM_VS_FINETUNED.md criticises unequal tuning effort as an unfairness, then
+# committed it: Gemini received a hand-tuned prompt with per-class definitions,
+# OWLv2 a domain vocabulary, and the rest a generic COCO list. Fixing that by
+# hand-tuning each model separately would just move the unfairness around --
+# whichever model got the most attention would win.
+#
+# So the effort is equalised MECHANICALLY. Every open-weights model is scored
+# against the SAME candidate list below, and each model's published prompt is
+# whichever candidate scored best FOR THAT MODEL. No model receives a candidate
+# another did not. "Equal effort" is then a property of the config, checkable by
+# reading it, rather than a claim in prose.
+#
+# SEARCH SPLIT: `valid` (96 images), NOT `test`.
+#
+# This is the point of the whole file. Choosing a prompt by its score on the 94
+# test images and then publishing those same test numbers is test-set tuning --
+# the reported number would be the max over 6 draws, biased upward, and no
+# longer an estimate of zero-shot performance. The search runs on val; the
+# winning prompt is then run ONCE on test by run_vlm_benchmark.py. val and test
+# have near-identical class distributions (val: 908 player / 287 referee / 522
+# number / 96 rim / 88 ball; test: 896 / 280 / 567 / 93 / 88), so val is a fair
+# proxy.
+#
+# Gemini is deliberately NOT in this file: it is a billed API, its prompt is a
+# free-text instruction rather than a class vocabulary, and sweeping it would
+# cost money per candidate per image. Its row keeps the hand-tuned prompt, and
+# the report says so plainly.
+
+split: valid
+
+# Equal-effort budget. Every model gets exactly this many candidates. Raising it
+# means re-running EVERY model, not just the one being improved.
+budget_per_model: 6
+
+candidates:
+  # Generic COCO vocabulary. The control: this is what OmDet-Turbo was actually
+  # running while the others had domain vocabulary, so it measures the size of
+  # the fairness gap being closed rather than assuming it.
+  - id: c0_coco_control
+    classes:
+      - person
+      - sports ball
+      - referee
+      - basketball hoop
+      - jersey number
+
+  # The domain vocabulary OWLv2/Grounding-DINO/Florence-2 currently use.
+  - id: c1_domain
+    classes:
+      - basketball player
+      - basketball
+      - referee
+      - basketball hoop
+      - jersey number
+
+  # Contrastive people split. `referee` vs `player` is the hard semantic split:
+  # both are people on a court, and the distinguishing signal is clothing, not
+  # role. Name the clothing.
+  - id: c2_contrastive
+    classes:
+      - basketball player in a team uniform
+      - basketball
+      - referee in a striped shirt
+      - basketball hoop
+      - jersey number
+
+  # Small-object phrasing. `ball` and `rim` collapse for every model. These name
+  # colour and structure -- signals a general detector's prior actually carries.
+  - id: c3_small_object
+    classes:
+      - basketball player
+      - orange basketball
+      - referee
+      - basketball hoop and backboard
+      - jersey number on a uniform
+
+  # Both interventions together: do they compose, or does the longer caption
+  # dilute the phrase grounding?
+  - id: c4_contrastive_small_object
+    classes:
+      - basketball player in a team uniform
+      - orange basketball
+      - referee in a striped shirt
+      - basketball hoop and backboard
+      - jersey number on a uniform
+
+  # Bare canonical names. The shortest possible prompt, and the one a reader
+  # would try first. Included so "elaborate prompts help" is a measured result
+  # rather than an assumption.
+  - id: c5_bare_canonical
+    classes:
+      - player
+      - ball
+      - referee
+      - rim
+      - number
+
+# Per-model inferencer settings. `classes` is supplied by the candidate above;
+# everything else matches that model's committed vlm_zeroshot.yaml row so the
+# search differs from the published run in the prompt ALONE.
+models:
+  - name: owlv2
+    inferencer: owlv2
+    model_name: google/owlv2-large-patch14-ensemble
+    box_threshold: 0.01
+    nms_iou_threshold: 0.3
+
+  - name: omdet_turbo
+    inferencer: omdet_turbo
+    model_name: omlab/omdet-turbo-swin-tiny-hf
+    box_threshold: 0.01
+
+  - name: grounding_dino
+    inferencer: grounding_dino
+    model_name: IDEA-Research/grounding-dino-base
+    box_threshold: 0.01
+    text_threshold: 0.25
+    nms_iou_threshold: 0.5
+
+  # Florence-2's caption is built from the candidate's `classes` (dot-joined),
+  # so it receives exactly the same vocabulary as every other model through the
+  # one input it accepts.
+  - name: florence2
+    inferencer: florence2
+    model_name: microsoft/Florence-2-large-ft
+    task: "<CAPTION_TO_PHRASE_GROUNDING>"
