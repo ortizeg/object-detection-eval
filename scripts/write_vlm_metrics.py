@@ -44,6 +44,7 @@ _VLM_FILES: dict[str, str] = {
     "Grounding-DINO": "grounding_dino.json",
     "OmDet-Turbo": "omdet_turbo.json",
     "Florence-2": "florence2.json",
+    "YOLO-World": "yolo_world.json",
 }
 
 

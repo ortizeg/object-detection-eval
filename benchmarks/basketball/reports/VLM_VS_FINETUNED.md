@@ -23,9 +23,77 @@ zero-shot mAP and a fine-tuned mAP are directly comparable — the gap between
 them is a real capability gap, not a protocol artifact. The methodology behind
 this parity is documented in [../../../docs/methodology.md](../../../docs/methodology.md).
 
+## How each model's prompt was chosen
+
+An earlier revision of this report criticised unequal tuning effort as an
+unfairness and then committed it: Gemini had a hand-tuned prompt with per-class
+definitions, OWLv2 a domain vocabulary, and OmDet-Turbo a generic COCO list.
+Hand-tuning each model separately would not have fixed that — it would only have
+moved the advantage to whichever model got the most attention.
+
+So the effort is now equalised **mechanically**. Every open-weights model is
+scored against the **same six candidate vocabularies**
+(`conf/vlm_prompt_search.yaml`), and each model's published prompt is whichever
+candidate won *for that model*. No model receives a candidate another did not,
+and the manifest's validator rejects a candidate list that disagrees with the
+declared budget — so "equal effort" is a property of the config you can check by
+reading it, not a claim you have to trust.
+
+The search runs on the **96-image validation split, never on test**. Choosing a
+prompt by its score on the 94 test images and then publishing those same test
+numbers would report the maximum over six draws as if it were a single unbiased
+measurement. The winning prompt is run on test exactly once, afterwards. Both
+the manifest schema and the CLI refuse `--split test` outright.
+
+**The winning vocabulary differs by model**, which is the result that makes
+per-model selection the fair choice rather than the convenient one:
+
+| Model | Winning candidate | val mAP@50:95 | vs. the shared "domain" vocabulary |
+| --- | --- | --- | --- |
+| Grounding-DINO | `c1_domain` | 0.244 | — (it won) |
+| OWLv2 | `c1_domain` | 0.229 | — (it won) |
+| OmDet-Turbo | `c5_bare_canonical` | 0.180 | +0.003 |
+| YOLO-World | `c0_coco_control` | 0.131 | **+0.087** |
+| Florence-2 | `c5_bare_canonical` | 0.125 | +0.015 |
+
+YOLO-World is the case that proves the point. Forcing the shared domain
+vocabulary on it would have published it at **0.044 instead of 0.131** — roughly
+a third of its real score. It uses "prompt-then-detect": the vocabulary is
+CLIP-encoded once and baked into the model. Given the compound phrase
+`"basketball player"` it emits essentially **no people at all** (0 across 5
+images, against 101 for `"person"`), while `basketball hoop` returns an identical
+box in both. Uniformity would have looked fairer and been less accurate.
+
+Gemini is excluded from the search: it is a billed API and its prompt is a
+free-text instruction rather than a class vocabulary. It keeps its hand-tuned
+prompt, and that remains an advantage over the open-weights rows — stated here
+rather than smoothed over.
+
+### What prompt engineering did *not* fix
+
+Two hypotheses this work set out to test, both refuted by measurement:
+
+- **Contrastive `referee`/`player` phrasing does not separate them — it
+  destroys the model.** `player` and `referee` are both people on a court, so
+  describing the clothing ("basketball player in a team uniform" vs "referee in
+  a striped shirt") looked promising. It is catastrophic for the
+  phrase-grounding models: Grounding-DINO's `player` AP@50 falls **0.828 →
+  0.000** and Florence-2's **0.317 → 0.000**. Longer descriptive phrases produce
+  labels spanning several classes, which the ambiguity guard then correctly
+  drops. The mechanism that prevents the old label-collapse bug is the same one
+  that makes verbose prompts useless.
+- **`rim` cannot be prompted into existence.** Across five models and six
+  vocabularies — thirty measurements — `rim` AP@50 is **0.000 everywhere** but
+  one (OWLv2 at 0.039). "basketball hoop", "basketball hoop and backboard",
+  "rim", "hoop": none of them work. The rim collapse is not a vocabulary
+  problem, so no amount of prompt engineering is going to close it.
+
+Both results are the reason the per-class analysis below still reads as a
+failure analysis rather than a tuning success story.
+
 ## The zero-shot ceiling
 
-Five zero-shot VLMs, scored on the merged-5 test split. The table is recomputed
+Six zero-shot VLMs, scored on the merged-5 test split. The table is recomputed
 from the committed prediction dumps in `results/vlm/*.json` (never transcribed):
 
 <!-- TABLE:vlm_summary START -->
@@ -88,37 +156,36 @@ COCO's `person`) and collapse on the small, domain-specific classes.**
   it is almost entirely responsible for the non-trivial overall mAP the leaders
   post. Strip `player` out and the zero-shot ceiling would be far lower still.
 
-> **⚠️ Two of these five rows measure a broken harness, not the model.** The
-> defects are **fixed in the harness as of 2026-07-30**, but the committed
-> prediction dumps these tables are computed from **predate the fix** and need a
-> GPU re-run. Until then the Grounding-DINO and Florence-2 rows above are stale.
+> **Two of these rows previously measured a broken harness rather than the
+> model.** Both defects were fixed on 2026-07-30 and **every open-weights row
+> above was re-run on an NVIDIA RTX A4000 on 2026-08-01** under the repaired
+> harness and the search-selected prompts. The numbers are current; this note
+> records what they replaced.
 >
 > - **Grounding-DINO emitted 533 detections per image, 99.7% labelled `person`**
 >   (49,935 of 50,103), and found the basketball exactly **once across all 94
->   images**. Two causes, both now fixed: `text_threshold` was `0.01`, so nearly
->   every text token activated and the returned label spanned the entire caption;
->   and `_resolve_label` broke such a label by taking the class name appearing
->   *earliest in the string* — which is the prompt's **ordering**, not the
->   model's opinion. Every ambiguous box therefore became whichever class was
->   listed first. The threshold is now Grounding DINO's published `0.25`, and an
+>   images**. Two causes: `text_threshold` was `0.01`, so nearly every text token
+>   activated and the returned label spanned the entire caption; and
+>   `_resolve_label` broke such a label by taking the class name appearing
+>   *earliest in the string* — the prompt's **ordering**, not the model's
+>   opinion. Every ambiguous box therefore became whichever class was listed
+>   first. The threshold is now Grounding DINO's published `0.25`, and an
 >   ambiguous label is **dropped rather than guessed**.
-> - **Florence-2 was run with `task: "<OD>"`** — Florence-2's *closed*-vocabulary
->   mode, which can only emit its own pretrained label set and cannot be steered
->   by `classes` at all. 923 of its 924 detections were `person`. Now
+> - **Florence-2 ran with `task: "<OD>"`** — its *closed*-vocabulary mode, which
+>   can only emit its own pretrained label set and cannot be steered by `classes`
+>   at all. 923 of its 924 detections were `person`. It now runs
 >   `<CAPTION_TO_PHRASE_GROUNDING>`, which actually grounds the class vocabulary.
 >
-> **Prompt effort was also unequal**, and that is the same unfairness this
-> project refuses to tolerate for training recipes. Gemini received a hand-tuned
-> prompt with per-class definitions and count constraints; OWLv2 got a
-> domain-specific vocabulary; Grounding-DINO, OmDet-Turbo and Florence-2 were
-> handed a generic COCO list. Grounding-DINO and Florence-2 now use the same
-> domain vocabulary as OWLv2. **OmDet-Turbo has not been equalised** and still
-> runs the generic list.
+> **Prompt effort is now equalised** — see [How each model's prompt was
+> chosen](#how-each-models-prompt-was-chosen). OmDet-Turbo's generic COCO list,
+> the last remaining gap, is closed. **Gemini remains the exception**: it is a
+> billed API with a hand-tuned free-text prompt and was not part of the search,
+> so its row still carries a tuning advantage the open-weights rows do not.
 >
-> Both re-configured rows have had their reproduction targets set to `null` in
-> `vlm_zeroshot.yaml` — their old published numbers came from the broken setup
-> and are not worth reproducing. Treat **Gemini and OWLv2** as the only
-> meaningful zero-shot ceiling here.
+> **Substrate.** These numbers come from CUDA (RTX A4000). The prompt *search*
+> that selected the vocabularies ran on Apple MPS, which is fine — it only ever
+> compared candidates against each other, and every published number here was
+> measured on CUDA.
 
 ### Methods this comparison does not cover
 
