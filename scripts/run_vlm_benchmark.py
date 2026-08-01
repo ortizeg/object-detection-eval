@@ -84,12 +84,32 @@ class ManifestEntry(BaseModel, frozen=True):
     prompt_template: str | None = None
     expected_map5095: float | None = Field(default=None, ge=0.0, le=1.0)
 
+    # --- billed API tier only (vlm_api_tier.yaml) ---------------------------
+    #: DeepDataSpace V2 task endpoint. Its presence is what marks a row billed.
+    api_path: str | None = None
+    #: Server-side NMS IoU for the cloud API (distinct from local nms_iou_threshold).
+    iou_threshold: float | None = Field(default=None, ge=0.0, le=1.0)
+
+    @property
+    def is_billed(self) -> bool:
+        """True for rows that cost money and are not reproducible from a clone."""
+        return self.inferencer == "dds_cloud"
+
 
 class Manifest(BaseModel, frozen=True):
-    """The committed zero-shot VLM manifest: six models + the gate tolerance."""
+    """A zero-shot VLM manifest: the models plus the gate tolerance."""
 
     tolerance: float = Field(default=0.02, ge=0.0, le=1.0)
     models: list[ManifestEntry]
+    #: Hard per-model cap on billed requests. Only meaningful for the API tier;
+    #: the inferencer RAISES when it is hit rather than silently returning
+    #: nothing, so an accidental re-run cannot quietly multiply the bill.
+    max_billed_calls: int = Field(default=100, ge=1)
+
+    @property
+    def has_billed_rows(self) -> bool:
+        """True if running this manifest would spend money."""
+        return any(m.is_billed for m in self.models)
 
 
 def load_manifest(path: Path) -> Manifest:
@@ -183,6 +203,31 @@ _INFERENCER_FACTORIES: dict[str, Callable[[ManifestEntry], BaseInferencer]] = {
 }
 
 
+def _build_inferencer(entry: ManifestEntry, max_billed_calls: int) -> BaseInferencer:
+    """Construct one row's inferencer.
+
+    The billed API tier is handled outside ``_INFERENCER_FACTORIES`` on purpose:
+    it is the only kind of row that needs a spend budget, and threading an
+    unused ``max_billed_calls`` through five free-model factories would hide
+    that asymmetry rather than state it.
+    """
+    if entry.inferencer == "dds_cloud":
+        from object_detection_eval.inference.vlm.dds_cloud import DDSCloudInferencer
+
+        if entry.api_path is None:
+            msg = f"{entry.name}: dds_cloud rows require an `api_path`"
+            raise ValueError(msg)
+        return DDSCloudInferencer(
+            model_name=entry.model_name,
+            api_path=entry.api_path,
+            classes=entry.classes,
+            box_threshold=entry.box_threshold if entry.box_threshold is not None else 0.25,
+            iou_threshold=entry.iou_threshold if entry.iou_threshold is not None else 0.8,
+            max_billed_calls=max_billed_calls,
+        )
+    return _INFERENCER_FACTORIES[entry.inferencer](entry)
+
+
 def _assert_preconditions(args: argparse.Namespace) -> None:
     """Halt with a clear message if the ground-truth annotations are missing."""
     gt_path = args.data_root / "test" / "_annotations.coco.json"
@@ -208,6 +253,7 @@ def _score_entry(
     args: argparse.Namespace,
     gt_map: dict[str, sv.Detections],
     name_to_id: dict[str, int],
+    max_billed_calls: int = 0,
 ) -> dict[str, sv.Detections]:
     """Run one VLM over the test split through the shared eval pipeline.
 
@@ -216,8 +262,7 @@ def _score_entry(
     with the prompt-search harness so the two cannot drift apart -- see that
     module's docstring for why the order is load-bearing.
     """
-    factory = _INFERENCER_FACTORIES[entry.inferencer]
-    inferencer = factory(entry)
+    inferencer = _build_inferencer(entry, max_billed_calls)
     label_map = dict(enumerate(entry.classes))
 
     pred_map = score_split(
@@ -317,7 +362,28 @@ def parse_args() -> argparse.Namespace:
             "consume onnxruntime execution providers."
         ),
     )
+    parser.add_argument(
+        "--i-understand-this-costs-money",
+        action="store_true",
+        help=(
+            "Required to run any billed API-tier row (vlm_api_tier.yaml). "
+            "Without it, a manifest containing billed rows is refused."
+        ),
+    )
     return parser.parse_args()
+
+
+def billed_run_is_authorised(
+    entries: list[ManifestEntry],
+    acknowledged: bool,
+) -> bool:
+    """True unless billed rows were requested without explicit acknowledgement.
+
+    Spending money is the one action here that cannot be undone by re-running,
+    so it takes a deliberate flag rather than a default. Kept pure so the rule
+    is testable without a token or a network.
+    """
+    return acknowledged or not any(e.is_billed for e in entries)
 
 
 def main() -> None:
@@ -330,6 +396,22 @@ def main() -> None:
         if not entries:
             msg = f"--only={args.only!r} does not match any manifest entry"
             raise ValueError(msg)
+
+    billed = [e for e in entries if e.is_billed]
+    if not billed_run_is_authorised(entries, args.i_understand_this_costs_money):
+        logger.error(
+            f"REFUSED: {len(billed)} row(s) in {args.manifest} are billed API models "
+            f"({', '.join(e.name for e in billed)}). Each scores {len(entries)} "
+            f"image(s) at real cost per call and is NOT reproducible from a clone "
+            f"of this repo. Re-run with --i-understand-this-costs-money if that "
+            f"spend is intended."
+        )
+        sys.exit(2)
+    if billed:
+        logger.warning(
+            f"Billed run authorised: {', '.join(e.name for e in billed)} "
+            f"(cap {manifest.max_billed_calls} calls per model)"
+        )
 
     _assert_preconditions(args)
 
@@ -346,7 +428,7 @@ def main() -> None:
     passed = True
     for entry in entries:
         logger.info(f"Scoring {entry.name} ({entry.inferencer}) via {entry.model_name}")
-        pred_map = _score_entry(entry, args, gt_map, name_to_id)
+        pred_map = _score_entry(entry, args, gt_map, name_to_id, manifest.max_billed_calls)
         _write_results(entry, pred_map, args.results_dir)
         metrics = compute_metrics(gt_map, pred_map, id_to_name)
         measured = float(metrics["mAP_50_95"])

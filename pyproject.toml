@@ -129,6 +129,9 @@ module = [
     "google.*",
     "tensorrt.*",
     "onnx_graphsurgeon.*",
+    # DeepDataSpace cloud SDK (DINO-X Pro / Grounding DINO 1.5-1.6 Pro).
+    # Billed-API-only extra; not installed in the default env.
+    "dds_cloudapi_sdk.*",
     # torch/torchvision/PIL are [vlm]-extra-only and not installed in the
     # default (torch-free) env that `pixi run typecheck` (CI) runs in.
     "torch.*",
