@@ -91,6 +91,40 @@ Two hypotheses this work set out to test, both refuted by measurement:
 Both results are the reason the per-class analysis below still reads as a
 failure analysis rather than a tuning success story.
 
+### One thing that *was* our fault
+
+Prompting was not the only suspect. The harness applies a `single_best_per_class`
+filter that kept the **top-1** box for `ball` and `rim` — reasonable on its face,
+since the ground truth holds roughly one of each per image. Measured on val, it
+was throwing away correct detections rather than duplicates:
+
+> **OWLv2 produces a correct `ball` box (IoU ≥ 0.5) in 90.9% of val images, but
+> ranks it first in only 51.1%.**
+
+The detections existed; the filter discarded them, and the result looked
+identical to a model that could not find the ball. Allowing three candidates per
+singleton class instead of one recovers most of it. Chosen on val across **all
+five** open-weights models, not just the one that motivated the change:
+
+| Model | k=1 | k=3 | Δ mAP@50:95 |
+| --- | --- | --- | --- |
+| **OWLv2** | 0.2293 | **0.2400** | **+0.0107** |
+| Grounding-DINO | 0.2439 | 0.2441 | +0.0002 |
+| OmDet-Turbo | 0.1804 | 0.1806 | +0.0002 |
+| YOLO-World | 0.1312 | 0.1318 | +0.0006 |
+| Florence-2 | 0.1251 | 0.1247 | −0.0004 |
+
+It is a floor being raised for one model, not a boost for everyone: OWLv2 emits a
+median of **613** `ball` candidates per image and had ranking headroom the others
+lack, while Grounding-DINO's higher text threshold and ambiguity guard leave it
+few candidates to re-rank. Florence-2's −0.0004 is inside AP quantisation noise.
+
+The same diagnostic settles `rim` in the *opposite* direction, which is why it
+belongs here rather than in a list of caveats: OWLv2's `rim` recall at **any**
+rank is 0.167, so 83% of images yield no correct rim box at all, at any
+confidence. Relaxing the cap moves `rim` from 0.001 to 0.012 and no further. The
+ball was hidden by our filter; the rim genuinely is not being detected.
+
 ## The zero-shot ceiling
 
 Six zero-shot VLMs, scored on the merged-5 test split. The table is recomputed
