@@ -7,8 +7,8 @@ current_phase_name: reports-docs
 status: executing
 stopped_at: Completed all Phase 7 plans (07-01..04). Reports generator + FINAL_COMPARISON_640.md + VLM_VS_FINETUNED.md + methodology + README, every table generator-emitted. REPORT-01..05 done. ALL 7 PHASES COMPLETE.
 last_updated: "2026-07-29T18:32:26.024Z"
-last_activity: 2026-07-31
-last_activity_desc: "Quick 260731-d01: VLM harness fixes (Grounding-DINO label collapse, Florence-2 task token)"
+last_activity: 2026-08-01
+last_activity_desc: "Quick 260801-e01: equal-effort VLM prompt search (val-split, no test tuning), YOLO-World added, licences corrected, test split re-run on CUDA"
 progress:
   total_phases: 7
   completed_phases: 7
@@ -30,7 +30,17 @@ See: .planning/PROJECT.md (updated 2026-07-24)
 Phase: 05 (zero-shot-vlm) — COMPLETE
 Plan: 4 of 4 executed
 Status: Phase 5 done — VLM zero-shot reproduction gate PASSED. Next: Phase 6 (Latency, needs a T4) or Phase 7 (Reports).
-Last activity: 2026-07-31 — Completed quick task 260731-d01: VLM harness fixes (Grounding-DINO + Florence-2)
+Last activity: 2026-08-01 — Completed quick task 260801-e01: VLM prompt parity + YOLO-World
+  - Prompt effort equalised MECHANICALLY: 6 shared candidates per model, selected on
+    the val split so no prompt is ever chosen on the split the report publishes.
+  - Refuted by measurement: contrastive referee/player phrasing collapses the
+    phrase-grounding models; `rim` is 0.000 across all 30 model x prompt cells.
+  - YOLO-World added (GPL-3.0 weights / AGPL-3.0 ultralytics, optional extra).
+    YOLOE verified AGPL-3.0 and NOT adopted.
+  - Open-weights test split re-run on a vast.ai RTX A4000; new [feature.vlmcuda]
+    because pixi otherwise installs a CPU-only torch on Linux.
+  - DINO-X / GDINO-Pro API tier built then dropped at the user's direction
+    (not reproducible from a clone).
 
 Progress: [█████████░] 88% (Phase 5 of 7)
 
