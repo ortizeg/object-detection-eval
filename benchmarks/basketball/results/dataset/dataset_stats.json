@@ -1,0 +1,289 @@
+{
+  "dataset": "basketball-player-detection-3",
+  "license": {
+    "name": "CC BY 4.0",
+    "url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  "raw_classes": [
+    "ball",
+    "ball-in-basket",
+    "number",
+    "player",
+    "player-in-possession",
+    "player-jump-shot",
+    "player-layup-dunk",
+    "player-shot-block",
+    "referee",
+    "rim"
+  ],
+  "merged_classes": [
+    "player",
+    "ball",
+    "referee",
+    "rim",
+    "number"
+  ],
+  "totals": {
+    "images": 654,
+    "annotations": 13485,
+    "clips": 21,
+    "games": 3
+  },
+  "image_geometry": [
+    {
+      "width": 1920,
+      "height": 1080,
+      "images": 654
+    }
+  ],
+  "splits": [
+    {
+      "name": "train",
+      "images": 464,
+      "annotations": 9552,
+      "clips": 15,
+      "games": 3,
+      "raw_class_counts": {
+        "ball": 432,
+        "ball-in-basket": 33,
+        "number": 2855,
+        "player": 4301,
+        "player-in-possession": 86,
+        "player-jump-shot": 72,
+        "player-layup-dunk": 33,
+        "player-shot-block": 64,
+        "referee": 1221,
+        "rim": 455
+      },
+      "merged_class_counts": {
+        "player": 4556,
+        "ball": 465,
+        "referee": 1221,
+        "rim": 455,
+        "number": 2855
+      },
+      "clip_inventory": [
+        {
+          "clip": "boston-celtics-new-york-knicks-game-1-q1|03_16-03_11",
+          "game": "boston-celtics-new-york-knicks-game-1",
+          "frames": 35
+        },
+        {
+          "clip": "boston-celtics-new-york-knicks-game-1-q1|04_28-04_20",
+          "game": "boston-celtics-new-york-knicks-game-1",
+          "frames": 31
+        },
+        {
+          "clip": "boston-celtics-new-york-knicks-game-1-q1|06_00-05_54",
+          "game": "boston-celtics-new-york-knicks-game-1",
+          "frames": 30
+        },
+        {
+          "clip": "boston-celtics-new-york-knicks-game-1-q2|08_43-08_38",
+          "game": "boston-celtics-new-york-knicks-game-1",
+          "frames": 32
+        },
+        {
+          "clip": "boston-celtics-new-york-knicks-game-1-q2|10_36-10_32",
+          "game": "boston-celtics-new-york-knicks-game-1",
+          "frames": 31
+        },
+        {
+          "clip": "boston-celtics-new-york-knicks-game-4-q1|00_05-00_01",
+          "game": "boston-celtics-new-york-knicks-game-4",
+          "frames": 27
+        },
+        {
+          "clip": "boston-celtics-new-york-knicks-game-4-q1|00_57-00_54",
+          "game": "boston-celtics-new-york-knicks-game-4",
+          "frames": 26
+        },
+        {
+          "clip": "boston-celtics-new-york-knicks-game-4-q1|01_22-01_16",
+          "game": "boston-celtics-new-york-knicks-game-4",
+          "frames": 29
+        },
+        {
+          "clip": "boston-celtics-new-york-knicks-game-4-q1|05_27-05_21",
+          "game": "boston-celtics-new-york-knicks-game-4",
+          "frames": 50
+        },
+        {
+          "clip": "boston-celtics-new-york-knicks-game-4-q1|10_10-10_02",
+          "game": "boston-celtics-new-york-knicks-game-4",
+          "frames": 26
+        },
+        {
+          "clip": "boston-celtics-new-york-knicks-game-4-q2|06_31-06_22",
+          "game": "boston-celtics-new-york-knicks-game-4",
+          "frames": 31
+        },
+        {
+          "clip": "boston-celtics-new-york-knicks-game-4-q2|07_01-06_53",
+          "game": "boston-celtics-new-york-knicks-game-4",
+          "frames": 48
+        },
+        {
+          "clip": "boston-celtics-orlando-magic-game-4-q1|00_09-00_05",
+          "game": "boston-celtics-orlando-magic-game-4",
+          "frames": 19
+        },
+        {
+          "clip": "boston-celtics-orlando-magic-game-4-q1|05_31-05_24",
+          "game": "boston-celtics-orlando-magic-game-4",
+          "frames": 38
+        },
+        {
+          "clip": "boston-celtics-orlando-magic-game-4-q1|08_18-08_14",
+          "game": "boston-celtics-orlando-magic-game-4",
+          "frames": 11
+        }
+      ],
+      "image_geometry": [
+        {
+          "width": 1920,
+          "height": 1080,
+          "images": 464
+        }
+      ]
+    },
+    {
+      "name": "valid",
+      "images": 96,
+      "annotations": 1953,
+      "clips": 3,
+      "games": 3,
+      "raw_class_counts": {
+        "ball": 88,
+        "ball-in-basket": 9,
+        "number": 522,
+        "player": 908,
+        "player-in-possession": 17,
+        "player-jump-shot": 17,
+        "player-layup-dunk": 0,
+        "player-shot-block": 9,
+        "referee": 287,
+        "rim": 96
+      },
+      "merged_class_counts": {
+        "player": 951,
+        "ball": 97,
+        "referee": 287,
+        "rim": 96,
+        "number": 522
+      },
+      "clip_inventory": [
+        {
+          "clip": "boston-celtics-new-york-knicks-game-1-q1|05_13-05_09",
+          "game": "boston-celtics-new-york-knicks-game-1",
+          "frames": 31
+        },
+        {
+          "clip": "boston-celtics-new-york-knicks-game-4-q1|05_58-05_53",
+          "game": "boston-celtics-new-york-knicks-game-4",
+          "frames": 32
+        },
+        {
+          "clip": "boston-celtics-orlando-magic-game-4-q1|01_33-01_25",
+          "game": "boston-celtics-orlando-magic-game-4",
+          "frames": 33
+        }
+      ],
+      "image_geometry": [
+        {
+          "width": 1920,
+          "height": 1080,
+          "images": 96
+        }
+      ]
+    },
+    {
+      "name": "test",
+      "images": 94,
+      "annotations": 1980,
+      "clips": 3,
+      "games": 3,
+      "raw_class_counts": {
+        "ball": 88,
+        "ball-in-basket": 8,
+        "number": 567,
+        "player": 896,
+        "player-in-possession": 18,
+        "player-jump-shot": 16,
+        "player-layup-dunk": 0,
+        "player-shot-block": 14,
+        "referee": 280,
+        "rim": 93
+      },
+      "merged_class_counts": {
+        "player": 944,
+        "ball": 96,
+        "referee": 280,
+        "rim": 93,
+        "number": 567
+      },
+      "clip_inventory": [
+        {
+          "clip": "boston-celtics-new-york-knicks-game-1-q1|07_41-07_34",
+          "game": "boston-celtics-new-york-knicks-game-1",
+          "frames": 30
+        },
+        {
+          "clip": "boston-celtics-new-york-knicks-game-4-q1|05_06-05_01",
+          "game": "boston-celtics-new-york-knicks-game-4",
+          "frames": 33
+        },
+        {
+          "clip": "boston-celtics-orlando-magic-game-4-q1|11_44-11_36",
+          "game": "boston-celtics-orlando-magic-game-4",
+          "frames": 31
+        }
+      ],
+      "image_geometry": [
+        {
+          "width": 1920,
+          "height": 1080,
+          "images": 94
+        }
+      ]
+    }
+  ],
+  "overlaps": [
+    {
+      "splits": [
+        "train",
+        "valid"
+      ],
+      "shared_clips": [],
+      "shared_games": [
+        "boston-celtics-new-york-knicks-game-1",
+        "boston-celtics-new-york-knicks-game-4",
+        "boston-celtics-orlando-magic-game-4"
+      ]
+    },
+    {
+      "splits": [
+        "train",
+        "test"
+      ],
+      "shared_clips": [],
+      "shared_games": [
+        "boston-celtics-new-york-knicks-game-1",
+        "boston-celtics-new-york-knicks-game-4",
+        "boston-celtics-orlando-magic-game-4"
+      ]
+    },
+    {
+      "splits": [
+        "valid",
+        "test"
+      ],
+      "shared_clips": [],
+      "shared_games": [
+        "boston-celtics-new-york-knicks-game-1",
+        "boston-celtics-new-york-knicks-game-4",
+        "boston-celtics-orlando-magic-game-4"
+      ]
+    }
+  ]
+}
