@@ -313,15 +313,23 @@ def image_geometry_note(stats: DatasetStats) -> str:
     one this is affects how letterboxing is interpreted — so the sentence is
     selected by the data rather than hard-coded to the uniform case.
     """
+    # The RUF001 suppressions below are for U+00D7 MULTIPLICATION SIGN, which is
+    # correct typography for a resolution in prose a human reads -- not a
+    # confusable typo for the letter x. Suppressed here rather than project-wide
+    # so the rule keeps working everywhere else.
     geometry = stats.image_geometry
     if len(geometry) == 1:
         only = geometry[0]
         return (
-            f"All **{_fmt_int(only.images)}** images are **{only.width}×{only.height}** "
+            f"All **{_fmt_int(only.images)}** images are "
+            f"**{only.width}×{only.height}** "  # noqa: RUF001
             f"(16:9). Every model therefore sees the same source geometry, and any "
             f"letterboxing or square-resize is applied identically across the set."
         )
-    parts = ", ".join(f"{g.width}×{g.height} ({_fmt_int(g.images)} images)" for g in geometry)
+    parts = ", ".join(
+        f"{g.width}×{g.height} ({_fmt_int(g.images)} images)"  # noqa: RUF001
+        for g in geometry
+    )
     return f"The images are **not** a single resolution: {parts}."
 
 

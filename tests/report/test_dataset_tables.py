@@ -102,7 +102,7 @@ def test_split_table_totals_row_comes_from_totals_not_a_row_sum(stats: DatasetSt
 
 def test_geometry_note_states_the_uniform_case(stats: DatasetStats) -> None:
     note = image_geometry_note(stats)
-    assert "All **60** images are **1920×1080**" in note
+    assert "All **60** images are **1920×1080**" in note  # noqa: RUF001
 
 
 def test_geometry_note_reports_a_mixed_resolution_set() -> None:
@@ -116,7 +116,7 @@ def test_geometry_note_reports_a_mixed_resolution_set() -> None:
         )
     )
     assert "**not** a single resolution" in note
-    assert "1280×720 (10 images)" in note
+    assert "1280×720 (10 images)" in note  # noqa: RUF001
 
 
 # --------------------------------------------------------------------------- #
