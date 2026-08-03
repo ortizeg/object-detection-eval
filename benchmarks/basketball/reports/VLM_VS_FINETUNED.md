@@ -190,6 +190,9 @@ COCO's `person`) and collapse on the small, domain-specific classes.**
   single largest contributor to its overall win, and it is also the model with
   the hand-tuned prompt — worth holding in mind. Describing the clothing
   explicitly was tried and made things *worse*, not better (see above).
+  YOLO-World's 0.000 has a different and more specific cause — see
+  [Does the COCO `person` alias manufacture false positives?](#does-the-coco-person-alias-manufacture-false-positives)
+  below.
 
 - **`player` carries the score.** Every model except Florence-2 scores 0.83–0.92
   on `player` — the one class that overlaps a general detector's prior, and
@@ -206,9 +209,73 @@ COCO's `person`) and collapse on the small, domain-specific classes.**
   vocabulary: it was given the same six candidates as everyone else and its best
   was still less than half the field's `player` AP.
 
+### Does the COCO `person` alias manufacture false positives?
+
+The taxonomy maps COCO's `person` onto `player`. YOLO-World is the only row that
+uses it (its search winner is the COCO vocabulary), which raises an obvious
+objection: `person` is a superset of `player`, so surely it floods the metric
+with false positives — the crowd, the bench, the coaching staff — and swallows
+the referees on top.
+
+Measured on the test split, at IoU ≥ 0.5, asking what each predicted `player`
+box actually landed on:
+
+| Model | prompt for people | pred `player` | → GT `player` | → GT `referee` | → nothing |
+| --- | --- | --- | --- | --- | --- |
+| YOLO-World | `person` | 9964 | 923 | 270 | **8771** |
+| OmDet-Turbo | `player` | 7634 | 1009 | 262 | 6363 |
+| OWLv2 | `basketball player` | 4623 | 823 | 144 | 3656 |
+| Grounding-DINO | `basketball player` | 822 | 811 | 6 | **5** |
+
+So yes — **88% of YOLO-World's `player` boxes match no ground-truth object at
+all.** But that is not where the metric is losing anything, for two reasons.
+
+**The false positives are almost free.** They sit in a low-confidence tail far
+below the real detections: YOLO-World's true positives have a median confidence
+of **0.581** against **0.018** for its false positives, and **not one false
+positive exceeds 0.5**. Average precision integrates a confidence-ranked
+precision-recall curve, so this mass accumulates only where precision has already
+collapsed. It is also why `box_threshold` is deliberately **0.01** for every
+model here rather than something tidier — a higher threshold would truncate the
+curve and *understate* every row.
+
+**And most of them are real people.** 68% of those unmatched boxes are less than
+half the height of a median ground-truth player, which is what the crowd and the
+back-of-court bench look like at 1920×1080. The dataset annotates on-court
+participants only, so detecting a spectator is a *labelling-convention* mismatch
+rather than a model error. Grounding-DINO shows the other extreme — 811 of 822
+correct, 5 false positives — bought with a higher `text_threshold` and the
+ambiguity guard, at the cost of recall (817 true positives against OWLv2's 967).
+
+**The referee result, however, is real — and the alias is not the cause.** The
+tempting story is that `person` is a superset that absorbs referees, since
+YOLO-World emits **zero** `referee` predictions while 270 of its `person`-derived
+boxes land on ground-truth referees. That story is wrong. Prompting YOLO-World
+with `referee` as the **only** class returns **nothing at all**:
+
+| YOLO-World vocabulary | detections over 20 val images |
+| --- | --- |
+| `person` + `referee` | `{person: 549}` |
+| **`referee` alone** | **`{}`** |
+| `referee` + `sports ball` | `{sports ball: 1}` |
+
+`person` is not suppressing `referee`; YOLO-World simply **cannot ground the word
+"referee"**, with or without competition. `person` is the only phrase that fires
+at all, and the alias then labels those officials `player`. Dropping the alias
+would not recover the referees — it would lose the players too and take the row
+to near zero.
+
+That reframes the row's 0.000. It is not "YOLO-World fails to detect referees":
+it detects them fine, as people. It is that **its only usable vocabulary is one
+that cannot name them** — a concrete limitation of prompt-then-detect, where the
+vocabulary is CLIP-encoded once and baked into the weights. OmDet-Turbo, by
+contrast, has a working `referee` class (0.350) and *still* puts 262 boxes on
+referees while calling them players: that one is genuine model confusion between
+two classes it can both express.
+
 > **Two of these rows previously measured a broken harness rather than the
 > model.** Both defects were fixed on 2026-07-30 and **every open-weights row
-> above was re-run on an NVIDIA RTX A4000 on 2026-08-01** under the repaired
+> above was re-run on an NVIDIA RTX A4000 on 2026-08-03** under the repaired
 > harness and the search-selected prompts. The numbers are current; this note
 > records what they replaced.
 >
