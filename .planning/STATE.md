@@ -7,8 +7,8 @@ current_phase_name: reports-docs
 status: executing
 stopped_at: Completed all Phase 7 plans (07-01..04). Reports generator + FINAL_COMPARISON_640.md + VLM_VS_FINETUNED.md + methodology + README, every table generator-emitted. REPORT-01..05 done. ALL 7 PHASES COMPLETE.
 last_updated: "2026-07-29T18:32:26.024Z"
-last_activity: 2026-07-31
-last_activity_desc: "Quick 260731-d01: VLM harness fixes (Grounding-DINO label collapse, Florence-2 task token)"
+last_activity: 2026-08-03
+last_activity_desc: "Quick 260803-f01: dataset documentation page (docs/dataset.md, generator-emitted)"
 progress:
   total_phases: 7
   completed_phases: 7
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-24)
 Phase: 05 (zero-shot-vlm) — COMPLETE
 Plan: 4 of 4 executed
 Status: Phase 5 done — VLM zero-shot reproduction gate PASSED. Next: Phase 6 (Latency, needs a T4) or Phase 7 (Reports).
-Last activity: 2026-07-31 — Completed quick task 260731-d01: VLM harness fixes (Grounding-DINO + Florence-2)
+Last activity: 2026-08-03 — Completed quick task 260803-f01: dataset documentation page (docs/dataset.md)
 
 Progress: [█████████░] 88% (Phase 5 of 7)
 
@@ -117,6 +117,9 @@ Recent decisions affecting current work:
 - [Phase ?]: 06-02: EfficientNMS_TRT graft attrs sourced from postprocessors; plugin schema LOW-confidence, T4-validated in 06-03 (Open Question 1)
 - [Phase ?]: Report generator built hermetically against synthetic fixtures (bootstrap file still generating); loaders read the real results files when present
 - [Phase ?]: per_class_table renders an em dash for a class absent from per_class_ap50 (raw10 player-layup-dunk zero support), never 0.000
+- [Quick 260803-f01]: clip_key promoted from scripts/run_clustered_bootstrap.py into src/object_detection_eval/data/clips.py -- one definition of clip identity for both the clustered bootstrap and the dataset page; output format verified byte-identical across all 654 filenames, so committed cluster keys still match
+- [Quick 260803-f01]: docs/dataset.md joined the generate_report registry (build_registry gained docs_dir) rather than getting its own generator -- a document belongs in the registry whenever it publishes numbers, wherever it lives
+- [Quick 260803-f01]: dataset statistics precomputed into a committed 7.4 KB JSON by scripts/write_dataset_stats.py, mirroring the VLM metrics file, so the --check drift gate runs where the dataset is absent (CI); write_dataset_stats.py --check is the local gate for the one thing CI cannot verify
 
 ### Pending Todos
 
@@ -129,6 +132,7 @@ None yet.
 - **[Phase 6] RTMDet-M on-GPU NMS delta unavailable:** its ungrafted mmdeploy `end2end` graph cannot build under TensorRT (pre-NMS `TopK`, K > 3840). Expected and reproduced on both machines; only `to_boxes − model_only` is affected.
 - **[Phase 6] CPU latency not re-measured:** `cpu_e2e_conf*.json` still carries pre-dedicated-T4 numbers, so the LAT-05 NMS blow-up table has not been revalidated on clean hardware.
 - **[Stats] The 94-image test set is 3 video clips (found 2026-07-30):** clip-disjoint across splits (no leakage), but frame-level resampling is pseudo-replication. Clip-clustered CIs are 1.4-3.9x wider and cut significant adjacent pairs 5/6 -> 2/6. Any future ranking claim must use `scripts/run_clustered_bootstrap.py`, not the frame-level anchor.
+- **[Docs] methodology.md's "94-image statistical limitation" section is stale (found 2026-08-03, quick 260803-f01):** it still presents the image-level bootstrap as primary and states "5 of the 6 adjacent pairs are significant". The clip-clustered work (quick 260730-c01, PR #14) cut that to 2/6 and FINAL_COMPARISON_640.md was rewritten; methodology.md was not. A pointer to docs/dataset.md was added, but the section itself still needs reconciling.
 - **[Stats] Training-seed variance is entirely unmeasured** and is plausibly larger than the test-set sampling uncertainty that is quantified.
 - **[Phase 5] External credential dependency:** VLM-02's Gemini row needs an API key; those tests are marked external.
 - **[Phase 5] VLM harness FIXED but results STALE (quick 260731-d01):** the Grounding-DINO label collapse (text_threshold + ambiguous-label guessing) and the Florence-2 `<OD>` closed-vocabulary task token are both fixed in code/config. The committed prediction dumps still predate the fixes, so both report tables are stale and `expected_map5095` is null for those rows. **Needs a GPU re-run.** OmDet-Turbo still runs the generic COCO prompt (not equalised).
@@ -146,6 +150,7 @@ None yet.
 | 260730-b01 | SmolVLM2 purge + registry yolox-m-800 -> yolox-m-640 | 2026-07-30 | 720a17c | [260730-b01-smolvlm2-purge-and-registry](./quick/260730-b01-smolvlm2-purge-and-registry/) |
 | 260730-c01 | Report rewrite + clip-clustered bootstrap (test set is 3 clips) | 2026-07-30 | effa610 | [260730-c01-report-rewrite](./quick/260730-c01-report-rewrite/) |
 | 260731-d01 | VLM harness fixes: Grounding-DINO label collapse + Florence-2 task token | 2026-07-31 | 90c5c1d | [260731-d01-vlm-harness-fixes](./quick/260731-d01-vlm-harness-fixes/) |
+| 260803-f01 | Dataset documentation page — docs/dataset.md, generator-emitted from a committed stats JSON | 2026-08-03 | 2e04c6f | [260803-f01-dataset-docs-page](./quick/260803-f01-dataset-docs-page/) |
 
 ## Deferred Items
 
