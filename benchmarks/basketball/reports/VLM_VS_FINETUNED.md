@@ -134,11 +134,11 @@ from the committed prediction dumps in `results/vlm/*.json` (never transcribed):
 | Model | mAP@50:95 | mAP@50 | mAP@75 |
 | --- | --- | --- | --- |
 | Gemini | 0.250 | 0.430 | 0.252 |
-| OWLv2 | 0.232 | 0.362 | 0.262 |
-| Grounding-DINO | 0.232 | 0.280 | 0.245 |
-| OmDet-Turbo | 0.179 | 0.262 | 0.192 |
+| OWLv2 | 0.246 | 0.386 | 0.274 |
+| Grounding-DINO | 0.234 | 0.283 | 0.247 |
+| OmDet-Turbo | 0.180 | 0.264 | 0.193 |
 | Florence-2 | 0.108 | 0.145 | 0.114 |
-| YOLO-World | 0.145 | 0.185 | 0.160 |
+| YOLO-World | 0.145 | 0.184 | 0.160 |
 <!-- TABLE:vlm_summary END -->
 
 The strongest zero-shot model in the table above still sits **below half** the
@@ -161,11 +161,11 @@ makes the pattern unmistakable:
 | Model | player | ball | referee | rim | number |
 | --- | --- | --- | --- | --- | --- |
 | Gemini | 0.923 | 0.316 | 0.717 | 0.036 | 0.156 |
-| OWLv2 | 0.848 | 0.271 | 0.352 | 0.003 | 0.337 |
-| Grounding-DINO | 0.851 | 0.304 | 0.237 | 0.000 | 0.009 |
-| OmDet-Turbo | 0.844 | 0.098 | 0.350 | 0.000 | 0.021 |
+| OWLv2 | 0.848 | 0.389 | 0.352 | 0.002 | 0.337 |
+| Grounding-DINO | 0.851 | 0.319 | 0.237 | 0.000 | 0.009 |
+| OmDet-Turbo | 0.844 | 0.104 | 0.350 | 0.000 | 0.021 |
 | Florence-2 | 0.335 | 0.139 | 0.224 | 0.000 | 0.027 |
-| YOLO-World | 0.829 | 0.080 | 0.000 | 0.000 | 0.014 |
+| YOLO-World | 0.829 | 0.078 | 0.000 | 0.000 | 0.014 |
 <!-- TABLE:vlm_per_class END -->
 
 Read down the columns and one story emerges: **open-vocabulary VLMs recognise
@@ -194,10 +194,12 @@ COCO's `person`) and collapse on the small, domain-specific classes.**
 - **`player` carries the score.** Every model except Florence-2 scores 0.83–0.92
   on `player` — the one class that overlaps a general detector's prior, and
   almost entirely responsible for the non-trivial overall mAP the leaders post.
-  Strip `player` out and the zero-shot ceiling would be far lower still. Note
-  how little the overall ranking depends on anything else: OWLv2 and
-  Grounding-DINO tie at 0.232 despite Grounding-DINO scoring 0.009 on `number`
-  against OWLv2's 0.337.
+  Strip `player` out and the zero-shot ceiling would be far lower still. Note how
+  little separates the top open-weights models on it: OWLv2 (0.848) and
+  Grounding-DINO (0.851) are within noise of each other on `player`, and the
+  0.012 gap between their overall scores is decided almost entirely by the other
+  four classes — chiefly `number`, where Grounding-DINO manages 0.009 against
+  OWLv2's 0.337.
 
 - **Florence-2 is the one genuinely weak detector here**, at 0.335 on `player`
   where every other model clears 0.82. Its failure is localisation, not

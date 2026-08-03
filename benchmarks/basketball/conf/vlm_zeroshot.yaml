@@ -37,6 +37,13 @@
 # instruction rather than a class vocabulary. It keeps its hand-tuned prompt and
 # the report says so.
 
+# SINGLETON FILTER (2026-08-03). filters.single_best_per_class now keeps the top
+# THREE ball/rim candidates per image rather than the top one. Top-1 was
+# discarding correct detections, not duplicates: OWLv2 produced a correct ball
+# box in 90.9% of val images but ranked it first in only 51.1%. Every target
+# below was measured under top-k=3; they are NOT comparable to numbers published
+# before that date.
+
 tolerance: 0.02
 
 models:
@@ -74,7 +81,10 @@ models:
       - jersey number
     box_threshold: 0.01
     nms_iou_threshold: 0.3
-    expected_map5095: 0.247
+    # Re-measured 2026-08-03 under the singleton top-k=3 filter: 0.2455. The
+    # prior 0.247 was measured under top-k=1 and happened to sit within
+    # tolerance of both, which is exactly why it is restated rather than left.
+    expected_map5095: 0.246
 
   # PROMPT EQUALISED (2026-08-01). This row ran the generic COCO list while
   # OWLv2/Grounding-DINO/Florence-2 had domain vocabulary -- the last known
@@ -82,9 +92,9 @@ models:
   # candidates in vlm_prompt_search.yaml scored best for it on the VAL split:
   # c5_bare_canonical (val mAP 0.1804, vs 0.1705 for the COCO list it replaces).
   #
-  # Target restored from the 2026-08-01 CUDA (RTX A4000) test-split run under
-  # this vocabulary: 0.1791. The previous 0.173 was measured with the generic
-  # COCO list and described a different configuration.
+  # Target from the 2026-08-03 CUDA (RTX A4000) run: 0.1796. The pre-2026-08-01
+  # 0.173 was measured with the generic COCO list and described a different
+  # configuration entirely.
   - name: omdet_turbo
     inferencer: omdet_turbo
     model_name: omlab/omdet-turbo-swin-tiny-hf
@@ -95,7 +105,7 @@ models:
       - rim
       - number
     box_threshold: 0.01
-    expected_map5095: 0.179
+    expected_map5095: 0.180
 
   # PROMPT PARITY (2026-07-30): given the same domain-specific vocabulary
   # OWLv2 already had. Previously it received a generic COCO list while Gemini
@@ -108,12 +118,12 @@ models:
   # caption, and label resolution collapsed: 533 detections/image, 99.7%
   # `person`, and the ball found ONCE in 94 images.
   #
-  # Target restored from the 2026-08-01 CUDA (RTX A4000) re-run: 0.2323. The
-  # previously published 0.147 came from the broken configuration. The repair is
-  # dramatic and worth recording: detections fell from 533/image to ~15, the
-  # dump shrank 10.5 MB -> 260 KB, `ball` went 0.000 -> 0.304 and `referee`
-  # 0.000 -> 0.237. This row is now tied with OWLv2 for the best open-weights
-  # score, having previously looked like the second-worst model in the table.
+  # Target from the 2026-08-03 CUDA (RTX A4000) run: 0.2338. The previously
+  # published 0.147 came from the broken configuration. The repair is dramatic
+  # and worth recording: detections fell from 533/image to ~15, the dump shrank
+  # 10.5 MB -> 260 KB, `ball` went 0.000 -> 0.319 and `referee` 0.000 -> 0.237.
+  # This row went from looking like the second-worst model in the table to the
+  # second-best open-weights one, 0.012 behind OWLv2.
   - name: grounding_dino
     inferencer: grounding_dino
     model_name: IDEA-Research/grounding-dino-base
@@ -126,7 +136,7 @@ models:
     box_threshold: 0.01
     text_threshold: 0.25
     nms_iou_threshold: 0.5
-    expected_map5095: 0.232
+    expected_map5095: 0.234
 
   # TASK TOKEN FIXED (2026-07-30). This ran with `<OD>` -- Florence-2's CLOSED
   # -vocabulary mode, which can only emit its own pretrained label set and
@@ -138,8 +148,8 @@ models:
   # phrases in `caption`, so the class vocabulary actually reaches the model.
   # Same domain vocabulary as OWLv2 and Grounding DINO (prompt parity).
   #
-  # Target restored from the 2026-08-01 CUDA (RTX A4000) re-run: 0.1079. The
-  # old 0.104 came from the closed-vocabulary <OD> mode.
+  # Target from the 2026-08-03 CUDA (RTX A4000) run: 0.1079. The old 0.104 came
+  # from the closed-vocabulary <OD> mode.
   - name: florence2
     inferencer: florence2
     model_name: microsoft/Florence-2-large-ft
@@ -176,7 +186,7 @@ models:
       - jersey number
     box_threshold: 0.01
     nms_iou_threshold: 0.5
-    # From the 2026-08-01 CUDA (RTX A4000) run: 0.1448.
+    # From the 2026-08-03 CUDA (RTX A4000) run: 0.1447.
     expected_map5095: 0.145
 
 # SmolVLM2 was removed 2026-07-30. It has no bounding-box grounding head: it was

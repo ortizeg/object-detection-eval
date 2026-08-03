@@ -54,9 +54,9 @@ _EXPECTED_NAMES = [
 #: targets they already reproduced.
 _EXPECTED_TARGETS = {
     "gemini": 0.265,
-    "owlv2": 0.247,
-    "omdet_turbo": 0.179,
-    "grounding_dino": 0.232,
+    "owlv2": 0.246,
+    "omdet_turbo": 0.180,
+    "grounding_dino": 0.234,
     "florence2": 0.108,
     "yolo_world": 0.145,
 }
