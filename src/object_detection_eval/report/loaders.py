@@ -297,3 +297,116 @@ def load_vlm_metrics(path: Path | str) -> dict[str, dict[str, Any]]:
     except ValidationError as exc:
         raise ReportLoadError(f"{path}: {exc}") from exc
     return {label: entry.model_dump(by_alias=True) for label, entry in models.items()}
+
+
+# --------------------------------------------------------------------------- #
+# Dataset: read the committed precomputed stats — never the raw dataset
+# --------------------------------------------------------------------------- #
+
+
+class DatasetLicense(BaseModel):
+    """The licence as recorded in the export's own COCO ``licenses`` block."""
+
+    model_config = _STRICT
+
+    name: str
+    url: str
+
+
+class ImageGeometry(BaseModel):
+    """One distinct image resolution and how many images carry it."""
+
+    model_config = _STRICT
+
+    width: int
+    height: int
+    images: int
+
+
+class ClipEntry(BaseModel):
+    """One source video clip: its id, its game, and how many frames it supplied."""
+
+    model_config = _STRICT
+
+    clip: str
+    game: str
+    frames: int
+
+
+class DatasetSplit(BaseModel):
+    """One split's counts, per-class breakdowns, and clip inventory.
+
+    ``clips`` is deliberately carried alongside ``images``: the two differ by
+    more than an order of magnitude, and that gap is the reason the reports use
+    a clip-clustered bootstrap rather than a per-image one.
+    """
+
+    model_config = _STRICT
+
+    name: str
+    images: int
+    annotations: int
+    clips: int
+    games: int
+    raw_class_counts: dict[str, int]
+    merged_class_counts: dict[str, int]
+    clip_inventory: list[ClipEntry]
+    image_geometry: list[ImageGeometry]
+
+
+class SplitOverlap(BaseModel):
+    """Overlap between one pair of splits, at clip AND game granularity.
+
+    Both lists are required, not optional: a shape that let one be omitted would
+    let the page report the flattering half alone.
+    """
+
+    model_config = _STRICT
+
+    splits: tuple[str, str]
+    shared_clips: list[str]
+    shared_games: list[str]
+
+
+class DatasetTotals(BaseModel):
+    """Whole-dataset totals across all splits."""
+
+    model_config = _STRICT
+
+    images: int
+    annotations: int
+    clips: int
+    games: int
+
+
+class DatasetStats(BaseModel):
+    """The committed ``dataset_stats.json`` payload.
+
+    Produced offline by ``scripts/write_dataset_stats.py`` from the raw dataset,
+    which lives outside the repo. Everything the dataset page publishes is
+    rendered from THIS file, so the drift gate runs where the dataset is absent
+    (the CI machine) — the same split the VLM metrics file uses.
+    """
+
+    model_config = _STRICT
+
+    dataset: str
+    license: DatasetLicense
+    raw_classes: list[str]
+    merged_classes: list[str]
+    totals: DatasetTotals
+    image_geometry: list[ImageGeometry]
+    splits: list[DatasetSplit]
+    overlaps: list[SplitOverlap]
+
+
+def load_dataset_stats(path: Path | str) -> DatasetStats:
+    """Load and validate the committed dataset statistics JSON.
+
+    Raises:
+        ReportLoadError: the file has an unexpected/missing key or wrong type.
+    """
+    try:
+        return DatasetStats.model_validate(_read_json(path))
+    except ValidationError as exc:
+        raise ReportLoadError(f"{path}: {exc}") from exc

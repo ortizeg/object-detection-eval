@@ -92,6 +92,10 @@ select = [
     "RUF", # ruff-specific
 ]
 
+# The report renderers emit prose read by humans, where the multiplication sign
+# is correct typography ("1920×1080"), not a confusable typo for the letter x.
+allowed-confusables = ["×"]
+
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = ["S101"] # assert is the point of a test
 

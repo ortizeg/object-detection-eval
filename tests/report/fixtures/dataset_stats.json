@@ -1,0 +1,206 @@
+{
+  "dataset": "fixture-dataset",
+  "license": {
+    "name": "CC BY 4.0",
+    "url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  "raw_classes": [
+    "ball",
+    "ball-in-basket",
+    "number",
+    "player",
+    "player-in-possession",
+    "player-jump-shot",
+    "player-layup-dunk",
+    "player-shot-block",
+    "referee",
+    "rim"
+  ],
+  "merged_classes": [
+    "player",
+    "ball",
+    "referee",
+    "rim",
+    "number"
+  ],
+  "totals": {
+    "images": 60,
+    "annotations": 600,
+    "clips": 6,
+    "games": 2
+  },
+  "image_geometry": [
+    {
+      "width": 1920,
+      "height": 1080,
+      "images": 60
+    }
+  ],
+  "splits": [
+    {
+      "name": "train",
+      "images": 40,
+      "annotations": 400,
+      "clips": 4,
+      "games": 2,
+      "raw_class_counts": {
+        "ball": 20,
+        "ball-in-basket": 5,
+        "number": 100,
+        "player": 240,
+        "player-in-possession": 10,
+        "player-jump-shot": 4,
+        "player-layup-dunk": 1,
+        "player-shot-block": 0,
+        "referee": 15,
+        "rim": 5
+      },
+      "merged_class_counts": {
+        "player": 255,
+        "ball": 25,
+        "referee": 15,
+        "rim": 5,
+        "number": 100
+      },
+      "clip_inventory": [
+        {
+          "clip": "alpha-beta-game-1-q1|01_00-00_55",
+          "game": "alpha-beta-game-1",
+          "frames": 12
+        },
+        {
+          "clip": "alpha-beta-game-1-q2|05_00-04_55",
+          "game": "alpha-beta-game-1",
+          "frames": 10
+        },
+        {
+          "clip": "gamma-delta-game-2-q1|02_00-01_55",
+          "game": "gamma-delta-game-2",
+          "frames": 10
+        },
+        {
+          "clip": "gamma-delta-game-2-q3|08_00-07_55",
+          "game": "gamma-delta-game-2",
+          "frames": 8
+        }
+      ],
+      "image_geometry": [
+        {
+          "width": 1920,
+          "height": 1080,
+          "images": 40
+        }
+      ]
+    },
+    {
+      "name": "valid",
+      "images": 10,
+      "annotations": 100,
+      "clips": 1,
+      "games": 1,
+      "raw_class_counts": {
+        "ball": 5,
+        "ball-in-basket": 1,
+        "number": 25,
+        "player": 60,
+        "player-in-possession": 2,
+        "player-jump-shot": 1,
+        "player-layup-dunk": 0,
+        "player-shot-block": 0,
+        "referee": 4,
+        "rim": 2
+      },
+      "merged_class_counts": {
+        "player": 63,
+        "ball": 6,
+        "referee": 4,
+        "rim": 2,
+        "number": 25
+      },
+      "clip_inventory": [
+        {
+          "clip": "alpha-beta-game-1-q4|09_00-08_55",
+          "game": "alpha-beta-game-1",
+          "frames": 10
+        }
+      ],
+      "image_geometry": [
+        {
+          "width": 1920,
+          "height": 1080,
+          "images": 10
+        }
+      ]
+    },
+    {
+      "name": "test",
+      "images": 10,
+      "annotations": 100,
+      "clips": 1,
+      "games": 1,
+      "raw_class_counts": {
+        "ball": 4,
+        "ball-in-basket": 1,
+        "number": 30,
+        "player": 55,
+        "player-in-possession": 3,
+        "player-jump-shot": 1,
+        "player-layup-dunk": 0,
+        "player-shot-block": 1,
+        "referee": 3,
+        "rim": 2
+      },
+      "merged_class_counts": {
+        "player": 60,
+        "ball": 5,
+        "referee": 3,
+        "rim": 2,
+        "number": 30
+      },
+      "clip_inventory": [
+        {
+          "clip": "gamma-delta-game-2-q4|11_44-11_36",
+          "game": "gamma-delta-game-2",
+          "frames": 10
+        }
+      ],
+      "image_geometry": [
+        {
+          "width": 1920,
+          "height": 1080,
+          "images": 10
+        }
+      ]
+    }
+  ],
+  "overlaps": [
+    {
+      "splits": [
+        "train",
+        "valid"
+      ],
+      "shared_clips": [],
+      "shared_games": [
+        "alpha-beta-game-1"
+      ]
+    },
+    {
+      "splits": [
+        "train",
+        "test"
+      ],
+      "shared_clips": [],
+      "shared_games": [
+        "gamma-delta-game-2"
+      ]
+    },
+    {
+      "splits": [
+        "valid",
+        "test"
+      ],
+      "shared_clips": [],
+      "shared_games": []
+    }
+  ]
+}
