@@ -69,7 +69,7 @@ object-detection-eval/
 ├── pyproject.toml
 │
 ├── registry/                       # model cards — version controlled, no weights
-│   ├── yolox_m_800.yaml
+│   ├── yolox_m_640.yaml
 │   ├── yolox_s_800.yaml
 │   ├── yolo26m_640.yaml            # ⚠ AGPL — see §11
 │   ├── yolo26s_640.yaml
@@ -106,7 +106,7 @@ object-detection-eval/
 │   │   │   ├── deim.py   rtdetrv2.py   damo.py   rfdetr.py
 │   │   └── vlm/                    # [vlm] extra
 │   │       ├── gemini.py  owlv2.py  grounding_dino.py
-│   │       ├── florence2.py  omdet_turbo.py  smolvlm2.py
+│   │       ├── florence2.py  omdet_turbo.py
 │   ├── metrics/
 │   │   ├── detection_map.py        # public compute_metrics() via supervision
 │   │   ├── prf1.py                 # threshold sweep, operating point
@@ -177,7 +177,7 @@ provenance:
   commit: 64c55e2
   config: benchmarks/basketball/... | docs/provenance/configs/...
   hardware: "vast.ai A100 80GB ×1"
-  command: "see docs/provenance/training-runs.md#yolox-m-800"
+  command: "see docs/provenance/training-runs.md#yolox-m-640"
 preprocessing:
   resize: letterbox
   alignment: top_left | center
@@ -188,6 +188,9 @@ preprocessing:
 
 That `preprocessing` block is the heart of the whole study — it is the thing that moved
 YOLOX-M from 30.8 to 72.3 mAP. Making it a first-class, validated field is the single
+
+> **RETIRED 2026-07-30.** The 30.8 / 48.9 'before' figures are not computed anywhere in this repo — there is no default-resize ablation arm — and the 'after' figures were mislabelled: 72.3 and 71.6 are mAP@**50:95**, not mAP@50 (the mAP@50 values are 0.934 and 0.950), and 72.3 is the @800 checkpoint, which conflates a resolution change with a preprocessing change. The claim was removed from the reports and README. Train-matched preprocessing is still the harness's design principle; only the unreproducible before/after numbers are gone.
+
 best design decision available here.
 
 **What LFS is used for:** PR-curve PNGs and gzipped result JSON only. `.gitattributes`:
@@ -323,7 +326,7 @@ project before (format-check oscillation).
 `pydantic>=2`, `hydra-core`, `loguru`, `supervision`, `pycocotools`, `matplotlib`,
 `tqdm`, `orjson`, `pyyaml`, `httpx`.
 
-**`[vlm]` extra:** `torch`, `torchvision`, `transformers>=4.49,<4.52` (SmolVLM2 pin),
+**`[vlm]` extra:** `torch`, `torchvision`, `transformers>=4.49,<4.52` (pin retained after the 2026-07-30 SmolVLM2 removal; not revalidated),
 `timm` (OmDet-Turbo backbone), `einops` (Florence-2), `peft`, `google-genai`.
 
 **`[trt]` extra:** `onnxruntime-gpu`, `tensorrt`, `onnx-graphsurgeon`. Linux-64 only.
@@ -404,6 +407,9 @@ Each phase ends at a reviewable checkpoint. Phase 3 carries the hard acceptance 
 
 **Phase 7 — Blog artifacts**
 - Figures for both posts; the preprocessing before/after table (30.8 → 72.3) as the
+
+> **RETIRED 2026-07-30.** The 30.8 / 48.9 'before' figures are not computed anywhere in this repo — there is no default-resize ablation arm — and the 'after' figures were mislabelled: 72.3 and 71.6 are mAP@**50:95**, not mAP@50 (the mAP@50 values are 0.934 and 0.950), and 72.3 is the @800 checkpoint, which conflates a resolution change with a preprocessing change. The claim was removed from the reports and README. Train-matched preprocessing is still the harness's design principle; only the unreproducible before/after numbers are gone.
+
   Post 1 lede graphic; the 7-model leaderboard with CI error bars; the zero-shot vs
   fine-tuned per-class breakdown for Post 2.
 - Cross-link the two posts to each other and to `object-detection-eval`. No links to the
@@ -477,8 +483,10 @@ repository, which is archived (§1).
 
 This post owns the methodology, so it carries the strongest material in the study:
 
-- **The preprocessing finding, as the lede.** YOLOX-M **30.8 → 72.3** and YOLO26m
-  **48.9 → 71.6** mAP purely from train-matched letterboxing. Cross-model gaps that
+- **The preprocessing finding, as the lede.** ~~YOLOX-M **30.8 → 72.3** and YOLO26m
+  **48.9 → 71.6** mAP purely from train-matched letterboxing.~~ **RETIRED
+  2026-07-30** — unreproducible from this repo and mislabelled (those are
+  mAP@50:95, and 72.3 is the @800 checkpoint). Cross-model gaps that
   looked like architecture differences were preprocessing mismatches. This is the most
   broadly applicable result in the whole body of work and it belongs up front, not in an
   appendix.

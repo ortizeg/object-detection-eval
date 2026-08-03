@@ -1,0 +1,47 @@
+{
+  "reproducibility": {
+    "status": "dedicated_instance_measured",
+    "label": "measured 2026-07-30 on a dedicated GCP T4 (sole tenant, locked clocks), TensorRT 10.3.0",
+    "measured_date": "2026-07-30",
+    "source_band_ms_2026_07_21": [
+      4.0,
+      7.1
+    ],
+    "second_run": {
+      "date": "2026-07-29",
+      "gpu": "Tesla T4 (vast.ai, SHARED instance) \u2014 SUPERSEDED",
+      "trt_version": "10.3.0",
+      "outcome": "Superseded: contention, not hardware variation."
+    }
+  },
+  "trt_version": "10.3.0",
+  "models": [
+    {
+      "name": "YOLOX-M",
+      "engine_scope": "to_boxes",
+      "median_ms": 5.6958,
+      "p99_ms": 5.85193,
+      "nms_graft": true,
+      "trt_version": "10.3.0",
+      "build_status": "ok"
+    },
+    {
+      "name": "DEIM-M",
+      "engine_scope": "to_boxes",
+      "median_ms": 6.61182,
+      "p99_ms": 7.15572,
+      "nms_graft": false,
+      "trt_version": "10.3.0",
+      "build_status": "ok"
+    },
+    {
+      "name": "RTMDet-M",
+      "engine_scope": "to_boxes",
+      "median_ms": 8.18799,
+      "p99_ms": 8.53589,
+      "nms_graft": true,
+      "trt_version": "10.3.0",
+      "build_status": "ok"
+    }
+  ]
+}

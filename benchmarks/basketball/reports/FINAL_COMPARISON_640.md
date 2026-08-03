@@ -9,41 +9,43 @@ results file and injected between `<!-- TABLE:... -->` markers; no number in any
 table is typed by hand. The methodology behind the shared protocol is documented
 in [../../../docs/methodology.md](../../../docs/methodology.md).
 
-## The finding that reorders the leaderboard: train-matched preprocessing
+## Headline result: the top three are a statistical tie, and the real choice is licensing
 
-The single most important result in this comparison is not which architecture
-wins — it is that **the preprocessing you score a model with can move its mAP by
-tens of points on identical weights.** Evaluating each detector through a
-generic, default resize instead of the exact letterbox-and-normalize pipeline it
-was *trained* with silently destroys accuracy:
+At a matched 640 input there is **no single winner at the top.** Once the test
+set's structure is accounted for (see below — the 94 images are 3 video clips),
+**YOLO26m, DEIM-M and YOLOX-M are mutually indistinguishable** on mAP@50:95.
+YOLO26m's apparent +4.4 pt lead over YOLOX-M carries a 95% CI of
+**[−0.7, +7.4] pt**, which straddles zero. All three do beat RTMDet-M,
+DAMO-YOLO-M and RT-DETRv2-M by margins that survive.
 
-- **YOLOX-M: mAP@50 30.8 → 72.3** once scored with its own top-left letterbox
-  (pad-114, BGR→RGB, /255) instead of a default square resize — a **+41.5-point**
-  swing on the same checkpoint.
-- **YOLO26m: mAP@50 48.9 → 71.6** once scored with its centered Ultralytics
-  letterbox instead of the default — a **+22.7-point** swing on the same
-  checkpoint.
+So the accuracy question does not separate the leaders. **Latency and licensing
+do**, and they point in opposite directions:
 
-Neither model was retrained to earn those points. The gain comes entirely from
-(a) feeding each model the preprocessing it expects and (b) de-transforming every
-prediction back to original-image pixels before matching against ground truth, so
-the boxes are scored in the same coordinate frame the labels live in. A benchmark
-that skips train-matched preprocessing does not measure the model — it measures a
-preprocessing mismatch, and it will rank a strong detector as a weak one. Every
-number in this report is produced with each model's train-matched pipeline; the
-per-model preprocessing table is in
-[../../../docs/methodology.md](../../../docs/methodology.md).
+| | mAP@50:95 | T4 fp16 to-boxes | Licence |
+|---|---|---|---|
+| **YOLOX-M** | 0.672 | **5.70 ms** (fastest measured) | **Apache-2.0** |
+| **YOLO26m** | 0.716 | 5.85 ms | **AGPL-3.0-only** |
+| **DEIM-M** | 0.686 | 6.61 ms | **Apache-2.0** |
 
-## Headline result: YOLOX-M and YOLO26m are joint-best (a statistical tie)
+Nothing here is both faster and more accurate than YOLOX-M or YOLO26m — those
+two are the entire Pareto frontier, and among Apache-2.0 models the frontier is
+YOLOX-M and DEIM-M.
 
-With preprocessing corrected, there is **no single winner at the top.** YOLOX-M
-(at its native 800 input) and YOLO26m (@640) are a **statistical tie** on
-mAP@50:95: the paired image-level bootstrap puts their difference at **+0.73 pt
-with a 95% CI of [−0.33, +1.90] pt — the interval straddles zero**, so the two
-are statistically indistinguishable and share the top of the leaderboard. Any
-claim of a single "best medium detector" here would over-read the data. The
-correct statement is that YOLOX-M and YOLO26m are joint-best, with DEIM-M a close
-third.
+**The practical reading:** YOLO26m has the best point estimate, but that lead is
+not statistically supported, and it is the only AGPL-3.0-only model here.
+Commercial deployment therefore needs a paid Ultralytics licence or an
+open-sourced inference stack, and Ultralytics' position is that weights
+fine-tuned with their code are derivative works — so weights trained on your own
+proprietary footage may be encumbered. (That reading is contested, and this is
+not legal advice, but it is a risk to price in.) It is not hypothetical here:
+this repo cannot redistribute the YOLO26m weights, which makes it the one row a
+reader cannot fully reproduce.
+
+**YOLOX-M gives up no measurable accuracy, is the fastest model in the roster,
+and is Apache-2.0.** On this dataset that is the defensible default. Pick
+YOLO26m if you want the best point estimate and the licence is not a constraint;
+pick DEIM-M if you want the best permissive point estimate and can afford
+~1 ms more.
 
 ### Capacity caveat (read before ranking)
 
@@ -79,11 +81,82 @@ intervals tell the honest story.
 
 ## Confidence intervals and pairwise significance
 
+### What the bootstrap actually does
+
+We have 94 test images and one score per model. The obvious worry: is YOLO26m's
+0.716 really better than DEIM-M's 0.686, or did YOLO26m just get lucky with
+*which* images landed in the test set?
+
+The bootstrap answers that by manufacturing new test sets. Draw 94 images at
+random **with replacement** from the 94 we have, score every model on that fake
+set, repeat. You get a spread of scores per model; the middle 95% of that spread
+is the confidence interval. It is a measure of how much to trust the third digit,
+nothing more.
+
+**What it is not.** Not multiple training runs, and not multiple inference runs.
+The weights are frozen and the predictions are read from disk. The *only* thing
+that varies is which images got sampled. It therefore measures **test-set
+sampling uncertainty and nothing else** — in particular it does **not** capture
+training-seed variance, which on a 465-image training set is plausibly the larger
+source of run-to-run movement and is entirely unmeasured here.
+
+**Why "paired" matters.** Inside a single replicate, every model is scored on the
+*same* resampled image list, and the difference A − B is taken within that
+replicate. When a draw happens to be easy it is easy for both models, so that
+shared "how hard was this draw" term cancels in the subtraction. The difference
+is measured far more precisely than either score alone.
+
+**Consequence, and the most common misreading:** *overlapping per-model CIs do
+not mean a tie.* Read the difference CI, never the overlap of two separate ones —
+eyeballing two independent intervals double-counts exactly the shared noise the
+pairing removes. The verdict column below is **derived from whether each pair's
+difference CI excludes zero**, not hand-authored.
+
+### ⚠️ The 94 images are 3 video clips, not 94 independent samples
+
+The table below resamples **images**, which assumes 94 independent observations.
+They are not. The test split is three short broadcast segments sampled at high
+frame rate:
+
+| Frames | Clip | Span |
+|---|---|---|
+| 33 | celtics–knicks game 4 q1 | 05:06 → 05:01 (5 s) |
+| 31 | celtics–magic game 4 q1 | 11:44 → 11:36 (8 s) |
+| 30 | celtics–knicks game 1 q1 | 07:41 → 07:34 (7 s) |
+
+Thirty frames spanning five seconds of one possession are near-duplicates — same
+players, jerseys, court, lighting, camera pose. Treating them as 30 independent
+draws is pseudo-replication, and it makes every interval below **too narrow**.
+
+Re-running the identical paired procedure while resampling **clips** instead of
+frames (`scripts/run_clustered_bootstrap.py`; with 3 clusters there are only 10
+distinct resamples, so it enumerates all of them exactly rather than sampling)
+widens the intervals **1.4×–3.9×** and collapses the adjacent-pair verdicts from
+**5 of 6 significant to 2 of 6**. Across all 21 pairs, 15 survive.
+
+What survives clustering, and what does not:
+
+- **Does not survive:** YOLO26m vs DEIM-M, DEIM-M vs YOLOX-M, YOLOX-M vs
+  RF-DETR-M, RF-DETR-M vs RTMDet-M — and the headline **YOLO26m vs YOLOX-M**
+  (+0.044, clip CI **[−0.007, +0.074]**). Which of these models wins depends on
+  which clip you look at.
+- **Does survive:** every comparison of the top three against RTMDet-M,
+  DAMO-YOLO-M and RT-DETRv2-M. Those gaps are consistent across all three clips.
+
+Treat the image-level numbers below as a **lower bound on uncertainty**, and the
+clip-level result as the honest one. The frame-level file is retained because it
+is the reproduction anchor the Phase 4 gate checks against.
+
+Two further caveats on the same table: there is **no multiple-comparison
+correction** across the 6 adjacent-pair tests (at α=0.05 across 6 tests the
+family-wise false-positive risk is ~26%), and all three test *games* also appear
+in train — different time segments, no clip overlap, so **no leakage**, but the
+result measures held-out *moments from seen games*, not held-out games. Expect
+lower numbers on genuinely new footage.
+
 95% confidence intervals from a **paired, image-level bootstrap** (n_boot=1000,
-seed=0) over the 94 test images, plus the significance verdict for each
-ranked-adjacent pair. The verdict column is **derived from whether each pair's
-bootstrap difference CI excludes zero** — it is not a hand-authored claim.
-Emitted from `results/bootstrap/bootstrap_7models.json`:
+seed=0) over the 94 test images. Emitted from
+`results/bootstrap/bootstrap_7models.json`:
 
 <!-- TABLE:ci_table START -->
 | Model | mAP@50:95 | 95% CI |
@@ -108,15 +181,38 @@ Emitted from `results/bootstrap/bootstrap_7models.json`:
 | DAMO-YOLO-M vs RT-DETRv2-M | +0.038 | [0.021, 0.053] | significant |
 <!-- TABLE:ci_table END -->
 
-Read this carefully, because it corrects an over-claim in the source report:
-**5 of the 6 adjacent pairs are statistically significant; RTMDet-M vs
-DAMO-YOLO-M is a statistical tie** (its difference CI straddles zero, point
-difference ≈ +0.009). The earlier framing — "every adjacent pair is
-significant" — was wrong: RTMDet-M and DAMO-YOLO-M are separated by less than a
-point and the bootstrap cannot distinguish them on this test set. Stating "5 of 6
-significant, with RTMDet-M/DAMO-YOLO-M tied" is the faithful reading of the data.
-(This is distinct from the top-of-leaderboard YOLOX-M/YOLO26m tie above, which is
-a separate check at YOLOX-M's native 800 input.)
+Two corrections are stacked in that table, and the second is the larger one.
+
+**First**, at image level, 5 of the 6 adjacent pairs are significant and
+**RTMDet-M vs DAMO-YOLO-M is a tie** (difference CI straddles zero, ≈ +0.009).
+The source report's "every adjacent pair is significant" was wrong.
+
+**Second, and more important: even that is too confident.** Once resampling
+respects the 3-clip structure, only **2 of the 6** adjacent pairs survive.
+Reported side by side:
+
+| Pair | Diff | image-level CI | verdict | **clip-level CI** | **verdict** |
+| --- | --- | --- | --- | --- | --- |
+| YOLO26m vs DEIM-M | +0.029 | [+0.014, +0.044] | significant | [−0.023, +0.075] | **tie** |
+| DEIM-M vs YOLOX-M | +0.015 | [+0.004, +0.025] | significant | [−0.001, +0.035] | **tie** |
+| YOLOX-M vs RF-DETR-M | +0.025 | [+0.010, +0.041] | significant | [−0.002, +0.049] | **tie** |
+| RF-DETR-M vs RTMDet-M | +0.019 | [+0.003, +0.034] | significant | [−0.012, +0.048] | **tie** |
+| RTMDet-M vs DAMO-YOLO-M | +0.009 | [−0.002, +0.020] | tie | [+0.003, +0.019] | significant |
+| DAMO-YOLO-M vs RT-DETRv2-M | +0.038 | [+0.021, +0.053] | significant | [+0.003, +0.081] | significant |
+
+(Emitted from `results/bootstrap/bootstrap_clustered_7models.json`; the
+clip-level columns are exact, not sampled.)
+
+RTMDet-M vs DAMO-YOLO-M moving the *other* way is not a paradox: its difference
+is small but highly **consistent** — DAMO-YOLO-M edges RTMDet-M in every clip —
+whereas the four pairs that collapse have differences that flip depending on
+which clip you score. Consistency is what clustering rewards, and raw magnitude
+is what it discounts.
+
+**The faithful summary of this leaderboard is therefore: YOLO26m, DEIM-M and
+YOLOX-M are mutually indistinguishable at the top; all three beat RTMDet-M,
+DAMO-YOLO-M and RT-DETRv2-M; and the ordering within each group is not
+supported by 3 clips of test data.**
 
 ## Per-class AP@50 — 5-class taxonomy (merged), test set
 
@@ -215,41 +311,66 @@ an unscorable class is never misread as a total failure. A present-but-zero clas
 
 ## §6. Latency — T4 fp16 to-boxes
 
-The published latency figure for this comparison is a **source T4, fp16,
-to-final-boxes** measurement. It is presented here with its provenance stated
-plainly, because latency — unlike accuracy — is **not reproducible from this
-repo**: it was measured by hand on a specific T4 instance and does not port
-across T4s. Emitted from `results/latency/trt_fp16_toboxes.json`:
+The published latency figure for this comparison is a **fp16, to-final-boxes**
+measurement taken on a **dedicated T4** — a sole-tenant `n1-standard-8` + 1×T4
+with persistence mode on and the SM clock locked to 1590 MHz, running TensorRT
+10.3.0 over ONNX artifacts verified md5-identical to the ones scored for
+accuracy. Emitted from `results/latency/trt_fp16_toboxes.json`:
 
 <!-- TABLE:latency_section START -->
 **Source-T4 fp16 to-boxes latency (headline band): 4.0-7.1 ms**
 
-_manually measured 2026-07-21, not reproducible from this repo_
+_measured 2026-07-30 on a dedicated GCP T4 (n1-standard-8, us-central1-a, sole tenant, persistence mode on, SM clock locked to 1590 MHz), TensorRT 10.3.0_
 
-The per-model medians below are a second-T4 cross-check (the build METHOD reproduces; absolute latency is higher and NOT portable across T4 instances) — they do not reproduce the headline band above.
+These per-model medians **are** the published measurement, taken on a sole-tenant T4 with locked clocks — not a contended instance. **4 of 7** land inside the 4.0-7.1 ms source band; RF-DETR-M, RTMDet-M, RT-DETRv2-M sit modestly above it.
+
+This supersedes the earlier shared-instance run, which read every model 17-85% slower and concluded the band was not portable across T4 instances. That conclusion was an artifact of neighbour contention: re-measuring byte-identical ONNX under the same TensorRT version on a dedicated instance recovered the band. The superseded numbers are kept in the results file under `reproducibility.second_run`.
 
 | Model | Median (ms) | P99 (ms) | NMS graft |
 | --- | --- | --- | --- |
-| YOLO26m | 12.99 | 15.02 | no |
-| DEIM-M | 43.00 | 43.11 | no |
-| YOLOX-M | 14.76 | 15.35 | yes |
-| RF-DETR-M | 9.33 | 9.67 | no |
-| RTMDet-M | 17.01 | 19.44 | yes |
-| DAMO-YOLO-M | 11.75 | 12.68 | yes |
-| RT-DETRv2-M | 9.55 | 9.69 | no |
+| YOLO26m | 5.85 | 6.00 | no |
+| DEIM-M | 6.61 | 7.16 | no |
+| YOLOX-M | 5.70 | 5.85 | yes |
+| RF-DETR-M | 7.71 | 7.91 | no |
+| RTMDet-M | 8.19 | 8.54 | yes |
+| DAMO-YOLO-M | 6.70 | 6.83 | yes |
+| RT-DETRv2-M | 7.93 | 8.10 | no |
 <!-- TABLE:latency_section END -->
 
-The **4.0–7.1 ms fp16 to-boxes band is the published headline figure**, and the
-caption carries its honest label verbatim: *manually measured 2026-07-21, not
-reproducible from this repo*. A second T4 was used to re-run the per-model
-medians shown in the table; those numbers **confirm the build method, not the
-absolute latency** — the medians are higher and are not portable across T4
-instances, so they must not be read as "reproducing" the 4.0–7.1 ms band. The
-method is reproducible; the specific milliseconds are hardware-bound. This is the
-correction Phase 6 landed (LAT-04), carried forward here rather than presenting
-the second-T4 numbers as a fresh reproduction of the source band.
+**This corrects the previous version of this report, which claimed the 4.0–7.1 ms
+band was not reproducible from this repo.** That claim came from a run on a
+*shared* vast.ai T4, where neighbour contention inflated every model — most
+visibly DEIM-M, which read **43.00 ms**. Re-measuring byte-identical ONNX under
+the **same** TensorRT 10.3.0 on a sole-tenant instance put DEIM-M at **6.61 ms**,
+against the source T4's 6.56. The variable was the tenancy, not the hardware:
+latency here is reproducible, and the earlier disclaimer was measuring a busy
+GPU rather than the models.
+
+Read the absolute numbers with the usual care. Four of the seven land inside the
+source band and three sit modestly above it (7.71–8.19 ms), so this is a
+*substantial* reproduction, not an exact one — the remaining gap is unexplained
+and is not claimed as noise. The superseded shared-instance numbers are retained
+in the results file under `reproducibility.second_run` as evidence of the
+contention effect.
+
+One gap: **RTMDet-M's on-GPU NMS delta is unavailable.** Its ungrafted graph
+cannot build under TensorRT — the mmdeploy `end2end` export decodes NMS in-graph
+behind a pre-NMS `TopK` whose K exceeds TensorRT's hard 3840 limit, which is
+precisely why `scripts/graft_efficientnms.py` strips that tail. Its grafted
+to-boxes number above is valid; only the `to_boxes − model_only` difference is
+missing. The shared-instance run failed identically here, so this is a property
+of the artifact, not of either machine.
 
 ### CPU / edge latency (LAT-05)
+
+> **⚠️ Provenance caveat.** Unlike the GPU table above, these CPU numbers were
+> **not** re-measured on a dedicated instance. They predate the 2026-07-30
+> correction and come from the same era as the GPU numbers that turned out to be
+> contention artifacts, so their *absolute* values should be treated as
+> unvalidated. The **relative** story below is more robust than the milliseconds:
+> the NMS blow-up it reports is a +46.9 ms effect concentrated in one model,
+> which contention alone is unlikely to manufacture. Read the Δ column, not the
+> absolute latencies.
 
 On a T4 the on-GPU NMS is nearly free (Phase 6), so dense-head and NMS-free
 models rank together. On **CPU** — the edge/no-accelerator regime — a dense head
@@ -283,6 +404,51 @@ pays for dropping the threshold. Emitted from
 | RT-DETRv2-M | 163.4 | 163.2 | -0.2 | DETR decode |
 | RF-DETR-M | 175.7 | 180.5 | +4.9 | DETR decode |
 <!-- TABLE:cpu_latency END -->
+
+## Takeaways
+
+**1. There is no accuracy winner — the top three are a statistical tie.**
+YOLO26m (0.716), DEIM-M (0.686) and YOLOX-M (0.672) cannot be separated once the
+test set's 3-clip structure is respected. The ranking you see is real as a point
+estimate and unsupported as a claim.
+
+**2. Speed and licence are what actually differentiate them.** YOLOX-M is the
+fastest model measured (5.70 ms fp16 to-boxes on a dedicated T4) *and*
+Apache-2.0. YOLO26m is 0.15 ms slower and AGPL-3.0-only. Nothing else in the
+roster is on the accuracy/latency frontier.
+
+**3. Why the licence is not a footnote.** AGPL-3.0-only means commercial serving
+needs a paid Ultralytics licence or an open-sourced stack; Ultralytics further
+asserts that weights fine-tuned with their code are derivative works, so models
+trained on your own proprietary footage may be encumbered. (Contested, and not
+legal advice — but a real diligence risk.) The concrete cost is already visible:
+YOLO26m is the one row here whose weights cannot be redistributed, so it is the
+one row a reader cannot fully reproduce. Apache-2.0 also carries an express
+patent grant.
+
+**4. `ball` is the only class that separates these architectures.** AP@50 spans
+**0.499 → 0.887** on `ball`, while `player` (0.955–0.987), `referee`
+(0.948–0.998) and `rim` (0.996–1.000) are effectively saturated for everyone. If
+your application does not need the ball, almost any of these models will do and
+the leaderboard is noise.
+
+**5. Benchmark on a dedicated instance, or do not report latency.** A shared
+vast.ai T4 made a 6.6 ms model look like 43.0 ms, inflated every model by
+17–85%, and **inverted the speed ranking** — it put RF-DETR-M first and YOLOX-M
+fifth, when on clean hardware YOLOX-M is first and RF-DETR-M fifth. It also
+produced a published, wrong conclusion that latency was not portable across T4s.
+Same TensorRT version, same byte-identical ONNX; the only variable was tenancy.
+
+**6. 94 images cannot resolve sub-point gaps — and they are not 94 samples.**
+The test set is 3 short clips. Report clustered intervals, or report point
+estimates without significance claims; do not present a fully-ordered
+leaderboard. Note also that training-seed variance is completely unmeasured here
+and is plausibly larger than the sampling uncertainty we do quantify.
+
+**7. Fine-tuning on 465 images beats the best zero-shot VLM by ~2.9×** (0.716 vs
+0.250 mAP@50:95, same protocol — see
+[VLM_VS_FINETUNED.md](VLM_VS_FINETUNED.md)). Zero-shot is a labelling bootstrap
+and a floor, not a deployment answer, when the classes are domain-specific.
 
 ## Reproducing every table in this report
 

@@ -35,6 +35,7 @@ _ACCURACY = _FIXTURES / "accuracy_merged5.json"
 _ACCURACY_RAW10 = _FIXTURES / "accuracy_raw10.json"
 _BOOTSTRAP = _FIXTURES / "bootstrap_7models.json"
 _LATENCY = _FIXTURES / "latency_toboxes.json"
+_LATENCY_DEDICATED = _FIXTURES / "latency_toboxes_dedicated.json"
 _CPU_LATENCY_025 = _FIXTURES / "cpu_e2e_conf025.json"
 _CPU_LATENCY_001 = _FIXTURES / "cpu_e2e_conf001.json"
 _VLM_METRICS = _FIXTURES / "vlm_metrics_merged5.json"
@@ -192,6 +193,32 @@ def test_latency_section_does_not_present_second_t4_as_reproduced() -> None:
     assert "reproduced source band" not in section.lower()
 
 
+def test_dedicated_instance_section_drops_the_non_portability_claim() -> None:
+    """A sole-tenant measurement must not carry the contended run's disclaimer.
+
+    The phrase "not portable across T4 instances" still appears, but only inside
+    the sentence that *refutes* it — so assert on the refutation and on the
+    absence of the cross-check framing, not on the raw phrase.
+    """
+    section = latency_section(load_latency_results(_LATENCY_DEDICATED))
+    assert "cross-check" not in section.lower()
+    assert "are** the published measurement" in section
+    assert "that conclusion was an artifact of neighbour contention" in section.lower()
+
+
+def test_dedicated_instance_in_band_count_is_derived_not_typed() -> None:
+    """The in-band tally must be counted from the models, so it cannot drift.
+
+    The fixture holds 3 models with two inside the 4.0-7.1 band (5.70, 6.61) and
+    one above it (8.19), so the rendered qualifier must read "2 of 3" and name
+    only the outlier.
+    """
+    section = latency_section(load_latency_results(_LATENCY_DEDICATED))
+    assert "**2 of 3**" in section
+    assert "RTMDet-M sit modestly above it" in section
+    assert "YOLOX-M sit modestly above" not in section
+
+
 # --------------------------------------------------------------------------- #
 # cpu_latency_section: joins the two conf runs, Δ column + head labels (LAT-05)
 # --------------------------------------------------------------------------- #
@@ -263,10 +290,13 @@ def test_vlm_per_class_table_surfaces_rim_and_zero_ap() -> None:
     # header: Model | player | ball | referee | rim | number
     assert cells[1] == "0.923"  # player
     assert cells[4] == "0.036"  # rim surfaced with a small nonzero value
-    # SmolVLM2 is the zero-AP floor: rim (and every class) present as 0.000.
-    smol_row = next(line for line in table.splitlines() if line.startswith("| SmolVLM2 "))
-    smol_cells = [c.strip() for c in smol_row.strip("|").split("|")]
-    assert smol_cells[4] == "0.000"
+    # Grounding-DINO is the zero-AP floor: a class the model genuinely scored
+    # 0.0 on must render "0.000", NOT the em dash reserved for an absent class.
+    gd_row = next(line for line in table.splitlines() if line.startswith("| Grounding-DINO "))
+    gd_cells = [c.strip() for c in gd_row.strip("|").split("|")]
+    assert gd_cells[4] == "0.000"  # rim
+    assert gd_cells[2] == "0.000"  # ball
+    assert gd_cells[1] == "0.849"  # player carries the score
 
 
 def test_vlm_per_class_table_absent_class_is_em_dash() -> None:

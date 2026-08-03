@@ -1,6 +1,6 @@
 # vlm_zeroshot.yaml -- VLM-01/VLM-02 zero-shot VLM run-and-reproduce manifest.
 #
-# Six zero-shot VLMs, scored over the 94-image basketball test split through
+# Five zero-shot VLMs, scored over the 94-image basketball test split through
 # the identical load_coco_gt -> predict -> remap_detections(merged5) ->
 # filters.area_outliers -> filters.single_best_per_class -> compute_metrics
 # path as the ONNX detectors in reproduction_640.yaml.
@@ -9,9 +9,8 @@
 # label id passed to remap_detections as that model's label_map). COCO/
 # VLM-prompt vocabulary ("person", "sports ball", "basketball hoop", ...) is
 # resolved into the merged5 canonical classes via merged5.yaml's `aliases`
-# block -- no code edit needed per model. Gemini and SmolVLM2 are prompted
-# directly with the canonical class names, so no alias resolution applies to
-# their rows.
+# block -- no code edit needed per model. Gemini is prompted directly with the
+# canonical class names, so no alias resolution applies to its row.
 #
 # `tolerance` (0.02 absolute mAP@50:95) is wider than the 7-detector
 # reproduction gate's 0.01 (reproduction_640.yaml) -- VLM inference is
@@ -20,10 +19,10 @@
 # beyond it is a defect to investigate (prompt/threshold/preprocessing), NOT
 # a tolerance to widen.
 #
-# `expected_map5095` is the published test mAP@50:95 for each row. `smolvlm2`
-# intentionally has NO expected value (null): it runs and emits a results
-# file, but no target is asserted (VLM-02) -- it establishes a zero-shot
-# baseline for future fine-tuning, not a reproduction target.
+# `expected_map5095` is the published test mAP@50:95 for each row. It stays
+# OPTIONAL (null is accepted, VLM-02): a row may run and emit a results file
+# without asserting a target. No current row uses that, but the capability is
+# retained for adding an exploratory model without gating the reproduction run.
 
 tolerance: 0.02
 
@@ -76,39 +75,62 @@ models:
     box_threshold: 0.01
     expected_map5095: 0.173
 
+  # PROMPT PARITY (2026-07-30): given the same domain-specific vocabulary
+  # OWLv2 already had. Previously it received a generic COCO list while Gemini
+  # got a hand-tuned prompt, so the comparison measured prompt effort as much as
+  # model capability -- the same unfairness the detector report refuses to
+  # tolerate for training recipes.
+  #
+  # text_threshold 0.01 -> 0.25 (Grounding DINO's published default). At 0.01
+  # nearly every text token activated, the returned label spanned the whole
+  # caption, and label resolution collapsed: 533 detections/image, 99.7%
+  # `person`, and the ball found ONCE in 94 images.
+  #
+  # expected_map5095 is deliberately NULL: the published 0.147 was produced by
+  # the broken configuration and is not a target worth reproducing. Restore a
+  # target only after a GPU re-run under this configuration.
   - name: grounding_dino
     inferencer: grounding_dino
     model_name: IDEA-Research/grounding-dino-base
     classes:
-      - person
-      - sports ball
+      - basketball player
+      - basketball
       - referee
       - basketball hoop
       - jersey number
     box_threshold: 0.01
-    text_threshold: 0.01
+    text_threshold: 0.25
     nms_iou_threshold: 0.5
-    expected_map5095: 0.147
+    expected_map5095: null
 
+  # TASK TOKEN FIXED (2026-07-30). This ran with `<OD>` -- Florence-2's CLOSED
+  # -vocabulary mode, which can only emit its own pretrained label set and
+  # cannot be steered by `classes` at all. The result was 923 of 924 detections
+  # labelled `person` and 0.000 AP on three of five classes: a measurement of
+  # the wrong operating mode, not of the model.
+  #
+  # `<CAPTION_TO_PHRASE_GROUNDING>` is the open-vocabulary path: it grounds the
+  # phrases in `caption`, so the class vocabulary actually reaches the model.
+  # Same domain vocabulary as OWLv2 and Grounding DINO (prompt parity).
+  #
+  # expected_map5095 NULL for the same reason as grounding_dino: 0.104 came from
+  # the wrong mode. Restore a target after a GPU re-run.
   - name: florence2
     inferencer: florence2
     model_name: microsoft/Florence-2-large-ft
     classes:
-      - person
-      - sports ball
+      - basketball player
+      - basketball
       - referee
       - basketball hoop
       - jersey number
-    task: "<OD>"
-    expected_map5095: 0.104
-
-  - name: smolvlm2
-    inferencer: smolvlm2
-    model_name: HuggingFaceTB/SmolVLM2-2.2B-Instruct
-    classes:
-      - player
-      - ball
-      - referee
-      - rim
-      - number
+    task: "<CAPTION_TO_PHRASE_GROUNDING>"
+    caption: "basketball player. basketball. referee. basketball hoop. jersey number."
     expected_map5095: null
+
+# SmolVLM2 was removed 2026-07-30. It has no bounding-box grounding head: it was
+# prompted for JSON boxes, emitted 1176 detections across the 94 test images all
+# labelled `player`, and scored 0.000 AP on every class — the boxes did not land
+# on the objects. Reporting it alongside five open-vocabulary DETECTORS invited
+# the reading that a detector had been benchmarked and failed, which is not what
+# happened. It also carried no reproduction target, so it gated nothing.

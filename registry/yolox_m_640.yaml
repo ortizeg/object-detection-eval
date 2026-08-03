@@ -1,19 +1,19 @@
-name: yolox-m-800
+name: yolox-m-640
 version: 1.0.0
 task: detection
 architecture: yolox-m
-description: YOLOX-M anchor-free detector fine-tuned on the basketball dataset at
-  an 800x800 input resolution. Reused from an earlier training run (not part of the
-  @640 final-comparison retrain batch); its harness test-set score came from correcting
-  the preprocessing (top-left pad-114 letterbox, BGR, no normalization) to match training,
-  which alone moved its mAP@50:95 from 30.8 to 72.3.
+description: YOLOX-M anchor-free detector fine-tuned on the basketball dataset at a
+  640x640 input resolution. This is the checkpoint every published YOLOX-M number in
+  the final @640 comparison is produced from, and the fastest model in that roster
+  on a dedicated T4 (5.70 ms fp16 to-boxes), while carrying a permissive Apache-2.0
+  licence.
 license: Apache-2.0
 training_dataset: basketball-player-detection-3
 num_parameters: 25300000
 inputs:
   channels: 3
-  height: 800
-  width: 800
+  height: 640
+  width: 640
   dtype: float32
   mean:
   - 0.0
@@ -30,16 +30,16 @@ preprocessing:
   normalize: none
   channel_order: BGR
 weights:
-  url: https://huggingface.co/ortizeg/basketball-yolox-m-800/resolve/main/yolox_m_basketball_800.onnx
-  sha256: 60e72a5920308c55ccbf6413a598bc45225ca162674b30f74dd7eb5d311331e2
-  size_bytes: 101261586
+  url: https://huggingface.co/ortizeg/basketball-yolox-m-640/resolve/main/yolox_m_basketball_640.onnx
+  sha256: 5f2f05c6890f513a06e6c94154363b351c1eefde0c57b2c9b16c2d48557d5c77
+  size_bytes: 101223226
   weight_format: onnx
 provenance:
   source_repo: https://github.com/ortizeg/YOLOX
   commit: null
   config: null
   hardware: null
-  command: see docs/provenance/training-runs.md#yolox-m-800
+  command: see docs/provenance/training-runs.md#yolox-m-640
 reproduction: null
 redistributable: true
 evaluations:
@@ -48,6 +48,8 @@ evaluations:
   metrics:
     map5095_5c: 0.672
     map50_5c: 0.934
+    map5095_10c: 0.580
+    map50_10c: 0.789
   hardware: null
 tags:
 - yolox

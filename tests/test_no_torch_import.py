@@ -1,6 +1,6 @@
 """CORE-08: the entire core import graph must stay torch-free.
 
-Torch belongs to the ``[vlm]`` optional extra (SmolVLM2, OmDet-Turbo,
+Torch belongs to the ``[vlm]`` optional extra (OmDet-Turbo,
 Florence-2). This walks every core submodule -- schemas, utils, data,
 metrics, inference (including all 7 detectors), and the bare
 ``inference.vlm`` package marker -- and asserts torch never enters

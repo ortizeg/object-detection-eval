@@ -160,6 +160,28 @@ def latency_section(result: LatencyResult) -> str:
             "portable across T4 instances) — they do not reproduce the headline band above."
         )
         lines.append("")
+    elif repro.status == "dedicated_instance_measured":
+        # Counted from the data, never hand-typed, so the qualifier cannot drift
+        # from the table beneath it.
+        in_band = [m for m in result.models if low <= m.median_ms <= high]
+        above = [m.name for m in result.models if m.median_ms > high]
+        lines.append(
+            f"These per-model medians **are** the published measurement, taken on a "
+            f"sole-tenant T4 with locked clocks — not a contended instance. "
+            f"**{len(in_band)} of {len(result.models)}** land inside the "
+            f"{low:.1f}-{high:.1f} ms source band"
+            + (f"; {', '.join(above)} sit modestly above it." if above else ".")
+        )
+        lines.append("")
+        lines.append(
+            "This supersedes the earlier shared-instance run, which read every model "
+            "17-85% slower and concluded the band was not portable across T4 "
+            "instances. That conclusion was an artifact of neighbour contention: "
+            "re-measuring byte-identical ONNX under the same TensorRT version on a "
+            "dedicated instance recovered the band. The superseded numbers are kept "
+            "in the results file under `reproducibility.second_run`."
+        )
+        lines.append("")
 
     table = _table(
         ["Model", "Median (ms)", "P99 (ms)", "NMS graft"],

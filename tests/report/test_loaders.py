@@ -109,7 +109,7 @@ def test_cpu_latency_loader_suspect_defaults_false(tmp_path: Path) -> None:
 def test_load_vlm_metrics_reads_committed_file_keyed_by_class_name() -> None:
     # No ground truth is touched: the loader reads only the committed file.
     by_model = load_vlm_metrics(_VLM_METRICS)
-    assert set(by_model) == {"Gemini", "SmolVLM2"}
+    assert set(by_model) == {"Gemini", "Grounding-DINO"}
     gemini = by_model["Gemini"]
     assert gemini["mAP_50_95"] == pytest.approx(0.2497350424528122)
     per_class = gemini["per_class_ap50"]
@@ -121,9 +121,9 @@ def test_load_vlm_metrics_reads_committed_file_keyed_by_class_name() -> None:
 def test_load_vlm_metrics_zero_ap_classes_present_as_zero() -> None:
     by_model = load_vlm_metrics(_VLM_METRICS)
     # The rim collapse / zero-AP classes are present as 0.0, not absent.
-    smolvlm2 = by_model["SmolVLM2"]["per_class_ap50"]
-    assert smolvlm2["rim"] == pytest.approx(0.0)
-    assert smolvlm2["player"] == pytest.approx(0.0)
+    grounding_dino = by_model["Grounding-DINO"]["per_class_ap50"]
+    assert grounding_dino["rim"] == pytest.approx(0.0)
+    assert grounding_dino["ball"] == pytest.approx(0.0)
 
 
 def test_load_vlm_metrics_rejects_unexpected_key(tmp_path: Path) -> None:

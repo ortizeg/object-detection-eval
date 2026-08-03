@@ -5,16 +5,22 @@
 Reproducible evaluation harness for object detection networks on small datasets.
 
 One evaluation protocol, applied to **fine-tuned detectors and zero-shot VLMs
-alike**, built around one finding: **most cross-model accuracy gaps in casual
-comparisons are preprocessing mismatches, not architecture differences.**
+alike**. Each model is evaluated with the letterbox, normalization and channel
+order it was *trained* with, and every prediction is de-transformed back to
+original-image pixels through one tested inverse before scoring — so a
+cross-model gap is a difference between models, not between plumbing. The
+harness is validated against a COCO reference run (YOLOX-S on val2017 scores
+39.6 here vs 40.5 published — the known `supervision`-vs-`pycocotools` gap), so
+the scorer is not the source of the differences it reports.
 
-Each model is evaluated with the preprocessing it was *trained* with, and every
-prediction is de-transformed back to original-image pixels through one tested
-inverse before scoring. Applying that correction moved YOLOX-M from 30.8 to 72.3
-mAP and YOLO26m from 48.9 to 71.6 — on identical weights. The harness is
-validated against a COCO reference run (YOLOX-S on val2017 scores 39.6 here vs
-40.5 published — the known `supervision`-vs-`pycocotools` gap), so those swings
-are attributable to preprocessing rather than to the scorer.
+Two findings the numbers here are built around:
+
+- **The leaderboard does not separate at the top.** YOLO26m, DEIM-M and YOLOX-M
+  are statistically indistinguishable on this test set. What separates them is
+  latency and licensing, not accuracy.
+- **The 94 test images are 3 video clips.** Resampling images instead of clips
+  makes every confidence interval too narrow; correcting it drops the
+  significant adjacent pairs from 5 of 6 to 2 of 6.
 
 ## Results
 
@@ -26,7 +32,7 @@ and drift-checked in CI, so nothing below is hand-typed:
   — 7 fine-tuned medium detectors @640, with paired-bootstrap 95% CIs (5 of 6
   adjacent pairs significant; RTMDet-M vs DAMO-YOLO-M a tie) and to-boxes latency.
 - **[benchmarks/basketball/reports/VLM_VS_FINETUNED.md](benchmarks/basketball/reports/VLM_VS_FINETUNED.md)**
-  — 6 zero-shot VLMs against the same protocol, with the per-class failure
+  — 5 zero-shot VLMs against the same protocol, with the per-class failure
   analysis (the `rim` collapse; zero-AP `ball`/`referee` for the weaker methods).
 
 The methodology behind the protocol — train-matched preprocessing, detector/VLM

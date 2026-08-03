@@ -1,0 +1,280 @@
+{
+  "config": {
+    "resampling_unit": "clip",
+    "method": "exact complete enumeration of all distinct cluster resamples",
+    "n_distinct_resamples": 10,
+    "n_images": 94,
+    "n_clusters": 3,
+    "cluster_sizes": [
+      30,
+      33,
+      31
+    ],
+    "models": [
+      "YOLO26m",
+      "DEIM-M",
+      "YOLOX-M",
+      "RF-DETR-M",
+      "RTMDet-M",
+      "DAMO-YOLO-M",
+      "RT-DETRv2-M"
+    ],
+    "note": "Clip-clustered paired bootstrap. The published bootstrap_7models.json resamples IMAGES, which treats 94 correlated frames from 3 short clips as independent observations and yields intervals that are too narrow. This file resamples clips."
+  },
+  "per_model": {
+    "YOLO26m": {
+      "mAP_50_95": {
+        "point_estimate": 0.7155253887176514,
+        "bootstrap_mean": 0.7162640425893996,
+        "bootstrap_std": 0.00941048787065819,
+        "ci_2.5": 0.7024564936757087,
+        "ci_97.5": 0.7367991775274276
+      }
+    },
+    "DEIM-M": {
+      "mAP_50_95": {
+        "point_estimate": 0.6863120794296265,
+        "bootstrap_mean": 0.6883180715419626,
+        "bootstrap_std": 0.026892850500420114,
+        "ci_2.5": 0.6281688421964645,
+        "ci_97.5": 0.7364893212914467
+      }
+    },
+    "YOLOX-M": {
+      "mAP_50_95": {
+        "point_estimate": 0.671764075756073,
+        "bootstrap_mean": 0.6726789077123004,
+        "bootstrap_std": 0.022134304266442407,
+        "ci_2.5": 0.6292287737131119,
+        "ci_97.5": 0.7209888756275177
+      }
+    },
+    "RF-DETR-M": {
+      "mAP_50_95": {
+        "point_estimate": 0.6464692950248718,
+        "bootstrap_mean": 0.6482342614067925,
+        "bootstrap_std": 0.03382513081432222,
+        "ci_2.5": 0.5803200677037239,
+        "ci_97.5": 0.7232995711266994
+      }
+    },
+    "RTMDet-M": {
+      "mAP_50_95": {
+        "point_estimate": 0.627628743648529,
+        "bootstrap_mean": 0.6295174625184801,
+        "bootstrap_std": 0.020366703277230967,
+        "ci_2.5": 0.592645513266325,
+        "ci_97.5": 0.6756459698081017
+      }
+    },
+    "DAMO-YOLO-M": {
+      "mAP_50_95": {
+        "point_estimate": 0.619206428527832,
+        "bootstrap_mean": 0.6212708530602631,
+        "bootstrap_std": 0.023159470039870587,
+        "ci_2.5": 0.5739363722503186,
+        "ci_97.5": 0.6716151118278503
+      }
+    },
+    "RT-DETRv2-M": {
+      "mAP_50_95": {
+        "point_estimate": 0.5813877582550049,
+        "bootstrap_mean": 0.584583251564591,
+        "bootstrap_std": 0.042428482638739065,
+        "ci_2.5": 0.49404588490724566,
+        "ci_97.5": 0.6556009739637375
+      }
+    }
+  },
+  "pairwise": {
+    "YOLO26m minus DEIM-M": {
+      "mAP_50_95": {
+        "point_diff": 0.029213309288024902,
+        "mean_diff": 0.027945971047436746,
+        "ci_2.5": -0.022519376873970032,
+        "ci_97.5": 0.0751666873693466,
+        "ci_excludes_zero": false
+      }
+    },
+    "YOLO26m minus YOLOX-M": {
+      "mAP_50_95": {
+        "point_diff": 0.04376131296157837,
+        "mean_diff": 0.04358513487709893,
+        "ci_2.5": -0.007018931210041045,
+        "ci_97.5": 0.07410675585269928,
+        "ci_excludes_zero": false
+      }
+    },
+    "YOLO26m minus RF-DETR-M": {
+      "mAP_50_95": {
+        "point_diff": 0.06905609369277954,
+        "mean_diff": 0.06802978118260701,
+        "ci_2.5": -0.009329626709222792,
+        "ci_97.5": 0.12301546186208724,
+        "ci_excludes_zero": false
+      }
+    },
+    "YOLO26m minus RTMDet-M": {
+      "mAP_50_95": {
+        "point_diff": 0.08789664506912231,
+        "mean_diff": 0.08674658007091945,
+        "ci_2.5": 0.03825253397226334,
+        "ci_97.5": 0.11129128932952881,
+        "ci_excludes_zero": true
+      }
+    },
+    "YOLO26m minus DAMO-YOLO-M": {
+      "mAP_50_95": {
+        "point_diff": 0.09631896018981934,
+        "mean_diff": 0.09499318952913637,
+        "ci_2.5": 0.042354832589626315,
+        "ci_97.5": 0.12939915731549262,
+        "ci_excludes_zero": true
+      }
+    },
+    "YOLO26m minus RT-DETRv2-M": {
+      "mAP_50_95": {
+        "point_diff": 0.13413763046264648,
+        "mean_diff": 0.13168079102480854,
+        "ci_2.5": 0.05836897045373917,
+        "ci_97.5": 0.2092896446585655,
+        "ci_excludes_zero": true
+      }
+    },
+    "DEIM-M minus YOLOX-M": {
+      "mAP_50_95": {
+        "point_diff": 0.014548003673553467,
+        "mean_diff": 0.01563916382966218,
+        "ci_2.5": -0.0011883713304996488,
+        "ci_97.5": 0.0351641297340393,
+        "ci_excludes_zero": false
+      }
+    },
+    "DEIM-M minus RF-DETR-M": {
+      "mAP_50_95": {
+        "point_diff": 0.03984278440475464,
+        "mean_diff": 0.04008381013517027,
+        "ci_2.5": 0.013063787668943406,
+        "ci_97.5": 0.05814802646636962,
+        "ci_excludes_zero": true
+      }
+    },
+    "DEIM-M minus RTMDet-M": {
+      "mAP_50_95": {
+        "point_diff": 0.05868333578109741,
+        "mean_diff": 0.05880060902348271,
+        "ci_2.5": 0.035208605229854584,
+        "ci_97.5": 0.07828770279884338,
+        "ci_excludes_zero": true
+      }
+    },
+    "DEIM-M minus DAMO-YOLO-M": {
+      "mAP_50_95": {
+        "point_diff": 0.06710565090179443,
+        "mean_diff": 0.06704721848169962,
+        "ci_2.5": 0.05403906181454658,
+        "ci_97.5": 0.08134324923157692,
+        "ci_excludes_zero": true
+      }
+    },
+    "DEIM-M minus RT-DETRv2-M": {
+      "mAP_50_95": {
+        "point_diff": 0.10492432117462158,
+        "mean_diff": 0.10373481997737176,
+        "ci_2.5": 0.08088834732770919,
+        "ci_97.5": 0.13495036587119102,
+        "ci_excludes_zero": true
+      }
+    },
+    "YOLOX-M minus RF-DETR-M": {
+      "mAP_50_95": {
+        "point_diff": 0.025294780731201172,
+        "mean_diff": 0.02444464630550808,
+        "ci_2.5": -0.002310695499181747,
+        "ci_97.5": 0.048908706009387966,
+        "ci_excludes_zero": false
+      }
+    },
+    "YOLOX-M minus RTMDet-M": {
+      "mAP_50_95": {
+        "point_diff": 0.044135332107543945,
+        "mean_diff": 0.04316144519382053,
+        "ci_2.5": 0.03639697656035423,
+        "ci_97.5": 0.04593324661254883,
+        "ci_excludes_zero": true
+      }
+    },
+    "YOLOX-M minus DAMO-YOLO-M": {
+      "mAP_50_95": {
+        "point_diff": 0.05255764722824097,
+        "mean_diff": 0.05140805465203743,
+        "ci_2.5": 0.046437923610210416,
+        "ci_97.5": 0.05529240146279336,
+        "ci_excludes_zero": true
+      }
+    },
+    "YOLOX-M minus RT-DETRv2-M": {
+      "mAP_50_95": {
+        "point_diff": 0.09037631750106812,
+        "mean_diff": 0.08809565614770959,
+        "ci_2.5": 0.04873908013105392,
+        "ci_97.5": 0.13613873720169067,
+        "ci_excludes_zero": true
+      }
+    },
+    "RF-DETR-M minus RTMDet-M": {
+      "mAP_50_95": {
+        "point_diff": 0.018840551376342773,
+        "mean_diff": 0.018716798888312444,
+        "ci_2.5": -0.01232544556260109,
+        "ci_97.5": 0.047653601318597784,
+        "ci_excludes_zero": false
+      }
+    },
+    "RF-DETR-M minus DAMO-YOLO-M": {
+      "mAP_50_95": {
+        "point_diff": 0.027262866497039795,
+        "mean_diff": 0.02696340834652936,
+        "ci_2.5": 0.00638369545340538,
+        "ci_97.5": 0.0516844592988491,
+        "ci_excludes_zero": true
+      }
+    },
+    "RF-DETR-M minus RT-DETRv2-M": {
+      "mAP_50_95": {
+        "point_diff": 0.06508153676986694,
+        "mean_diff": 0.06365100984220151,
+        "ci_2.5": 0.02657252624630928,
+        "ci_97.5": 0.08838999271392822,
+        "ci_excludes_zero": true
+      }
+    },
+    "RTMDet-M minus DAMO-YOLO-M": {
+      "mAP_50_95": {
+        "point_diff": 0.008422315120697021,
+        "mean_diff": 0.008246609458216914,
+        "ci_2.5": 0.003083370625972748,
+        "ci_97.5": 0.018830456584691995,
+        "ci_excludes_zero": true
+      }
+    },
+    "RTMDet-M minus RT-DETRv2-M": {
+      "mAP_50_95": {
+        "point_diff": 0.04624098539352417,
+        "mean_diff": 0.044934210953889074,
+        "ci_2.5": 0.005615507066249847,
+        "ci_97.5": 0.09974176064133643,
+        "ci_excludes_zero": true
+      }
+    },
+    "DAMO-YOLO-M minus RT-DETRv2-M": {
+      "mAP_50_95": {
+        "point_diff": 0.03781867027282715,
+        "mean_diff": 0.036687601495672156,
+        "ci_2.5": 0.002559960633516312,
+        "ci_97.5": 0.08091130405664443,
+        "ci_excludes_zero": true
+      }
+    }
+  }
+}
