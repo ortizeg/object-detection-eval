@@ -11,11 +11,16 @@ results file and injected between stable ``<!-- TABLE:name ... -->`` markers.
   unified diff and exiting nonzero on any drift — the CI anti-drift gate that
   makes "no published number can drift from its data" enforceable.
 
-The generator is torch-free and never touches ground truth: it only reads
-committed JSON results files. The VLM tables read a precomputed metrics file
-(``results/vlm/vlm_metrics_merged5.json``, produced offline by
-``scripts/write_vlm_metrics.py``), so ``--check`` runs where the raw dataset is
-absent (the CI machine).
+The generator is torch-free and never touches ground truth or the raw dataset:
+it only reads committed JSON results files. Two of those files are precomputed
+offline for exactly that reason — ``results/vlm/vlm_metrics_merged5.json`` (from
+``scripts/write_vlm_metrics.py``) and ``results/dataset/dataset_stats.json``
+(from ``scripts/write_dataset_stats.py``) — so ``--check`` runs where the raw
+dataset is absent (the CI machine).
+
+The registry spans both the benchmark reports under ``report_dir`` and the
+dataset page under ``docs_dir``: a document belongs here whenever it publishes
+numbers, wherever it happens to live.
 """
 
 from __future__ import annotations
@@ -30,26 +35,37 @@ from pathlib import Path
 from loguru import logger
 
 from object_detection_eval.report import (
+    DatasetStats,
     ci_table,
+    class_count_table,
+    clip_inventory_table,
+    clip_structure_note,
     cpu_latency_section,
+    dataset_split_table,
+    image_geometry_note,
     inject_table,
     latency_section,
     load_accuracy_results,
     load_bootstrap_report,
     load_cpu_latency_results,
+    load_dataset_stats,
     load_latency_results,
     load_vlm_metrics,
     per_class_table,
     primary_7model_table,
+    split_overlap_table,
+    taxonomy_alias_table,
+    taxonomy_merge_table,
     vlm_per_class_table,
     vlm_summary_table,
 )
-from object_detection_eval.schemas.taxonomy import load_taxonomy_spec
+from object_detection_eval.schemas.taxonomy import TaxonomySpec, load_taxonomy_spec
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 _DEFAULT_RESULTS_DIR = _REPO_ROOT / "benchmarks" / "basketball" / "results"
 _DEFAULT_REPORT_DIR = _REPO_ROOT / "benchmarks" / "basketball" / "reports"
 _DEFAULT_TAXONOMY_DIR = _REPO_ROOT / "benchmarks" / "basketball" / "conf" / "taxonomy"
+_DEFAULT_DOCS_DIR = _REPO_ROOT / "docs"
 
 #: Injected in place of the CPU-latency table while the two measured CPU results
 #: files are not yet committed. The section renders GT-free from committed JSON
@@ -141,13 +157,20 @@ def build_registry(
     results_dir: Path,
     report_dir: Path,
     taxonomy_dir: Path = _DEFAULT_TAXONOMY_DIR,
+    docs_dir: Path = _DEFAULT_DOCS_DIR,
 ) -> list[ReportSpec]:
     """Build the declarative report registry: report id -> doc + table slots.
 
     Each slot's ``render`` thunk lazily loads its results file(s) only when the
     report is actually rendered, so building the registry is cheap and does not
-    require every results file to exist. No slot touches ground truth: the VLM
-    tables read the precomputed ``vlm_metrics_merged5.json`` results file.
+    require every results file to exist. No slot touches ground truth or the raw
+    dataset: the VLM tables read the precomputed ``vlm_metrics_merged5.json``,
+    and the dataset tables read the precomputed ``dataset_stats.json``.
+
+    Not every registered document lives under ``report_dir``: the dataset page
+    is prose in ``docs/`` that happens to own generated tables, so it takes its
+    path from ``docs_dir``. Being in the registry is what puts it behind the
+    same ``--check`` drift gate as the two benchmark reports.
     """
     acc_merged5 = results_dir / "accuracy" / "reproduction_640_merged5.json"
     acc_raw10 = results_dir / "accuracy" / "reproduction_640_raw10.json"
@@ -156,6 +179,7 @@ def build_registry(
     cpu_latency_conf025 = results_dir / "latency" / "cpu_e2e_conf025.json"
     cpu_latency_conf001 = results_dir / "latency" / "cpu_e2e_conf001.json"
     vlm_metrics_path = results_dir / "vlm" / "vlm_metrics_merged5.json"
+    dataset_stats_path = results_dir / "dataset" / "dataset_stats.json"
 
     # Load the precomputed VLM metrics once per render and share them across the
     # summary + per-class slots. Lazy: only evaluated if the VLM report is
@@ -213,7 +237,37 @@ def build_registry(
         ],
     )
 
-    return [final_comparison, vlm_vs_finetuned]
+    # Loaded once per render and shared across the dataset page's nine slots.
+    dataset_cache: list[DatasetStats] = []
+
+    def dataset_stats() -> DatasetStats:
+        if not dataset_cache:
+            dataset_cache.append(load_dataset_stats(dataset_stats_path))
+        return dataset_cache[0]
+
+    def merged5() -> TaxonomySpec:
+        return load_taxonomy_spec(taxonomy_dir / "merged5.yaml")
+
+    def raw10() -> TaxonomySpec:
+        return load_taxonomy_spec(taxonomy_dir / "raw10.yaml")
+
+    dataset = ReportSpec(
+        report_id="dataset",
+        md_path=docs_dir / "dataset.md",
+        slots=[
+            Slot("dataset_splits", lambda: dataset_split_table(dataset_stats())),
+            Slot("image_geometry", lambda: image_geometry_note(dataset_stats())),
+            Slot("clip_structure", lambda: clip_structure_note(dataset_stats())),
+            Slot("clip_inventory", lambda: clip_inventory_table(dataset_stats())),
+            Slot("split_overlap", lambda: split_overlap_table(dataset_stats())),
+            Slot("class_counts_raw10", lambda: class_count_table(dataset_stats(), "raw")),
+            Slot("class_counts_merged5", lambda: class_count_table(dataset_stats(), "merged")),
+            Slot("taxonomy_merge", lambda: taxonomy_merge_table(merged5(), raw10())),
+            Slot("taxonomy_aliases", lambda: taxonomy_alias_table(merged5())),
+        ],
+    )
+
+    return [final_comparison, vlm_vs_finetuned, dataset]
 
 
 def _run(specs: list[ReportSpec], *, check: bool, write: bool) -> int:
@@ -236,6 +290,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--results-dir", type=Path, default=_DEFAULT_RESULTS_DIR)
     parser.add_argument("--report-dir", type=Path, default=_DEFAULT_REPORT_DIR)
     parser.add_argument("--taxonomy-dir", type=Path, default=_DEFAULT_TAXONOMY_DIR)
+    parser.add_argument("--docs-dir", type=Path, default=_DEFAULT_DOCS_DIR)
     parser.add_argument(
         "--report",
         default=None,
@@ -246,7 +301,7 @@ def main(argv: list[str] | None = None) -> int:
     mode.add_argument("--write", action="store_true", help="Regenerate reports in place.")
     args = parser.parse_args(argv)
 
-    specs = build_registry(args.results_dir, args.report_dir, args.taxonomy_dir)
+    specs = build_registry(args.results_dir, args.report_dir, args.taxonomy_dir, args.docs_dir)
     if args.report is not None:
         specs = [s for s in specs if s.report_id == args.report]
         if not specs:

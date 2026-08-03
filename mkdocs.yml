@@ -53,6 +53,7 @@ markdown_extensions:
 
 nav:
   - Home: index.md
+  - Dataset: dataset.md
   - Reports:
       - Fine-tuned comparison (@640): reports/FINAL_COMPARISON_640.md
       - Zero-shot VLM vs fine-tuned: reports/VLM_VS_FINETUNED.md
