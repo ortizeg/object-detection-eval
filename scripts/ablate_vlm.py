@@ -438,6 +438,10 @@ def build_inferencer(arm: Arm, *, raw_mode: bool) -> Any:
             classes=arm.classes,
             task=arm.task or "<CAPTION_TO_PHRASE_GROUNDING>",
             caption=". ".join(arm.classes) + ".",
+            # In raw mode the cache must be un-suppressed so the replay can
+            # sweep; the arm's own value only applies to the live path --verify
+            # compares against.
+            nms_iou_threshold=None if raw_mode else arm.nms_iou_threshold,
         )
     if arm.inferencer == "yolo_world":
         from object_detection_eval.inference.vlm.yolo_world import YOLOWorldInferencer

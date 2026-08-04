@@ -160,6 +160,35 @@ elements:
     applies_to: [yolo_world]
     values: [yolov8l-worldv2.pt, yolov8m-worldv2.pt, yolov8s-worldv2.pt]
 
+  # ELEMENT 4b -- the vocabulary re-search the checkpoint element owes.
+  #
+  # Florence-2's published vocabulary (c5_bare_canonical) won its six-candidate
+  # search AS THE -ft CHECKPOINT. Adopting `-large` on that checkpoint's
+  # vocabulary would hand the new weights a prompt chosen for different ones,
+  # which is precisely the unequal-effort problem vlm_prompt_search.yaml exists
+  # to prevent — so the winning checkpoint faces the same six candidates the
+  # old one did, verbatim from that manifest.
+  #
+  # This is the only element that pins a second field (`fixed`), and it has to:
+  # a vocabulary arm on the OLD checkpoint would answer a question already
+  # asked and answered. The one-change-per-arm test accounts for `fixed`
+  # explicitly rather than being weakened to let it through.
+  - name: vocabulary_on_new_checkpoint
+    knob: classes
+    applies_to: [florence2]
+    fixed:
+      model_name: microsoft/Florence-2-large
+    values:
+      - [person, sports ball, referee, basketball hoop, jersey number]
+      - [basketball player, basketball, referee, basketball hoop, jersey number]
+      - [basketball player in a team uniform, basketball, referee in a striped shirt,
+         basketball hoop, jersey number]
+      - [basketball player, orange basketball, referee, basketball hoop and backboard,
+         jersey number on a uniform]
+      - [basketball player in a team uniform, orange basketball, referee in a striped shirt,
+         basketball hoop and backboard, jersey number on a uniform]
+      - [player, ball, referee, rim, number]
+
   # ELEMENT 5 -- ultralytics' detection cap. YOLO-World-only, and worth an arm
   # because at box_threshold 0.01 this model can hit 300 boxes on an image, at
   # which point the cap and not the model decides what is reported.

@@ -160,6 +160,7 @@ def _florence2_factory(entry: ManifestEntry) -> BaseInferencer:
         model_name=entry.model_name,
         classes=entry.classes,
         task=entry.task or "<OD>",
+        nms_iou_threshold=entry.nms_iou_threshold,
         **({"caption": entry.caption} if entry.caption else {}),
     )
 

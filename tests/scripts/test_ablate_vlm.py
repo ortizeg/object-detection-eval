@@ -99,16 +99,22 @@ def test_cli_refuses_the_test_split(sut: types.ModuleType, monkeypatch: Any) -> 
 # ---------------------------------------------------------------------------
 
 
-def test_every_generated_arm_differs_from_its_baseline_in_one_field(manifest: Any) -> None:
+def test_every_generated_arm_changes_only_what_its_element_declares(manifest: Any) -> None:
     """The method's central claim, checked against the committed manifest.
 
     An arm that changed two things at once would attribute the combined delta to
     whichever element it was filed under, which is precisely the confound the
     one-at-a-time protocol exists to avoid.
+
+    An element may pin extra fields via ``fixed`` — the vocabulary re-search a
+    winning checkpoint owes cannot be run on the old checkpoint. That is allowed
+    and counted, not waved through: an arm must differ in its knob plus exactly
+    the pinned fields, so an accidental second change still fails here.
     """
     bookkeeping = {"id", "model", "element", "baseline"}
     arms = manifest.expand()
     baselines = {a.model: a for a in arms if a.element == "baseline"}
+    elements = {e.name: e for e in manifest.elements}
 
     for arm in arms:
         if arm.element == "baseline" or arm.baseline is None:
@@ -119,7 +125,29 @@ def test_every_generated_arm_differs_from_its_baseline_in_one_field(manifest: An
             for field in type(arm).model_fields
             if field not in bookkeeping and getattr(arm, field) != getattr(base, field)
         }
-        assert len(differing) == 1, f"{arm.id} changes {sorted(differing)}, not one field"
+        element = elements[arm.element]
+        allowed = {element.knob} | set(element.fixed)
+        assert differing <= allowed, (
+            f"{arm.id} changes {sorted(differing - allowed)}, which element "
+            f"{arm.element!r} does not declare"
+        )
+        # Non-empty rather than "varies its own knob": one candidate in the
+        # checkpoint re-search is the baseline's own vocabulary, so that arm
+        # measures the pinned checkpoint alone. That is a real cell of the grid
+        # — equal effort means all six candidates, the incumbent included — not
+        # an arm that forgot to change anything.
+        assert differing, f"{arm.id} is identical to its baseline"
+
+
+def test_only_the_checkpoint_re_search_pins_a_second_field(manifest: Any) -> None:
+    """`fixed` is an escape hatch; it should stay rare enough to name.
+
+    Every extra pinned field is one more thing a delta could be caused by, so
+    the committed manifest is expected to use it only where a knob is genuinely
+    meaningless without another change.
+    """
+    pinned = {e.name for e in manifest.elements if e.fixed}
+    assert pinned <= {"vocabulary_on_new_checkpoint"}
 
 
 def test_every_model_gets_exactly_one_baseline_arm(manifest: Any) -> None:
