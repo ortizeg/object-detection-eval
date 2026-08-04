@@ -125,6 +125,45 @@ rank is 0.167, so 83% of images yield no correct rim box at all, at any
 confidence. Relaxing the cap moves `rim` from 0.001 to 0.012 and no further. The
 ball was hidden by our filter; the rim genuinely is not being detected.
 
+### What was tuned, and what was not
+
+The zero-shot rows have had prompt effort equalised and three harness defects
+repaired. That is **not** the same as having maximised each model, and this
+report does not claim it. Stated plainly so the comparison can be read for what
+it is:
+
+**Searched, on val, equally across models**
+
+| Knob | How |
+| --- | --- |
+| Class vocabulary | 6 shared candidates × 5 models = 30 measurements |
+| Singleton `top_k` (ball/rim) | 6 values × 5 models, chosen jointly |
+| `box_threshold` | Fixed at **0.01** for every model — and the same value the fine-tuned detectors use (`reproduction_640.yaml`) |
+| `area_outliers` (5% of image) | Validated, not assumed: **no** ground-truth box in either split exceeds 5% — the largest object in the dataset is a player at 3.3%, so this filter cannot discard a true positive |
+
+**Not searched — known gaps**
+
+| Gap | Why it matters |
+| --- | --- |
+| **NMS IoU is not equalised** | OWLv2 uses 0.3, Grounding-DINO and YOLO-World 0.5; OmDet-Turbo and Florence-2 expose no such control. This is the same species of unequal tuning the vocabulary search exists to eliminate, one layer down. |
+| **Checkpoint size/variant** | Each model runs one checkpoint, never compared against its siblings. Florence-2 in particular: an incidental val measurement put the **base** checkpoint ~0.03 above the `-ft` one published here. Untested, and larger than anything the prompt search bought. |
+| **Input resolution / tiling** | Untested. The only lever that plausibly targets `rim`, `ball` and `number` together, all of which are small and all of which score near zero. |
+| **Gemini's prompt** | Hand-written with per-class definitions and count constraints; excluded from the search because it is a billed API. It keeps an advantage no open-weights row has. |
+
+**One protocol asymmetry, disclosed.** The zero-shot rows pass through two
+filters the fine-tuned detectors do not — `area_outliers` and
+`single_best_per_class`. The ground truth, taxonomy, de-transform, scorer and
+confidence threshold are identical, but post-processing is not. The net effect
+cuts both ways: the area filter *removes* junk boxes a trained detector would
+never emit, while the singleton cap *constrains* the zero-shot rows.
+
+**Does any of this threaten the conclusion?** No, and the margin is why. The best
+zero-shot model (0.250) sits **2.5× below the lowest-ranked fine-tuned detector**
+(0.619). The largest single improvement produced by all of the tuning above was
+**+0.013 mAP**. Closing the gap would take roughly **28 more wins of that size**.
+The remaining knobs are worth closing for fairness, not because they could change
+the answer.
+
 ## The zero-shot ceiling
 
 Six zero-shot VLMs, scored on the merged-5 test split. The table is recomputed
