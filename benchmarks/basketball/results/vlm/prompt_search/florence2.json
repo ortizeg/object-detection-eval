@@ -1,0 +1,122 @@
+{
+  "model": "florence2",
+  "split": "valid",
+  "budget_per_model": 6,
+  "best_candidate": "c5_bare_canonical",
+  "results": [
+    {
+      "candidate": "c0_coco_control",
+      "classes": [
+        "person",
+        "sports ball",
+        "referee",
+        "basketball hoop",
+        "jersey number"
+      ],
+      "mAP_50_95": 0.11022496223449707,
+      "mAP_50": 0.15435071289539337,
+      "per_class_ap50": {
+        "player": 0.30931422114372253,
+        "ball": 0.19280178844928741,
+        "referee": 0.2620457410812378,
+        "rim": 0.0,
+        "number": 0.007591830566525459
+      }
+    },
+    {
+      "candidate": "c1_domain",
+      "classes": [
+        "basketball player",
+        "basketball",
+        "referee",
+        "basketball hoop",
+        "jersey number"
+      ],
+      "mAP_50_95": 0.11055435985326767,
+      "mAP_50": 0.1684342622756958,
+      "per_class_ap50": {
+        "player": 0.31683167815208435,
+        "ball": 0.36413639783859253,
+        "referee": 0.15469062328338623,
+        "rim": 0.00028698521782644093,
+        "number": 0.006225622724741697
+      }
+    },
+    {
+      "candidate": "c2_contrastive",
+      "classes": [
+        "basketball player in a team uniform",
+        "basketball",
+        "referee in a striped shirt",
+        "basketball hoop",
+        "jersey number"
+      ],
+      "mAP_50_95": 0.019406462088227272,
+      "mAP_50": 0.07923006266355515,
+      "per_class_ap50": {
+        "player": 0.0,
+        "ball": 0.39217492938041687,
+        "referee": 0.0,
+        "rim": 0.0,
+        "number": 0.003975397441536188
+      }
+    },
+    {
+      "candidate": "c3_small_object",
+      "classes": [
+        "basketball player",
+        "orange basketball",
+        "referee",
+        "basketball hoop and backboard",
+        "jersey number on a uniform"
+      ],
+      "mAP_50_95": 0.09432046860456467,
+      "mAP_50": 0.15193264186382294,
+      "per_class_ap50": {
+        "player": 0.2574257552623749,
+        "ball": 0.2703792154788971,
+        "referee": 0.2318582534790039,
+        "rim": 0.0,
+        "number": 0.0
+      }
+    },
+    {
+      "candidate": "c4_contrastive_small_object",
+      "classes": [
+        "basketball player in a team uniform",
+        "orange basketball",
+        "referee in a striped shirt",
+        "basketball hoop and backboard",
+        "jersey number on a uniform"
+      ],
+      "mAP_50_95": 0.013275504112243652,
+      "mAP_50": 0.05455229803919792,
+      "per_class_ap50": {
+        "player": 0.0,
+        "ball": 0.2727614939212799,
+        "referee": 0.0,
+        "rim": 0.0,
+        "number": 0.0
+      }
+    },
+    {
+      "candidate": "c5_bare_canonical",
+      "classes": [
+        "player",
+        "ball",
+        "referee",
+        "rim",
+        "number"
+      ],
+      "mAP_50_95": 0.12513266503810883,
+      "mAP_50": 0.17581459879875183,
+      "per_class_ap50": {
+        "player": 0.33638614416122437,
+        "ball": 0.2555122375488281,
+        "referee": 0.22883494198322296,
+        "rim": 0.0,
+        "number": 0.0583396814763546
+      }
+    }
+  ]
+}

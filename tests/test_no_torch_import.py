@@ -36,6 +36,13 @@ def test_core_import_graph_is_torch_free() -> None:
     import object_detection_eval.inference.postprocess
     import object_detection_eval.inference.preprocess
     import object_detection_eval.inference.vlm  # bare marker; VLM-04
+    import object_detection_eval.inference.vlm.filters
+
+    # Shared zero-shot scoring path. Torch-free by construction: it takes an
+    # already-built inferencer and never imports one. Guarded here because that
+    # property is the whole reason it can be imported by both the benchmark
+    # runner and the prompt-search harness.
+    import object_detection_eval.inference.vlm.protocol
     import object_detection_eval.metrics.bootstrap
     import object_detection_eval.metrics.curves
     import object_detection_eval.metrics.detection_map

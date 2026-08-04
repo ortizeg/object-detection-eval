@@ -40,17 +40,30 @@ _MANIFEST_PATH = (
     Path(__file__).resolve().parents[2] / "benchmarks" / "basketball" / "conf" / "vlm_zeroshot.yaml"
 )
 
-_EXPECTED_NAMES = ["gemini", "owlv2", "omdet_turbo", "grounding_dino", "florence2"]
-#: Rows whose published target is still valid. grounding_dino and florence2 are
-#: absent ON PURPOSE: their 2026-07-30 configuration fixes (label-collapse
-#: threshold, and <OD> -> <CAPTION_TO_PHRASE_GROUNDING>) invalidated the numbers
-#: those rows used to reproduce, and new targets need a GPU re-run.
+_EXPECTED_NAMES = [
+    "gemini",
+    "owlv2",
+    "omdet_turbo",
+    "grounding_dino",
+    "florence2",
+    "yolo_world",
+]
+#: Every row now carries a target. grounding_dino, florence2, omdet_turbo and
+#: yolo_world were re-measured on CUDA (RTX A4000) on 2026-08-01 under the
+#: repaired harness and the search-selected prompts; gemini and owlv2 keep the
+#: targets they already reproduced.
 _EXPECTED_TARGETS = {
     "gemini": 0.265,
-    "owlv2": 0.247,
-    "omdet_turbo": 0.173,
+    "owlv2": 0.246,
+    "omdet_turbo": 0.180,
+    "grounding_dino": 0.234,
+    "florence2": 0.108,
+    "yolo_world": 0.145,
 }
-_UNTARGETED = {"grounding_dino", "florence2"}
+#: No row runs untargeted. Kept as an explicit empty set rather than deleting
+#: the test: a row silently losing its target is exactly the drift worth
+#: catching, and an empty expectation still fails loudly if one appears.
+_UNTARGETED: set[str] = set()
 
 
 def _load_run_vlm_benchmark_module() -> types.ModuleType:
@@ -75,13 +88,13 @@ run_vlm_benchmark = _load_run_vlm_benchmark_module()
 # ---------------------------------------------------------------------------
 
 
-def test_manifest_has_six_models_in_documented_order() -> None:
+def test_manifest_lists_every_model_in_documented_order() -> None:
     manifest = run_vlm_benchmark.load_manifest(_MANIFEST_PATH)
 
     assert [m.name for m in manifest.models] == _EXPECTED_NAMES
 
 
-def test_manifest_five_models_carry_published_targets() -> None:
+def test_manifest_targeted_rows_carry_their_published_targets() -> None:
     manifest = run_vlm_benchmark.load_manifest(_MANIFEST_PATH)
 
     targeted = {
@@ -91,7 +104,12 @@ def test_manifest_five_models_carry_published_targets() -> None:
 
 
 def test_manifest_untargeted_rows_are_exactly_the_reconfigured_ones() -> None:
-    """Only rows whose config changed may run untargeted -- nothing else drifts."""
+    """Only rows whose config changed may run untargeted -- nothing else drifts.
+
+    A row loses its target when its PROMPT changes, not only when its harness
+    is repaired: a target measured under a different vocabulary describes a
+    different configuration, so reproducing it would assert the wrong thing.
+    """
     manifest = run_vlm_benchmark.load_manifest(_MANIFEST_PATH)
 
     assert [m.name for m in manifest.models] == _EXPECTED_NAMES
