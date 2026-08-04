@@ -104,12 +104,16 @@ def test_check_fails_on_hand_edited_cell(tmp_path: Path) -> None:
 
 
 def test_main_skips_report_without_document(tmp_path: Path) -> None:
-    # Real results dir, but a fresh (empty) report dir: every registered report
-    # has no .md yet, so main skips them all and exits 0.
+    # Real results dir, but fresh (empty) report AND docs dirs: every registered
+    # report has no .md yet, so main skips them all and exits 0. Both dirs are
+    # redirected so the assertion stays about skipping, not about whether the
+    # committed documents happen to be in sync.
     exit_code = generate_report.main(
         [
             "--check",
             "--report-dir",
+            str(tmp_path),
+            "--docs-dir",
             str(tmp_path),
         ]
     )
@@ -118,9 +122,34 @@ def test_main_skips_report_without_document(tmp_path: Path) -> None:
 
 def test_main_unknown_report_id_errors(tmp_path: Path) -> None:
     exit_code = generate_report.main(
-        ["--check", "--report", "does_not_exist", "--report-dir", str(tmp_path)]
+        [
+            "--check",
+            "--report",
+            "does_not_exist",
+            "--report-dir",
+            str(tmp_path),
+            "--docs-dir",
+            str(tmp_path),
+        ]
     )
     assert exit_code == 2
+
+
+def test_dataset_page_is_registered_and_reads_only_committed_json(tmp_path: Path) -> None:
+    """The dataset page must be in the registry, and must not need the dataset.
+
+    The raw dataset is absent on the CI machine, so a dataset slot that reached
+    for it would make the whole drift gate unrunnable there. Rendering it here —
+    in a suite that has no dataset — is what proves it does not.
+    """
+    specs = generate_report.build_registry(
+        _REPO_ROOT / "benchmarks" / "basketball" / "results",
+        tmp_path,
+    )
+    dataset = next(s for s in specs if s.report_id == "dataset")
+    assert dataset.md_path == _REPO_ROOT / "docs" / "dataset.md"
+    for slot in dataset.slots:
+        assert slot.render()  # renders from committed JSON alone
 
 
 _CPU_FIXTURE_DIR = _REPO_ROOT / "tests" / "report" / "fixtures"
@@ -163,7 +192,11 @@ def test_cpu_latency_section_skips_gracefully_when_results_absent(
 
 
 def test_committed_reports_are_not_drifted() -> None:
-    """Dormant REPORT-01 CI gate: enforced once the Wave-2 reports exist."""
+    """The live REPORT-01 CI gate, covering every registered document.
+
+    Registry-driven rather than an explicit list, so a newly registered
+    document (e.g. the dataset page) is covered the moment it is added.
+    """
     report_dir = _REPO_ROOT / "benchmarks" / "basketball" / "reports"
     specs = generate_report.build_registry(
         _REPO_ROOT / "benchmarks" / "basketball" / "results",

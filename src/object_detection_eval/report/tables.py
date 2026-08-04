@@ -18,6 +18,7 @@ from object_detection_eval.report.loaders import (
     BootstrapReport,
     CpuLatencyModelEntry,
     CpuLatencyResult,
+    DatasetStats,
     LatencyResult,
 )
 from object_detection_eval.schemas.taxonomy import TaxonomySpec
@@ -258,6 +259,246 @@ def cpu_latency_section(conf025: CpuLatencyResult, conf001: CpuLatencyResult) ->
         "head",
     ]
     return _table(header, rows)
+
+
+# --------------------------------------------------------------------------- #
+# Dataset (docs/dataset.md): rendered from the committed dataset_stats.json
+# --------------------------------------------------------------------------- #
+
+
+def _fmt_int(value: int) -> str:
+    """Format a count with thousands separators (e.g. 13,485)."""
+    return f"{value:,}"
+
+
+def dataset_split_table(stats: DatasetStats) -> str:
+    """Render per-split image / clip / annotation counts, plus a totals row.
+
+    ``Clips`` sits next to ``Images`` deliberately. The two differ by more than
+    an order of magnitude, and reading them side by side is the fastest way to
+    see why the reports resample clips rather than images.
+    """
+    header = ["Split", "Images", "Clips", "Games", "Annotations", "Ann/image", "Frames/clip"]
+    rows = [
+        [
+            split.name,
+            _fmt_int(split.images),
+            _fmt_int(split.clips),
+            _fmt_int(split.games),
+            _fmt_int(split.annotations),
+            f"{split.annotations / split.images:.1f}",
+            f"{split.images / split.clips:.1f}",
+        ]
+        for split in stats.splits
+    ]
+    totals = stats.totals
+    rows.append(
+        [
+            "**all**",
+            f"**{_fmt_int(totals.images)}**",
+            f"**{_fmt_int(totals.clips)}**",
+            f"**{_fmt_int(totals.games)}**",
+            f"**{_fmt_int(totals.annotations)}**",
+            f"**{totals.annotations / totals.images:.1f}**",
+            f"**{totals.images / totals.clips:.1f}**",
+        ]
+    )
+    return _table(header, rows)
+
+
+def image_geometry_note(stats: DatasetStats) -> str:
+    """State the image resolution(s) present, derived from the counts.
+
+    Single-resolution and mixed-resolution datasets read differently, and which
+    one this is affects how letterboxing is interpreted — so the sentence is
+    selected by the data rather than hard-coded to the uniform case.
+    """
+    # The RUF001 suppressions below are for U+00D7 MULTIPLICATION SIGN, which is
+    # correct typography for a resolution in prose a human reads -- not a
+    # confusable typo for the letter x. Suppressed here rather than project-wide
+    # so the rule keeps working everywhere else.
+    geometry = stats.image_geometry
+    if len(geometry) == 1:
+        only = geometry[0]
+        return (
+            f"All **{_fmt_int(only.images)}** images are "
+            f"**{only.width}×{only.height}** "  # noqa: RUF001
+            f"(16:9). Every model therefore sees the same source geometry, and any "
+            f"letterboxing or square-resize is applied identically across the set."
+        )
+    parts = ", ".join(
+        f"{g.width}×{g.height} ({_fmt_int(g.images)} images)"  # noqa: RUF001
+        for g in geometry
+    )
+    return f"The images are **not** a single resolution: {parts}."
+
+
+def class_count_table(stats: DatasetStats, level: str = "raw") -> str:
+    """Render per-class annotation counts per split at one taxonomy level.
+
+    Args:
+        stats: The loaded dataset statistics.
+        level: ``"raw"`` for the 10 annotated categories, ``"merged"`` for the
+            5 evaluated classes.
+
+    The final column is each class's **share of the test split**, because the
+    imbalance is what makes the reports' ``ball`` and ``rim`` AP columns noisy —
+    a share renders that immediately, where four raw counts do not.
+
+    Raises:
+        ValueError: ``level`` is neither ``"raw"`` nor ``"merged"``.
+    """
+    if level == "raw":
+        classes, attr = stats.raw_classes, "raw_class_counts"
+    elif level == "merged":
+        classes, attr = stats.merged_classes, "merged_class_counts"
+    else:
+        msg = f"level must be 'raw' or 'merged', got {level!r}"
+        raise ValueError(msg)
+
+    counts = {split.name: getattr(split, attr) for split in stats.splits}
+    test_total = sum(counts["test"].values()) if "test" in counts else 0
+
+    header = ["Class", *counts, "total", "% of test"]
+    rows = []
+    for cls in classes:
+        per_split = [counts[name].get(cls, 0) for name in counts]
+        total = sum(per_split)
+        test_count = counts.get("test", {}).get(cls, 0)
+        share = f"{100.0 * test_count / test_total:.1f}%" if test_total else _EM_DASH
+        rows.append([cls, *(_fmt_int(n) for n in per_split), _fmt_int(total), share])
+    return _table(header, rows)
+
+
+def taxonomy_merge_table(merged: TaxonomySpec, raw: TaxonomySpec) -> str:
+    """Render how the raw annotated categories collapse into the eval classes.
+
+    A canonical class always absorbs itself, plus whatever ``merge`` lists for
+    it. Classes that pass through untouched are shown as such rather than
+    omitted, so the table accounts for every raw category.
+
+    Raises:
+        ValueError: some raw category is not covered by the merged taxonomy —
+            it would then be silently unscored, and the table would imply a
+            completeness it does not have.
+    """
+    header = ["Eval class", "Absorbs (annotated categories)", "Collapsed from"]
+    rows = []
+    covered: set[str] = set()
+    for cls in merged.classes:
+        sources = [cls, *merged.merge.get(cls, [])]
+        covered.update(sources)
+        rows.append([cls, ", ".join(f"`{s}`" for s in sources), str(len(sources))])
+
+    missing = [c for c in raw.classes if c not in covered]
+    if missing:
+        msg = f"{merged.name} does not cover {raw.name} categories: {missing}"
+        raise ValueError(msg)
+    return _table(header, rows)
+
+
+def taxonomy_alias_table(spec: TaxonomySpec) -> str:
+    """Render the prompt-vocabulary aliases, which are NOT dataset categories.
+
+    These exist so an open-vocabulary VLM prompted with ``"basketball hoop"``
+    scores against ``rim``. Nothing in the dataset is annotated with these
+    names — they never contribute a single annotation to any count on this
+    page.
+    """
+    header = ["Prompt string", "Scores as"]
+    rows = [[f"`{alias}`", canonical] for alias, canonical in spec.aliases.items()]
+    return _table(header, rows)
+
+
+def clip_inventory_table(stats: DatasetStats) -> str:
+    """Render every source clip, its split, its game, and its frame count.
+
+    The full inventory rather than a summary: 21 rows is small enough to print,
+    and printing it is what lets a reader confirm the split structure instead of
+    taking the summary counts on trust.
+    """
+    header = ["Split", "Game", "Quarter + span", "Frames"]
+    rows = []
+    for split in stats.splits:
+        for entry in split.clip_inventory:
+            segment = entry.clip.removeprefix(f"{entry.game}-").replace("|", " ")
+            rows.append([split.name, entry.game, f"`{segment}`", _fmt_int(entry.frames)])
+    return _table(header, rows)
+
+
+def clip_structure_note(stats: DatasetStats) -> str:
+    """State the image-vs-clip gap as numbers, derived from the inventory.
+
+    The interpretation lives in the page's prose; this renders only the figures
+    that interpretation rests on, so the prose can never quote a stale count.
+    """
+    totals = stats.totals
+    by_name = {split.name: split for split in stats.splits}
+    test = by_name.get("test")
+    lines = [
+        f"**{_fmt_int(totals.images)} images, but only {_fmt_int(totals.clips)} clips** — a mean "
+        f"of **{totals.images / totals.clips:.1f} frames per clip**, drawn from "
+        f"**{_fmt_int(totals.games)}** games."
+    ]
+    if test is not None:
+        lines.append(
+            f"The test split is **{_fmt_int(test.images)} images from "
+            f"{_fmt_int(test.clips)} clips** "
+            f"({', '.join(str(c.frames) for c in test.clip_inventory)} frames), so its "
+            f"number of independent observations is nearer **{_fmt_int(test.clips)}** "
+            f"than {_fmt_int(test.images)}."
+        )
+    return "\n\n".join(lines)
+
+
+def split_overlap_table(stats: DatasetStats) -> str:
+    """Render pairwise split overlap at clip AND game granularity, with a verdict.
+
+    Both verdicts are DERIVED from the counts (the ``ci_table`` precedent):
+    "clip-disjoint" is emitted because zero pairs share a clip, not because a
+    sentence says so. If a clip ever did leak across splits, this table would
+    say so on the next regeneration without anyone editing prose.
+    """
+    header = ["Split pair", "Shared clips", "Shared games"]
+    rows = []
+    leaking = 0
+    for overlap in stats.overlaps:
+        a, b = overlap.splits
+        n_clips = len(overlap.shared_clips)
+        if n_clips:
+            leaking += 1
+        shared = ", ".join(f"`{c}`" for c in overlap.shared_clips) if n_clips else "0"
+        rows.append([f"{a} vs {b}", shared, str(len(overlap.shared_games))])
+    table = _table(header, rows)
+
+    n_pairs = len(stats.overlaps)
+    if leaking:
+        clip_verdict = (
+            f"**{leaking} of {n_pairs} split pairs share at least one clip** — frames of "
+            f"the same clip appear on both sides of a split boundary. That is leakage."
+        )
+    else:
+        clip_verdict = (
+            f"**No clip is shared by any of the {n_pairs} split pairs.** No frame of a "
+            f"training clip appears in validation or test: the splits are clip-disjoint, "
+            f"so there is no clip-level leakage."
+        )
+
+    game_counts = [len(o.shared_games) for o in stats.overlaps]
+    low, high = min(game_counts, default=0), max(game_counts, default=0)
+    if low == high:
+        game_verdict = (
+            f"But every pair of splits draws from the **same {low}** games "
+            f"(of {stats.totals.games} in the dataset), so the splits are clip-disjoint "
+            f"and game-correlated at the same time."
+        )
+    else:
+        game_verdict = (
+            f"Split pairs share between **{low}** and **{high}** games "
+            f"(of {stats.totals.games} in the dataset), so clip-disjointness does not "
+            f"make them independent."
+        )
+    return f"{table}\n\n{clip_verdict} {game_verdict}"
 
 
 def vlm_summary_table(metrics_by_model: Mapping[str, Mapping[str, Any]]) -> str:

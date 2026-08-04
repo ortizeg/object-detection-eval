@@ -37,7 +37,9 @@ and drift-checked in CI, so nothing below is hand-typed:
 
 The methodology behind the protocol — train-matched preprocessing, detector/VLM
 parity, the single de-transform, and the 94-image statistical limitation — is in
-[docs/methodology.md](docs/methodology.md).
+[docs/methodology.md](docs/methodology.md). What the dataset actually contains,
+and why 654 images from 21 video clips is a smaller sample than it looks, is in
+[docs/dataset.md](docs/dataset.md).
 
 ## Design
 
@@ -115,6 +117,7 @@ pixi run quality      # lint + format-check + typecheck + test
 | `src/object_detection_eval/` | The harness: inference, metrics, latency, reporting |
 | `registry/` | Model cards — one YAML per evaluated model, no binaries |
 | `benchmarks/basketball/` | The study: configs, reports, results |
+| `docs/dataset.md` | What the dataset contains, and its two sampling caveats |
 | `docs/provenance/` | How each evaluated model was actually trained |
 | `docs/methodology.md` | The evaluation protocol and its statistical caveats |
 | `scripts/` | Benchmark, bootstrap, latency, and report drivers |
@@ -126,4 +129,5 @@ Apache-2.0. Evaluated model weights carry their own licenses — see each
 here; those cards carry reproduction instructions instead.
 
 The basketball dataset is CC BY 4.0, from
-[ego-playground/basketball-player-detection-3](https://universe.roboflow.com/ego-playground/basketball-player-detection-3-ycjdo-lacpg).
+[ego-playground/basketball-player-detection-3](https://universe.roboflow.com/ego-playground/basketball-player-detection-3-ycjdo-lacpg)
+— see [docs/dataset.md](docs/dataset.md) for the full breakdown.

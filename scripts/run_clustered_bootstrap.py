@@ -36,7 +36,6 @@ from __future__ import annotations
 import argparse
 import gzip
 import json
-import re
 import shutil
 import tempfile
 from collections import Counter, defaultdict
@@ -52,6 +51,7 @@ from loguru import logger
 from numpy.typing import NDArray
 from pydantic import BaseModel
 
+from object_detection_eval.data.clips import clip_key
 from object_detection_eval.data.coco_gt import load_coco_gt
 from object_detection_eval.data.taxonomy import resolve_taxonomy
 from object_detection_eval.metrics.bootstrap import (
@@ -67,11 +67,6 @@ _DEFAULT_MANIFEST = Path("benchmarks/basketball/conf/reproduction_640.yaml")
 _DEFAULT_OUT = Path("benchmarks/basketball/results/bootstrap/bootstrap_clustered_7models.json")
 _METRIC = "mAP_50_95"
 
-#: `<teams>-game-N-qM-<start>-<end>-<frame>_png.rf.<hash>.jpg` -> clip key
-#: `<teams>-game-N-qM|<start>-<end>`. The frame index is dropped; everything
-#: before it identifies the contiguous source segment.
-_CLIP_RE = re.compile(r"^(?P<game>.*?-game-\d+-q\d+)-(?P<span>[\d_]+-[\d_]+)-\d+$")
-
 
 class ManifestEntry(BaseModel):
     name: str
@@ -82,21 +77,6 @@ class ManifestEntry(BaseModel):
 
 class Manifest(BaseModel):
     models: list[ManifestEntry]
-
-
-def clip_key(filename: str) -> str:
-    """Map a test image filename to its source-clip identifier.
-
-    A filename that does not match the known Roboflow naming pattern becomes its
-    own singleton cluster rather than being silently merged into another — an
-    unparsed name must never widen a cluster it does not belong to.
-    """
-    base = filename.split("_png.rf.")[0]
-    match = _CLIP_RE.match(base)
-    if match is None:
-        logger.warning(f"unparsed filename, treating as its own cluster: {filename}")
-        return f"__singleton__{filename}"
-    return f"{match.group('game')}|{match.group('span')}"
 
 
 def build_clusters(filenames: list[str]) -> list[NDArray[np.intp]]:

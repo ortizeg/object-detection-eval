@@ -242,8 +242,12 @@ coordinate frame for all models.
 ### The 94-image statistical limitation
 
 The test split is **94 images**. That is small, and single-number rankings on 94
-images are noisier than the three-decimal mAP values suggest. Two consequences
-shape how the results are read:
+images are noisier than the three-decimal mAP values suggest — and smaller still
+than the image count implies, because those 94 images are **3 video clips**
+rather than 94 independent samples. [`dataset.md`](dataset.md) documents that
+structure, the clip-clustered bootstrap it forces, and the class imbalance
+behind the noisy `ball`/`rim` columns. Two consequences shape how the results
+are read:
 
 1. **Paired image-level bootstrap CIs are the primary evidence, not point
    estimates.** Rankings are reported with 95% confidence intervals resampled at

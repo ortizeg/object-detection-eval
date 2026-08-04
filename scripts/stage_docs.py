@@ -42,6 +42,7 @@ _PLAN: list[_Copy] = [
                 "reports/VLM_VS_FINETUNED.md",
             ),
             ("docs/methodology.md", "methodology.md"),
+            ("docs/dataset.md", "dataset.md"),
         ],
     ),
     (
@@ -57,6 +58,20 @@ _PLAN: list[_Copy] = [
     (
         DOCS / "methodology.md",
         "methodology.md",
+        [
+            (
+                "../benchmarks/basketball/reports/FINAL_COMPARISON_640.md",
+                "reports/FINAL_COMPARISON_640.md",
+            ),
+            (
+                "../benchmarks/basketball/reports/VLM_VS_FINETUNED.md",
+                "reports/VLM_VS_FINETUNED.md",
+            ),
+        ],
+    ),
+    (
+        DOCS / "dataset.md",
+        "dataset.md",
         [
             (
                 "../benchmarks/basketball/reports/FINAL_COMPARISON_640.md",
