@@ -114,7 +114,20 @@ def test_every_generated_arm_changes_only_what_its_element_declares(manifest: An
     bookkeeping = {"id", "model", "element", "baseline"}
     arms = manifest.expand()
     baselines = {a.model: a for a in arms if a.element == "baseline"}
-    elements = {e.name: e for e in manifest.elements}
+
+    def declaration(name: str, model: str) -> Any:
+        """The element declaration governing this arm.
+
+        Keyed by (name, model), not name alone: several elements are declared
+        once per model — `checkpoint` because each model has different siblings,
+        `combined` because each model adopted a different set. Looking up by name
+        would silently pick whichever was declared last and check every model's
+        arms against another model's rules.
+        """
+        for element in manifest.elements:
+            if element.name == name and (not element.applies_to or model in element.applies_to):
+                return element
+        raise AssertionError(f"no element {name!r} applies to {model!r}")
 
     for arm in arms:
         if arm.element == "baseline" or arm.baseline is None:
@@ -125,7 +138,7 @@ def test_every_generated_arm_changes_only_what_its_element_declares(manifest: An
             for field in type(arm).model_fields
             if field not in bookkeeping and getattr(arm, field) != getattr(base, field)
         }
-        element = elements[arm.element]
+        element = declaration(arm.element, arm.model)
         allowed = {element.knob} | set(element.fixed)
         assert differing <= allowed, (
             f"{arm.id} changes {sorted(differing - allowed)}, which element "
@@ -149,7 +162,7 @@ def test_only_the_checkpoint_re_search_pins_a_second_field(manifest: Any) -> Non
     several accepted things at once and check they compose.
     """
     pinned = {e.name for e in manifest.elements if e.fixed}
-    assert pinned <= {"vocabulary_on_new_checkpoint", "combined"}
+    assert pinned <= {"vocabulary_on_new_checkpoint", "combined", "nms_on_tiles"}
 
 
 def test_every_model_gets_exactly_one_baseline_arm(manifest: Any) -> None:

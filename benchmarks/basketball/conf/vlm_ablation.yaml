@@ -299,3 +299,100 @@ elements:
     applies_to: [yolo_world, grounding_dino, florence2, omdet_turbo, owlv2]
     values:
       - [3, 3]
+
+  # ELEMENT 9b -- NMS IoU RE-SWEPT ON TOP OF TILING.
+  #
+  # This element exists because the first combination arm failed, and failed
+  # informatively. OWLv2 adopted NMS IoU 1.0 — no suppression at all — because
+  # that is what won on the untiled model. Stacked with 2x2 tiling it scored
+  # 0.2424 against 0.2831 for tiling alone: worse than either change by itself.
+  #
+  # The cause is not subtle once seen. Tiling runs the model on five overlapping
+  # crops, so a player near a seam is detected several times over. "Suppress
+  # nothing" is a reasonable setting when each object is seen once and NMS is
+  # mostly deleting genuinely distinct overlapping players; it is a bad one when
+  # the pipeline itself manufactures duplicates. The knob was chosen against a
+  # baseline that stopped existing the moment tiling was adopted, which is
+  # exactly the failure the combination arms are there to catch.
+  #
+  # So it is re-swept inside the new regime, for every model that adopted tiling,
+  # at zero forward-pass cost: NMS is post-processing and the tiled caches
+  # already exist.
+  - name: nms_on_tiles
+    knob: nms_iou_threshold
+    applies_to: [owlv2, grounding_dino, omdet_turbo]
+    fixed:
+      tiles: [2, 2]
+    values: [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+
+  # Florence-2 has no NMS at all, so for it this is "does the pipeline's own
+  # duplicate-manufacturing finally make suppression worth adding?" — the same
+  # question florence2_nms asked untiled and answered with exactly +0.0000.
+  - name: nms_on_tiles
+    knob: nms_iou_threshold
+    applies_to: [florence2]
+    fixed:
+      tiles: [2, 2]
+    values: [0.3, 0.5, 0.7, 0.9]
+
+  # ELEMENT 10 -- every element that cleared the 0.002 noise floor for a model,
+  # applied together.
+  #
+  # Rule 3 of the adoption protocol, and the reason it exists: a single-element
+  # delta is measured against a baseline that STOPS EXISTING the moment another
+  # element is accepted, so the deltas cannot be added. Two changes that each
+  # recover the same missing detections compose to far less than their sum;
+  # tiling and a per-class vocabulary both act on `ball` and `number`, so this is
+  # a live risk here rather than a theoretical one.
+  #
+  # Expressed with `fixed` so the one-change-per-arm test counts every field
+  # these arms touch instead of being weakened to let them through.
+  #
+  # YOLO-World's stack deliberately EXCLUDES tiling: 2x2 cost it 0.0529, the
+  # worst result in the sweep. It is the one model with a native resolution
+  # knob, and raising `imgsz` does for it what tiling does for the others.
+  # OWLv2's stack takes the NMS the RE-SWEEP chose (0.5), not the 1.0 that won
+  # untiled. Inheriting 1.0 is what made the first attempt score below tiling
+  # alone.
+  - name: combined
+    knob: tiles
+    applies_to: [owlv2]
+    fixed:
+      classes: [basketball player, basketball, referee, rim, number]
+      nms_iou_threshold: 0.5
+    values:
+      - [2, 2]
+
+  - name: combined
+    knob: tiles
+    applies_to: [grounding_dino]
+    fixed:
+      nms_iou_threshold: 0.7
+    values:
+      - [2, 2]
+
+  - name: combined
+    knob: tiles
+    applies_to: [omdet_turbo]
+    fixed:
+      classes: [basketball player, basketball, referee, rim, number]
+    values:
+      - [2, 2]
+
+  - name: combined
+    knob: tiles
+    applies_to: [florence2]
+    fixed:
+      model_name: microsoft/Florence-2-large
+    values:
+      - [2, 2]
+
+  - name: combined
+    knob: imgsz
+    applies_to: [yolo_world]
+    fixed:
+      classes: [person, basketball, referee, basketball hoop, jersey number on a uniform]
+      box_threshold: 0.001
+      nms_iou_threshold: 0.8
+    values:
+      - 1280
