@@ -207,6 +207,14 @@ score against `player`. **Nothing in the dataset is annotated with any of these
 names** — they contribute zero annotations to every count on this page, and they
 appear only in the VLM prompt vocabulary.
 
+The list is longer than the class count because it also holds the phrasings the
+prompt search explores — descriptive alternatives like `"referee in a striped
+shirt"` for the hardest semantic split in this taxonomy. Registering them is not
+optional: an unaliased phrase is dropped silently at remap time, so a model
+prompted with it scores as though it detected nothing at all, which is
+indistinguishable from a genuinely bad prompt unless the mapping is guaranteed
+up front.
+
 <!-- TABLE:taxonomy_aliases START -->
 | Prompt string | Scores as |
 | --- | --- |
@@ -217,6 +225,11 @@ appear only in the VLM prompt vocabulary.
 | `hoop` | rim |
 | `jersey number` | number |
 | `basketball player` | player |
+| `basketball player in a team uniform` | player |
+| `referee in a striped shirt` | referee |
+| `orange basketball` | ball |
+| `basketball hoop and backboard` | rim |
+| `jersey number on a uniform` | number |
 <!-- TABLE:taxonomy_aliases END -->
 
 ### Annotation counts, 10 raw categories
