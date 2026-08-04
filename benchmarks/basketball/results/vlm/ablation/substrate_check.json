@@ -1,0 +1,699 @@
+{
+  "why": "The ablation searches on val using local Apple MPS, the same substrate the prompt search used, while every number the report publishes comes from a CUDA test-split run. That split of duties is only sound if the two substrates rank configurations identically, so this file measures it instead of assuming it: the same arms scored on an RTX 3090 (CUDA 12.1, pytorch-gpu) and on an M-series MPS backend.",
+  "cuda_device": "NVIDIA GeForce RTX 3090 (vast.ai instance 46753805, 2026-08-04)",
+  "mps_device": "Apple MPS, PYTORCH_ENABLE_MPS_FALLBACK=1",
+  "n_arms": 86,
+  "median_abs_gap": 2.8312206268310547e-07,
+  "max_abs_gap": 0.0007329583168029785,
+  "n_arms_disagreeing_above_0.002": 0,
+  "arms": [
+    {
+      "arm": "florence2__baseline",
+      "model": "florence2",
+      "element": "baseline",
+      "cuda_map5095": 0.1246548667550087,
+      "mps_map5095": 0.1246548667550087,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "florence2__singleton_top_k__1",
+      "model": "florence2",
+      "element": "singleton_top_k",
+      "cuda_map5095": 0.12513266503810883,
+      "mps_map5095": 0.12513266503810883,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "florence2__singleton_top_k__10",
+      "model": "florence2",
+      "element": "singleton_top_k",
+      "cuda_map5095": 0.1246548667550087,
+      "mps_map5095": 0.1246548667550087,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "florence2__singleton_top_k__1000",
+      "model": "florence2",
+      "element": "singleton_top_k",
+      "cuda_map5095": 0.1246548667550087,
+      "mps_map5095": 0.1246548667550087,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "florence2__singleton_top_k__2",
+      "model": "florence2",
+      "element": "singleton_top_k",
+      "cuda_map5095": 0.1246548667550087,
+      "mps_map5095": 0.1246548667550087,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "florence2__singleton_top_k__5",
+      "model": "florence2",
+      "element": "singleton_top_k",
+      "cuda_map5095": 0.1246548667550087,
+      "mps_map5095": 0.1246548667550087,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "grounding_dino__baseline",
+      "model": "grounding_dino",
+      "element": "baseline",
+      "cuda_map5095": 0.24369843304157257,
+      "mps_map5095": 0.2440824806690216,
+      "abs_gap": 0.00038404762744903564
+    },
+    {
+      "arm": "grounding_dino__box_threshold__0.001",
+      "model": "grounding_dino",
+      "element": "box_threshold",
+      "cuda_map5095": 0.24369843304157257,
+      "mps_map5095": 0.2440824806690216,
+      "abs_gap": 0.00038404762744903564
+    },
+    {
+      "arm": "grounding_dino__box_threshold__0.005",
+      "model": "grounding_dino",
+      "element": "box_threshold",
+      "cuda_map5095": 0.24369843304157257,
+      "mps_map5095": 0.2440824806690216,
+      "abs_gap": 0.00038404762744903564
+    },
+    {
+      "arm": "grounding_dino__box_threshold__0.02",
+      "model": "grounding_dino",
+      "element": "box_threshold",
+      "cuda_map5095": 0.24369843304157257,
+      "mps_map5095": 0.2440824806690216,
+      "abs_gap": 0.00038404762744903564
+    },
+    {
+      "arm": "grounding_dino__box_threshold__0.05",
+      "model": "grounding_dino",
+      "element": "box_threshold",
+      "cuda_map5095": 0.24369843304157257,
+      "mps_map5095": 0.2440824806690216,
+      "abs_gap": 0.00038404762744903564
+    },
+    {
+      "arm": "grounding_dino__box_threshold__0.1",
+      "model": "grounding_dino",
+      "element": "box_threshold",
+      "cuda_map5095": 0.24369843304157257,
+      "mps_map5095": 0.2440824806690216,
+      "abs_gap": 0.00038404762744903564
+    },
+    {
+      "arm": "grounding_dino__nms_iou__0.2",
+      "model": "grounding_dino",
+      "element": "nms_iou",
+      "cuda_map5095": 0.23559141159057617,
+      "mps_map5095": 0.23611202836036682,
+      "abs_gap": 0.0005206167697906494
+    },
+    {
+      "arm": "grounding_dino__nms_iou__0.3",
+      "model": "grounding_dino",
+      "element": "nms_iou",
+      "cuda_map5095": 0.23869356513023376,
+      "mps_map5095": 0.23942652344703674,
+      "abs_gap": 0.0007329583168029785
+    },
+    {
+      "arm": "grounding_dino__nms_iou__0.4",
+      "model": "grounding_dino",
+      "element": "nms_iou",
+      "cuda_map5095": 0.24188081920146942,
+      "mps_map5095": 0.24250158667564392,
+      "abs_gap": 0.0006207674741744995
+    },
+    {
+      "arm": "grounding_dino__nms_iou__0.6",
+      "model": "grounding_dino",
+      "element": "nms_iou",
+      "cuda_map5095": 0.24473480880260468,
+      "mps_map5095": 0.24543356895446777,
+      "abs_gap": 0.0006987601518630981
+    },
+    {
+      "arm": "grounding_dino__nms_iou__0.7",
+      "model": "grounding_dino",
+      "element": "nms_iou",
+      "cuda_map5095": 0.24594955146312714,
+      "mps_map5095": 0.24649086594581604,
+      "abs_gap": 0.0005413144826889038
+    },
+    {
+      "arm": "grounding_dino__nms_iou__0.8",
+      "model": "grounding_dino",
+      "element": "nms_iou",
+      "cuda_map5095": 0.24569229781627655,
+      "mps_map5095": 0.24620351195335388,
+      "abs_gap": 0.0005112141370773315
+    },
+    {
+      "arm": "grounding_dino__nms_iou__0.9",
+      "model": "grounding_dino",
+      "element": "nms_iou",
+      "cuda_map5095": 0.24567607045173645,
+      "mps_map5095": 0.24635538458824158,
+      "abs_gap": 0.000679314136505127
+    },
+    {
+      "arm": "grounding_dino__singleton_top_k__1",
+      "model": "grounding_dino",
+      "element": "singleton_top_k",
+      "cuda_map5095": 0.2434385120868683,
+      "mps_map5095": 0.24385729432106018,
+      "abs_gap": 0.00041878223419189453
+    },
+    {
+      "arm": "grounding_dino__singleton_top_k__10",
+      "model": "grounding_dino",
+      "element": "singleton_top_k",
+      "cuda_map5095": 0.2436656504869461,
+      "mps_map5095": 0.24404509365558624,
+      "abs_gap": 0.0003794431686401367
+    },
+    {
+      "arm": "grounding_dino__singleton_top_k__1000",
+      "model": "grounding_dino",
+      "element": "singleton_top_k",
+      "cuda_map5095": 0.2436656504869461,
+      "mps_map5095": 0.24404509365558624,
+      "abs_gap": 0.0003794431686401367
+    },
+    {
+      "arm": "grounding_dino__singleton_top_k__2",
+      "model": "grounding_dino",
+      "element": "singleton_top_k",
+      "cuda_map5095": 0.24403464794158936,
+      "mps_map5095": 0.24441540241241455,
+      "abs_gap": 0.0003807544708251953
+    },
+    {
+      "arm": "grounding_dino__singleton_top_k__5",
+      "model": "grounding_dino",
+      "element": "singleton_top_k",
+      "cuda_map5095": 0.2436656504869461,
+      "mps_map5095": 0.24404509365558624,
+      "abs_gap": 0.0003794431686401367
+    },
+    {
+      "arm": "omdet_turbo__baseline",
+      "model": "omdet_turbo",
+      "element": "baseline",
+      "cuda_map5095": 0.1803211271762848,
+      "mps_map5095": 0.18059946596622467,
+      "abs_gap": 0.00027833878993988037
+    },
+    {
+      "arm": "omdet_turbo__box_threshold__0.001",
+      "model": "omdet_turbo",
+      "element": "box_threshold",
+      "cuda_map5095": 0.1803211271762848,
+      "mps_map5095": 0.18059946596622467,
+      "abs_gap": 0.00027833878993988037
+    },
+    {
+      "arm": "omdet_turbo__box_threshold__0.005",
+      "model": "omdet_turbo",
+      "element": "box_threshold",
+      "cuda_map5095": 0.1803211271762848,
+      "mps_map5095": 0.18059946596622467,
+      "abs_gap": 0.00027833878993988037
+    },
+    {
+      "arm": "omdet_turbo__box_threshold__0.02",
+      "model": "omdet_turbo",
+      "element": "box_threshold",
+      "cuda_map5095": 0.1803211271762848,
+      "mps_map5095": 0.18059946596622467,
+      "abs_gap": 0.00027833878993988037
+    },
+    {
+      "arm": "omdet_turbo__box_threshold__0.05",
+      "model": "omdet_turbo",
+      "element": "box_threshold",
+      "cuda_map5095": 0.17824608087539673,
+      "mps_map5095": 0.17857176065444946,
+      "abs_gap": 0.0003256797790527344
+    },
+    {
+      "arm": "omdet_turbo__box_threshold__0.1",
+      "model": "omdet_turbo",
+      "element": "box_threshold",
+      "cuda_map5095": 0.17012551426887512,
+      "mps_map5095": 0.17038019001483917,
+      "abs_gap": 0.0002546757459640503
+    },
+    {
+      "arm": "omdet_turbo__nms_iou__0.2",
+      "model": "omdet_turbo",
+      "element": "nms_iou",
+      "cuda_map5095": 0.17116333544254303,
+      "mps_map5095": 0.17138880491256714,
+      "abs_gap": 0.0002254694700241089
+    },
+    {
+      "arm": "omdet_turbo__nms_iou__0.3",
+      "model": "omdet_turbo",
+      "element": "nms_iou",
+      "cuda_map5095": 0.17589448392391205,
+      "mps_map5095": 0.17616285383701324,
+      "abs_gap": 0.0002683699131011963
+    },
+    {
+      "arm": "omdet_turbo__nms_iou__0.4",
+      "model": "omdet_turbo",
+      "element": "nms_iou",
+      "cuda_map5095": 0.17780940234661102,
+      "mps_map5095": 0.17810289561748505,
+      "abs_gap": 0.00029349327087402344
+    },
+    {
+      "arm": "omdet_turbo__nms_iou__0.6",
+      "model": "omdet_turbo",
+      "element": "nms_iou",
+      "cuda_map5095": 0.1803177446126938,
+      "mps_map5095": 0.18059605360031128,
+      "abs_gap": 0.0002783089876174927
+    },
+    {
+      "arm": "omdet_turbo__nms_iou__0.7",
+      "model": "omdet_turbo",
+      "element": "nms_iou",
+      "cuda_map5095": 0.1803177446126938,
+      "mps_map5095": 0.18059605360031128,
+      "abs_gap": 0.0002783089876174927
+    },
+    {
+      "arm": "omdet_turbo__nms_iou__0.8",
+      "model": "omdet_turbo",
+      "element": "nms_iou",
+      "cuda_map5095": 0.1803177446126938,
+      "mps_map5095": 0.18059605360031128,
+      "abs_gap": 0.0002783089876174927
+    },
+    {
+      "arm": "omdet_turbo__nms_iou__0.9",
+      "model": "omdet_turbo",
+      "element": "nms_iou",
+      "cuda_map5095": 0.1803177446126938,
+      "mps_map5095": 0.18059605360031128,
+      "abs_gap": 0.0002783089876174927
+    },
+    {
+      "arm": "omdet_turbo__processor_nms_iou__0.2",
+      "model": "omdet_turbo",
+      "element": "processor_nms_iou",
+      "cuda_map5095": 0.17248401045799255,
+      "mps_map5095": 0.17248401045799255,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "omdet_turbo__processor_nms_iou__0.3",
+      "model": "omdet_turbo",
+      "element": "processor_nms_iou",
+      "cuda_map5095": 0.17717953026294708,
+      "mps_map5095": 0.17717953026294708,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "omdet_turbo__processor_nms_iou__0.4",
+      "model": "omdet_turbo",
+      "element": "processor_nms_iou",
+      "cuda_map5095": 0.17862670123577118,
+      "mps_map5095": 0.17862670123577118,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "omdet_turbo__processor_nms_iou__0.6",
+      "model": "omdet_turbo",
+      "element": "processor_nms_iou",
+      "cuda_map5095": 0.17970682680606842,
+      "mps_map5095": 0.17970682680606842,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "omdet_turbo__processor_nms_iou__0.7",
+      "model": "omdet_turbo",
+      "element": "processor_nms_iou",
+      "cuda_map5095": 0.17991194128990173,
+      "mps_map5095": 0.17991194128990173,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "omdet_turbo__processor_nms_iou__0.8",
+      "model": "omdet_turbo",
+      "element": "processor_nms_iou",
+      "cuda_map5095": 0.18030700087547302,
+      "mps_map5095": 0.18030700087547302,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "omdet_turbo__processor_nms_iou__0.9",
+      "model": "omdet_turbo",
+      "element": "processor_nms_iou",
+      "cuda_map5095": 0.1803036630153656,
+      "mps_map5095": 0.1803036630153656,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "omdet_turbo__singleton_top_k__1",
+      "model": "omdet_turbo",
+      "element": "singleton_top_k",
+      "cuda_map5095": 0.18013986945152283,
+      "mps_map5095": 0.1804182380437851,
+      "abs_gap": 0.00027836859226226807
+    },
+    {
+      "arm": "omdet_turbo__singleton_top_k__10",
+      "model": "omdet_turbo",
+      "element": "singleton_top_k",
+      "cuda_map5095": 0.18053403496742249,
+      "mps_map5095": 0.1808125376701355,
+      "abs_gap": 0.0002785027027130127
+    },
+    {
+      "arm": "omdet_turbo__singleton_top_k__1000",
+      "model": "omdet_turbo",
+      "element": "singleton_top_k",
+      "cuda_map5095": 0.1806444227695465,
+      "mps_map5095": 0.18092307448387146,
+      "abs_gap": 0.00027865171432495117
+    },
+    {
+      "arm": "omdet_turbo__singleton_top_k__2",
+      "model": "omdet_turbo",
+      "element": "singleton_top_k",
+      "cuda_map5095": 0.1803211271762848,
+      "mps_map5095": 0.18059946596622467,
+      "abs_gap": 0.00027833878993988037
+    },
+    {
+      "arm": "omdet_turbo__singleton_top_k__5",
+      "model": "omdet_turbo",
+      "element": "singleton_top_k",
+      "cuda_map5095": 0.18046480417251587,
+      "mps_map5095": 0.18074330687522888,
+      "abs_gap": 0.0002785027027130127
+    },
+    {
+      "arm": "owlv2__baseline",
+      "model": "owlv2",
+      "element": "baseline",
+      "cuda_map5095": 0.23999886214733124,
+      "mps_map5095": 0.23999914526939392,
+      "abs_gap": 2.8312206268310547e-07
+    },
+    {
+      "arm": "owlv2__box_threshold__0.001",
+      "model": "owlv2",
+      "element": "box_threshold",
+      "cuda_map5095": 0.24000802636146545,
+      "mps_map5095": 0.24000830948352814,
+      "abs_gap": 2.8312206268310547e-07
+    },
+    {
+      "arm": "owlv2__box_threshold__0.005",
+      "model": "owlv2",
+      "element": "box_threshold",
+      "cuda_map5095": 0.24000339210033417,
+      "mps_map5095": 0.24000367522239685,
+      "abs_gap": 2.8312206268310547e-07
+    },
+    {
+      "arm": "owlv2__box_threshold__0.02",
+      "model": "owlv2",
+      "element": "box_threshold",
+      "cuda_map5095": 0.23998387157917023,
+      "mps_map5095": 0.2399839162826538,
+      "abs_gap": 4.470348358154297e-08
+    },
+    {
+      "arm": "owlv2__box_threshold__0.05",
+      "model": "owlv2",
+      "element": "box_threshold",
+      "cuda_map5095": 0.23982465267181396,
+      "mps_map5095": 0.23982472717761993,
+      "abs_gap": 7.450580596923828e-08
+    },
+    {
+      "arm": "owlv2__box_threshold__0.1",
+      "model": "owlv2",
+      "element": "box_threshold",
+      "cuda_map5095": 0.2386074811220169,
+      "mps_map5095": 0.2386075258255005,
+      "abs_gap": 4.470348358154297e-08
+    },
+    {
+      "arm": "owlv2__checkpoint__google-owlv2-base-patch16-ensemble",
+      "model": "owlv2",
+      "element": "checkpoint",
+      "cuda_map5095": 0.17986680567264557,
+      "mps_map5095": 0.17986680567264557,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "owlv2__nms_iou__0.2",
+      "model": "owlv2",
+      "element": "nms_iou",
+      "cuda_map5095": 0.23505575954914093,
+      "mps_map5095": 0.23505651950836182,
+      "abs_gap": 7.599592208862305e-07
+    },
+    {
+      "arm": "owlv2__nms_iou__0.4",
+      "model": "owlv2",
+      "element": "nms_iou",
+      "cuda_map5095": 0.2432411164045334,
+      "mps_map5095": 0.24324116110801697,
+      "abs_gap": 4.470348358154297e-08
+    },
+    {
+      "arm": "owlv2__nms_iou__0.5",
+      "model": "owlv2",
+      "element": "nms_iou",
+      "cuda_map5095": 0.24518068134784698,
+      "mps_map5095": 0.2451806515455246,
+      "abs_gap": 2.9802322387695312e-08
+    },
+    {
+      "arm": "owlv2__nms_iou__0.6",
+      "model": "owlv2",
+      "element": "nms_iou",
+      "cuda_map5095": 0.24608278274536133,
+      "mps_map5095": 0.24608325958251953,
+      "abs_gap": 4.76837158203125e-07
+    },
+    {
+      "arm": "owlv2__nms_iou__0.7",
+      "model": "owlv2",
+      "element": "nms_iou",
+      "cuda_map5095": 0.24697712063789368,
+      "mps_map5095": 0.24697725474834442,
+      "abs_gap": 1.341104507446289e-07
+    },
+    {
+      "arm": "owlv2__nms_iou__0.8",
+      "model": "owlv2",
+      "element": "nms_iou",
+      "cuda_map5095": 0.24725130200386047,
+      "mps_map5095": 0.24725162982940674,
+      "abs_gap": 3.2782554626464844e-07
+    },
+    {
+      "arm": "owlv2__nms_iou__0.9",
+      "model": "owlv2",
+      "element": "nms_iou",
+      "cuda_map5095": 0.24747434258460999,
+      "mps_map5095": 0.2474745512008667,
+      "abs_gap": 2.086162567138672e-07
+    },
+    {
+      "arm": "owlv2__singleton_top_k__1",
+      "model": "owlv2",
+      "element": "singleton_top_k",
+      "cuda_map5095": 0.2293281853199005,
+      "mps_map5095": 0.2293284684419632,
+      "abs_gap": 2.8312206268310547e-07
+    },
+    {
+      "arm": "owlv2__singleton_top_k__10",
+      "model": "owlv2",
+      "element": "singleton_top_k",
+      "cuda_map5095": 0.24131178855895996,
+      "mps_map5095": 0.24131207168102264,
+      "abs_gap": 2.8312206268310547e-07
+    },
+    {
+      "arm": "owlv2__singleton_top_k__1000",
+      "model": "owlv2",
+      "element": "singleton_top_k",
+      "cuda_map5095": 0.24144390225410461,
+      "mps_map5095": 0.2414442002773285,
+      "abs_gap": 2.980232238769531e-07
+    },
+    {
+      "arm": "owlv2__singleton_top_k__2",
+      "model": "owlv2",
+      "element": "singleton_top_k",
+      "cuda_map5095": 0.23912496864795685,
+      "mps_map5095": 0.23912525177001953,
+      "abs_gap": 2.8312206268310547e-07
+    },
+    {
+      "arm": "owlv2__singleton_top_k__5",
+      "model": "owlv2",
+      "element": "singleton_top_k",
+      "cuda_map5095": 0.24072353541851044,
+      "mps_map5095": 0.24072381854057312,
+      "abs_gap": 2.8312206268310547e-07
+    },
+    {
+      "arm": "yolo_world__baseline",
+      "model": "yolo_world",
+      "element": "baseline",
+      "cuda_map5095": 0.1318090260028839,
+      "mps_map5095": 0.1318090260028839,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "yolo_world__box_threshold__0.001",
+      "model": "yolo_world",
+      "element": "box_threshold",
+      "cuda_map5095": 0.13585355877876282,
+      "mps_map5095": 0.13585355877876282,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "yolo_world__box_threshold__0.005",
+      "model": "yolo_world",
+      "element": "box_threshold",
+      "cuda_map5095": 0.13481250405311584,
+      "mps_map5095": 0.13481250405311584,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "yolo_world__box_threshold__0.02",
+      "model": "yolo_world",
+      "element": "box_threshold",
+      "cuda_map5095": 0.13077087700366974,
+      "mps_map5095": 0.13077087700366974,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "yolo_world__box_threshold__0.05",
+      "model": "yolo_world",
+      "element": "box_threshold",
+      "cuda_map5095": 0.12419164180755615,
+      "mps_map5095": 0.12419164180755615,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "yolo_world__box_threshold__0.1",
+      "model": "yolo_world",
+      "element": "box_threshold",
+      "cuda_map5095": 0.12217984348535538,
+      "mps_map5095": 0.12217984348535538,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "yolo_world__nms_iou__0.2",
+      "model": "yolo_world",
+      "element": "nms_iou",
+      "cuda_map5095": 0.1219717487692833,
+      "mps_map5095": 0.1219717487692833,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "yolo_world__nms_iou__0.3",
+      "model": "yolo_world",
+      "element": "nms_iou",
+      "cuda_map5095": 0.1272885650396347,
+      "mps_map5095": 0.1272885650396347,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "yolo_world__nms_iou__0.4",
+      "model": "yolo_world",
+      "element": "nms_iou",
+      "cuda_map5095": 0.13046099245548248,
+      "mps_map5095": 0.13046099245548248,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "yolo_world__nms_iou__0.6",
+      "model": "yolo_world",
+      "element": "nms_iou",
+      "cuda_map5095": 0.1327514350414276,
+      "mps_map5095": 0.1327514350414276,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "yolo_world__nms_iou__0.7",
+      "model": "yolo_world",
+      "element": "nms_iou",
+      "cuda_map5095": 0.13461491465568542,
+      "mps_map5095": 0.13461491465568542,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "yolo_world__nms_iou__0.8",
+      "model": "yolo_world",
+      "element": "nms_iou",
+      "cuda_map5095": 0.13563460111618042,
+      "mps_map5095": 0.13563460111618042,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "yolo_world__nms_iou__0.9",
+      "model": "yolo_world",
+      "element": "nms_iou",
+      "cuda_map5095": 0.13425329327583313,
+      "mps_map5095": 0.13425329327583313,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "yolo_world__singleton_top_k__1",
+      "model": "yolo_world",
+      "element": "singleton_top_k",
+      "cuda_map5095": 0.13124807178974152,
+      "mps_map5095": 0.13124807178974152,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "yolo_world__singleton_top_k__10",
+      "model": "yolo_world",
+      "element": "singleton_top_k",
+      "cuda_map5095": 0.1318090260028839,
+      "mps_map5095": 0.1318090260028839,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "yolo_world__singleton_top_k__1000",
+      "model": "yolo_world",
+      "element": "singleton_top_k",
+      "cuda_map5095": 0.1318090260028839,
+      "mps_map5095": 0.1318090260028839,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "yolo_world__singleton_top_k__2",
+      "model": "yolo_world",
+      "element": "singleton_top_k",
+      "cuda_map5095": 0.13188818097114563,
+      "mps_map5095": 0.13188818097114563,
+      "abs_gap": 0.0
+    },
+    {
+      "arm": "yolo_world__singleton_top_k__5",
+      "model": "yolo_world",
+      "element": "singleton_top_k",
+      "cuda_map5095": 0.1318090260028839,
+      "mps_map5095": 0.1318090260028839,
+      "abs_gap": 0.0
+    }
+  ]
+}
