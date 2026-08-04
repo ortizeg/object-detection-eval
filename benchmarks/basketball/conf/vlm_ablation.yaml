@@ -92,10 +92,15 @@ elements:
   # equalised across models and never measured for any of them. Florence-2 is
   # excluded because it has no NMS to retune; giving it one is a separate
   # element (florence2_nms) since that is adding a stage, not tuning it.
+  #
+  # The grid runs to 1.0 — no suppression at all — because the first pass found
+  # every model improving monotonically toward the top of a 0.2-0.9 range, with
+  # OWLv2's best sitting on the boundary. A sweep whose optimum is at its own
+  # edge has not found an optimum, it has found the edge.
   - name: nms_iou
     knob: nms_iou_threshold
     applies_to: [owlv2, omdet_turbo, grounding_dino, yolo_world]
-    values: [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    values: [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 1.0]
 
   # ELEMENT 1b -- OmDet-Turbo's INNER NMS, the one inside
   # post_process_grounded_object_detection. It runs first and on the full
@@ -165,8 +170,86 @@ elements:
 
   # ELEMENT 6 -- input resolution. Only YOLO-World exposes one directly; the HF
   # models fix theirs in their processors, which is what makes tiling (element
-  # 7) the only resolution lever available to them.
+  # 8) the only resolution lever available to them.
   - name: imgsz
     knob: imgsz
     applies_to: [yolo_world]
     values: [960, 1280, 1600]
+
+  # ELEMENT 7 -- give Florence-2 an NMS. It is the only model here that applies
+  # none, and it also assigns EVERY detection confidence 1.0, so within an image
+  # the scorer cannot rank its output at all: duplicate boxes are neither
+  # suppressed nor ordered. Structurally different from retuning an existing
+  # stage, hence a separate element from `nms_iou`.
+  #
+  # The tie-breaking guarantee in per_class_nms is what makes this well-defined
+  # at all — with every confidence equal, "keep the higher-scoring box" has no
+  # meaning and the kept set falls back to input order.
+  - name: florence2_nms
+    knob: nms_iou_threshold
+    applies_to: [florence2]
+    values: [0.3, 0.5, 0.7, 0.9]
+
+  # ELEMENT 8 -- per-class best-of vocabulary. The six-candidate search picked
+  # ONE vocabulary per model by total mAP, but the per-class numbers show
+  # different candidates winning different classes for the same model: OWLv2
+  # takes `player` at 0.833 under c1_domain while `referee` (0.455) and `number`
+  # (0.472) both peak under c5_bare_canonical.
+  #
+  # This is NOT arithmetic. The identical word scores differently beside
+  # different neighbours — `referee` is the same string in c1 and c5 and scores
+  # 0.215 there against 0.455 here — because the vocabulary competes for the
+  # same detections. So the per-class winners are assembled into a seventh
+  # candidate and MEASURED, rather than the per-class maxima being summed and
+  # reported as if a model had achieved them together.
+  #
+  # Equal effort survives: every model gets exactly one derived candidate, built
+  # by the same rule from its own search results. The vocabularies differ per
+  # model because the rule's inputs do, which is the same reason the six-way
+  # search already produced different winners per model.
+  - name: vocab_per_class_best
+    knob: classes
+    applies_to: [owlv2]
+    values:
+      - [basketball player, basketball, referee, rim, number]
+
+  - name: vocab_per_class_best
+    knob: classes
+    applies_to: [omdet_turbo]
+    values:
+      - [basketball player, basketball, referee, rim, number]
+
+  - name: vocab_per_class_best
+    knob: classes
+    applies_to: [grounding_dino]
+    values:
+      - [player, basketball, referee, rim, jersey number]
+
+  - name: vocab_per_class_best
+    knob: classes
+    applies_to: [florence2]
+    values:
+      - [player, basketball, referee, rim, number]
+
+  # YOLO-World scores 0.000 on referee and rim under every candidate, so those
+  # two positions keep the baseline's phrasing — there is no per-class winner to
+  # take. `person` is its only working people-prompt (compound phrases make it
+  # emit essentially no people at all).
+  - name: vocab_per_class_best
+    knob: classes
+    applies_to: [yolo_world]
+    values:
+      - [person, basketball, referee, basketball hoop, jersey number on a uniform]
+
+  # ELEMENT 9 -- overlapping tiles. The only lever that targets rim, ball and
+  # number together, and the only resolution lever at all for the four models
+  # whose processor fixes the input size. A basketball is ~30 px in a 1920x1080
+  # frame and arrives at OWLv2 as ~15 px of a 1008x1008 letterbox.
+  #
+  # Expensive: 2x2 plus the full frame is five forward passes per image, 3x3 is
+  # ten. Run last for that reason, and on CUDA rather than local MPS.
+  - name: tiles
+    knob: tiles
+    values:
+      - [2, 2]
+      - [3, 3]
