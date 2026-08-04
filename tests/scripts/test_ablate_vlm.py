@@ -144,10 +144,12 @@ def test_only_the_checkpoint_re_search_pins_a_second_field(manifest: Any) -> Non
 
     Every extra pinned field is one more thing a delta could be caused by, so
     the committed manifest is expected to use it only where a knob is genuinely
-    meaningless without another change.
+    meaningless without another change: the vocabulary re-search a winning
+    checkpoint owes, and the `combined` arms whose entire purpose is to change
+    several accepted things at once and check they compose.
     """
     pinned = {e.name for e in manifest.elements if e.fixed}
-    assert pinned <= {"vocabulary_on_new_checkpoint"}
+    assert pinned <= {"vocabulary_on_new_checkpoint", "combined"}
 
 
 def test_every_model_gets_exactly_one_baseline_arm(manifest: Any) -> None:
