@@ -394,7 +394,7 @@ def test_merge_overwrites_a_rerun_arm(sut: types.ModuleType, tmp_path: Path) -> 
 
 def test_element_filter_keeps_the_baselines_it_needs(sut: types.ModuleType, manifest: Any) -> None:
     """Without the baseline in the run, every delta for the element would be None."""
-    args = types.SimpleNamespace(only=None, element="nms_iou", arm=None)
+    args = types.SimpleNamespace(only=None, element="nms_iou", arm=None, skip_element=None)
     selected = sut.select_arms(manifest, args)
     touched = {a.model for a in selected if a.element == "nms_iou"}
     assert {a.model for a in selected if a.element == "baseline"} == touched
@@ -404,7 +404,7 @@ def test_element_filter_drops_baselines_of_untouched_models(
     sut: types.ModuleType, manifest: Any
 ) -> None:
     """Florence-2 has no NMS to retune, so it should not be run for that element."""
-    args = types.SimpleNamespace(only=None, element="nms_iou", arm=None)
+    args = types.SimpleNamespace(only=None, element="nms_iou", arm=None, skip_element=None)
     selected = sut.select_arms(manifest, args)
     assert "florence2" not in {a.model for a in selected}
 
@@ -450,3 +450,24 @@ def test_distinct_long_signatures_do_not_collide(sut: types.ModuleType, tmp_path
     a = sut._cache_path(tmp_path, "valid", base + "-a")
     b = sut._cache_path(tmp_path, "valid", base + "-b")
     assert a != b
+
+
+def test_skip_element_defers_the_expensive_arms(sut: types.ModuleType, manifest: Any) -> None:
+    """Tiling is ten forward passes per image; it must be deferrable.
+
+    Paying for the most expensive element before the cheap ones have reported is
+    how two GPU-hours get committed to a question the first fifteen minutes
+    could have answered.
+    """
+    args = types.SimpleNamespace(only=None, element=None, arm=None, skip_element="tiles,tiles_3x3")
+    selected = sut.select_arms(manifest, args)
+    assert not [a for a in selected if a.element.startswith("tiles")]
+    assert [a for a in selected if a.element == "nms_iou"]
+
+
+def test_element_filter_accepts_several_names(sut: types.ModuleType, manifest: Any) -> None:
+    args = types.SimpleNamespace(
+        only=None, element="nms_iou,box_threshold", arm=None, skip_element=None
+    )
+    elements = {a.element for a in sut.select_arms(manifest, args)}
+    assert elements == {"baseline", "nms_iou", "box_threshold"}

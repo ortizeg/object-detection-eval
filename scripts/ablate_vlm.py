@@ -700,7 +700,20 @@ def parse_args() -> argparse.Namespace:
         help="Override the manifest split. Cannot be 'test'.",
     )
     parser.add_argument("--only", default=None, help="Restrict to one model name.")
-    parser.add_argument("--element", default=None, help="Restrict to one element.")
+    parser.add_argument(
+        "--element",
+        default=None,
+        help="Restrict to these elements (comma-separated).",
+    )
+    parser.add_argument(
+        "--skip-element",
+        default=None,
+        help=(
+            "Exclude these elements (comma-separated). Exists so the expensive "
+            "tiling arms can be deferred until the cheap ones have reported, "
+            "rather than paying for them before knowing whether they are worth it."
+        ),
+    )
     parser.add_argument("--arm", default=None, help="Restrict to one arm id.")
     parser.add_argument(
         "--refresh-cache",
@@ -735,7 +748,11 @@ def select_arms(manifest: AblationManifest, args: argparse.Namespace) -> list[Ar
     if args.only is not None:
         arms = [a for a in arms if a.model == args.only]
     if args.element is not None:
-        arms = [a for a in arms if a.element in {args.element, "baseline"}]
+        wanted = set(args.element.split(",")) | {"baseline"}
+        arms = [a for a in arms if a.element in wanted]
+    if args.skip_element is not None:
+        skipped = set(args.skip_element.split(","))
+        arms = [a for a in arms if a.element not in skipped]
     if args.arm is not None:
         wanted = set(args.arm.split(","))
         arms = [a for a in arms if a.id in wanted]

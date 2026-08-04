@@ -291,7 +291,10 @@ elements:
     values:
       - [2, 2]
 
-  - name: tiles
+  # Named apart from the 2x2 element, not folded in with it: at ten forward
+  # passes per image this is the single most expensive thing in the sweep, and
+  # it needs to be schedulable, reportable and revertable on its own.
+  - name: tiles_3x3
     knob: tiles
     applies_to: [yolo_world, grounding_dino, florence2, omdet_turbo, owlv2]
     values:

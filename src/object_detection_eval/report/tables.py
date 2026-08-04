@@ -553,7 +553,8 @@ _ABLATION_ELEMENTS: tuple[tuple[str, str], ...] = (
     ("imgsz", "Input resolution"),
     ("florence2_nms", "Add NMS"),
     ("vocabulary_on_new_checkpoint", "Vocabulary re-search (new checkpoint)"),
-    ("tiles", "Overlapping tiles"),
+    ("tiles", "Overlapping tiles 2x2"),
+    ("tiles_3x3", "Overlapping tiles 3x3"),
     # Last, because it is not a single element: it stacks the ones already
     # accepted for that model and exists to check they compose. Single-element
     # deltas are measured against a baseline that stops existing the moment
