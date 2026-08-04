@@ -1,0 +1,172 @@
+# vlm_ablation.yaml -- the one-element-at-a-time zero-shot VLM ablation.
+#
+# WHY THIS FILE EXISTS
+#
+# vlm_prompt_search.yaml equalised the *prompt*. Nothing else about how these
+# five models are run was ever measured. Some of it was not even equal across
+# models: OWLv2 suppressed at NMS IoU 0.3 while Grounding-DINO and YOLO-World
+# used 0.5, and OmDet-Turbo ran a SECOND, hardwired NMS inside its HuggingFace
+# processor that no manifest mentioned. A published zero-shot ceiling that
+# depends on unexamined constants is a measurement of those constants.
+#
+# So every knob gets swept, one at a time, and each result is kept or reverted
+# on the measured delta. Reverted elements stay in this file: the negative
+# results are the substance of the exercise, and deleting a failed arm would
+# make the ablation log a record of what worked rather than of what was tried.
+#
+# SEARCH SPLIT: `valid` (96 images), NOT `test`.
+#
+# Identical rule and identical enforcement to vlm_prompt_search.yaml. Choosing a
+# configuration by its score on the 94 test images and then publishing those
+# same test numbers reports the maximum over every arm below as if it were one
+# unbiased measurement. `AblationManifest` refuses split: test, and so does
+# --split. The chosen configuration is scored on test exactly once, by
+# run_vlm_benchmark.py, after this file is finished with.
+#
+# Gemini is absent for the same reason it is absent from the prompt search: it
+# is a billed API and every arm would cost money per image.
+
+split: valid
+
+# ---------------------------------------------------------------------------
+# Baselines -- each model exactly as vlm_zeroshot.yaml publishes it today.
+# Every delta below is measured against these, re-scored by this harness on val
+# so that no comparison mixes numbers from two different measurement paths.
+# ---------------------------------------------------------------------------
+models:
+  - name: owlv2
+    config:
+      inferencer: owlv2
+      model_name: google/owlv2-large-patch14-ensemble
+      classes: [basketball player, basketball, referee, basketball hoop, jersey number]
+      box_threshold: 0.01
+      nms_iou_threshold: 0.3
+
+  - name: omdet_turbo
+    config:
+      inferencer: omdet_turbo
+      model_name: omlab/omdet-turbo-swin-tiny-hf
+      classes: [player, ball, referee, rim, number]
+      box_threshold: 0.01
+      nms_iou_threshold: 0.5
+      # The value the HF processor was silently defaulting to before this
+      # ablation made it explicit. Stated so the baseline is reproducible.
+      processor_nms_threshold: 0.5
+
+  - name: grounding_dino
+    config:
+      inferencer: grounding_dino
+      model_name: IDEA-Research/grounding-dino-base
+      classes: [basketball player, basketball, referee, basketball hoop, jersey number]
+      box_threshold: 0.01
+      text_threshold: 0.25
+      nms_iou_threshold: 0.5
+
+  - name: florence2
+    config:
+      inferencer: florence2
+      model_name: microsoft/Florence-2-large-ft
+      classes: [player, ball, referee, rim, number]
+      task: "<CAPTION_TO_PHRASE_GROUNDING>"
+      box_threshold: 0.01
+      # null, not a number: Florence-2 genuinely applies no NMS. Writing 1.0
+      # here would say "NMS that suppresses nothing", which is the same output
+      # by a different claim.
+      nms_iou_threshold: null
+
+  - name: yolo_world
+    config:
+      inferencer: yolo_world
+      model_name: yolov8x-worldv2.pt
+      classes: [person, sports ball, referee, basketball hoop, jersey number]
+      box_threshold: 0.01
+      nms_iou_threshold: 0.5
+      imgsz: 640
+      max_det: 300
+
+# ---------------------------------------------------------------------------
+# Elements. One knob each; arms are generated as baseline-plus-one-change.
+# ---------------------------------------------------------------------------
+elements:
+  # ELEMENT 1 -- NMS IoU. The clearest remaining unfairness: this was never
+  # equalised across models and never measured for any of them. Florence-2 is
+  # excluded because it has no NMS to retune; giving it one is a separate
+  # element (florence2_nms) since that is adding a stage, not tuning it.
+  - name: nms_iou
+    knob: nms_iou_threshold
+    applies_to: [owlv2, omdet_turbo, grounding_dino, yolo_world]
+    values: [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+
+  # ELEMENT 1b -- OmDet-Turbo's INNER NMS, the one inside
+  # post_process_grounded_object_detection. It runs first and on the full
+  # candidate set, so it is the pass that actually sets this model's operating
+  # point; the outer per-class NMS can only remove what it already let through.
+  - name: processor_nms_iou
+    knob: processor_nms_threshold
+    applies_to: [omdet_turbo]
+    values: [0.2, 0.3, 0.4, 0.6, 0.7, 0.8, 0.9]
+
+  # ELEMENT 2 -- box_threshold. 0.01 everywhere, inherited from the ONNX
+  # detectors, never checked for a VLM. The expectation is that it does nothing:
+  # mAP integrates the whole precision-recall curve, so a lower threshold should
+  # only add low-confidence tail. Measured rather than assumed, because "it
+  # cannot matter" is exactly the reasoning that left OmDet-Turbo's inner NMS
+  # unexamined. 0.001 is the raw-cache floor and cannot go lower without
+  # rebuilding it.
+  - name: box_threshold
+    knob: box_threshold
+    applies_to: [owlv2, omdet_turbo, grounding_dino, yolo_world]
+    values: [0.001, 0.005, 0.02, 0.05, 0.1]
+
+  # ELEMENT 3 -- singleton top_k. Chosen as 3 on val under the OLD NMS and
+  # threshold settings. If element 1 or 2 moves, that choice was made under a
+  # configuration that no longer exists, so it is re-confirmed rather than
+  # inherited.
+  - name: singleton_top_k
+    knob: singleton_top_k
+    values: [1, 2, 5, 10, 1000]
+
+  # ELEMENT 4 -- checkpoint variants. Every model here runs exactly one
+  # checkpoint and has never been compared to its own siblings.
+  #
+  # A checkpoint swap invalidates the vocabulary choice: the prompt each model
+  # publishes won its six-candidate search AS THAT CHECKPOINT. Any winner here
+  # therefore re-runs the full search against the new weights before it can be
+  # adopted, so the new checkpoint receives the same effort the old one did.
+  - name: checkpoint
+    knob: model_name
+    applies_to: [owlv2]
+    values:
+      - google/owlv2-base-patch16-ensemble
+      - google/owlv2-large-patch14-finetuned
+
+  - name: checkpoint
+    knob: model_name
+    applies_to: [grounding_dino]
+    values: [IDEA-Research/grounding-dino-tiny]
+
+  - name: checkpoint
+    knob: model_name
+    applies_to: [florence2]
+    values: [microsoft/Florence-2-large, microsoft/Florence-2-base-ft, microsoft/Florence-2-base]
+
+  - name: checkpoint
+    knob: model_name
+    applies_to: [yolo_world]
+    values: [yolov8l-worldv2.pt, yolov8m-worldv2.pt, yolov8s-worldv2.pt]
+
+  # ELEMENT 5 -- ultralytics' detection cap. YOLO-World-only, and worth an arm
+  # because at box_threshold 0.01 this model can hit 300 boxes on an image, at
+  # which point the cap and not the model decides what is reported.
+  - name: max_det
+    knob: max_det
+    applies_to: [yolo_world]
+    values: [1000, 3000]
+
+  # ELEMENT 6 -- input resolution. Only YOLO-World exposes one directly; the HF
+  # models fix theirs in their processors, which is what makes tiling (element
+  # 7) the only resolution lever available to them.
+  - name: imgsz
+    knob: imgsz
+    applies_to: [yolo_world]
+    values: [960, 1280, 1600]
