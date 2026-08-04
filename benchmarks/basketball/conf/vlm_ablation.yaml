@@ -277,8 +277,22 @@ elements:
   #
   # Expensive: 2x2 plus the full frame is five forward passes per image, 3x3 is
   # ten. Run last for that reason, and on CUDA rather than local MPS.
+  #
+  # SPLIT INTO TWO DECLARATIONS, AND ORDERED CHEAPEST MODEL FIRST, deliberately.
+  # Written as one element with both grids, expansion runs every grid for a
+  # model before moving to the next — which on measured per-pass timings meant
+  # OWLv2's 3x3 (~80 min) completing before any other model's 2x2 had been
+  # tried. Two hours committed before learning whether tiling does anything at
+  # all. This way every 2x2 lands first, cheapest model first, so 3x3 is only
+  # paid for if 2x2 earns it.
   - name: tiles
     knob: tiles
+    applies_to: [yolo_world, grounding_dino, florence2, omdet_turbo, owlv2]
     values:
       - [2, 2]
+
+  - name: tiles
+    knob: tiles
+    applies_to: [yolo_world, grounding_dino, florence2, omdet_turbo, owlv2]
+    values:
       - [3, 3]
