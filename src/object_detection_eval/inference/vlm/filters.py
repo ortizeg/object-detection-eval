@@ -19,41 +19,88 @@ from loguru import logger
 
 from object_detection_eval.schemas.detection import Detection
 
+#: How many candidates to keep per singleton class, per image.
+#:
+#: Was effectively 1 until 2026-08-01, when a val-split sweep showed top-1 was
+#: discarding correct detections rather than only duplicates. OWLv2 produced a
+#: correct `ball` box in 90.9% of val images but ranked it first in only 51.1%,
+#: so the cap — not the model — was responsible for most of the missing AP:
+#: relaxing it moved `ball` AP@50 from 0.387 to 0.508 and overall mAP@50:95 from
+#: 0.2293 to 0.2413.
+#:
+#: 3 rather than "unlimited": the ground truth really does hold ~1 ball and ~1
+#: rim per image, so the singleton prior is sound; what was wrong was allowing
+#: it ZERO ranking slack. Almost all of the recoverable AP is back by k=3
+#: (OWLv2 0.2400 of a 0.2414 ceiling at k=inf), and keeping a small cap
+#: preserves the filter's original purpose of suppressing duplicate singletons.
+#:
+#: k was chosen on the VAL split across ALL five open-weights models, not on the
+#: model that motivated the change (mAP@50:95, k=1 -> k=3)::
+#:
+#:     OWLv2           0.2293 -> 0.2400   (+0.0107)
+#:     Grounding-DINO  0.2439 -> 0.2441   (+0.0002)
+#:     OmDet-Turbo     0.1804 -> 0.1806   (+0.0002)
+#:     YOLO-World      0.1312 -> 0.1318   (+0.0006)
+#:     Florence-2      0.1251 -> 0.1247   (-0.0004)
+#:
+#: So this is a floor, not a boost: it recovers a lot for ONE model and is
+#: neutral for the rest. Grounding-DINO, OmDet-Turbo and Florence-2 barely move
+#: because their thresholds and label guards leave them few candidates to rank
+#: in the first place; OWLv2 emits a median of 613 `ball` candidates per image
+#: and so has ranking headroom the others do not. Florence-2's -0.0004 is the
+#: only regression and is well inside AP quantisation noise.
+DEFAULT_SINGLETON_TOP_K = 3
+
 
 def single_best_per_class(
     detections: list[Detection],
     single_class_ids: frozenset[int] = frozenset({1, 3}),
+    top_k: int = DEFAULT_SINGLETON_TOP_K,
 ) -> list[Detection]:
-    """Keep only the highest-confidence detection for singleton classes.
+    """Keep the ``top_k`` highest-confidence detections for singleton classes.
 
-    For classes where at most one instance exists per image (e.g. ball=1,
-    rim=3 in the merged5 eval taxonomy), retain only the top-scoring
-    detection. All other classes pass through unchanged. The result is
-    order-independent: the same kept set is produced regardless of input
-    order. Does not mutate ``detections``.
+    For classes where roughly one instance exists per image (ball=1, rim=3 in
+    the merged5 eval taxonomy), retain only the highest-scoring few. All other
+    classes pass through unchanged. The result is order-independent: the same
+    kept set is produced regardless of input order, with ties broken toward the
+    detection appearing earlier in ``detections``. Does not mutate the input.
+
+    ``top_k`` defaults to :data:`DEFAULT_SINGLETON_TOP_K` — see that constant
+    for why it is 3 and not 1. Pass ``top_k=1`` to reproduce the pre-2026-08-01
+    behaviour, or a very large value to disable the cap.
 
     Args:
         detections: List of detections, already remapped to eval class IDs.
         single_class_ids: Class IDs to filter (default: ball, rim).
+        top_k: Max detections kept per singleton class.
+
+    Raises:
+        ValueError: If ``top_k`` is less than 1. Zero would silently delete
+            every ball and rim, scoring as "the model found nothing".
     """
+    if top_k < 1:
+        msg = f"top_k must be >= 1, got {top_k}: 0 would drop every singleton detection"
+        raise ValueError(msg)
+
     result: list[Detection] = []
-    best_per_class: dict[int, Detection] = {}
+    buckets: dict[int, list[Detection]] = {}
 
     for det in detections:
         if det.class_id not in single_class_ids:
             result.append(det)
         else:
-            current_best = best_per_class.get(det.class_id)
-            if current_best is None or det.confidence > current_best.confidence:
-                best_per_class[det.class_id] = det
+            buckets.setdefault(det.class_id, []).append(det)
 
-    result.extend(best_per_class.values())
+    for candidates in buckets.values():
+        # Stable sort on confidence alone: equal-confidence detections keep
+        # their input order, so the kept set does not depend on dict ordering.
+        result.extend(sorted(candidates, key=lambda d: d.confidence, reverse=True)[:top_k])
 
     n_removed = len(detections) - len(result)
     if n_removed > 0:
         logger.debug(
-            f"Single-best filter removed {n_removed}/{len(detections)} "
-            f"duplicate detections for classes {single_class_ids}"
+            f"Singleton top-{top_k} filter removed {n_removed}/{len(detections)} "
+            f"detections for classes {single_class_ids}"
         )
     return result
 

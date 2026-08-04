@@ -20,7 +20,14 @@ merge:
   ball:
     - ball-in-basket
 
-# COCO-vocabulary / VLM-prompt aliases -> canonical class
+# COCO-vocabulary / VLM-prompt aliases -> canonical class.
+#
+# Adding prompt vocabulary REQUIRES adding it here. remap_detections drops any
+# detection whose label has no eval mapping, silently — so an unaliased prompt
+# phrase does not score badly, it scores as if the model detected nothing. The
+# prompt-search harness (scripts/search_vlm_prompts.py) asserts every candidate
+# phrase resolves before it will run, so that failure mode cannot be mistaken
+# for a bad prompt.
 aliases:
   person: player            # COCO "person"
   sports ball: ball         # COCO "sports ball"
@@ -29,3 +36,17 @@ aliases:
   hoop: rim
   jersey number: number
   basketball player: player # OWLv2 prompt
+
+  # --- prompt-search vocabulary (260801-e01) -------------------------------
+  # Contrastive people split: `referee` and `player` are both people on a
+  # court, which is the hardest semantic split in this taxonomy. These phrases
+  # describe the visual difference (team uniform vs striped shirt) rather than
+  # the role, which is not visible.
+  basketball player in a team uniform: player
+  referee in a striped shirt: referee
+
+  # Small-object phrasing: `ball` and `rim` are the two classes every model
+  # collapses on. These name the appearance rather than the object category.
+  orange basketball: ball
+  basketball hoop and backboard: rim
+  jersey number on a uniform: number

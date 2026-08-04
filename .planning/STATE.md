@@ -31,6 +31,25 @@ Phase: 05 (zero-shot-vlm) — COMPLETE
 Plan: 4 of 4 executed
 Status: Phase 5 done — VLM zero-shot reproduction gate PASSED. Next: Phase 6 (Latency, needs a T4) or Phase 7 (Reports).
 Last activity: 2026-08-03 — Completed quick task 260803-f01: dataset documentation page (docs/dataset.md)
+  - Every table generator-emitted from a committed dataset_stats.json, so the
+    --check drift gate runs where the dataset is absent (CI has no copy).
+  - The two sampling caveats stated outright: 654 images are only 21 clips (the
+    94-image test split is 3), and the splits are clip-disjoint but all three
+    draw from the same 3 games.
+  - clip_key promoted into src/object_detection_eval/data/clips.py so the page
+    and the clustered bootstrap share one definition of clip identity.
+
+Prior activity: 2026-08-01 — Completed quick task 260801-e01: VLM prompt parity + YOLO-World
+  - Prompt effort equalised MECHANICALLY: 6 shared candidates per model, selected on
+    the val split so no prompt is ever chosen on the split the report publishes.
+  - Refuted by measurement: contrastive referee/player phrasing collapses the
+    phrase-grounding models; `rim` is 0.000 across all 30 model x prompt cells.
+  - YOLO-World added (GPL-3.0 weights / AGPL-3.0 ultralytics, optional extra).
+    YOLOE verified AGPL-3.0 and NOT adopted.
+  - Open-weights test split re-run on a vast.ai RTX A4000; new [feature.vlmcuda]
+    because pixi otherwise installs a CPU-only torch on Linux.
+  - DINO-X / GDINO-Pro API tier built then dropped at the user's direction
+    (not reproducible from a clone).
 
 Progress: [█████████░] 88% (Phase 5 of 7)
 
@@ -150,6 +169,7 @@ None yet.
 | 260730-b01 | SmolVLM2 purge + registry yolox-m-800 -> yolox-m-640 | 2026-07-30 | 720a17c | [260730-b01-smolvlm2-purge-and-registry](./quick/260730-b01-smolvlm2-purge-and-registry/) |
 | 260730-c01 | Report rewrite + clip-clustered bootstrap (test set is 3 clips) | 2026-07-30 | effa610 | [260730-c01-report-rewrite](./quick/260730-c01-report-rewrite/) |
 | 260731-d01 | VLM harness fixes: Grounding-DINO label collapse + Florence-2 task token | 2026-07-31 | 90c5c1d | [260731-d01-vlm-harness-fixes](./quick/260731-d01-vlm-harness-fixes/) |
+| 260801-e01 | Equal-effort VLM prompt search (val-split selected), YOLO-World added, licences corrected, test split re-run on CUDA | 2026-08-01 | cd3391e | [260801-e01-vlm-prompt-parity-and-new-models](./quick/260801-e01-vlm-prompt-parity-and-new-models/) |
 | 260803-f01 | Dataset documentation page — docs/dataset.md, generator-emitted from a committed stats JSON | 2026-08-03 | 2e04c6f | [260803-f01-dataset-docs-page](./quick/260803-f01-dataset-docs-page/) |
 
 ## Deferred Items

@@ -55,10 +55,46 @@ _RAW10_NAME_TO_ID = {name: idx for idx, name in _RAW10_ID_TO_NAME.items()}
 
 
 def test_merged5_reproduces_legacy_maps() -> None:
-    """merged5.yaml resolves to the exact legacy merged-5 maps."""
+    """merged5.yaml still resolves every legacy merged-5 mapping, unchanged.
+
+    Relaxed from exact dict equality on 2026-08-01, when the prompt search added
+    vocabulary aliases ("orange basketball", "referee in a striped shirt", ...).
+    Exact equality would make every new prompt candidate a test failure, which
+    is not what this test is protecting.
+
+    What it protects is that no LEGACY mapping is removed or repointed — either
+    would silently change what published numbers mean, because a detection whose
+    label loses its eval mapping is dropped rather than mis-scored. So the
+    legacy map must remain a subset with identical values, and `id_to_name`
+    (the canonical five classes and their ids) must still match EXACTLY: adding
+    a class, reordering them, or renaming one is still a hard failure.
+    """
     spec = load_taxonomy_spec(_TAX_DIR / "merged5.yaml")
     assert spec.id_to_name == _MERGED5_ID_TO_NAME
-    assert spec.name_to_id == _MERGED5_NAME_TO_ID
+
+    missing = {k: v for k, v in _MERGED5_NAME_TO_ID.items() if k not in spec.name_to_id}
+    assert not missing, f"legacy merged5 mappings were removed: {missing}"
+
+    repointed = {
+        k: (v, spec.name_to_id[k])
+        for k, v in _MERGED5_NAME_TO_ID.items()
+        if spec.name_to_id[k] != v
+    }
+    assert not repointed, f"legacy merged5 mappings changed target (name: (was, now)): {repointed}"
+
+
+def test_merged5_extra_aliases_only_target_canonical_classes() -> None:
+    """Any alias added beyond the legacy set must land on a real eval id.
+
+    Guards the failure mode the prompt search made possible: an alias pointing
+    at a class id that does not exist would not raise, it would just make those
+    detections unscoreable.
+    """
+    spec = load_taxonomy_spec(_TAX_DIR / "merged5.yaml")
+    valid_ids = set(_MERGED5_ID_TO_NAME)
+    extras = {k: v for k, v in spec.name_to_id.items() if k not in _MERGED5_NAME_TO_ID}
+    bad = {k: v for k, v in extras.items() if v not in valid_ids}
+    assert not bad, f"aliases target non-existent eval ids: {bad}"
 
 
 def test_raw10_reproduces_legacy_maps() -> None:

@@ -51,11 +51,10 @@ from loguru import logger
 from pydantic import BaseModel, Field
 
 from object_detection_eval.data.coco_gt import load_coco_gt
-from object_detection_eval.data.image import ImageLoader
-from object_detection_eval.data.taxonomy import remap_detections, resolve_taxonomy
+from object_detection_eval.data.taxonomy import resolve_taxonomy
 from object_detection_eval.inference.base import BaseInferencer
-from object_detection_eval.inference.vlm.filters import area_outliers, single_best_per_class
-from object_detection_eval.metrics.detection_map import compute_metrics, detections_to_sv
+from object_detection_eval.inference.vlm.protocol import score_split
+from object_detection_eval.metrics.detection_map import compute_metrics
 
 _DEFAULT_DATA_ROOT = Path(
     "/Users/ortizeg/1Projects/⛹️‍♂️ Next Play/data/basketball-player-detection-3"
@@ -165,6 +164,17 @@ def _florence2_factory(entry: ManifestEntry) -> BaseInferencer:
     )
 
 
+def _yolo_world_factory(entry: ManifestEntry) -> BaseInferencer:
+    from object_detection_eval.inference.vlm.yolo_world import YOLOWorldInferencer
+
+    return YOLOWorldInferencer(
+        model_name=entry.model_name,
+        classes=entry.classes,
+        box_threshold=entry.box_threshold if entry.box_threshold is not None else 0.01,
+        nms_iou_threshold=(entry.nms_iou_threshold if entry.nms_iou_threshold is not None else 0.5),
+    )
+
+
 def _gemini_factory(entry: ManifestEntry) -> BaseInferencer:
     from object_detection_eval.inference.vlm.gemini import GeminiInferencer
 
@@ -181,6 +191,7 @@ _INFERENCER_FACTORIES: dict[str, Callable[[ManifestEntry], BaseInferencer]] = {
     "omdet_turbo": _omdet_turbo_factory,
     "grounding_dino": _grounding_dino_factory,
     "florence2": _florence2_factory,
+    "yolo_world": _yolo_world_factory,
 }
 
 
@@ -212,26 +223,22 @@ def _score_entry(
 ) -> dict[str, sv.Detections]:
     """Run one VLM over the test split through the shared eval pipeline.
 
-    Pipeline order (BLOCKER-3): remap_detections FIRST (raw model label
-    space -> merged5 eval-id space), THEN filters.area_outliers, THEN
-    filters.single_best_per_class -- see module docstring for why the order
-    is load-bearing.
+    The pipeline order (BLOCKER-3) lives in
+    :func:`object_detection_eval.inference.vlm.protocol.score_split`, shared
+    with the prompt-search harness so the two cannot drift apart -- see that
+    module's docstring for why the order is load-bearing.
     """
     factory = _INFERENCER_FACTORIES[entry.inferencer]
     inferencer = factory(entry)
     label_map = dict(enumerate(entry.classes))
 
-    test_dir = args.data_root / "test"
-    pred_map: dict[str, sv.Detections] = {}
-    for filename in gt_map:
-        loader = ImageLoader(test_dir / filename)
-        image = loader.read()
-        width, height = loader.width, loader.height
-        raw_detections = inferencer.predict(image, image_width=width, image_height=height)
-        remapped = remap_detections(raw_detections, label_map, name_to_id)
-        area_filtered = area_outliers(remapped)
-        final_detections = single_best_per_class(area_filtered)
-        pred_map[filename] = detections_to_sv(final_detections, width, height)
+    pred_map = score_split(
+        inferencer,
+        image_dir=args.data_root / "test",
+        filenames=list(gt_map.keys()),
+        label_map=label_map,
+        name_to_id=name_to_id,
+    )
 
     if hasattr(inferencer, "unload"):
         inferencer.unload()
