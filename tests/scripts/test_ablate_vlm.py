@@ -407,3 +407,46 @@ def test_element_filter_drops_baselines_of_untouched_models(
     args = types.SimpleNamespace(only=None, element="nms_iou", arm=None)
     selected = sut.select_arms(manifest, args)
     assert "florence2" not in {a.model for a in selected}
+
+
+# ---------------------------------------------------------------------------
+# Cache paths survive the filesystem
+# ---------------------------------------------------------------------------
+
+
+def test_a_long_signature_is_hashed_into_a_writable_filename(
+    sut: types.ModuleType, tmp_path: Path
+) -> None:
+    """OSError 36 killed a full CUDA sweep 111 arms in; it must not recur.
+
+    Signatures embed the whole class vocabulary, and the prompt-search
+    candidates include phrases like "basketball player in a team uniform". With
+    a checkpoint id and a task token alongside them, a Florence-2 re-search arm
+    overshoots the 255-byte filename limit and `os.stat` raises.
+    """
+    signature = "florence2__" + "basketball-player-in-a-team-uniform-" * 20
+    path = sut._cache_path(tmp_path, "valid", signature)
+
+    assert len(path.name) < 255
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("{}")  # the actual assertion: the filesystem accepts it
+    assert path.is_file()
+
+
+def test_short_signatures_keep_their_readable_filename(
+    sut: types.ModuleType, tmp_path: Path
+) -> None:
+    """Hashing unconditionally would rename every existing cache entry.
+
+    On a rented box that means re-running forward passes already paid for, so
+    only over-long names are digested.
+    """
+    signature = "owlv2__google_owlv2-large__player|ball"
+    assert sut._cache_path(tmp_path, "valid", signature).name == f"{signature}.json"
+
+
+def test_distinct_long_signatures_do_not_collide(sut: types.ModuleType, tmp_path: Path) -> None:
+    base = "florence2__" + "basketball-player-in-a-team-uniform-" * 20
+    a = sut._cache_path(tmp_path, "valid", base + "-a")
+    b = sut._cache_path(tmp_path, "valid", base + "-b")
+    assert a != b

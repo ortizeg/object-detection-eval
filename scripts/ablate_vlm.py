@@ -49,8 +49,10 @@ Usage::
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
+import traceback
 from pathlib import Path
 from typing import Any
 
@@ -358,8 +360,32 @@ def deltas(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
 # ---------------------------------------------------------------------------
 
 
+#: Longest cache filename stem written verbatim before falling back to a hash.
+#:
+#: Signatures embed the whole class vocabulary, and the prompt-search candidates
+#: include phrases like "basketball player in a team uniform". Concatenated with
+#: a checkpoint id and a task token, a Florence-2 re-search arm overshoots the
+#: 255-byte filename limit on ext4/overlayfs and `os.stat` raises OSError 36.
+#: That is exactly what killed the first full CUDA sweep 111 arms in.
+#:
+#: 180 leaves room for the ".json" suffix and a wide margin, and readable names
+#: are kept below it because the cache is something a human debugs by listing.
+_MAX_CACHE_STEM = 180
+
+
 def _cache_path(cache_dir: Path, split: str, signature: str) -> Path:
-    return cache_dir / split / f"{signature}.json"
+    """Cache file for a signature, hashed only when too long to write verbatim.
+
+    Deliberately NOT hashed unconditionally: hashing everything would rename
+    every existing cache entry, and on a rented box that means re-running
+    forward passes already paid for. Short signatures keep their readable name;
+    long ones get a stable digest with an identifying prefix.
+    """
+    stem = signature
+    if len(stem) > _MAX_CACHE_STEM:
+        digest = hashlib.sha256(signature.encode()).hexdigest()[:16]
+        stem = f"{signature[:120]}__sha{digest}"
+    return cache_dir / split / f"{stem}.json"
 
 
 def _serialise(raw_map: dict[str, list[Detection]]) -> dict[str, list[list[float]]]:
@@ -751,10 +777,21 @@ def main() -> None:
 
     rows: list[dict[str, Any]] = []
     mismatches: list[str] = []
+    failures: list[str] = []
     for signature, group in groups.items():
-        raw_map = load_or_collect_raw(
-            group[0], split_dir, filenames, args.cache_dir, split, refresh=args.refresh_cache
-        )
+        try:
+            raw_map = load_or_collect_raw(
+                group[0], split_dir, filenames, args.cache_dir, split, refresh=args.refresh_cache
+            )
+        except Exception:
+            # A sweep is a hundred independent measurements; letting one bad
+            # signature abort the rest turns a recoverable arm into hours of
+            # discarded GPU time. Record it, keep going, and fail at the end so
+            # the failure is still loud.
+            failures.append(f"{group[0].id}: {traceback.format_exc(limit=2)}")
+            logger.error(f"forward pass FAILED for {group[0].id}; continuing:\n{signature}")
+            logger.exception("cause")
+            continue
         for arm in group:
             row = score_arm_from_cache(
                 arm, raw_map, dims, filenames, name_to_id, id_to_name, gt_map
@@ -780,8 +817,11 @@ def main() -> None:
 
     logger.info(f"{len(rows)} arm(s) -> {args.results_dir / f'{split}_arms.json'}")
 
+    if failures:
+        logger.error(f"{len(failures)} forward pass(es) failed:\n" + "\n".join(failures))
     if mismatches:
         logger.error(f"{len(mismatches)} cache/live mismatch(es): {mismatches}")
+    if failures or mismatches:
         sys.exit(3)
 
 
