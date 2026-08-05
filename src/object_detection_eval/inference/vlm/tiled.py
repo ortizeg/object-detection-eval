@@ -15,13 +15,22 @@ failure rather than a resolution one, so this is expected to help ``ball`` and
 ``number`` and not ``rim``. Recorded here as a prediction so the measurement can
 contradict it.
 
-MERGING is deliberately not done here. Overlapping tiles produce duplicate boxes
-for anything near a seam, and the obvious fix — suppress them inside this class
-— would apply NMS at a threshold the ablation is simultaneously trying to
-choose. Instead the tile detections are simply concatenated and the caller's
-existing per-class NMS does the merge, which keeps tiling a pure
-"more detections, at higher effective resolution" change and leaves suppression
-a single tunable stage.
+MERGING HAPPENS HERE, and an earlier revision of this file got that wrong in a
+way worth recording. It concatenated the tiles and left suppression to "the
+caller's existing per-class NMS", reasoning that suppressing here would bake in
+an IoU threshold the ablation was still choosing.
+
+That was true of the ablation, whose replay applies NMS to the *merged*
+detection set, and false of the benchmark: ``score_split`` runs
+``remap -> area_outliers -> single_best_per_class`` and applies **no NMS at
+all**. The inner inferencer only suppresses within each tile. So the published
+test run kept every cross-tile duplicate — 962 detections per image against 662
+— and ``player``, the class with the most overlap between crops, fell from 0.831
+to 0.643 AP@50 on the same split with the same cache.
+
+The threshold is therefore a parameter, not a decision this class makes: the
+ablation passes the value it chose, and the live path performs the identical
+merge the replay scored.
 
 Torch-free (CORE-08): numpy and the detection schema only. The wrapped
 inferencer supplies whatever backend it needs.
@@ -34,6 +43,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 from loguru import logger
 
+from object_detection_eval.inference.vlm.nms import per_class_nms
 from object_detection_eval.schemas.detection import BoundingBox, Detection
 
 if TYPE_CHECKING:
@@ -103,6 +113,11 @@ class TiledInferencer:
             tiling can only lose large objects: a player spanning two tiles is
             clipped in both, and ``player`` carries most of the mAP here. The
             full-frame pass makes tiling strictly additive in coverage.
+        merge_nms_iou_threshold: Per-class NMS IoU applied to the CONCATENATED
+            detections, suppressing the duplicates tiling necessarily creates.
+            ``None`` skips the merge entirely and is almost never what you want
+            — see the module docstring for what that cost when it was the only
+            behaviour available.
     """
 
     def __init__(
@@ -112,15 +127,18 @@ class TiledInferencer:
         cols: int = 2,
         overlap: float = 0.2,
         include_full_image: bool = True,
+        merge_nms_iou_threshold: float | None = 0.5,
     ) -> None:
         self.inner = inner
         self.rows = rows
         self.cols = cols
         self.overlap = overlap
         self.include_full_image = include_full_image
+        self.merge_nms_iou_threshold = merge_nms_iou_threshold
         logger.info(
             f"Tiling {type(inner).__name__} at {rows}x{cols}, overlap {overlap:.0%}, "
-            f"full frame {'included' if include_full_image else 'excluded'}"
+            f"full frame {'included' if include_full_image else 'excluded'}, "
+            f"merge NMS {merge_nms_iou_threshold}"
         )
 
     def predict(
@@ -145,7 +163,9 @@ class TiledInferencer:
             raw = self.inner.predict(tile, image_width=tile_w, image_height=tile_h)
             detections.extend(_to_full_image(raw, x0, y0, tile_w, tile_h, width, height))
 
-        return detections
+        if self.merge_nms_iou_threshold is None:
+            return detections
+        return per_class_nms(detections, self.merge_nms_iou_threshold)
 
     def unload(self) -> None:
         """Free the wrapped model, if it holds anything."""

@@ -151,16 +151,32 @@ def test_confidence_and_class_survive_the_remap() -> None:
     assert {d.class_id for d in dets} == {0}
 
 
-def test_no_suppression_happens_here() -> None:
-    """Merging is the caller's per-class NMS, at a threshold the ablation chooses.
+def test_cross_tile_duplicates_are_merged_here() -> None:
+    """The merge must happen in the wrapper, because no caller does it.
 
-    Suppressing inside the wrapper would bake in an IoU value while the sweep is
-    still deciding what it should be.
+    An earlier revision left this to "the caller's per-class NMS". That was true
+    of the ablation replay and false of the benchmark, whose scoring path runs
+    remap -> area -> singleton and applies no NMS at all. The published test run
+    therefore kept every cross-tile duplicate, and `player` — the class with the
+    most overlap between crops — fell 0.831 -> 0.643 AP@50 on the same split.
     """
     inner = _FullTileDetector()
-    tiled = TiledInferencer(inner, rows=2, cols=2, overlap=0.5, include_full_image=True)
+    tiled = TiledInferencer(
+        inner, rows=2, cols=2, overlap=0.5, include_full_image=True, merge_nms_iou_threshold=0.5
+    )
 
-    # Heavy overlap means heavily duplicated boxes; all of them should come back.
+    # Every tile returns a box covering its own crop, and at 50% overlap those
+    # cover much the same ground; the merge must collapse them.
+    assert len(tiled.predict(_image())) < 5
+
+
+def test_merge_can_be_disabled_for_the_raw_cache() -> None:
+    """The ablation caches un-suppressed detections so it can sweep the threshold."""
+    inner = _FullTileDetector()
+    tiled = TiledInferencer(
+        inner, rows=2, cols=2, overlap=0.5, include_full_image=True, merge_nms_iou_threshold=None
+    )
+
     assert len(tiled.predict(_image())) == 5
 
 

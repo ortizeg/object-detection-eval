@@ -229,7 +229,15 @@ def _maybe_tiled(inferencer: BaseInferencer, entry: ManifestEntry) -> Any:
 
     rows, cols = entry.tiles
     return TiledInferencer(
-        inferencer, rows=rows, cols=cols, overlap=entry.tile_overlap, include_full_image=True
+        inferencer,
+        rows=rows,
+        cols=cols,
+        overlap=entry.tile_overlap,
+        include_full_image=True,
+        # The row's NMS threshold was chosen on val against the MERGED tile
+        # output. Leaving this unset published a pipeline that never suppressed
+        # cross-tile duplicates at all.
+        merge_nms_iou_threshold=entry.nms_iou_threshold,
     )
 
 
