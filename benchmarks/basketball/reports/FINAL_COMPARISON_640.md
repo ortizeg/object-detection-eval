@@ -445,10 +445,18 @@ estimates without significance claims; do not present a fully-ordered
 leaderboard. Note also that training-seed variance is completely unmeasured here
 and is plausibly larger than the sampling uncertainty we do quantify.
 
-**7. Fine-tuning on 465 images beats the best zero-shot VLM by ~2.9×** (0.716 vs
-0.250 mAP@50:95, same protocol — see
+**7. Fine-tuning on 465 images beats the best zero-shot VLM by ~2.3×** (0.716 vs
+0.315 mAP@50:95, same protocol — see
 [VLM_VS_FINETUNED.md](VLM_VS_FINETUNED.md)). Zero-shot is a labelling bootstrap
 and a floor, not a deployment answer, when the classes are domain-specific.
+
+This margin was ~2.9× until 2026-08-05, against a zero-shot ceiling of 0.250. It
+narrowed because the zero-shot side improved, not because anything here changed:
+a configuration ablation across the five open-weights VLMs — NMS thresholds,
+input tiling, checkpoints, per-class vocabularies — moved that ceiling to 0.315
+and put an open-weights model above Gemini for the first time. The direction of
+the conclusion is unchanged and the size of it is not, which is the sort of thing
+worth restating rather than leaving a stale multiple in place.
 
 ## Reproducing every table in this report
 

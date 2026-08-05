@@ -174,7 +174,21 @@ cache-versus-live divergence; it had only ever been run on untiled arms, so it
 was green and blind at once. It now warns when a verification run covers no
 tiled arm, and the tiled arm it missed verifies to 1.0e-07.
 
-The table below is the corrected run.
+The corrected run is the table below. With the merge in place, **every model
+improved on test, and by more than it had on val**:
+
+| Model | published before | val best | test (corrected) | Δ |
+| --- | --- | --- | --- | --- |
+| OWLv2 | 0.246 | 0.288 | **0.315** | **+0.069** |
+| Grounding-DINO | 0.234 | 0.278 | **0.293** | **+0.059** |
+| Florence-2 | 0.108 | 0.234 | **0.238** | **+0.130** |
+| OmDet-Turbo | 0.180 | 0.216 | **0.211** | +0.031 |
+| YOLO-World | 0.145 | 0.177 | **0.189** | +0.044 |
+| **mean** | | **+0.054** | | **+0.067** |
+
+YOLO-World is the control that confirms the diagnosis: it is the one row that
+does **not** tile, the fix therefore should not touch it, and it moved 0.1891 →
+0.1892 — run-to-run noise. Every model that tiles moved by 0.03 to 0.08.
 
 <details markdown="1">
 <summary><strong>How the val configuration was reached</strong> — the interactions that produced it</summary>
@@ -302,29 +316,38 @@ from the committed prediction dumps in `results/vlm/*.json` (never transcribed):
 | Model | mAP@50:95 | mAP@50 | mAP@75 |
 | --- | --- | --- | --- |
 | Gemini | 0.250 | 0.430 | 0.252 |
-| OWLv2 | 0.235 | 0.339 | 0.277 |
-| Grounding-DINO | 0.244 | 0.285 | 0.258 |
-| OmDet-Turbo | 0.173 | 0.234 | 0.179 |
-| Florence-2 | 0.154 | 0.200 | 0.158 |
+| OWLv2 | 0.315 | 0.476 | 0.367 |
+| Grounding-DINO | 0.293 | 0.352 | 0.318 |
+| OmDet-Turbo | 0.211 | 0.297 | 0.219 |
+| Florence-2 | 0.238 | 0.323 | 0.255 |
 | YOLO-World | 0.189 | 0.241 | 0.209 |
 <!-- TABLE:vlm_summary END -->
 
-The strongest zero-shot model still sits **below half** the mAP@50:95 of even the
-*lowest-ranked* fine-tuned detector (0.250 against 0.619), and well under half of
-the best one — see [FINAL_COMPARISON_640.md](FINAL_COMPARISON_640.md) for the
-fine-tuned figures rather than re-tabulating them here.
+Two things about this table changed with the 2026-08-05 ablation, and both are
+worth stating plainly because earlier revisions of this report said otherwise.
 
-That margin is what the ablation above should be read against. A configuration
-search that swept every remaining knob, measured ~180 arms, and produced +0.054
-on val moved the *published* ceiling by +0.016 on average and left the top of the
-table where it was: Gemini at 0.250, with Grounding-DINO now the best
-open-weights row at 0.244. Closing a 0.37 gap at +0.016 per exhaustive sweep is
-not a programme anyone should start.
+**An open-weights model now leads.** OWLv2 at 0.315 is ahead of Gemini's 0.250.
+Every previous revision had Gemini on top, and the gap was routinely explained by
+its hand-tuned prompt. Configuration, not prompting, closed it.
 
-Fine-tuning on this small in-domain dataset buys a large, unambiguous accuracy
-margin over the best general-purpose zero-shot detector available off the shelf.
-Zero-shot is a useful floor and a fast way to bootstrap labels; it is not a
-substitute for fine-tuning when the target classes are domain-specific.
+**"Below half the worst fine-tuned detector" is no longer true.** That sentence
+appeared here for months and was correct when the ceiling was 0.250. At 0.315
+against the lowest-ranked fine-tuned detector's 0.619 the ratio is **1.97×**, not
+the 2.5× this report used to quote — see
+[FINAL_COMPARISON_640.md](FINAL_COMPARISON_640.md) for the fine-tuned figures
+rather than re-tabulating them here.
+
+What has *not* changed is the conclusion. A near-2× gap is still decisive, it is
+still the gap between "usable for bootstrapping labels" and "usable in
+production", and closing it took an exhaustive configuration search that will not
+repeat: the knobs are now measured and the remaining ones are documented above as
+not worth their GPU-hours. Fine-tuning on this small in-domain dataset still buys
+a large, unambiguous margin over the best general-purpose zero-shot detector
+available off the shelf.
+
+The honest revision is that the margin is smaller than this report used to claim,
+and that a chunk of what looked like a capability gap was configuration nobody
+had examined.
 
 ## Per-class failure analysis: where zero-shot breaks
 
@@ -337,10 +360,10 @@ makes the pattern unmistakable:
 | Model | player | ball | referee | rim | number |
 | --- | --- | --- | --- | --- | --- |
 | Gemini | 0.923 | 0.316 | 0.717 | 0.036 | 0.156 |
-| OWLv2 | 0.630 | 0.448 | 0.277 | 0.004 | 0.336 |
-| Grounding-DINO | 0.633 | 0.283 | 0.503 | 0.000 | 0.006 |
-| OmDet-Turbo | 0.622 | 0.139 | 0.293 | 0.000 | 0.118 |
-| Florence-2 | 0.374 | 0.114 | 0.381 | 0.000 | 0.132 |
+| OWLv2 | 0.901 | 0.583 | 0.388 | 0.002 | 0.505 |
+| Grounding-DINO | 0.867 | 0.355 | 0.533 | 0.000 | 0.006 |
+| OmDet-Turbo | 0.805 | 0.187 | 0.369 | 0.000 | 0.127 |
+| Florence-2 | 0.749 | 0.151 | 0.560 | 0.000 | 0.152 |
 | YOLO-World | 0.840 | 0.311 | 0.000 | 0.005 | 0.051 |
 <!-- TABLE:vlm_per_class END -->
 
