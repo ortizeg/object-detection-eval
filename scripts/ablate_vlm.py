@@ -575,9 +575,15 @@ def image_dimensions(image_dir: Path, filenames: list[str]) -> dict[str, tuple[i
     return dims
 
 
-def _row(arm: Arm, metrics: dict[str, Any]) -> dict[str, Any]:
+def _row(arm: Arm, metrics: dict[str, Any], substrate: str) -> dict[str, Any]:
     return {
         "arm": arm.id,
+        # Which accelerator produced this row. Recorded per arm, not per file,
+        # because the log accumulates across runs and this one accumulated
+        # across machines. `substrate_check.json` measures what that costs: 86
+        # arms scored on both CUDA and MPS, median gap 0.000000, and no arm
+        # disagreeing by more than the adoption noise floor.
+        "substrate": substrate,
         "model": arm.model,
         "element": arm.element,
         "baseline": arm.baseline,
@@ -596,6 +602,7 @@ def score_arm_from_cache(
     name_to_id: dict[str, int],
     id_to_name: dict[int, str],
     gt_map: dict[str, Any],
+    substrate: str,
 ) -> dict[str, Any]:
     """Replay the cache through the arm's post-processing and score it."""
     label_map = dict(enumerate(arm.classes))
@@ -618,7 +625,7 @@ def score_arm_from_cache(
             max_area_fraction=arm.max_area_fraction,
             singleton_top_k=arm.singleton_top_k,
         )
-    return _row(arm, compute_metrics(gt_map, pred_map, id_to_name))
+    return _row(arm, compute_metrics(gt_map, pred_map, id_to_name), substrate)
 
 
 def score_arm_live(
@@ -628,6 +635,7 @@ def score_arm_live(
     name_to_id: dict[str, int],
     id_to_name: dict[int, str],
     gt_map: dict[str, Any],
+    substrate: str,
 ) -> dict[str, Any]:
     """Score an arm through the ordinary benchmark path, ignoring any cache.
 
@@ -650,7 +658,7 @@ def score_arm_live(
     unload = getattr(inferencer, "unload", None)
     if unload is not None:
         unload()
-    return _row(arm, compute_metrics(gt_map, pred_map, id_to_name))
+    return _row(arm, compute_metrics(gt_map, pred_map, id_to_name), substrate)
 
 
 # ---------------------------------------------------------------------------
@@ -675,6 +683,26 @@ def merge_results(path: Path, split: str, rows: list[dict[str, Any]]) -> None:
         json.dump({"split": split, "arms": list(existing.values())}, f, indent=2)
 
 
+def _torch_device() -> str:
+    """Name the accelerator this run will use, for the substrate label.
+
+    Imported lazily and defensively: this module stays runnable without torch
+    for --help and manifest validation, and an unlabelled row is better than a
+    crash at the point of recording provenance.
+    """
+    try:
+        import torch
+
+        if torch.cuda.is_available():
+            return f"cuda:{torch.cuda.get_device_name(0)}"
+        if torch.backends.mps.is_available():
+            return "mps"
+    except Exception:  # pragma: no cover - provenance must never break a run
+        logger.warning("could not resolve torch device for the substrate label")
+        return "unknown"
+    return "cpu"
+
+
 def _log_row(arm: Arm, row: dict[str, Any]) -> None:
     logger.info(
         f"{arm.model:<16} | {arm.element:<20} | {arm.id:<44} | "
@@ -694,6 +722,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--results-dir", type=Path, default=_DEFAULT_RESULTS_DIR)
     parser.add_argument("--cache-dir", type=Path, default=_DEFAULT_CACHE_DIR)
     parser.add_argument("--taxonomy", default="merged5")
+    parser.add_argument(
+        "--substrate",
+        default=None,
+        help=(
+            "Label recorded on every arm this run produces (default: the torch "
+            "device in use). The log accumulates across runs, and this one "
+            "accumulated across machines, so the substrate belongs on the row "
+            "rather than on the file."
+        ),
+    )
     parser.add_argument(
         "--split",
         default=None,
@@ -780,6 +818,9 @@ def main() -> None:
         logger.error("no arms selected; check --only/--element/--arm")
         sys.exit(2)
 
+    substrate = args.substrate if args.substrate is not None else _torch_device()
+    logger.info(f"substrate: {substrate}")
+
     name_to_id, id_to_name = resolve_taxonomy(args.taxonomy)
     split_dir = args.data_root / split
     gt_map = load_coco_gt(split_dir / "_annotations.coco.json", name_to_id)
@@ -811,12 +852,14 @@ def main() -> None:
             continue
         for arm in group:
             row = score_arm_from_cache(
-                arm, raw_map, dims, filenames, name_to_id, id_to_name, gt_map
+                arm, raw_map, dims, filenames, name_to_id, id_to_name, gt_map, substrate
             )
             rows.append(row)
             _log_row(arm, row)
             if args.verify:
-                live = score_arm_live(arm, split_dir, filenames, name_to_id, id_to_name, gt_map)
+                live = score_arm_live(
+                    arm, split_dir, filenames, name_to_id, id_to_name, gt_map, substrate
+                )
                 gap = abs(live["mAP_50_95"] - row["mAP_50_95"])
                 if gap > args.verify_tolerance:
                     mismatches.append(
