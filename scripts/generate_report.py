@@ -36,6 +36,8 @@ from loguru import logger
 
 from object_detection_eval.report import (
     DatasetStats,
+    ablation_headline_table,
+    ablation_summary_table,
     ci_table,
     class_count_table,
     clip_inventory_table,
@@ -45,12 +47,14 @@ from object_detection_eval.report import (
     image_geometry_note,
     inject_table,
     latency_section,
+    load_ablation_log,
     load_accuracy_results,
     load_bootstrap_report,
     load_cpu_latency_results,
     load_dataset_stats,
     load_latency_results,
     load_vlm_metrics,
+    load_zeroshot_config,
     per_class_table,
     primary_7model_table,
     split_overlap_table,
@@ -66,6 +70,7 @@ _DEFAULT_RESULTS_DIR = _REPO_ROOT / "benchmarks" / "basketball" / "results"
 _DEFAULT_REPORT_DIR = _REPO_ROOT / "benchmarks" / "basketball" / "reports"
 _DEFAULT_TAXONOMY_DIR = _REPO_ROOT / "benchmarks" / "basketball" / "conf" / "taxonomy"
 _DEFAULT_DOCS_DIR = _REPO_ROOT / "docs"
+_DEFAULT_CONF_DIR = _REPO_ROOT / "benchmarks" / "basketball" / "conf"
 
 #: Injected in place of the CPU-latency table while the two measured CPU results
 #: files are not yet committed. The section renders GT-free from committed JSON
@@ -158,6 +163,7 @@ def build_registry(
     report_dir: Path,
     taxonomy_dir: Path = _DEFAULT_TAXONOMY_DIR,
     docs_dir: Path = _DEFAULT_DOCS_DIR,
+    conf_dir: Path = _DEFAULT_CONF_DIR,
 ) -> list[ReportSpec]:
     """Build the declarative report registry: report id -> doc + table slots.
 
@@ -180,6 +186,8 @@ def build_registry(
     cpu_latency_conf001 = results_dir / "latency" / "cpu_e2e_conf001.json"
     vlm_metrics_path = results_dir / "vlm" / "vlm_metrics_merged5.json"
     dataset_stats_path = results_dir / "dataset" / "dataset_stats.json"
+    ablation_path = results_dir / "vlm" / "ablation" / "valid_arms.json"
+    zeroshot_conf = conf_dir / "vlm_zeroshot.yaml"
 
     # Load the precomputed VLM metrics once per render and share them across the
     # summary + per-class slots. Lazy: only evaluated if the VLM report is
@@ -232,6 +240,24 @@ def build_registry(
                 lambda: vlm_per_class_table(
                     vlm_metrics(),
                     load_taxonomy_spec(taxonomy_dir / "merged5.yaml").classes,
+                ),
+            ),
+            # The kept/reverted column is derived by comparing each element's
+            # val winner against vlm_zeroshot.yaml, so this slot reads the
+            # manifest as well as the results. Editing the published config
+            # without re-rendering is then drift, and --check says so.
+            Slot(
+                "vlm_ablation_headline",
+                lambda: ablation_headline_table(
+                    load_ablation_log(ablation_path),
+                    load_zeroshot_config(zeroshot_conf),
+                ),
+            ),
+            Slot(
+                "vlm_ablation",
+                lambda: ablation_summary_table(
+                    load_ablation_log(ablation_path),
+                    load_zeroshot_config(zeroshot_conf),
                 ),
             ),
         ],
@@ -291,6 +317,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--report-dir", type=Path, default=_DEFAULT_REPORT_DIR)
     parser.add_argument("--taxonomy-dir", type=Path, default=_DEFAULT_TAXONOMY_DIR)
     parser.add_argument("--docs-dir", type=Path, default=_DEFAULT_DOCS_DIR)
+    parser.add_argument("--conf-dir", type=Path, default=_DEFAULT_CONF_DIR)
     parser.add_argument(
         "--report",
         default=None,
@@ -301,7 +328,9 @@ def main(argv: list[str] | None = None) -> int:
     mode.add_argument("--write", action="store_true", help="Regenerate reports in place.")
     args = parser.parse_args(argv)
 
-    specs = build_registry(args.results_dir, args.report_dir, args.taxonomy_dir, args.docs_dir)
+    specs = build_registry(
+        args.results_dir, args.report_dir, args.taxonomy_dir, args.docs_dir, args.conf_dir
+    )
     if args.report is not None:
         specs = [s for s in specs if s.report_id == args.report]
         if not specs:

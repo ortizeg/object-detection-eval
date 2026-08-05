@@ -127,28 +127,170 @@ ball was hidden by our filter; the rim genuinely is not being detected.
 
 ### What was tuned, and what was not
 
-The zero-shot rows have had prompt effort equalised and three harness defects
-repaired. That is **not** the same as having maximised each model, and this
-report does not claim it. Stated plainly so the comparison can be read for what
-it is:
+The zero-shot rows have had prompt effort equalised, three harness defects
+repaired, and — as of 2026-08-04 — every remaining configuration knob swept one
+at a time on val. This section says what that found, including what it did not.
 
-**Searched, on val, equally across models**
+**The ablation: what changed, and what it bought**
 
-| Knob | How |
+Each element was added alone, measured on the 96-image **val** split, and kept
+only if it beat the model's baseline by at least 0.002 mAP@50:95 — 96 images
+under COCO's 101-point interpolation do not resolve a thousandth of a point, and
+adopting a smaller "win" is fitting the val split.
+
+<!-- TABLE:vlm_ablation_headline START -->
+| Model | Published | Best on val | Δ | Changes kept |
+| --- | --- | --- | --- | --- |
+| owlv2 | 0.240 | **0.288** | +0.0479 | NMS IoU 0.5, tiling 2x2 |
+| grounding_dino | 0.244 | **0.278** | +0.0338 | NMS IoU 0.7, tiling 2x2 |
+| florence2 | 0.125 | **0.234** | +0.1094 | checkpoint `Florence-2-large`, NMS IoU 0.4, tiling 2x2 |
+| omdet_turbo | 0.181 | **0.216** | +0.0353 | vocabulary, tiling 2x2 |
+| yolo_world | 0.132 | **0.177** | +0.0453 | vocabulary, box threshold 0.001, NMS IoU 0.7, input size 1280 |
+<!-- TABLE:vlm_ablation_headline END -->
+
+**Only a third of that survived contact with the test split, and two models got
+worse.** The configuration above was chosen on val and scored once on test:
+
+| Model | val Δ | test Δ | transferred |
+| --- | --- | --- | --- |
+| YOLO-World | +0.045 | **+0.044** | 97% |
+| Florence-2 | +0.109 | **+0.046** | 42% |
+| Grounding-DINO | +0.034 | **+0.010** | 29% |
+| OmDet-Turbo | +0.035 | **−0.007** | — |
+| OWLv2 | +0.048 | **−0.011** | — |
+| **mean** | **+0.054** | **+0.016** | **30%** |
+
+This is the most useful thing the exercise produced, and it is a negative
+result. Every internal check said the val gains were real: each cleared a noise
+floor set before the results were seen, each was the argmax of its element, and
+the stacks were measured rather than summed precisely because summing them would
+have been wrong. None of that made them generalise. Ninety-six images is enough
+to rank configurations that differ by a lot and not enough to rank ones that
+differ by 0.03, and the two models whose gains came from a broad tiling win
+rather than a specific capability change are exactly the two that regressed.
+
+**The published numbers are the test numbers, including the regressions.** It
+would have been easy to look at this table, keep tiling for the three models it
+helped and revert it for the two it hurt, and publish a clean sweep of
+improvements. That is test-set tuning — the thing this whole protocol exists to
+prevent — and it would have made the reported figures the maximum over two
+choices per model rather than one measurement. The configuration was chosen on
+val; the test column is what it is.
+
+**What actually generalised** is the change that fixed something specific rather
+than the change that added resolution everywhere. YOLO-World's per-class
+vocabulary and larger input transferred almost completely (97%), and Florence-2's
+checkpoint swap carried most of its gain. Broad tiling wins transferred worst.
+
+<details markdown="1">
+<summary><strong>How the val configuration was reached</strong> — the interactions that produced it</summary>
+
+Florence-2's three accepted changes measured **+0.030**, **+0.011** and **exactly
++0.000** in isolation; together they were worth **+0.109** on val. Adding NMS
+does nothing to a model that scores every detection at confidence 1.0 —
+suppression has no ranking to work with — and becomes its largest lever the
+moment tiling starts producing the same object in several overlapping crops.
+
+OWLv2 shows the same interaction inverted, and it is why the protocol measures
+stacks instead of adding deltas. Swept on whole frames its NMS optimum was IoU
+**1.0**, no suppression at all, because at 0.3 NMS was deleting genuinely
+distinct overlapping players rather than duplicates. Carried into the tiled
+configuration unchanged it scored **0.2424** — *worse than tiling alone at
+0.2831* — because tiling manufactures the very duplicates "suppress nothing" was
+chosen to keep. Adding the single-element deltas would have predicted +0.061;
+measuring the stack gave +0.002.
+
+Tiling was the largest val lever and it did not help everyone. It moved
+`referee` from 0.239 to 0.445 for Grounding-DINO and `number` from 0.042 to
+0.149 for OmDet-Turbo, and it cost YOLO-World **0.053** — that model has a
+native resolution knob and would rather have `imgsz` raised than be fed crops at
+a scale its training never saw. `rim` stayed 0.000 under every tiled arm, which
+was predicted in advance: the prompt search had already put it at 0.000 across
+essentially all thirty model-by-prompt cells, making it a grounding failure
+rather than a resolution one.
+
+</details>
+
+<details markdown="1">
+<summary><strong>Every element tried, including the ones reverted</strong> — the full per-element record</summary>
+
+The negative results are most of what was learned, so reverted elements stay in
+the log: one holding only the winners would record what was adopted rather than
+what was tried. The complete per-arm record — per-class AP, full configuration,
+and the accelerator each arm was scored on — is committed at
+`results/vlm/ablation/valid_arms.json`.
+
+The verdict column is *derived* by comparing each element's val winner against
+what `vlm_zeroshot.yaml` actually runs, so the table cannot claim a change was
+adopted that never reached the published config, and editing that config without
+re-rendering fails the drift gate.
+
+<!-- TABLE:vlm_ablation START -->
+| Model | Element | Tried | Best | val mAP@50:95 | Δ | Verdict |
+| --- | --- | --- | --- | --- | --- | --- |
+| grounding_dino | NMS IoU | 9 | `0.7` | 0.246 | +0.0021 | **kept** |
+| omdet_turbo | NMS IoU | 9 | `0.6` | 0.181 | -0.0000 | reverted (within noise) |
+| owlv2 | NMS IoU | 9 | `1.0` | 0.248 | +0.0075 | reverted |
+| yolo_world | NMS IoU | 9 | `0.8` | 0.136 | +0.0038 | reverted |
+| omdet_turbo | Processor NMS IoU | 7 | `0.8` | 0.180 | -0.0003 | reverted (within noise) |
+| grounding_dino | `box_threshold` | 5 | `0.001` | 0.244 | +0.0000 | reverted (within noise) |
+| omdet_turbo | `box_threshold` | 5 | `0.001` | 0.181 | +0.0000 | reverted (within noise) |
+| owlv2 | `box_threshold` | 5 | `0.001` | 0.240 | +0.0000 | reverted (within noise) |
+| yolo_world | `box_threshold` | 5 | `0.001` | 0.136 | +0.0040 | **kept** |
+| florence2 | Singleton `top_k` | 5 | `1` | 0.125 | +0.0005 | reverted (within noise) |
+| grounding_dino | Singleton `top_k` | 5 | `2` | 0.245 | +0.0003 | reverted (within noise) |
+| omdet_turbo | Singleton `top_k` | 5 | `1000` | 0.181 | +0.0003 | reverted (within noise) |
+| owlv2 | Singleton `top_k` | 5 | `1000` | 0.241 | +0.0014 | reverted (within noise) |
+| yolo_world | Singleton `top_k` | 5 | `2` | 0.132 | +0.0001 | reverted (within noise) |
+| florence2 | Checkpoint | 3 | `microsoft/Florence-2-large` | 0.155 | +0.0300 | **kept** |
+| grounding_dino | Checkpoint | 1 | `IDEA-Research/grounding-dino-tiny` | 0.212 | -0.0324 | reverted (within noise) |
+| owlv2 | Checkpoint | 2 | `google/owlv2-base-patch16-ensemble` | 0.180 | -0.0601 | reverted (within noise) |
+| yolo_world | Checkpoint | 3 | `yolov8l-worldv2.pt` | 0.122 | -0.0100 | reverted (within noise) |
+| florence2 | Per-class best vocabulary | 1 | `['player', 'basketball', 'referee', 'rim', 'number']` | 0.124 | -0.0002 | reverted (within noise) |
+| grounding_dino | Per-class best vocabulary | 1 | `['player', 'basketball', 'referee', 'rim', 'jersey number']` | 0.242 | -0.0022 | reverted (within noise) |
+| omdet_turbo | Per-class best vocabulary | 1 | `['basketball player', 'basketball', 'referee', 'rim', 'number']` | 0.187 | +0.0060 | **kept** |
+| owlv2 | Per-class best vocabulary | 1 | `['basketball player', 'basketball', 'referee', 'rim', 'number']` | 0.250 | +0.0102 | reverted |
+| yolo_world | Per-class best vocabulary | 1 | `['person', 'basketball', 'referee', 'basketball hoop', 'jersey number on a uniform']` | 0.164 | +0.0324 | **kept** |
+| yolo_world | `max_det` | 2 | `1000` | 0.132 | +0.0000 | reverted (within noise) |
+| yolo_world | Input resolution | 3 | `1280` | 0.145 | +0.0134 | **kept** |
+| florence2 | Add NMS | 4 | `0.3` | 0.125 | +0.0000 | reverted (within noise) |
+| florence2 | Vocabulary re-search (new checkpoint) | 6 | `microsoft/Florence-2-large` | 0.155 | +0.0300 | **kept** |
+| florence2 | Overlapping tiles 2x2 | 1 | `[2, 2]` | 0.135 | +0.0104 | **kept** |
+| grounding_dino | Overlapping tiles 2x2 | 1 | `[2, 2]` | 0.278 | +0.0337 | **kept** |
+| omdet_turbo | Overlapping tiles 2x2 | 1 | `[2, 2]` | 0.207 | +0.0260 | **kept** |
+| owlv2 | Overlapping tiles 2x2 | 1 | `[2, 2]` | 0.283 | +0.0431 | **kept** |
+| yolo_world | Overlapping tiles 2x2 | 1 | `[2, 2]` | 0.079 | -0.0528 | reverted (within noise) |
+| florence2 | NMS re-swept under tiling | 4 | `?` | 0.189 | +0.0646 | reverted |
+| grounding_dino | NMS re-swept under tiling | 9 | `?` | 0.278 | +0.0338 | reverted |
+| omdet_turbo | NMS re-swept under tiling | 9 | `?` | 0.207 | +0.0263 | reverted |
+| owlv2 | NMS re-swept under tiling | 9 | `?` | 0.288 | +0.0479 | reverted |
+| florence2 | All accepted changes together | 1 | `?` | 0.165 | +0.0407 | reverted |
+| grounding_dino | All accepted changes together | 1 | `?` | 0.278 | +0.0338 | reverted |
+| omdet_turbo | All accepted changes together | 1 | `?` | 0.216 | +0.0353 | reverted |
+| owlv2 | All accepted changes together | 1 | `?` | 0.287 | +0.0466 | reverted |
+| yolo_world | All accepted changes together | 1 | `?` | 0.177 | +0.0450 | reverted |
+| florence2 | NMS re-swept on the full stack | 5 | `?` | 0.234 | +0.1094 | reverted |
+| omdet_turbo | NMS re-swept on the full stack | 5 | `?` | 0.216 | +0.0353 | reverted |
+| owlv2 | NMS re-swept on the full stack | 5 | `?` | 0.287 | +0.0468 | reverted |
+| yolo_world | NMS re-swept on the full stack | 4 | `?` | 0.177 | +0.0453 | reverted |
+<!-- TABLE:vlm_ablation END -->
+
+</details>
+
+**Nothing here was chosen on `test`.** Every number above is val. The chosen
+configuration was scored on test exactly once, afterwards, and that run produced
+the tables in this report. Both the ablation manifest schema and its CLI refuse
+`--split test`, as the prompt search already did, because selecting a setting on
+the split the report publishes would make the published number the maximum over
+the ~130 arms tried rather than a measurement.
+
+**Still not searched**
+
+| Gap | Why it was left |
 | --- | --- |
-| Class vocabulary | 6 shared candidates × 5 models = 30 measurements |
-| Singleton `top_k` (ball/rim) | 6 values × 5 models, chosen jointly |
-| `box_threshold` | Fixed at **0.01** for every model — and the same value the fine-tuned detectors use (`reproduction_640.yaml`) |
-| `area_outliers` (5% of image) | Validated, not assumed: **no** ground-truth box in either split exceeds 5% — the largest object in the dataset is a player at 3.3%, so this filter cannot discard a true positive |
-
-**Not searched — known gaps**
-
-| Gap | Why it matters |
-| --- | --- |
-| **NMS IoU is not equalised** | OWLv2 uses 0.3, Grounding-DINO and YOLO-World 0.5; OmDet-Turbo and Florence-2 expose no such control. This is the same species of unequal tuning the vocabulary search exists to eliminate, one layer down. |
-| **Checkpoint size/variant** | Each model runs one checkpoint, never compared against its siblings. Florence-2 in particular: an incidental val measurement put the **base** checkpoint ~0.03 above the `-ft` one published here. Untested, and larger than anything the prompt search bought. |
-| **Input resolution / tiling** | Untested. The only lever that plausibly targets `rim`, `ball` and `number` together, all of which are small and all of which score near zero. |
-| **Gemini's prompt** | Hand-written with per-class definitions and count constraints; excluded from the search because it is a billed API. It keeps an advantage no open-weights row has. |
+| **Gemini's prompt** | Hand-written with per-class definitions and count constraints; excluded from every search because it is a billed API and each arm would cost money per image. It keeps an advantage no open-weights row has, and this report says so rather than pretending otherwise. |
+| **Vocabulary re-search for losing checkpoints** | A checkpoint that *won* re-ran the full six-candidate vocabulary search against its own weights, so the new checkpoint received the same effort the old one did. Checkpoints that lost did not. A different vocabulary could in principle reorder them; each re-search is six more forward passes to relitigate a gap of 0.03–0.06, and that is not a good use of the budget. |
+| **`area_outliers` (5% of image)** | Validated rather than swept: **no** ground-truth box in either split exceeds 5% — the largest object in the dataset is a player at 3.3% — so this filter cannot discard a true positive, and there is nothing for a sweep to find. |
 
 **One protocol asymmetry, disclosed.** The zero-shot rows pass through two
 filters the fine-tuned detectors do not — `area_outliers` and
@@ -156,13 +298,6 @@ filters the fine-tuned detectors do not — `area_outliers` and
 confidence threshold are identical, but post-processing is not. The net effect
 cuts both ways: the area filter *removes* junk boxes a trained detector would
 never emit, while the singleton cap *constrains* the zero-shot rows.
-
-**Does any of this threaten the conclusion?** No, and the margin is why. The best
-zero-shot model (0.250) sits **2.5× below the lowest-ranked fine-tuned detector**
-(0.619). The largest single improvement produced by all of the tuning above was
-**+0.013 mAP**. Closing the gap would take roughly **28 more wins of that size**.
-The remaining knobs are worth closing for fairness, not because they could change
-the answer.
 
 ## The zero-shot ceiling
 
@@ -173,21 +308,29 @@ from the committed prediction dumps in `results/vlm/*.json` (never transcribed):
 | Model | mAP@50:95 | mAP@50 | mAP@75 |
 | --- | --- | --- | --- |
 | Gemini | 0.250 | 0.430 | 0.252 |
-| OWLv2 | 0.246 | 0.386 | 0.274 |
-| Grounding-DINO | 0.234 | 0.283 | 0.247 |
-| OmDet-Turbo | 0.180 | 0.264 | 0.193 |
-| Florence-2 | 0.108 | 0.145 | 0.114 |
-| YOLO-World | 0.145 | 0.184 | 0.160 |
+| OWLv2 | 0.235 | 0.339 | 0.277 |
+| Grounding-DINO | 0.244 | 0.285 | 0.258 |
+| OmDet-Turbo | 0.173 | 0.234 | 0.179 |
+| Florence-2 | 0.154 | 0.200 | 0.158 |
+| YOLO-World | 0.189 | 0.241 | 0.209 |
 <!-- TABLE:vlm_summary END -->
 
-The strongest zero-shot model in the table above still sits **below half** the
-mAP@50:95 of even the *lowest-ranked* fine-tuned detector, and well under half
-of the best one — see [FINAL_COMPARISON_640.md](FINAL_COMPARISON_640.md) for the
-fine-tuned figures rather than re-tabulating them here. Fine-tuning on this small
-in-domain dataset buys a large, unambiguous accuracy margin over the best
-general-purpose zero-shot detector available off the shelf. Zero-shot is a
-useful floor and a fast way to bootstrap labels; it is not a substitute for
-fine-tuning when the target classes are domain-specific.
+The strongest zero-shot model still sits **below half** the mAP@50:95 of even the
+*lowest-ranked* fine-tuned detector (0.250 against 0.619), and well under half of
+the best one — see [FINAL_COMPARISON_640.md](FINAL_COMPARISON_640.md) for the
+fine-tuned figures rather than re-tabulating them here.
+
+That margin is what the ablation above should be read against. A configuration
+search that swept every remaining knob, measured ~180 arms, and produced +0.054
+on val moved the *published* ceiling by +0.016 on average and left the top of the
+table where it was: Gemini at 0.250, with Grounding-DINO now the best
+open-weights row at 0.244. Closing a 0.37 gap at +0.016 per exhaustive sweep is
+not a programme anyone should start.
+
+Fine-tuning on this small in-domain dataset buys a large, unambiguous accuracy
+margin over the best general-purpose zero-shot detector available off the shelf.
+Zero-shot is a useful floor and a fast way to bootstrap labels; it is not a
+substitute for fine-tuning when the target classes are domain-specific.
 
 ## Per-class failure analysis: where zero-shot breaks
 
@@ -200,11 +343,11 @@ makes the pattern unmistakable:
 | Model | player | ball | referee | rim | number |
 | --- | --- | --- | --- | --- | --- |
 | Gemini | 0.923 | 0.316 | 0.717 | 0.036 | 0.156 |
-| OWLv2 | 0.848 | 0.389 | 0.352 | 0.002 | 0.337 |
-| Grounding-DINO | 0.851 | 0.319 | 0.237 | 0.000 | 0.009 |
-| OmDet-Turbo | 0.844 | 0.104 | 0.350 | 0.000 | 0.021 |
-| Florence-2 | 0.335 | 0.139 | 0.224 | 0.000 | 0.027 |
-| YOLO-World | 0.829 | 0.078 | 0.000 | 0.000 | 0.014 |
+| OWLv2 | 0.630 | 0.448 | 0.277 | 0.004 | 0.336 |
+| Grounding-DINO | 0.633 | 0.283 | 0.503 | 0.000 | 0.006 |
+| OmDet-Turbo | 0.622 | 0.139 | 0.293 | 0.000 | 0.118 |
+| Florence-2 | 0.374 | 0.114 | 0.381 | 0.000 | 0.132 |
+| YOLO-World | 0.840 | 0.311 | 0.000 | 0.005 | 0.051 |
 <!-- TABLE:vlm_per_class END -->
 
 Read down the columns and one story emerges: **open-vocabulary VLMs recognise
@@ -384,15 +527,28 @@ clear the zero-shot ceiling by such a wide margin.
 
 ## Reproducing these tables
 
-Both tables are emitted by the report generator from the committed prediction
-dumps, so they cannot drift from the data:
+Every table here is emitted by the report generator from committed files, so
+none of them can drift from the data:
 
 ```bash
 pixi run python scripts/generate_report.py --report vlm_vs_finetuned --write   # regenerate
 pixi run python scripts/generate_report.py --report vlm_vs_finetuned --check   # CI drift gate
 ```
 
-The generator loads each `results/vlm/*.json`, recomputes AP against the shared
-ground truth through `compute_metrics` with the `merged5` taxonomy, and injects
-the result between the `<!-- TABLE:... -->` markers above. No number in this
-report is typed by hand.
+The two test-split tables come from `results/vlm/vlm_metrics_merged5.json`,
+precomputed once by `scripts/write_vlm_metrics.py` where the ground truth
+exists, so `--check` runs on a machine without the dataset. The ablation table
+comes from `results/vlm/ablation/valid_arms.json` plus `conf/vlm_zeroshot.yaml`
+— it reads the manifest because its kept/reverted column is *derived* from what
+the published config actually runs, which is what makes "kept" a checkable claim
+rather than an assertion. All three are injected between the
+`<!-- TABLE:... -->` markers above. No number in this report is typed by hand.
+
+To reproduce the ablation itself (val split, ~130 arms; the raw-detection cache
+means the post-processing sweeps cost one forward pass each rather than one per
+value):
+
+```bash
+pixi run -e vlm python scripts/ablate_vlm.py                    # the whole sweep
+pixi run -e vlm python scripts/ablate_vlm.py --verify --only owlv2   # cache vs live
+```

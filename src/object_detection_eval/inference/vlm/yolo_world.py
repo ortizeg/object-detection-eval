@@ -53,6 +53,11 @@ class YOLOWorldInferencer(BaseInferencer):
             integrates the full precision-recall curve, matching the other
             inferencers here.
         nms_iou_threshold: IoU threshold for ultralytics' built-in NMS.
+        imgsz: Letterbox size the image is resized to before inference.
+        max_det: Cap on detections kept per image, applied inside ultralytics'
+            NMS. Made explicit rather than left at the library default because
+            at ``box_threshold=0.01`` this model can exceed it, and a cap that
+            truncates silently reads as a model that found nothing more.
         device: ``"cuda"``, ``"cpu"``, ``"mps"``, or ``"auto"``.
     """
 
@@ -62,6 +67,8 @@ class YOLOWorldInferencer(BaseInferencer):
         classes: list[str] | None = None,
         box_threshold: float = 0.01,
         nms_iou_threshold: float = 0.5,
+        imgsz: int = 640,
+        max_det: int = 300,
         device: str = "auto",
     ) -> None:
         import torch
@@ -71,6 +78,8 @@ class YOLOWorldInferencer(BaseInferencer):
         self.classes = classes or []
         self.box_threshold = box_threshold
         self.nms_iou_threshold = nms_iou_threshold
+        self.imgsz = imgsz
+        self.max_det = max_det
 
         if device == "auto":
             if torch.cuda.is_available():
@@ -108,6 +117,8 @@ class YOLOWorldInferencer(BaseInferencer):
                 image,
                 conf=self.box_threshold,
                 iou=self.nms_iou_threshold,
+                imgsz=self.imgsz,
+                max_det=self.max_det,
                 device=self._device,
                 verbose=False,
             )

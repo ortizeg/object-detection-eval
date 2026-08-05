@@ -536,3 +536,191 @@ def vlm_per_class_table(
             cells.append(_EM_DASH if value is None else _fmt3(float(value)))
         rows.append(cells)
     return _table(header, rows)
+
+
+#: Human-readable names for the ablation elements, in the order they were tried.
+#: Order is fixed here rather than taken from the log so the rendered table
+#: reads as the sequence the method actually followed, not as whatever order the
+#: arms happen to sit in the JSON after several merged runs.
+_ABLATION_ELEMENTS: tuple[tuple[str, str], ...] = (
+    ("nms_iou", "NMS IoU"),
+    ("processor_nms_iou", "Processor NMS IoU"),
+    ("box_threshold", "`box_threshold`"),
+    ("singleton_top_k", "Singleton `top_k`"),
+    ("checkpoint", "Checkpoint"),
+    ("vocab_per_class_best", "Per-class best vocabulary"),
+    ("max_det", "`max_det`"),
+    ("imgsz", "Input resolution"),
+    ("florence2_nms", "Add NMS"),
+    ("vocabulary_on_new_checkpoint", "Vocabulary re-search (new checkpoint)"),
+    ("tiles", "Overlapping tiles 2x2"),
+    ("tiles_3x3", "Overlapping tiles 3x3"),
+    # Last, because it is not a single element: it stacks the ones already
+    # accepted for that model and exists to check they compose. Single-element
+    # deltas are measured against a baseline that stops existing the moment
+    # another element is adopted, so they cannot simply be added.
+    ("nms_on_tiles", "NMS re-swept under tiling"),
+    ("combined", "All accepted changes together"),
+    ("nms_on_combined", "NMS re-swept on the full stack"),
+)
+
+#: Element deltas below this are reported as no effect rather than as a win.
+#:
+#: 96 val images and a metric quantised by COCO's 101-point interpolation do not
+#: resolve a thousandth of a point. Adopting a +0.0004 "improvement" would be
+#: fitting the val split, which is the same error as fitting the test split, one
+#: step removed.
+ABLATION_NOISE_FLOOR = 0.002
+
+
+def _fmt_delta(value: float) -> str:
+    return f"{value:+.4f}"
+
+
+def _varied_knob(arm: Any, baseline: Any) -> tuple[str, Any] | None:
+    """The single config field an arm changes, and its value.
+
+    Derived by comparison rather than recorded, so the rendered table cannot
+    claim an arm varied something it did not. Returns ``None`` if the arm
+    differs in zero or more than one field, which the ablation's own schema test
+    already forbids.
+    """
+    differing = [
+        (key, value) for key, value in arm.config.items() if baseline.config.get(key) != value
+    ]
+    return differing[0] if len(differing) == 1 else None
+
+
+def ablation_summary_table(
+    log: Any,
+    adopted: Mapping[str, Mapping[str, Any]],
+) -> str:
+    """Render the one-element-at-a-time ablation: best arm per model per element.
+
+    The verdict column is DERIVED, not stored: an element counts as kept only if
+    the value that won on val is the value the published manifest actually
+    runs. So the table cannot say "kept" about a change that never reached the
+    config, and editing the config without re-rendering fails the drift gate.
+
+    Args:
+        log: A loaded :class:`~object_detection_eval.report.loaders.AblationLog`.
+        adopted: ``{model_name: published_config}`` from the committed
+            ``vlm_zeroshot.yaml``, keyed by the same model names the log uses.
+
+    Returns:
+        One row per (model, element) actually measured, ordered by element in
+        the sequence the ablation followed and by model within it.
+    """
+    baselines = {a.model: a for a in log.arms if a.element == "baseline"}
+    by_key: dict[tuple[str, str], list[Any]] = {}
+    for arm in log.arms:
+        if arm.element == "baseline":
+            continue
+        by_key.setdefault((arm.element, arm.model), []).append(arm)
+
+    header = ["Model", "Element", "Tried", "Best", "val mAP@50:95", "Δ", "Verdict"]
+    rows: list[list[str]] = []
+
+    for element, label in _ABLATION_ELEMENTS:
+        for model in sorted({m for el, m in by_key if el == element}):
+            arms = by_key[(element, model)]
+            base = baselines.get(model)
+            best = max(arms, key=lambda a: a.map_50_95)
+            varied = _varied_knob(best, base) if base is not None else None
+            knob, value = varied if varied is not None else ("?", "?")
+
+            delta = best.delta_map5095
+            published = adopted.get(model, {}).get(knob)
+            kept = delta is not None and delta >= ABLATION_NOISE_FLOOR and published == value
+
+            if delta is None:
+                verdict = "not comparable"
+            elif kept:
+                verdict = "**kept**"
+            elif delta < ABLATION_NOISE_FLOOR:
+                verdict = "reverted (within noise)"
+            else:
+                verdict = "reverted"
+
+            rows.append(
+                [
+                    model,
+                    label,
+                    str(len(arms)),
+                    f"`{value}`",
+                    _fmt3(best.map_50_95),
+                    _EM_DASH if delta is None else _fmt_delta(delta),
+                    verdict,
+                ]
+            )
+
+    return _table(header, rows)
+
+
+def ablation_headline_table(
+    log: Any,
+    adopted: Mapping[str, Mapping[str, Any]],
+) -> str:
+    """Render one row per model: what it was, what it became, what did it.
+
+    Separate from :func:`ablation_summary_table` for readability rather than
+    content. The per-element table is the evidence — forty-odd rows covering
+    every knob tried and reverted — and burying the outcome in it serves nobody.
+    This is the answer; that is the working.
+
+    "Changes kept" is derived from the winning arm's config rather than stored,
+    so it cannot describe a configuration the log does not contain.
+    """
+    baselines = {a.model: a for a in log.arms if a.element == "baseline"}
+    best: dict[str, Any] = {}
+    for arm in log.arms:
+        if arm.element == "baseline":
+            continue
+        if arm.model not in best or arm.map_50_95 > best[arm.model].map_50_95:
+            best[arm.model] = arm
+
+    header = ["Model", "Published", "Best on val", "Δ", "Changes kept"]
+    rows: list[list[str]] = []
+    for model, arm in sorted(best.items(), key=lambda kv: -kv[1].map_50_95):
+        base = baselines.get(model)
+        if base is None:  # pragma: no cover - every model has a baseline
+            continue
+        changed = [
+            _describe_change(key, value)
+            for key, value in arm.config.items()
+            if base.config.get(key) != value
+        ]
+        rows.append(
+            [
+                model,
+                _fmt3(base.map_50_95),
+                f"**{_fmt3(arm.map_50_95)}**",
+                _fmt_delta(arm.map_50_95 - base.map_50_95),
+                ", ".join(changed) or _EM_DASH,
+            ]
+        )
+    return _table(header, rows)
+
+
+#: Human-readable names for the config fields the headline table reports.
+_CHANGE_LABELS = {
+    "tiles": "tiling",
+    "nms_iou_threshold": "NMS IoU",
+    "classes": "vocabulary",
+    "model_name": "checkpoint",
+    "imgsz": "input size",
+    "box_threshold": "box threshold",
+    "processor_nms_threshold": "processor NMS",
+}
+
+
+def _describe_change(key: str, value: Any) -> str:
+    """One accepted change, as a reader would say it."""
+    label = _CHANGE_LABELS.get(key, key)
+    if key == "tiles":
+        return f"{label} {value[0]}x{value[1]}" if value else f"no {label}"
+    if key == "classes":
+        return label
+    if key == "model_name":
+        return f"{label} `{str(value).split('/')[-1]}`"
+    return f"{label} {value}"

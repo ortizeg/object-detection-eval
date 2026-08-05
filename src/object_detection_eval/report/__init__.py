@@ -12,6 +12,8 @@ from __future__ import annotations
 
 from object_detection_eval.report.inject import inject_table
 from object_detection_eval.report.loaders import (
+    AblationArm,
+    AblationLog,
     AccuracyModelEntry,
     AccuracyResult,
     BootstrapConfig,
@@ -33,14 +35,19 @@ from object_detection_eval.report.loaders import (
     SecondRun,
     SplitOverlap,
     VlmModelEntry,
+    load_ablation_log,
     load_accuracy_results,
     load_bootstrap_report,
     load_cpu_latency_results,
     load_dataset_stats,
     load_latency_results,
     load_vlm_metrics,
+    load_zeroshot_config,
 )
 from object_detection_eval.report.tables import (
+    ABLATION_NOISE_FLOOR,
+    ablation_headline_table,
+    ablation_summary_table,
     ci_table,
     class_count_table,
     clip_inventory_table,
@@ -59,6 +66,9 @@ from object_detection_eval.report.tables import (
 )
 
 __all__ = [
+    "ABLATION_NOISE_FLOOR",
+    "AblationArm",
+    "AblationLog",
     "AccuracyModelEntry",
     "AccuracyResult",
     "BootstrapConfig",
@@ -80,6 +90,8 @@ __all__ = [
     "SecondRun",
     "SplitOverlap",
     "VlmModelEntry",
+    "ablation_headline_table",
+    "ablation_summary_table",
     "ci_table",
     "class_count_table",
     "clip_inventory_table",
@@ -89,12 +101,14 @@ __all__ = [
     "image_geometry_note",
     "inject_table",
     "latency_section",
+    "load_ablation_log",
     "load_accuracy_results",
     "load_bootstrap_report",
     "load_cpu_latency_results",
     "load_dataset_stats",
     "load_latency_results",
     "load_vlm_metrics",
+    "load_zeroshot_config",
     "per_class_table",
     "primary_7model_table",
     "split_overlap_table",

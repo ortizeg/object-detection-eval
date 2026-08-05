@@ -20,6 +20,7 @@ from PIL import Image
 from transformers import Owlv2ForObjectDetection, Owlv2Processor
 
 from object_detection_eval.inference.base import BaseInferencer
+from object_detection_eval.inference.vlm.nms import per_class_nms
 from object_detection_eval.schemas.detection import BoundingBox, Detection
 from object_detection_eval.utils.boxes import pixel_xyxy_to_normalized_xywh
 
@@ -110,7 +111,7 @@ class OWLv2Inferencer(BaseInferencer):
             )[0]
 
             detections = self._convert_results(results, w, h)
-            return self._nms(detections)
+            return per_class_nms(detections, self.nms_iou_threshold)
 
         except Exception:
             logger.exception("OWLv2 inference failed")
@@ -172,50 +173,3 @@ class OWLv2Inferencer(BaseInferencer):
             )
 
         return detections
-
-    # ------------------------------------------------------------------
-    # Per-class greedy NMS on normalized xywh boxes
-    # ------------------------------------------------------------------
-
-    def _nms(self, detections: list[Detection]) -> list[Detection]:
-        """Apply per-class greedy NMS to remove duplicate boxes."""
-        if len(detections) <= 1:
-            return detections
-
-        dets = sorted(detections, key=lambda d: d.confidence, reverse=True)
-
-        keep: list[Detection] = []
-        suppressed = [False] * len(dets)
-
-        for i, det_i in enumerate(dets):
-            if suppressed[i]:
-                continue
-            keep.append(det_i)
-            for j in range(i + 1, len(dets)):
-                if suppressed[j]:
-                    continue
-                if dets[j].class_id != det_i.class_id:
-                    continue
-                if self._iou(det_i, dets[j]) > self.nms_iou_threshold:
-                    suppressed[j] = True
-
-        return keep
-
-    @staticmethod
-    def _iou(a: Detection, b: Detection) -> float:
-        """Compute IoU between two detections (normalized xywh boxes)."""
-        ax1, ay1 = a.bbox.x, a.bbox.y
-        ax2, ay2 = a.bbox.x + a.bbox.w, a.bbox.y + a.bbox.h
-        bx1, by1 = b.bbox.x, b.bbox.y
-        bx2, by2 = b.bbox.x + b.bbox.w, b.bbox.y + b.bbox.h
-
-        ix1 = max(ax1, bx1)
-        iy1 = max(ay1, by1)
-        ix2 = min(ax2, bx2)
-        iy2 = min(ay2, by2)
-
-        inter = max(0.0, ix2 - ix1) * max(0.0, iy2 - iy1)
-        area_a = a.bbox.w * a.bbox.h
-        area_b = b.bbox.w * b.bbox.h
-        union = area_a + area_b - inter
-        return inter / max(union, 1e-9)

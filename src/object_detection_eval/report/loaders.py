@@ -410,3 +410,116 @@ def load_dataset_stats(path: Path | str) -> DatasetStats:
         return DatasetStats.model_validate(_read_json(path))
     except ValidationError as exc:
         raise ReportLoadError(f"{path}: {exc}") from exc
+
+
+# Ablation: results/vlm/ablation/valid_arms.json
+# --------------------------------------------------------------------------- #
+
+
+class AblationArm(BaseModel):
+    """One scored ablation arm: its configuration, its score, its delta."""
+
+    model_config = _STRICT
+
+    arm: str
+    model: str
+    element: str
+    baseline: str | None
+    map_50_95: float = Field(alias="mAP_50_95")
+    map_50: float = Field(alias="mAP_50")
+    per_class_ap50: dict[str, float]
+    delta_map5095: float | None
+    #: Which accelerator scored this arm. The log accumulated across machines —
+    #: see ``results/vlm/ablation/substrate_check.json``, which measures that
+    #: the choice cannot move an arm by more than the adoption noise floor.
+    substrate: str | None = None
+    #: The arm's full configuration. Untyped on purpose: this mirrors
+    #: ``ablate_vlm.Arm`` field for field, and duplicating that schema here
+    #: would create two definitions of one thing that must not disagree.
+    config: dict[str, Any]
+
+
+class AblationLog(BaseModel):
+    """The accumulated ablation record for one split."""
+
+    model_config = _STRICT
+
+    split: str
+    arms: list[AblationArm]
+
+
+def load_ablation_log(path: Path | str) -> AblationLog:
+    """Load the committed VLM ablation log.
+
+    Args:
+        path: The committed ``results/vlm/ablation/{split}_arms.json``.
+
+    Returns:
+        Every arm measured, kept and reverted alike. Reverted arms are the
+        point: a log holding only the winners would record what was adopted
+        rather than what was tried.
+
+    Raises:
+        ReportLoadError: the file has an unexpected/missing key or wrong type,
+            or records the split the report publishes. The ablation is a search
+            and must never have run on ``test``; a log that says it did is a
+            protocol failure, not a rendering problem, so it fails at load.
+    """
+    try:
+        log = AblationLog.model_validate(_read_json(path))
+    except ValidationError as exc:
+        raise ReportLoadError(f"{path}: {exc}") from exc
+    if log.split == "test":
+        msg = (
+            f"{path}: ablation log records split='test'. Configurations must be "
+            f"chosen on val; a log scored on the published split means the "
+            f"reported numbers are the maximum over the arms tried."
+        )
+        raise ReportLoadError(msg)
+    return log
+
+
+# --------------------------------------------------------------------------- #
+# The published zero-shot configuration: conf/vlm_zeroshot.yaml
+# --------------------------------------------------------------------------- #
+
+
+def load_zeroshot_config(path: Path | str) -> dict[str, dict[str, Any]]:
+    """Load the published per-model zero-shot configuration.
+
+    The ablation table's kept/reverted verdict is decided by comparing each
+    element's val winner against what the manifest ACTUALLY runs, so the report
+    cannot claim a change was adopted unless it reached the config. That makes
+    this a report input rather than only a run input: editing the manifest
+    without re-rendering fails ``generate_report.py --check``.
+
+    Reading YAML here is a deliberate exception to "loaders read committed JSON
+    results". The manifest is committed, contains no ground truth, and is the
+    only place the adopted configuration exists — deriving the verdict from a
+    copy would let the copy drift from the thing it describes.
+
+    Args:
+        path: The committed ``conf/vlm_zeroshot.yaml``.
+
+    Returns:
+        ``{model_name: config}`` with the bookkeeping keys removed, so the
+        remaining keys line up with an ablation arm's ``config``.
+
+    Raises:
+        ReportLoadError: the file is unreadable or is not a model list.
+    """
+    import yaml
+
+    raw = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+    if not isinstance(raw, dict) or not isinstance(raw.get("models"), list):
+        msg = f"{path}: expected a mapping with a `models` list"
+        raise ReportLoadError(msg)
+
+    out: dict[str, dict[str, Any]] = {}
+    for entry in raw["models"]:
+        if not isinstance(entry, dict) or "name" not in entry:
+            msg = f"{path}: every model entry needs a `name`"
+            raise ReportLoadError(msg)
+        config = {k: v for k, v in entry.items() if k not in {"name", "expected_map5095"}}
+        out[str(entry["name"])] = config
+    return out

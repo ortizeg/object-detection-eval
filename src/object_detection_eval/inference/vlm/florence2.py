@@ -21,6 +21,7 @@ from PIL import Image
 from transformers import AutoModelForCausalLM, AutoProcessor
 
 from object_detection_eval.inference.base import BaseInferencer
+from object_detection_eval.inference.vlm.nms import per_class_nms
 from object_detection_eval.schemas.detection import BoundingBox, Detection
 from object_detection_eval.utils.boxes import pixel_xyxy_to_normalized_xywh
 
@@ -42,7 +43,19 @@ class Florence2Inferencer(BaseInferencer):
         task: Florence-2 task prompt (``"<OD>"`` or
             ``"<CAPTION_TO_PHRASE_GROUNDING>"``).
         default_confidence: Confidence assigned to all detections.
+        nms_iou_threshold: Per-class NMS IoU, or ``None`` for no suppression at
+            all — which is what this model did unconditionally until 2026-08-03,
+            and which is a real operating point rather than a missing feature.
         device: Device string (``"cuda"``, ``"cpu"``, ``"mps"``, or ``"auto"``).
+
+    Note:
+        Because every detection carries the same confidence, NMS here cannot
+        mean "keep the higher-scoring box". It falls back to
+        :func:`~.nms.per_class_nms`'s documented tie-break — input order, which
+        for Florence-2 is generation order. That makes it a de-duplicator rather
+        than a ranker, and it is the reason the ablation treats adding NMS to
+        this model as its own element instead of folding it into the shared
+        ``nms_iou`` sweep.
     """
 
     def __init__(
@@ -52,6 +65,7 @@ class Florence2Inferencer(BaseInferencer):
         caption: str = "",
         task: str = "<OD>",
         default_confidence: float = 1.0,
+        nms_iou_threshold: float | None = None,
         device: str = "auto",
     ) -> None:
         self.model_name = model_name
@@ -59,6 +73,7 @@ class Florence2Inferencer(BaseInferencer):
         self.caption = caption
         self._task = task
         self.default_confidence = default_confidence
+        self.nms_iou_threshold = nms_iou_threshold
 
         # Build normalised lookup: lower-cased class name -> class index
         self._name_to_id: dict[str, int] = {
@@ -124,7 +139,10 @@ class Florence2Inferencer(BaseInferencer):
                 image_size=(w, h),
             )
 
-            return self._convert_results(parsed, w, h)
+            detections = self._convert_results(parsed, w, h)
+            if self.nms_iou_threshold is None:
+                return detections
+            return per_class_nms(detections, self.nms_iou_threshold)
 
         except Exception:
             logger.exception("Florence-2 inference failed")

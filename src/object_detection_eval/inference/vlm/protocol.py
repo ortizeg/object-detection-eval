@@ -35,7 +35,11 @@ import supervision as sv
 
 from object_detection_eval.data.image import ImageLoader
 from object_detection_eval.data.taxonomy import remap_detections
-from object_detection_eval.inference.vlm.filters import area_outliers, single_best_per_class
+from object_detection_eval.inference.vlm.filters import (
+    DEFAULT_SINGLETON_TOP_K,
+    area_outliers,
+    single_best_per_class,
+)
 from object_detection_eval.metrics.detection_map import detections_to_sv
 
 if TYPE_CHECKING:
@@ -71,6 +75,8 @@ def score_split(
     filenames: list[str],
     label_map: dict[int, str],
     name_to_id: dict[str, int],
+    max_area_fraction: float = 0.05,
+    singleton_top_k: int = DEFAULT_SINGLETON_TOP_K,
 ) -> dict[str, sv.Detections]:
     """Run one inferencer over a split and return scorer-ready detections.
 
@@ -80,6 +86,12 @@ def score_split(
         filenames: Image filenames to score, in ground-truth order.
         label_map: The inferencer's own class-id -> prompt-name map.
         name_to_id: Eval taxonomy (lowercased name -> eval id), incl. aliases.
+        max_area_fraction: Passed to :func:`~.filters.area_outliers`. Exposed so
+            ``scripts/ablate_vlm.py`` can score a filter arm through this exact
+            path rather than a parallel one; the default is the published value
+            and no caller in the benchmark overrides it.
+        singleton_top_k: Passed to :func:`~.filters.single_best_per_class`. Same
+            reason, same published default.
 
     Returns:
         ``filename -> sv.Detections`` in the eval taxonomy's id space, ready to
@@ -93,8 +105,8 @@ def score_split(
 
         raw = inferencer.predict(image, image_width=width, image_height=height)
         remapped = remap_detections(raw, label_map, name_to_id)
-        area_filtered = area_outliers(remapped)
-        final = single_best_per_class(area_filtered)
+        area_filtered = area_outliers(remapped, max_area_fraction=max_area_fraction)
+        final = single_best_per_class(area_filtered, top_k=singleton_top_k)
 
         pred_map[filename] = detections_to_sv(final, width, height)
     return pred_map

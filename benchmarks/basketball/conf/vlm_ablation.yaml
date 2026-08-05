@@ -1,0 +1,442 @@
+# vlm_ablation.yaml -- the one-element-at-a-time zero-shot VLM ablation.
+#
+# WHY THIS FILE EXISTS
+#
+# vlm_prompt_search.yaml equalised the *prompt*. Nothing else about how these
+# five models are run was ever measured. Some of it was not even equal across
+# models: OWLv2 suppressed at NMS IoU 0.3 while Grounding-DINO and YOLO-World
+# used 0.5, and OmDet-Turbo ran a SECOND, hardwired NMS inside its HuggingFace
+# processor that no manifest mentioned. A published zero-shot ceiling that
+# depends on unexamined constants is a measurement of those constants.
+#
+# So every knob gets swept, one at a time, and each result is kept or reverted
+# on the measured delta. Reverted elements stay in this file: the negative
+# results are the substance of the exercise, and deleting a failed arm would
+# make the ablation log a record of what worked rather than of what was tried.
+#
+# SEARCH SPLIT: `valid` (96 images), NOT `test`.
+#
+# Identical rule and identical enforcement to vlm_prompt_search.yaml. Choosing a
+# configuration by its score on the 94 test images and then publishing those
+# same test numbers reports the maximum over every arm below as if it were one
+# unbiased measurement. `AblationManifest` refuses split: test, and so does
+# --split. The chosen configuration is scored on test exactly once, by
+# run_vlm_benchmark.py, after this file is finished with.
+#
+# Gemini is absent for the same reason it is absent from the prompt search: it
+# is a billed API and every arm would cost money per image.
+
+split: valid
+
+# ---------------------------------------------------------------------------
+# Baselines -- each model exactly as vlm_zeroshot.yaml publishes it today.
+# Every delta below is measured against these, re-scored by this harness on val
+# so that no comparison mixes numbers from two different measurement paths.
+# ---------------------------------------------------------------------------
+models:
+  - name: owlv2
+    config:
+      inferencer: owlv2
+      model_name: google/owlv2-large-patch14-ensemble
+      classes: [basketball player, basketball, referee, basketball hoop, jersey number]
+      box_threshold: 0.01
+      nms_iou_threshold: 0.3
+
+  - name: omdet_turbo
+    config:
+      inferencer: omdet_turbo
+      model_name: omlab/omdet-turbo-swin-tiny-hf
+      classes: [player, ball, referee, rim, number]
+      box_threshold: 0.01
+      nms_iou_threshold: 0.5
+      # The value the HF processor was silently defaulting to before this
+      # ablation made it explicit. Stated so the baseline is reproducible.
+      processor_nms_threshold: 0.5
+
+  - name: grounding_dino
+    config:
+      inferencer: grounding_dino
+      model_name: IDEA-Research/grounding-dino-base
+      classes: [basketball player, basketball, referee, basketball hoop, jersey number]
+      box_threshold: 0.01
+      text_threshold: 0.25
+      nms_iou_threshold: 0.5
+
+  - name: florence2
+    config:
+      inferencer: florence2
+      model_name: microsoft/Florence-2-large-ft
+      classes: [player, ball, referee, rim, number]
+      task: "<CAPTION_TO_PHRASE_GROUNDING>"
+      box_threshold: 0.01
+      # null, not a number: Florence-2 genuinely applies no NMS. Writing 1.0
+      # here would say "NMS that suppresses nothing", which is the same output
+      # by a different claim.
+      nms_iou_threshold: null
+
+  - name: yolo_world
+    config:
+      inferencer: yolo_world
+      model_name: yolov8x-worldv2.pt
+      classes: [person, sports ball, referee, basketball hoop, jersey number]
+      box_threshold: 0.01
+      nms_iou_threshold: 0.5
+      imgsz: 640
+      max_det: 300
+
+# ---------------------------------------------------------------------------
+# Elements. One knob each; arms are generated as baseline-plus-one-change.
+# ---------------------------------------------------------------------------
+elements:
+  # ELEMENT 1 -- NMS IoU. The clearest remaining unfairness: this was never
+  # equalised across models and never measured for any of them. Florence-2 is
+  # excluded because it has no NMS to retune; giving it one is a separate
+  # element (florence2_nms) since that is adding a stage, not tuning it.
+  #
+  # The grid runs to 1.0 — no suppression at all — because the first pass found
+  # every model improving monotonically toward the top of a 0.2-0.9 range, with
+  # OWLv2's best sitting on the boundary. A sweep whose optimum is at its own
+  # edge has not found an optimum, it has found the edge.
+  - name: nms_iou
+    knob: nms_iou_threshold
+    applies_to: [owlv2, omdet_turbo, grounding_dino, yolo_world]
+    values: [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 1.0]
+
+  # ELEMENT 1b -- OmDet-Turbo's INNER NMS, the one inside
+  # post_process_grounded_object_detection. It runs first and on the full
+  # candidate set, so it is the pass that actually sets this model's operating
+  # point; the outer per-class NMS can only remove what it already let through.
+  - name: processor_nms_iou
+    knob: processor_nms_threshold
+    applies_to: [omdet_turbo]
+    values: [0.2, 0.3, 0.4, 0.6, 0.7, 0.8, 0.9]
+
+  # ELEMENT 2 -- box_threshold. 0.01 everywhere, inherited from the ONNX
+  # detectors, never checked for a VLM. The expectation is that it does nothing:
+  # mAP integrates the whole precision-recall curve, so a lower threshold should
+  # only add low-confidence tail. Measured rather than assumed, because "it
+  # cannot matter" is exactly the reasoning that left OmDet-Turbo's inner NMS
+  # unexamined. 0.001 is the raw-cache floor and cannot go lower without
+  # rebuilding it.
+  - name: box_threshold
+    knob: box_threshold
+    applies_to: [owlv2, omdet_turbo, grounding_dino, yolo_world]
+    values: [0.001, 0.005, 0.02, 0.05, 0.1]
+
+  # ELEMENT 3 -- singleton top_k. Chosen as 3 on val under the OLD NMS and
+  # threshold settings. If element 1 or 2 moves, that choice was made under a
+  # configuration that no longer exists, so it is re-confirmed rather than
+  # inherited.
+  - name: singleton_top_k
+    knob: singleton_top_k
+    values: [1, 2, 5, 10, 1000]
+
+  # ELEMENT 4 -- checkpoint variants. Every model here runs exactly one
+  # checkpoint and has never been compared to its own siblings.
+  #
+  # A checkpoint swap invalidates the vocabulary choice: the prompt each model
+  # publishes won its six-candidate search AS THAT CHECKPOINT. Any winner here
+  # therefore re-runs the full search against the new weights before it can be
+  # adopted, so the new checkpoint receives the same effort the old one did.
+  - name: checkpoint
+    knob: model_name
+    applies_to: [owlv2]
+    values:
+      - google/owlv2-base-patch16-ensemble
+      - google/owlv2-large-patch14-finetuned
+
+  - name: checkpoint
+    knob: model_name
+    applies_to: [grounding_dino]
+    values: [IDEA-Research/grounding-dino-tiny]
+
+  - name: checkpoint
+    knob: model_name
+    applies_to: [florence2]
+    values: [microsoft/Florence-2-large, microsoft/Florence-2-base-ft, microsoft/Florence-2-base]
+
+  - name: checkpoint
+    knob: model_name
+    applies_to: [yolo_world]
+    values: [yolov8l-worldv2.pt, yolov8m-worldv2.pt, yolov8s-worldv2.pt]
+
+  # ELEMENT 4b -- the vocabulary re-search the checkpoint element owes.
+  #
+  # Florence-2's published vocabulary (c5_bare_canonical) won its six-candidate
+  # search AS THE -ft CHECKPOINT. Adopting `-large` on that checkpoint's
+  # vocabulary would hand the new weights a prompt chosen for different ones,
+  # which is precisely the unequal-effort problem vlm_prompt_search.yaml exists
+  # to prevent — so the winning checkpoint faces the same six candidates the
+  # old one did, verbatim from that manifest.
+  #
+  # This is the only element that pins a second field (`fixed`), and it has to:
+  # a vocabulary arm on the OLD checkpoint would answer a question already
+  # asked and answered. The one-change-per-arm test accounts for `fixed`
+  # explicitly rather than being weakened to let it through.
+  - name: vocabulary_on_new_checkpoint
+    knob: classes
+    applies_to: [florence2]
+    fixed:
+      model_name: microsoft/Florence-2-large
+    values:
+      - [person, sports ball, referee, basketball hoop, jersey number]
+      - [basketball player, basketball, referee, basketball hoop, jersey number]
+      - [basketball player in a team uniform, basketball, referee in a striped shirt,
+         basketball hoop, jersey number]
+      - [basketball player, orange basketball, referee, basketball hoop and backboard,
+         jersey number on a uniform]
+      - [basketball player in a team uniform, orange basketball, referee in a striped shirt,
+         basketball hoop and backboard, jersey number on a uniform]
+      - [player, ball, referee, rim, number]
+
+  # ELEMENT 5 -- ultralytics' detection cap. YOLO-World-only, and worth an arm
+  # because at box_threshold 0.01 this model can hit 300 boxes on an image, at
+  # which point the cap and not the model decides what is reported.
+  - name: max_det
+    knob: max_det
+    applies_to: [yolo_world]
+    values: [1000, 3000]
+
+  # ELEMENT 6 -- input resolution. Only YOLO-World exposes one directly; the HF
+  # models fix theirs in their processors, which is what makes tiling (element
+  # 8) the only resolution lever available to them.
+  - name: imgsz
+    knob: imgsz
+    applies_to: [yolo_world]
+    values: [960, 1280, 1600]
+
+  # ELEMENT 7 -- give Florence-2 an NMS. It is the only model here that applies
+  # none, and it also assigns EVERY detection confidence 1.0, so within an image
+  # the scorer cannot rank its output at all: duplicate boxes are neither
+  # suppressed nor ordered. Structurally different from retuning an existing
+  # stage, hence a separate element from `nms_iou`.
+  #
+  # The tie-breaking guarantee in per_class_nms is what makes this well-defined
+  # at all — with every confidence equal, "keep the higher-scoring box" has no
+  # meaning and the kept set falls back to input order.
+  - name: florence2_nms
+    knob: nms_iou_threshold
+    applies_to: [florence2]
+    values: [0.3, 0.5, 0.7, 0.9]
+
+  # ELEMENT 8 -- per-class best-of vocabulary. The six-candidate search picked
+  # ONE vocabulary per model by total mAP, but the per-class numbers show
+  # different candidates winning different classes for the same model: OWLv2
+  # takes `player` at 0.833 under c1_domain while `referee` (0.455) and `number`
+  # (0.472) both peak under c5_bare_canonical.
+  #
+  # This is NOT arithmetic. The identical word scores differently beside
+  # different neighbours — `referee` is the same string in c1 and c5 and scores
+  # 0.215 there against 0.455 here — because the vocabulary competes for the
+  # same detections. So the per-class winners are assembled into a seventh
+  # candidate and MEASURED, rather than the per-class maxima being summed and
+  # reported as if a model had achieved them together.
+  #
+  # Equal effort survives: every model gets exactly one derived candidate, built
+  # by the same rule from its own search results. The vocabularies differ per
+  # model because the rule's inputs do, which is the same reason the six-way
+  # search already produced different winners per model.
+  - name: vocab_per_class_best
+    knob: classes
+    applies_to: [owlv2]
+    values:
+      - [basketball player, basketball, referee, rim, number]
+
+  - name: vocab_per_class_best
+    knob: classes
+    applies_to: [omdet_turbo]
+    values:
+      - [basketball player, basketball, referee, rim, number]
+
+  - name: vocab_per_class_best
+    knob: classes
+    applies_to: [grounding_dino]
+    values:
+      - [player, basketball, referee, rim, jersey number]
+
+  - name: vocab_per_class_best
+    knob: classes
+    applies_to: [florence2]
+    values:
+      - [player, basketball, referee, rim, number]
+
+  # YOLO-World scores 0.000 on referee and rim under every candidate, so those
+  # two positions keep the baseline's phrasing — there is no per-class winner to
+  # take. `person` is its only working people-prompt (compound phrases make it
+  # emit essentially no people at all).
+  - name: vocab_per_class_best
+    knob: classes
+    applies_to: [yolo_world]
+    values:
+      - [person, basketball, referee, basketball hoop, jersey number on a uniform]
+
+  # ELEMENT 9 -- overlapping tiles. The only lever that targets rim, ball and
+  # number together, and the only resolution lever at all for the four models
+  # whose processor fixes the input size. A basketball is ~30 px in a 1920x1080
+  # frame and arrives at OWLv2 as ~15 px of a 1008x1008 letterbox.
+  #
+  # Expensive: 2x2 plus the full frame is five forward passes per image, 3x3 is
+  # ten. Run last for that reason, and on CUDA rather than local MPS.
+  #
+  # SPLIT INTO TWO DECLARATIONS, AND ORDERED CHEAPEST MODEL FIRST, deliberately.
+  # Written as one element with both grids, expansion runs every grid for a
+  # model before moving to the next — which on measured per-pass timings meant
+  # OWLv2's 3x3 (~80 min) completing before any other model's 2x2 had been
+  # tried. Two hours committed before learning whether tiling does anything at
+  # all. This way every 2x2 lands first, cheapest model first, so 3x3 is only
+  # paid for if 2x2 earns it.
+  - name: tiles
+    knob: tiles
+    applies_to: [yolo_world, grounding_dino, florence2, omdet_turbo, owlv2]
+    values:
+      - [2, 2]
+
+  # Named apart from the 2x2 element, not folded in with it: at ten forward
+  # passes per image this is the single most expensive thing in the sweep, and
+  # it needs to be schedulable, reportable and revertable on its own.
+  - name: tiles_3x3
+    knob: tiles
+    applies_to: [yolo_world, grounding_dino, florence2, omdet_turbo, owlv2]
+    values:
+      - [3, 3]
+
+  # ELEMENT 9b -- NMS IoU RE-SWEPT ON TOP OF TILING.
+  #
+  # This element exists because the first combination arm failed, and failed
+  # informatively. OWLv2 adopted NMS IoU 1.0 — no suppression at all — because
+  # that is what won on the untiled model. Stacked with 2x2 tiling it scored
+  # 0.2424 against 0.2831 for tiling alone: worse than either change by itself.
+  #
+  # The cause is not subtle once seen. Tiling runs the model on five overlapping
+  # crops, so a player near a seam is detected several times over. "Suppress
+  # nothing" is a reasonable setting when each object is seen once and NMS is
+  # mostly deleting genuinely distinct overlapping players; it is a bad one when
+  # the pipeline itself manufactures duplicates. The knob was chosen against a
+  # baseline that stopped existing the moment tiling was adopted, which is
+  # exactly the failure the combination arms are there to catch.
+  #
+  # So it is re-swept inside the new regime, for every model that adopted tiling,
+  # at zero forward-pass cost: NMS is post-processing and the tiled caches
+  # already exist.
+  - name: nms_on_tiles
+    knob: nms_iou_threshold
+    applies_to: [owlv2, grounding_dino, omdet_turbo]
+    fixed:
+      tiles: [2, 2]
+    values: [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+
+  # Florence-2 has no NMS at all, so for it this is "does the pipeline's own
+  # duplicate-manufacturing finally make suppression worth adding?" — the same
+  # question florence2_nms asked untiled and answered with exactly +0.0000.
+  - name: nms_on_tiles
+    knob: nms_iou_threshold
+    applies_to: [florence2]
+    fixed:
+      tiles: [2, 2]
+    values: [0.3, 0.5, 0.7, 0.9]
+
+  # ELEMENT 10 -- every element that cleared the 0.002 noise floor for a model,
+  # applied together.
+  #
+  # Rule 3 of the adoption protocol, and the reason it exists: a single-element
+  # delta is measured against a baseline that STOPS EXISTING the moment another
+  # element is accepted, so the deltas cannot be added. Two changes that each
+  # recover the same missing detections compose to far less than their sum;
+  # tiling and a per-class vocabulary both act on `ball` and `number`, so this is
+  # a live risk here rather than a theoretical one.
+  #
+  # Expressed with `fixed` so the one-change-per-arm test counts every field
+  # these arms touch instead of being weakened to let them through.
+  #
+  # YOLO-World's stack deliberately EXCLUDES tiling: 2x2 cost it 0.0529, the
+  # worst result in the sweep. It is the one model with a native resolution
+  # knob, and raising `imgsz` does for it what tiling does for the others.
+  # OWLv2's stack takes the NMS the RE-SWEEP chose (0.5), not the 1.0 that won
+  # untiled. Inheriting 1.0 is what made the first attempt score below tiling
+  # alone.
+  - name: combined
+    knob: tiles
+    applies_to: [owlv2]
+    fixed:
+      classes: [basketball player, basketball, referee, rim, number]
+      nms_iou_threshold: 0.5
+    values:
+      - [2, 2]
+
+  - name: combined
+    knob: tiles
+    applies_to: [grounding_dino]
+    fixed:
+      nms_iou_threshold: 0.7
+    values:
+      - [2, 2]
+
+  - name: combined
+    knob: tiles
+    applies_to: [omdet_turbo]
+    fixed:
+      classes: [basketball player, basketball, referee, rim, number]
+    values:
+      - [2, 2]
+
+  - name: combined
+    knob: tiles
+    applies_to: [florence2]
+    fixed:
+      model_name: microsoft/Florence-2-large
+    values:
+      - [2, 2]
+
+  - name: combined
+    knob: imgsz
+    applies_to: [yolo_world]
+    fixed:
+      classes: [person, basketball, referee, basketball hoop, jersey number on a uniform]
+      box_threshold: 0.001
+      nms_iou_threshold: 0.8
+    values:
+      - 1280
+
+  # ELEMENT 10b -- NMS re-swept on top of the COMBINED configuration.
+  #
+  # The same lesson as nms_on_tiles, one level further in. Florence-2 makes the
+  # case: its best arm at this point was tiles + NMS 0.3 on the OLD checkpoint
+  # (0.1892), because the `combined` arm adopted the better `-large` checkpoint
+  # but inherited "no NMS" — the setting that was correct for an untiled model
+  # and is not correct once tiling manufactures duplicates. Neither arm had all
+  # three accepted changes at once.
+  #
+  # Free: NMS is post-processing and every combined configuration already has a
+  # cached forward pass.
+  - name: nms_on_combined
+    knob: nms_iou_threshold
+    applies_to: [florence2]
+    fixed:
+      model_name: microsoft/Florence-2-large
+      tiles: [2, 2]
+    values: [0.2, 0.3, 0.4, 0.5, 0.7]
+
+  - name: nms_on_combined
+    knob: nms_iou_threshold
+    applies_to: [omdet_turbo]
+    fixed:
+      classes: [basketball player, basketball, referee, rim, number]
+      tiles: [2, 2]
+    values: [0.3, 0.4, 0.5, 0.6, 0.7]
+
+  - name: nms_on_combined
+    knob: nms_iou_threshold
+    applies_to: [owlv2]
+    fixed:
+      classes: [basketball player, basketball, referee, rim, number]
+      tiles: [2, 2]
+    values: [0.3, 0.4, 0.5, 0.6, 0.7]
+
+  - name: nms_on_combined
+    knob: nms_iou_threshold
+    applies_to: [yolo_world]
+    fixed:
+      classes: [person, basketball, referee, basketball hoop, jersey number on a uniform]
+      imgsz: 1280
+      box_threshold: 0.001
+    values: [0.6, 0.7, 0.8, 0.9]

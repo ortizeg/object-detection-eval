@@ -22,6 +22,7 @@ from PIL import Image
 from transformers import AutoModelForZeroShotObjectDetection, AutoProcessor
 
 from object_detection_eval.inference.base import BaseInferencer
+from object_detection_eval.inference.vlm.nms import per_class_nms
 from object_detection_eval.schemas.detection import BoundingBox, Detection
 from object_detection_eval.utils.boxes import pixel_xyxy_to_normalized_xywh
 
@@ -36,7 +37,25 @@ class OmDetTurboInferencer(BaseInferencer):
         model_name: HuggingFace model ID.
         classes: Ordered list of class names (index = class ID).
         box_threshold: Minimum confidence for detections.
+        nms_iou_threshold: IoU for the per-class NMS this class applies to the
+            processor's output.
+        processor_nms_threshold: IoU for the NMS the HuggingFace processor
+            applies *inside* ``post_process_grounded_object_detection``. See the
+            note below on why this model has two.
         device: Device string (``"cuda"``, ``"cpu"``, ``"mps"``, or ``"auto"``).
+
+    Note:
+        OmDet-Turbo is the only model here that is suppressed twice. Its HF
+        processor runs ``batched_nms`` internally at a ``nms_threshold`` that
+        defaults to 0.5, and this class then runs its own per-class NMS over the
+        survivors. The internal pass happens first and on the full candidate
+        set, so it is the one that actually decides the operating point; the
+        outer pass can only remove what the inner one already let through.
+
+        Until 2026-08-03 the internal threshold was never passed, so it sat at
+        the library default while the outer one was described in the manifest as
+        though it were the model's NMS setting. Both are now explicit, because a
+        threshold nobody passes is not a chosen configuration.
     """
 
     def __init__(
@@ -45,12 +64,14 @@ class OmDetTurboInferencer(BaseInferencer):
         classes: list[str] | None = None,
         box_threshold: float = 0.01,
         nms_iou_threshold: float = 0.5,
+        processor_nms_threshold: float = 0.5,
         device: str = "auto",
     ) -> None:
         self.model_name = model_name
         self.classes = classes or []
         self.box_threshold = box_threshold
         self.nms_iou_threshold = nms_iou_threshold
+        self.processor_nms_threshold = processor_nms_threshold
 
         # Build normalised lookup: lower-cased class name -> class index
         self._name_to_id: dict[str, int] = {
@@ -110,11 +131,12 @@ class OmDetTurboInferencer(BaseInferencer):
             results = self._processor.post_process_grounded_object_detection(
                 outputs,
                 threshold=self.box_threshold,
+                nms_threshold=self.processor_nms_threshold,
                 target_sizes=[(h, w)],
             )[0]
 
             detections = self._convert_results(results, w, h)
-            return self._nms(detections)
+            return per_class_nms(detections, self.nms_iou_threshold)
 
         except Exception:
             logger.exception("OmDet-Turbo inference failed")
@@ -199,51 +221,3 @@ class OmDetTurboInferencer(BaseInferencer):
             )
 
         return detections
-
-    # ------------------------------------------------------------------
-    # Per-class greedy NMS on normalized xywh boxes
-    # ------------------------------------------------------------------
-
-    def _nms(self, detections: list[Detection]) -> list[Detection]:
-        """Apply per-class greedy NMS to remove duplicate boxes."""
-        if len(detections) <= 1:
-            return detections
-
-        # Sort by confidence descending
-        dets = sorted(detections, key=lambda d: d.confidence, reverse=True)
-
-        keep: list[Detection] = []
-        suppressed = [False] * len(dets)
-
-        for i, det_i in enumerate(dets):
-            if suppressed[i]:
-                continue
-            keep.append(det_i)
-            for j in range(i + 1, len(dets)):
-                if suppressed[j]:
-                    continue
-                if dets[j].class_id != det_i.class_id:
-                    continue
-                if self._iou(det_i, dets[j]) > self.nms_iou_threshold:
-                    suppressed[j] = True
-
-        return keep
-
-    @staticmethod
-    def _iou(a: Detection, b: Detection) -> float:
-        """Compute IoU between two detections (normalized xywh boxes)."""
-        ax1, ay1 = a.bbox.x, a.bbox.y
-        ax2, ay2 = a.bbox.x + a.bbox.w, a.bbox.y + a.bbox.h
-        bx1, by1 = b.bbox.x, b.bbox.y
-        bx2, by2 = b.bbox.x + b.bbox.w, b.bbox.y + b.bbox.h
-
-        ix1 = max(ax1, bx1)
-        iy1 = max(ay1, by1)
-        ix2 = min(ax2, bx2)
-        iy2 = min(ay2, by2)
-
-        inter = max(0.0, ix2 - ix1) * max(0.0, iy2 - iy1)
-        area_a = a.bbox.w * a.bbox.h
-        area_b = b.bbox.w * b.bbox.h
-        union = area_a + area_b - inter
-        return inter / max(union, 1e-9)

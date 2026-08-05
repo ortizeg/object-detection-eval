@@ -79,6 +79,18 @@ class ManifestEntry(BaseModel, frozen=True):
     box_threshold: float | None = Field(default=None, ge=0.0, le=1.0)
     text_threshold: float | None = Field(default=None, ge=0.0, le=1.0)
     nms_iou_threshold: float | None = Field(default=None, ge=0.0, le=1.0)
+    #: OmDet-Turbo only: the IoU of the NMS its HF processor runs BEFORE the
+    #: inferencer's own. Left unset it silently took the library default while
+    #: the manifest documented the outer one as this model's setting.
+    processor_nms_threshold: float | None = Field(default=None, ge=0.0, le=1.0)
+    #: Ultralytics-only: letterbox size and per-image detection cap.
+    imgsz: int | None = Field(default=None, ge=32)
+    max_det: int | None = Field(default=None, ge=1)
+    #: Overlapping-tile grid, e.g. ``[2, 2]``. ``None`` runs the whole frame
+    #: once. The single largest win the 2026-08-04 ablation found, and the only
+    #: resolution lever the models with fixed-size processors have.
+    tiles: list[int] | None = None
+    tile_overlap: float = Field(default=0.2, ge=0.0, lt=1.0)
     task: str | None = None
     caption: str | None = None
     prompt_template: str | None = None
@@ -150,6 +162,10 @@ def _omdet_turbo_factory(entry: ManifestEntry) -> BaseInferencer:
         model_name=entry.model_name,
         classes=entry.classes,
         box_threshold=entry.box_threshold if entry.box_threshold is not None else 0.01,
+        nms_iou_threshold=(entry.nms_iou_threshold if entry.nms_iou_threshold is not None else 0.5),
+        processor_nms_threshold=(
+            entry.processor_nms_threshold if entry.processor_nms_threshold is not None else 0.5
+        ),
     )
 
 
@@ -160,6 +176,7 @@ def _florence2_factory(entry: ManifestEntry) -> BaseInferencer:
         model_name=entry.model_name,
         classes=entry.classes,
         task=entry.task or "<OD>",
+        nms_iou_threshold=entry.nms_iou_threshold,
         **({"caption": entry.caption} if entry.caption else {}),
     )
 
@@ -172,6 +189,8 @@ def _yolo_world_factory(entry: ManifestEntry) -> BaseInferencer:
         classes=entry.classes,
         box_threshold=entry.box_threshold if entry.box_threshold is not None else 0.01,
         nms_iou_threshold=(entry.nms_iou_threshold if entry.nms_iou_threshold is not None else 0.5),
+        imgsz=entry.imgsz if entry.imgsz is not None else 640,
+        max_det=entry.max_det if entry.max_det is not None else 300,
     )
 
 
@@ -193,6 +212,25 @@ _INFERENCER_FACTORIES: dict[str, Callable[[ManifestEntry], BaseInferencer]] = {
     "florence2": _florence2_factory,
     "yolo_world": _yolo_world_factory,
 }
+
+
+def _maybe_tiled(inferencer: BaseInferencer, entry: ManifestEntry) -> Any:
+    """Wrap the inferencer in the overlapping-tile slicer if the row asks for one.
+
+    Tiling is not a property of any model, so it lives outside every inferencer
+    and composes with all of them. Cross-tile duplicates are merged by the
+    inferencer's own per-class NMS, which is why four of the five rows that
+    adopted tiling also had to re-tune that threshold — suppression tuned on
+    whole frames is wrong once the pipeline itself produces duplicates.
+    """
+    if entry.tiles is None:
+        return inferencer
+    from object_detection_eval.inference.vlm.tiled import TiledInferencer
+
+    rows, cols = entry.tiles
+    return TiledInferencer(
+        inferencer, rows=rows, cols=cols, overlap=entry.tile_overlap, include_full_image=True
+    )
 
 
 def _assert_preconditions(args: argparse.Namespace) -> None:
@@ -229,7 +267,7 @@ def _score_entry(
     module's docstring for why the order is load-bearing.
     """
     factory = _INFERENCER_FACTORIES[entry.inferencer]
-    inferencer = factory(entry)
+    inferencer = _maybe_tiled(factory(entry), entry)
     label_map = dict(enumerate(entry.classes))
 
     pred_map = score_split(
