@@ -92,7 +92,7 @@ models:
     box_threshold: 0.01
     nms_iou_threshold: 0.5
     tiles: [2, 2]
-    expected_map5095: 0.235
+    expected_map5095: 0.315
 
   # PROMPT EQUALISED (2026-08-01). This row ran the generic COCO list while
   # OWLv2/Grounding-DINO/Florence-2 had domain vocabulary -- the last known
@@ -124,7 +124,7 @@ models:
     nms_iou_threshold: 0.5
     processor_nms_threshold: 0.5
     tiles: [2, 2]
-    expected_map5095: 0.173
+    expected_map5095: 0.211
 
   # PROMPT PARITY (2026-07-30): given the same domain-specific vocabulary
   # OWLv2 already had. Previously it received a generic COCO list while Gemini
@@ -158,7 +158,7 @@ models:
     # `referee` (0.239 -> 0.445). NMS re-tuned under tiling: 0.5 -> 0.7.
     nms_iou_threshold: 0.7
     tiles: [2, 2]
-    expected_map5095: 0.244
+    expected_map5095: 0.293
 
   # TASK TOKEN FIXED (2026-07-30). This ran with `<OD>` -- Florence-2's CLOSED
   # -vocabulary mode, which can only emit its own pretrained label set and
@@ -198,7 +198,7 @@ models:
     caption: "player. ball. referee. rim. number."
     nms_iou_threshold: 0.4
     tiles: [2, 2]
-    expected_map5095: 0.154
+    expected_map5095: 0.238
 
   # YOLO-World (added 2026-08-01) -- the open-weights gap this comparison had.
   # Open-vocabulary and real-time, but licensed GPL-3.0 (weights) / AGPL-3.0

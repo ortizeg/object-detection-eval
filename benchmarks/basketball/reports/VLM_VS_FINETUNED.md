@@ -148,39 +148,47 @@ adopting a smaller "win" is fitting the val split.
 | yolo_world | 0.132 | **0.177** | +0.0453 | vocabulary, box threshold 0.001, NMS IoU 0.7, input size 1280 |
 <!-- TABLE:vlm_ablation_headline END -->
 
-**Only a third of that survived contact with the test split, and two models got
-worse.** The configuration above was chosen on val and scored once on test:
+**Retracted, 2026-08-05.** An earlier revision of this section reported that only
+30% of the val gain survived on test and that two models regressed, and drew from
+that the conclusion that 96 images cannot rank close configurations. **That was a
+bug in this repository, not a property of the data**, and the paragraph is
+removed rather than quietly edited because the wrong version was published.
 
-| Model | val Δ | test Δ | transferred |
+`TiledInferencer` concatenated its tiles and left duplicate suppression to "the
+caller's per-class NMS". That held for the ablation, whose replay applies NMS to
+the *merged* detection set, and not for the benchmark, whose scoring path runs
+`remap → area_outliers → single_best_per_class` and applies **no NMS at all**.
+The inner model only ever suppressed within a single tile, so the published run
+kept every cross-tile duplicate. Measured on val against one cached forward
+pass:
+
+| pipeline | val mAP@50:95 | `player` AP@50 | detections/image |
 | --- | --- | --- | --- |
-| YOLO-World | +0.045 | **+0.044** | 97% |
-| Florence-2 | +0.109 | **+0.046** | 42% |
-| Grounding-DINO | +0.034 | **+0.010** | 29% |
-| OmDet-Turbo | +0.035 | **−0.007** | — |
-| OWLv2 | +0.048 | **−0.011** | — |
-| **mean** | **+0.054** | **+0.016** | **30%** |
+| with cross-tile NMS — what the ablation scored | **0.207** | **0.831** | 662 |
+| without — what the first test run executed | 0.174 | 0.643 | 962 |
 
-This is the most useful thing the exercise produced, and it is a negative
-result. Every internal check said the val gains were real: each cleared a noise
-floor set before the results were seen, each was the argmax of its element, and
-the stacks were measured rather than summed precisely because summing them would
-have been wrong. None of that made them generalise. Ninety-six images is enough
-to rank configurations that differ by a lot and not enough to rank ones that
-differ by 0.03, and the two models whose gains came from a broad tiling win
-rather than a specific capability change are exactly the two that regressed.
+`player` is 45% of test instances and has the most overlap between crops, which
+is why the two models whose gains depended on tiling were the two that appeared
+to regress. The harness has a `--verify` mode built specifically to catch
+cache-versus-live divergence; it had only ever been run on untiled arms, so it
+was green and blind at once. It now warns when a verification run covers no
+tiled arm, and the tiled arm it missed verifies to 1.0e-07.
 
-**The published numbers are the test numbers, including the regressions.** It
-would have been easy to look at this table, keep tiling for the three models it
-helped and revert it for the two it hurt, and publish a clean sweep of
-improvements. That is test-set tuning — the thing this whole protocol exists to
-prevent — and it would have made the reported figures the maximum over two
-choices per model rather than one measurement. The configuration was chosen on
-val; the test column is what it is.
+The corrected run is the table below. With the merge in place, **every model
+improved on test, and by more than it had on val**:
 
-**What actually generalised** is the change that fixed something specific rather
-than the change that added resolution everywhere. YOLO-World's per-class
-vocabulary and larger input transferred almost completely (97%), and Florence-2's
-checkpoint swap carried most of its gain. Broad tiling wins transferred worst.
+| Model | published before | val best | test (corrected) | Δ |
+| --- | --- | --- | --- | --- |
+| OWLv2 | 0.246 | 0.288 | **0.315** | **+0.069** |
+| Grounding-DINO | 0.234 | 0.278 | **0.293** | **+0.059** |
+| Florence-2 | 0.108 | 0.234 | **0.238** | **+0.130** |
+| OmDet-Turbo | 0.180 | 0.216 | **0.211** | +0.031 |
+| YOLO-World | 0.145 | 0.177 | **0.189** | +0.044 |
+| **mean** | | **+0.054** | | **+0.067** |
+
+YOLO-World is the control that confirms the diagnosis: it is the one row that
+does **not** tile, the fix therefore should not touch it, and it moved 0.1891 →
+0.1892 — run-to-run noise. Every model that tiles moved by 0.03 to 0.08.
 
 <details markdown="1">
 <summary><strong>How the val configuration was reached</strong> — the interactions that produced it</summary>
@@ -308,29 +316,38 @@ from the committed prediction dumps in `results/vlm/*.json` (never transcribed):
 | Model | mAP@50:95 | mAP@50 | mAP@75 |
 | --- | --- | --- | --- |
 | Gemini | 0.250 | 0.430 | 0.252 |
-| OWLv2 | 0.235 | 0.339 | 0.277 |
-| Grounding-DINO | 0.244 | 0.285 | 0.258 |
-| OmDet-Turbo | 0.173 | 0.234 | 0.179 |
-| Florence-2 | 0.154 | 0.200 | 0.158 |
+| OWLv2 | 0.315 | 0.476 | 0.367 |
+| Grounding-DINO | 0.293 | 0.352 | 0.318 |
+| OmDet-Turbo | 0.211 | 0.297 | 0.219 |
+| Florence-2 | 0.238 | 0.323 | 0.255 |
 | YOLO-World | 0.189 | 0.241 | 0.209 |
 <!-- TABLE:vlm_summary END -->
 
-The strongest zero-shot model still sits **below half** the mAP@50:95 of even the
-*lowest-ranked* fine-tuned detector (0.250 against 0.619), and well under half of
-the best one — see [FINAL_COMPARISON_640.md](FINAL_COMPARISON_640.md) for the
-fine-tuned figures rather than re-tabulating them here.
+Two things about this table changed with the 2026-08-05 ablation, and both are
+worth stating plainly because earlier revisions of this report said otherwise.
 
-That margin is what the ablation above should be read against. A configuration
-search that swept every remaining knob, measured ~180 arms, and produced +0.054
-on val moved the *published* ceiling by +0.016 on average and left the top of the
-table where it was: Gemini at 0.250, with Grounding-DINO now the best
-open-weights row at 0.244. Closing a 0.37 gap at +0.016 per exhaustive sweep is
-not a programme anyone should start.
+**An open-weights model now leads.** OWLv2 at 0.315 is ahead of Gemini's 0.250.
+Every previous revision had Gemini on top, and the gap was routinely explained by
+its hand-tuned prompt. Configuration, not prompting, closed it.
 
-Fine-tuning on this small in-domain dataset buys a large, unambiguous accuracy
-margin over the best general-purpose zero-shot detector available off the shelf.
-Zero-shot is a useful floor and a fast way to bootstrap labels; it is not a
-substitute for fine-tuning when the target classes are domain-specific.
+**"Below half the worst fine-tuned detector" is no longer true.** That sentence
+appeared here for months and was correct when the ceiling was 0.250. At 0.315
+against the lowest-ranked fine-tuned detector's 0.619 the ratio is **1.97×**, not
+the 2.5× this report used to quote — see
+[FINAL_COMPARISON_640.md](FINAL_COMPARISON_640.md) for the fine-tuned figures
+rather than re-tabulating them here.
+
+What has *not* changed is the conclusion. A near-2× gap is still decisive, it is
+still the gap between "usable for bootstrapping labels" and "usable in
+production", and closing it took an exhaustive configuration search that will not
+repeat: the knobs are now measured and the remaining ones are documented above as
+not worth their GPU-hours. Fine-tuning on this small in-domain dataset still buys
+a large, unambiguous margin over the best general-purpose zero-shot detector
+available off the shelf.
+
+The honest revision is that the margin is smaller than this report used to claim,
+and that a chunk of what looked like a capability gap was configuration nobody
+had examined.
 
 ## Per-class failure analysis: where zero-shot breaks
 
@@ -343,10 +360,10 @@ makes the pattern unmistakable:
 | Model | player | ball | referee | rim | number |
 | --- | --- | --- | --- | --- | --- |
 | Gemini | 0.923 | 0.316 | 0.717 | 0.036 | 0.156 |
-| OWLv2 | 0.630 | 0.448 | 0.277 | 0.004 | 0.336 |
-| Grounding-DINO | 0.633 | 0.283 | 0.503 | 0.000 | 0.006 |
-| OmDet-Turbo | 0.622 | 0.139 | 0.293 | 0.000 | 0.118 |
-| Florence-2 | 0.374 | 0.114 | 0.381 | 0.000 | 0.132 |
+| OWLv2 | 0.901 | 0.583 | 0.388 | 0.002 | 0.505 |
+| Grounding-DINO | 0.867 | 0.355 | 0.533 | 0.000 | 0.006 |
+| OmDet-Turbo | 0.805 | 0.187 | 0.369 | 0.000 | 0.127 |
+| Florence-2 | 0.749 | 0.151 | 0.560 | 0.000 | 0.152 |
 | YOLO-World | 0.840 | 0.311 | 0.000 | 0.005 | 0.051 |
 <!-- TABLE:vlm_per_class END -->
 

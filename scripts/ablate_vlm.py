@@ -484,7 +484,7 @@ def build_inferencer(arm: Arm, *, raw_mode: bool) -> Any:
     raise ValueError(msg)
 
 
-def _wrap_tiled(inferencer: Any, arm: Arm) -> Any:
+def _wrap_tiled(inferencer: Any, arm: Arm, *, raw_mode: bool = False) -> Any:
     """Wrap an inferencer in the overlapping-tile slicer, if the arm asks for one."""
     if arm.tiles is None:
         return inferencer
@@ -497,6 +497,11 @@ def _wrap_tiled(inferencer: Any, arm: Arm) -> Any:
         cols=cols,
         overlap=arm.tile_overlap,
         include_full_image=True,
+        # The replay suppresses the MERGED detection set; the live path has to
+        # do the same or --verify is comparing two different pipelines. In
+        # raw-cache mode nothing is suppressed anywhere, so the grid can be
+        # swept offline.
+        merge_nms_iou_threshold=None if raw_mode else arm.nms_iou_threshold,
     )
 
 
@@ -513,7 +518,9 @@ def collect_raw(
     holds that arm's finished detections and only the filters replay — which is
     still enough to make ``singleton_top_k`` free for it.
     """
-    inferencer = _wrap_tiled(build_inferencer(arm, raw_mode=arm.replayable), arm)
+    inferencer = _wrap_tiled(
+        build_inferencer(arm, raw_mode=arm.replayable), arm, raw_mode=arm.replayable
+    )
     raw_map: dict[str, list[Detection]] = {}
     for i, filename in enumerate(filenames, start=1):
         loader = ImageLoader(image_dir / filename)
@@ -645,7 +652,7 @@ def score_arm_live(
     """
     from object_detection_eval.inference.vlm.protocol import score_split
 
-    inferencer = _wrap_tiled(build_inferencer(arm, raw_mode=False), arm)
+    inferencer = _wrap_tiled(build_inferencer(arm, raw_mode=False), arm, raw_mode=False)
     pred_map = score_split(
         inferencer,
         image_dir=image_dir,
@@ -876,6 +883,20 @@ def main() -> None:
         merge_results(args.results_dir / f"{split}_arms.json", split, deltas(rows))
 
     logger.info(f"{len(rows)} arm(s) -> {args.results_dir / f'{split}_arms.json'}")
+
+    if args.verify and not any(a.tiles for a in arms):
+        # --verify exists to catch cache-vs-live divergence, and the divergence
+        # that actually shipped was tiling-specific: the replay suppressed the
+        # merged tile output while the live path suppressed only within each
+        # tile. Every arm verified before that release was untiled, so the check
+        # was green and blind at the same time. A verification run that never
+        # touched a tiled arm has not tested the composition most likely to
+        # break, and should not read as reassurance.
+        logger.warning(
+            "--verify covered no tiled arm. The one cache-vs-live divergence "
+            "this project has actually shipped was in tile merging; verify a "
+            "tiled arm before trusting a tiled number."
+        )
 
     if failures:
         logger.error(f"{len(failures)} forward pass(es) failed:\n" + "\n".join(failures))
