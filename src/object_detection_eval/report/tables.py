@@ -559,7 +559,9 @@ _ABLATION_ELEMENTS: tuple[tuple[str, str], ...] = (
     # accepted for that model and exists to check they compose. Single-element
     # deltas are measured against a baseline that stops existing the moment
     # another element is adopted, so they cannot simply be added.
+    ("nms_on_tiles", "NMS re-swept under tiling"),
     ("combined", "All accepted changes together"),
+    ("nms_on_combined", "NMS re-swept on the full stack"),
 )
 
 #: Element deltas below this are reported as no effect rather than as a win.

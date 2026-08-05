@@ -127,28 +127,38 @@ ball was hidden by our filter; the rim genuinely is not being detected.
 
 ### What was tuned, and what was not
 
-The zero-shot rows have had prompt effort equalised and three harness defects
-repaired. That is **not** the same as having maximised each model, and this
-report does not claim it. Stated plainly so the comparison can be read for what
-it is:
+The zero-shot rows have had prompt effort equalised, three harness defects
+repaired, and — as of 2026-08-04 — every remaining configuration knob swept one
+at a time on val. This section says what that found, including what it did not.
 
-**Searched, on val, equally across models**
+**The ablation**
 
-| Knob | How |
+Each element was added alone, measured on the 96-image **val** split against the
+configuration published before it, and kept only if it helped. Reverted elements
+stay in the table: the negative results are most of what was learned, and a log
+holding only the winners would record what was adopted rather than what was
+tried. The full per-arm record is committed at
+`results/vlm/ablation/valid_arms.json`; this is the per-element summary, and the
+kept/reverted column is derived by comparing each winner against what
+`vlm_zeroshot.yaml` actually runs.
+
+<!-- TABLE:vlm_ablation START -->
+<!-- TABLE:vlm_ablation END -->
+
+**Nothing here was chosen on `test`.** Every number above is val. The chosen
+configuration was scored on test exactly once, afterwards, and that run produced
+the tables in this report. Both the ablation manifest schema and its CLI refuse
+`--split test`, as the prompt search already did, because selecting a setting on
+the split the report publishes would make the published number the maximum over
+the ~130 arms tried rather than a measurement.
+
+**Still not searched**
+
+| Gap | Why it was left |
 | --- | --- |
-| Class vocabulary | 6 shared candidates × 5 models = 30 measurements |
-| Singleton `top_k` (ball/rim) | 6 values × 5 models, chosen jointly |
-| `box_threshold` | Fixed at **0.01** for every model — and the same value the fine-tuned detectors use (`reproduction_640.yaml`) |
-| `area_outliers` (5% of image) | Validated, not assumed: **no** ground-truth box in either split exceeds 5% — the largest object in the dataset is a player at 3.3%, so this filter cannot discard a true positive |
-
-**Not searched — known gaps**
-
-| Gap | Why it matters |
-| --- | --- |
-| **NMS IoU is not equalised** | OWLv2 uses 0.3, Grounding-DINO and YOLO-World 0.5; OmDet-Turbo and Florence-2 expose no such control. This is the same species of unequal tuning the vocabulary search exists to eliminate, one layer down. |
-| **Checkpoint size/variant** | Each model runs one checkpoint, never compared against its siblings. Florence-2 in particular: an incidental val measurement put the **base** checkpoint ~0.03 above the `-ft` one published here. Untested, and larger than anything the prompt search bought. |
-| **Input resolution / tiling** | Untested. The only lever that plausibly targets `rim`, `ball` and `number` together, all of which are small and all of which score near zero. |
-| **Gemini's prompt** | Hand-written with per-class definitions and count constraints; excluded from the search because it is a billed API. It keeps an advantage no open-weights row has. |
+| **Gemini's prompt** | Hand-written with per-class definitions and count constraints; excluded from every search because it is a billed API and each arm would cost money per image. It keeps an advantage no open-weights row has, and this report says so rather than pretending otherwise. |
+| **Vocabulary re-search for losing checkpoints** | A checkpoint that *won* re-ran the full six-candidate vocabulary search against its own weights, so the new checkpoint received the same effort the old one did. Checkpoints that lost did not. A different vocabulary could in principle reorder them; each re-search is six more forward passes to relitigate a gap of 0.03–0.06, and that is not a good use of the budget. |
+| **`area_outliers` (5% of image)** | Validated rather than swept: **no** ground-truth box in either split exceeds 5% — the largest object in the dataset is a player at 3.3% — so this filter cannot discard a true positive, and there is nothing for a sweep to find. |
 
 **One protocol asymmetry, disclosed.** The zero-shot rows pass through two
 filters the fine-tuned detectors do not — `area_outliers` and
@@ -156,13 +166,6 @@ filters the fine-tuned detectors do not — `area_outliers` and
 confidence threshold are identical, but post-processing is not. The net effect
 cuts both ways: the area filter *removes* junk boxes a trained detector would
 never emit, while the singleton cap *constrains* the zero-shot rows.
-
-**Does any of this threaten the conclusion?** No, and the margin is why. The best
-zero-shot model (0.250) sits **2.5× below the lowest-ranked fine-tuned detector**
-(0.619). The largest single improvement produced by all of the tuning above was
-**+0.013 mAP**. Closing the gap would take roughly **28 more wins of that size**.
-The remaining knobs are worth closing for fairness, not because they could change
-the answer.
 
 ## The zero-shot ceiling
 
@@ -384,15 +387,28 @@ clear the zero-shot ceiling by such a wide margin.
 
 ## Reproducing these tables
 
-Both tables are emitted by the report generator from the committed prediction
-dumps, so they cannot drift from the data:
+Every table here is emitted by the report generator from committed files, so
+none of them can drift from the data:
 
 ```bash
 pixi run python scripts/generate_report.py --report vlm_vs_finetuned --write   # regenerate
 pixi run python scripts/generate_report.py --report vlm_vs_finetuned --check   # CI drift gate
 ```
 
-The generator loads each `results/vlm/*.json`, recomputes AP against the shared
-ground truth through `compute_metrics` with the `merged5` taxonomy, and injects
-the result between the `<!-- TABLE:... -->` markers above. No number in this
-report is typed by hand.
+The two test-split tables come from `results/vlm/vlm_metrics_merged5.json`,
+precomputed once by `scripts/write_vlm_metrics.py` where the ground truth
+exists, so `--check` runs on a machine without the dataset. The ablation table
+comes from `results/vlm/ablation/valid_arms.json` plus `conf/vlm_zeroshot.yaml`
+— it reads the manifest because its kept/reverted column is *derived* from what
+the published config actually runs, which is what makes "kept" a checkable claim
+rather than an assertion. All three are injected between the
+`<!-- TABLE:... -->` markers above. No number in this report is typed by hand.
+
+To reproduce the ablation itself (val split, ~130 arms; the raw-detection cache
+means the post-processing sweeps cost one forward pass each rather than one per
+value):
+
+```bash
+pixi run -e vlm python scripts/ablate_vlm.py                    # the whole sweep
+pixi run -e vlm python scripts/ablate_vlm.py --verify --only owlv2   # cache vs live
+```

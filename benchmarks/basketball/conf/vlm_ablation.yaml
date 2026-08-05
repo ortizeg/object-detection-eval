@@ -396,3 +396,47 @@ elements:
       nms_iou_threshold: 0.8
     values:
       - 1280
+
+  # ELEMENT 10b -- NMS re-swept on top of the COMBINED configuration.
+  #
+  # The same lesson as nms_on_tiles, one level further in. Florence-2 makes the
+  # case: its best arm at this point was tiles + NMS 0.3 on the OLD checkpoint
+  # (0.1892), because the `combined` arm adopted the better `-large` checkpoint
+  # but inherited "no NMS" — the setting that was correct for an untiled model
+  # and is not correct once tiling manufactures duplicates. Neither arm had all
+  # three accepted changes at once.
+  #
+  # Free: NMS is post-processing and every combined configuration already has a
+  # cached forward pass.
+  - name: nms_on_combined
+    knob: nms_iou_threshold
+    applies_to: [florence2]
+    fixed:
+      model_name: microsoft/Florence-2-large
+      tiles: [2, 2]
+    values: [0.2, 0.3, 0.4, 0.5, 0.7]
+
+  - name: nms_on_combined
+    knob: nms_iou_threshold
+    applies_to: [omdet_turbo]
+    fixed:
+      classes: [basketball player, basketball, referee, rim, number]
+      tiles: [2, 2]
+    values: [0.3, 0.4, 0.5, 0.6, 0.7]
+
+  - name: nms_on_combined
+    knob: nms_iou_threshold
+    applies_to: [owlv2]
+    fixed:
+      classes: [basketball player, basketball, referee, rim, number]
+      tiles: [2, 2]
+    values: [0.3, 0.4, 0.5, 0.6, 0.7]
+
+  - name: nms_on_combined
+    knob: nms_iou_threshold
+    applies_to: [yolo_world]
+    fixed:
+      classes: [person, basketball, referee, basketball hoop, jersey number on a uniform]
+      imgsz: 1280
+      box_threshold: 0.001
+    values: [0.6, 0.7, 0.8, 0.9]

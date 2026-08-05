@@ -427,6 +427,10 @@ class AblationArm(BaseModel):
     map_50: float = Field(alias="mAP_50")
     per_class_ap50: dict[str, float]
     delta_map5095: float | None
+    #: Which accelerator scored this arm. The log accumulated across machines —
+    #: see ``results/vlm/ablation/substrate_check.json``, which measures that
+    #: the choice cannot move an arm by more than the adoption noise floor.
+    substrate: str | None = None
     #: The arm's full configuration. Untyped on purpose: this mirrors
     #: ``ablate_vlm.Arm`` field for field, and duplicating that schema here
     #: would create two definitions of one thing that must not disagree.

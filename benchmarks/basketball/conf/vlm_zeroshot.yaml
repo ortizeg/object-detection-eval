@@ -70,6 +70,16 @@ models:
       - "number" for visible jersey numbers (tight box around the digits only)
     expected_map5095: 0.265
 
+  # ABLATION (2026-08-04). 2x2 overlapping tiles plus the full frame, and NMS
+  # re-tuned INSIDE that regime. val 0.2400 -> 0.2879.
+  #
+  # The NMS value is the whole lesson of this row. Swept on whole frames, this
+  # model's optimum was IoU 1.0 — no suppression at all, worth +0.0075, because
+  # at 0.3 NMS was deleting genuinely distinct overlapping players rather than
+  # duplicates. Carried into the tiled configuration unchanged it scored 0.2424,
+  # WORSE than tiling alone at 0.2831, because tiling runs five overlapping
+  # crops and manufactures the duplicates "suppress nothing" was chosen to keep.
+  # Re-swept under tiling the optimum is 0.5.
   - name: owlv2
     inferencer: owlv2
     model_name: google/owlv2-large-patch14-ensemble
@@ -80,11 +90,9 @@ models:
       - basketball hoop
       - jersey number
     box_threshold: 0.01
-    nms_iou_threshold: 0.3
-    # Re-measured 2026-08-03 under the singleton top-k=3 filter: 0.2455. The
-    # prior 0.247 was measured under top-k=1 and happened to sit within
-    # tolerance of both, which is exactly why it is restated rather than left.
-    expected_map5095: 0.246
+    nms_iou_threshold: 0.5
+    tiles: [2, 2]
+    expected_map5095: null
 
   # PROMPT EQUALISED (2026-08-01). This row ran the generic COCO list while
   # OWLv2/Grounding-DINO/Florence-2 had domain vocabulary -- the last known
@@ -95,17 +103,28 @@ models:
   # Target from the 2026-08-03 CUDA (RTX A4000) run: 0.1796. The pre-2026-08-01
   # 0.173 was measured with the generic COCO list and described a different
   # configuration entirely.
+  # ABLATION (2026-08-04). val 0.1806 -> 0.2159, from tiling (+0.0259) and a
+  # per-class vocabulary (+0.0060). Every other knob was inside noise — this was
+  # the model nothing helped until tiling.
+  #
+  # processor_nms_threshold is now stated. It was never passed before, so it sat
+  # at the transformers default while the manifest documented the OUTER NMS as
+  # this model's setting; the inner pass runs first and on the full candidate
+  # set, which is why the outer one measured as a no-op above 0.5.
   - name: omdet_turbo
     inferencer: omdet_turbo
     model_name: omlab/omdet-turbo-swin-tiny-hf
     classes:
-      - player
-      - ball
+      - basketball player
+      - basketball
       - referee
       - rim
       - number
     box_threshold: 0.01
-    expected_map5095: 0.180
+    nms_iou_threshold: 0.5
+    processor_nms_threshold: 0.5
+    tiles: [2, 2]
+    expected_map5095: null
 
   # PROMPT PARITY (2026-07-30): given the same domain-specific vocabulary
   # OWLv2 already had. Previously it received a generic COCO list while Gemini
@@ -135,8 +154,11 @@ models:
       - jersey number
     box_threshold: 0.01
     text_threshold: 0.25
-    nms_iou_threshold: 0.5
-    expected_map5095: 0.234
+    # ABLATION (2026-08-04): 2x2 tiling, +0.0332 on val, almost all of it
+    # `referee` (0.239 -> 0.445). NMS re-tuned under tiling: 0.5 -> 0.7.
+    nms_iou_threshold: 0.7
+    tiles: [2, 2]
+    expected_map5095: null
 
   # TASK TOKEN FIXED (2026-07-30). This ran with `<OD>` -- Florence-2's CLOSED
   # -vocabulary mode, which can only emit its own pretrained label set and
@@ -150,9 +172,22 @@ models:
   #
   # Target from the 2026-08-03 CUDA (RTX A4000) run: 0.1079. The old 0.104 came
   # from the closed-vocabulary <OD> mode.
+  # ABLATION (2026-08-04). val 0.1247 -> 0.2340, +0.1094: the largest gain in
+  # the whole exercise, and none of it visible one element at a time.
+  #
+  # Measured alone the three changes were worth +0.0300 (the -large checkpoint
+  # over -large-ft), +0.0105 (2x2 tiling) and EXACTLY +0.0000 (adding NMS).
+  # Together they are worth +0.1094. NMS does nothing to this model on whole
+  # frames because it scores every detection at confidence 1.0, leaving
+  # suppression no ranking to work with — and becomes its single largest lever
+  # the moment tiling starts producing the same object in several crops.
+  #
+  # The checkpoint change re-ran the full six-candidate vocabulary search
+  # against the new weights, as the equal-effort rule requires. It returned the
+  # incumbent vocabulary, so `classes` is unchanged: a null result, recorded.
   - name: florence2
     inferencer: florence2
-    model_name: microsoft/Florence-2-large-ft
+    model_name: microsoft/Florence-2-large
     classes:
       - player
       - ball
@@ -161,7 +196,9 @@ models:
       - number
     task: "<CAPTION_TO_PHRASE_GROUNDING>"
     caption: "player. ball. referee. rim. number."
-    expected_map5095: 0.108
+    nms_iou_threshold: 0.4
+    tiles: [2, 2]
+    expected_map5095: null
 
   # YOLO-World (added 2026-08-01) -- the open-weights gap this comparison had.
   # Open-vocabulary and real-time, but licensed GPL-3.0 (weights) / AGPL-3.0
@@ -175,19 +212,28 @@ models:
   # vs 101 for "person") while `basketball hoop` is unchanged. Forcing one
   # shared vocabulary on every model for the look of fairness would have
   # published this row at a third of its real score.
+  # ABLATION (2026-08-04). val 0.1318 -> 0.1771, from a per-class vocabulary
+  # (+0.0324), imgsz 640 -> 1280 (+0.0134) and a lower box_threshold (+0.0040).
+  #
+  # This row does NOT tile, and that is a measured decision rather than an
+  # omission: 2x2 tiling cost it 0.0529, the worst result in the sweep, because
+  # `player` collapsed 0.777 -> 0.450. It is the only model here with a native
+  # resolution knob, and raising imgsz does for it what tiling does for the
+  # others — without feeding a 640-trained detector crops at a scale its
+  # training never saw.
   - name: yolo_world
     inferencer: yolo_world
     model_name: yolov8x-worldv2.pt
     classes:
       - person
-      - sports ball
+      - basketball
       - referee
       - basketball hoop
-      - jersey number
-    box_threshold: 0.01
-    nms_iou_threshold: 0.5
-    # From the 2026-08-03 CUDA (RTX A4000) run: 0.1447.
-    expected_map5095: 0.145
+      - jersey number on a uniform
+    box_threshold: 0.001
+    nms_iou_threshold: 0.7
+    imgsz: 1280
+    expected_map5095: null
 
 # SmolVLM2 was removed 2026-07-30. It has no bounding-box grounding head: it was
 # prompted for JSON boxes, emitted 1176 detections across the 94 test images all
