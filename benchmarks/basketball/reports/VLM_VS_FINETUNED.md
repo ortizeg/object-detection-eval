@@ -131,19 +131,114 @@ The zero-shot rows have had prompt effort equalised, three harness defects
 repaired, and — as of 2026-08-04 — every remaining configuration knob swept one
 at a time on val. This section says what that found, including what it did not.
 
-**The ablation**
+**The ablation: what changed, and what it bought**
 
-Each element was added alone, measured on the 96-image **val** split against the
-configuration published before it, and kept only if it helped. Reverted elements
-stay in the table: the negative results are most of what was learned, and a log
-holding only the winners would record what was adopted rather than what was
-tried. The full per-arm record is committed at
-`results/vlm/ablation/valid_arms.json`; this is the per-element summary, and the
-kept/reverted column is derived by comparing each winner against what
-`vlm_zeroshot.yaml` actually runs.
+Each element was added alone, measured on the 96-image **val** split, and kept
+only if it beat the model's baseline by at least 0.002 mAP@50:95 — 96 images
+under COCO's 101-point interpolation do not resolve a thousandth of a point, and
+adopting a smaller "win" is fitting the val split.
+
+<!-- TABLE:vlm_ablation_headline START -->
+| Model | Published | Best on val | Δ | Changes kept |
+| --- | --- | --- | --- | --- |
+| owlv2 | 0.240 | **0.288** | +0.0479 | NMS IoU 0.5, tiling 2x2 |
+| grounding_dino | 0.244 | **0.278** | +0.0338 | NMS IoU 0.7, tiling 2x2 |
+| florence2 | 0.125 | **0.234** | +0.1094 | checkpoint `Florence-2-large`, NMS IoU 0.4, tiling 2x2 |
+| omdet_turbo | 0.181 | **0.216** | +0.0353 | vocabulary, tiling 2x2 |
+| yolo_world | 0.132 | **0.177** | +0.0453 | vocabulary, box threshold 0.001, NMS IoU 0.7, input size 1280 |
+<!-- TABLE:vlm_ablation_headline END -->
+
+**Almost none of that was visible one element at a time.** Florence-2's three
+accepted changes measured **+0.030**, **+0.011** and **exactly +0.000** in
+isolation; together they are worth **+0.109**. Adding NMS does nothing to a
+model that scores every detection at confidence 1.0 — suppression has no ranking
+to work with — and becomes its single largest lever the moment tiling starts
+producing the same object in several overlapping crops.
+
+OWLv2 shows the same interaction from the other side, and it is the reason the
+protocol requires measuring stacks rather than adding deltas. Swept on whole
+frames its NMS optimum was IoU **1.0**, no suppression at all, because at 0.3 NMS
+was deleting genuinely distinct overlapping players rather than duplicates.
+Carried into the tiled configuration unchanged, that scored **0.2424** — *worse
+than tiling alone at 0.2831* — because tiling manufactures the very duplicates
+"suppress nothing" was chosen to keep. Re-swept inside the tiled regime, the
+optimum is 0.5.
+
+Tiling is the largest single lever and it does not help everyone. It moved
+`referee` from 0.239 to 0.445 for Grounding-DINO and `number` from 0.042 to
+0.149 for OmDet-Turbo — the small, low-resolution classes it was aimed at — and
+it cost YOLO-World **0.053**, the worst result in the sweep, because that model
+is the one with a native resolution knob and would rather have `imgsz` raised
+than be fed crops at a scale its training never saw. `rim` stayed at 0.000 under
+every tiled arm, which was predicted in advance: the prompt search had already
+put it at 0.000 across essentially all thirty model-by-prompt cells, making it a
+grounding failure rather than a resolution one.
+
+<details markdown="1">
+<summary><strong>Every element tried, including the ones reverted</strong> — the full per-element record</summary>
+
+The negative results are most of what was learned, so reverted elements stay in
+the log: one holding only the winners would record what was adopted rather than
+what was tried. The complete per-arm record — per-class AP, full configuration,
+and the accelerator each arm was scored on — is committed at
+`results/vlm/ablation/valid_arms.json`.
+
+The verdict column is *derived* by comparing each element's val winner against
+what `vlm_zeroshot.yaml` actually runs, so the table cannot claim a change was
+adopted that never reached the published config, and editing that config without
+re-rendering fails the drift gate.
 
 <!-- TABLE:vlm_ablation START -->
+| Model | Element | Tried | Best | val mAP@50:95 | Δ | Verdict |
+| --- | --- | --- | --- | --- | --- | --- |
+| grounding_dino | NMS IoU | 9 | `0.7` | 0.246 | +0.0021 | **kept** |
+| omdet_turbo | NMS IoU | 9 | `0.6` | 0.181 | -0.0000 | reverted (within noise) |
+| owlv2 | NMS IoU | 9 | `1.0` | 0.248 | +0.0075 | reverted |
+| yolo_world | NMS IoU | 9 | `0.8` | 0.136 | +0.0038 | reverted |
+| omdet_turbo | Processor NMS IoU | 7 | `0.8` | 0.180 | -0.0003 | reverted (within noise) |
+| grounding_dino | `box_threshold` | 5 | `0.001` | 0.244 | +0.0000 | reverted (within noise) |
+| omdet_turbo | `box_threshold` | 5 | `0.001` | 0.181 | +0.0000 | reverted (within noise) |
+| owlv2 | `box_threshold` | 5 | `0.001` | 0.240 | +0.0000 | reverted (within noise) |
+| yolo_world | `box_threshold` | 5 | `0.001` | 0.136 | +0.0040 | **kept** |
+| florence2 | Singleton `top_k` | 5 | `1` | 0.125 | +0.0005 | reverted (within noise) |
+| grounding_dino | Singleton `top_k` | 5 | `2` | 0.245 | +0.0003 | reverted (within noise) |
+| omdet_turbo | Singleton `top_k` | 5 | `1000` | 0.181 | +0.0003 | reverted (within noise) |
+| owlv2 | Singleton `top_k` | 5 | `1000` | 0.241 | +0.0014 | reverted (within noise) |
+| yolo_world | Singleton `top_k` | 5 | `2` | 0.132 | +0.0001 | reverted (within noise) |
+| florence2 | Checkpoint | 3 | `microsoft/Florence-2-large` | 0.155 | +0.0300 | **kept** |
+| grounding_dino | Checkpoint | 1 | `IDEA-Research/grounding-dino-tiny` | 0.212 | -0.0324 | reverted (within noise) |
+| owlv2 | Checkpoint | 2 | `google/owlv2-base-patch16-ensemble` | 0.180 | -0.0601 | reverted (within noise) |
+| yolo_world | Checkpoint | 3 | `yolov8l-worldv2.pt` | 0.122 | -0.0100 | reverted (within noise) |
+| florence2 | Per-class best vocabulary | 1 | `['player', 'basketball', 'referee', 'rim', 'number']` | 0.124 | -0.0002 | reverted (within noise) |
+| grounding_dino | Per-class best vocabulary | 1 | `['player', 'basketball', 'referee', 'rim', 'jersey number']` | 0.242 | -0.0022 | reverted (within noise) |
+| omdet_turbo | Per-class best vocabulary | 1 | `['basketball player', 'basketball', 'referee', 'rim', 'number']` | 0.187 | +0.0060 | **kept** |
+| owlv2 | Per-class best vocabulary | 1 | `['basketball player', 'basketball', 'referee', 'rim', 'number']` | 0.250 | +0.0102 | reverted |
+| yolo_world | Per-class best vocabulary | 1 | `['person', 'basketball', 'referee', 'basketball hoop', 'jersey number on a uniform']` | 0.164 | +0.0324 | **kept** |
+| yolo_world | `max_det` | 2 | `1000` | 0.132 | +0.0000 | reverted (within noise) |
+| yolo_world | Input resolution | 3 | `1280` | 0.145 | +0.0134 | **kept** |
+| florence2 | Add NMS | 4 | `0.3` | 0.125 | +0.0000 | reverted (within noise) |
+| florence2 | Vocabulary re-search (new checkpoint) | 6 | `microsoft/Florence-2-large` | 0.155 | +0.0300 | **kept** |
+| florence2 | Overlapping tiles 2x2 | 1 | `[2, 2]` | 0.135 | +0.0104 | **kept** |
+| grounding_dino | Overlapping tiles 2x2 | 1 | `[2, 2]` | 0.278 | +0.0337 | **kept** |
+| omdet_turbo | Overlapping tiles 2x2 | 1 | `[2, 2]` | 0.207 | +0.0260 | **kept** |
+| owlv2 | Overlapping tiles 2x2 | 1 | `[2, 2]` | 0.283 | +0.0431 | **kept** |
+| yolo_world | Overlapping tiles 2x2 | 1 | `[2, 2]` | 0.079 | -0.0528 | reverted (within noise) |
+| florence2 | NMS re-swept under tiling | 4 | `?` | 0.189 | +0.0646 | reverted |
+| grounding_dino | NMS re-swept under tiling | 9 | `?` | 0.278 | +0.0338 | reverted |
+| omdet_turbo | NMS re-swept under tiling | 9 | `?` | 0.207 | +0.0263 | reverted |
+| owlv2 | NMS re-swept under tiling | 9 | `?` | 0.288 | +0.0479 | reverted |
+| florence2 | All accepted changes together | 1 | `?` | 0.165 | +0.0407 | reverted |
+| grounding_dino | All accepted changes together | 1 | `?` | 0.278 | +0.0338 | reverted |
+| omdet_turbo | All accepted changes together | 1 | `?` | 0.216 | +0.0353 | reverted |
+| owlv2 | All accepted changes together | 1 | `?` | 0.287 | +0.0466 | reverted |
+| yolo_world | All accepted changes together | 1 | `?` | 0.177 | +0.0450 | reverted |
+| florence2 | NMS re-swept on the full stack | 5 | `?` | 0.234 | +0.1094 | reverted |
+| omdet_turbo | NMS re-swept on the full stack | 5 | `?` | 0.216 | +0.0353 | reverted |
+| owlv2 | NMS re-swept on the full stack | 5 | `?` | 0.287 | +0.0468 | reverted |
+| yolo_world | NMS re-swept on the full stack | 4 | `?` | 0.177 | +0.0453 | reverted |
 <!-- TABLE:vlm_ablation END -->
+
+</details>
 
 **Nothing here was chosen on `test`.** Every number above is val. The chosen
 configuration was scored on test exactly once, afterwards, and that run produced

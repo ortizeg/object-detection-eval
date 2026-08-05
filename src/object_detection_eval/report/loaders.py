@@ -410,6 +410,8 @@ def load_dataset_stats(path: Path | str) -> DatasetStats:
         return DatasetStats.model_validate(_read_json(path))
     except ValidationError as exc:
         raise ReportLoadError(f"{path}: {exc}") from exc
+
+
 # Ablation: results/vlm/ablation/valid_arms.json
 # --------------------------------------------------------------------------- #
 

@@ -22,6 +22,16 @@ rm -f "$MARKER"
 cd "$REPO"
 export PATH="$HOME/.pixi/bin:$PATH"
 
+# [feature.vlmcuda] is specified in pixi.toml but deliberately NOT composed into
+# [environments] there — pixi cannot solve a linux-64-only environment from the
+# macOS host this repo is developed on. Compose it here, as the pixi.toml
+# comment instructs. Without it `pixi install -e vlm` silently resolves
+# conda-forge's CPU pytorch and turns a rented GPU into a slow CPU box.
+if ! grep -q '^vlm-cuda = ' pixi.toml; then
+  sed -i 's/^vlm = \["dev", "vlm"\]$/vlm = ["dev", "vlm"]\nvlm-cuda = ["dev", "vlm", "vlmcuda"]/' pixi.toml
+fi
+pixi install -e vlm-cuda
+
 pixi run -e vlm-cuda python - <<'PY'
 import sys
 

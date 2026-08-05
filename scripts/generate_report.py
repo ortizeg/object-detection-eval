@@ -36,6 +36,7 @@ from loguru import logger
 
 from object_detection_eval.report import (
     DatasetStats,
+    ablation_headline_table,
     ablation_summary_table,
     ci_table,
     class_count_table,
@@ -245,6 +246,13 @@ def build_registry(
             # val winner against vlm_zeroshot.yaml, so this slot reads the
             # manifest as well as the results. Editing the published config
             # without re-rendering is then drift, and --check says so.
+            Slot(
+                "vlm_ablation_headline",
+                lambda: ablation_headline_table(
+                    load_ablation_log(ablation_path),
+                    load_zeroshot_config(zeroshot_conf),
+                ),
+            ),
             Slot(
                 "vlm_ablation",
                 lambda: ablation_summary_table(

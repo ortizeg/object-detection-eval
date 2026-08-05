@@ -655,3 +655,72 @@ def ablation_summary_table(
             )
 
     return _table(header, rows)
+
+
+def ablation_headline_table(
+    log: Any,
+    adopted: Mapping[str, Mapping[str, Any]],
+) -> str:
+    """Render one row per model: what it was, what it became, what did it.
+
+    Separate from :func:`ablation_summary_table` for readability rather than
+    content. The per-element table is the evidence — forty-odd rows covering
+    every knob tried and reverted — and burying the outcome in it serves nobody.
+    This is the answer; that is the working.
+
+    "Changes kept" is derived from the winning arm's config rather than stored,
+    so it cannot describe a configuration the log does not contain.
+    """
+    baselines = {a.model: a for a in log.arms if a.element == "baseline"}
+    best: dict[str, Any] = {}
+    for arm in log.arms:
+        if arm.element == "baseline":
+            continue
+        if arm.model not in best or arm.map_50_95 > best[arm.model].map_50_95:
+            best[arm.model] = arm
+
+    header = ["Model", "Published", "Best on val", "Δ", "Changes kept"]
+    rows: list[list[str]] = []
+    for model, arm in sorted(best.items(), key=lambda kv: -kv[1].map_50_95):
+        base = baselines.get(model)
+        if base is None:  # pragma: no cover - every model has a baseline
+            continue
+        changed = [
+            _describe_change(key, value)
+            for key, value in arm.config.items()
+            if base.config.get(key) != value
+        ]
+        rows.append(
+            [
+                model,
+                _fmt3(base.map_50_95),
+                f"**{_fmt3(arm.map_50_95)}**",
+                _fmt_delta(arm.map_50_95 - base.map_50_95),
+                ", ".join(changed) or _EM_DASH,
+            ]
+        )
+    return _table(header, rows)
+
+
+#: Human-readable names for the config fields the headline table reports.
+_CHANGE_LABELS = {
+    "tiles": "tiling",
+    "nms_iou_threshold": "NMS IoU",
+    "classes": "vocabulary",
+    "model_name": "checkpoint",
+    "imgsz": "input size",
+    "box_threshold": "box threshold",
+    "processor_nms_threshold": "processor NMS",
+}
+
+
+def _describe_change(key: str, value: Any) -> str:
+    """One accepted change, as a reader would say it."""
+    label = _CHANGE_LABELS.get(key, key)
+    if key == "tiles":
+        return f"{label} {value[0]}x{value[1]}" if value else f"no {label}"
+    if key == "classes":
+        return label
+    if key == "model_name":
+        return f"{label} `{str(value).split('/')[-1]}`"
+    return f"{label} {value}"

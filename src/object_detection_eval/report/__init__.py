@@ -46,6 +46,7 @@ from object_detection_eval.report.loaders import (
 )
 from object_detection_eval.report.tables import (
     ABLATION_NOISE_FLOOR,
+    ablation_headline_table,
     ablation_summary_table,
     ci_table,
     class_count_table,
@@ -89,6 +90,7 @@ __all__ = [
     "SecondRun",
     "SplitOverlap",
     "VlmModelEntry",
+    "ablation_headline_table",
     "ablation_summary_table",
     "ci_table",
     "class_count_table",
