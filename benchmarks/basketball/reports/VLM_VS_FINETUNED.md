@@ -148,39 +148,33 @@ adopting a smaller "win" is fitting the val split.
 | yolo_world | 0.132 | **0.177** | +0.0453 | vocabulary, box threshold 0.001, NMS IoU 0.7, input size 1280 |
 <!-- TABLE:vlm_ablation_headline END -->
 
-**Only a third of that survived contact with the test split, and two models got
-worse.** The configuration above was chosen on val and scored once on test:
+**Retracted, 2026-08-05.** An earlier revision of this section reported that only
+30% of the val gain survived on test and that two models regressed, and drew from
+that the conclusion that 96 images cannot rank close configurations. **That was a
+bug in this repository, not a property of the data**, and the paragraph is
+removed rather than quietly edited because the wrong version was published.
 
-| Model | val Δ | test Δ | transferred |
+`TiledInferencer` concatenated its tiles and left duplicate suppression to "the
+caller's per-class NMS". That held for the ablation, whose replay applies NMS to
+the *merged* detection set, and not for the benchmark, whose scoring path runs
+`remap → area_outliers → single_best_per_class` and applies **no NMS at all**.
+The inner model only ever suppressed within a single tile, so the published run
+kept every cross-tile duplicate. Measured on val against one cached forward
+pass:
+
+| pipeline | val mAP@50:95 | `player` AP@50 | detections/image |
 | --- | --- | --- | --- |
-| YOLO-World | +0.045 | **+0.044** | 97% |
-| Florence-2 | +0.109 | **+0.046** | 42% |
-| Grounding-DINO | +0.034 | **+0.010** | 29% |
-| OmDet-Turbo | +0.035 | **−0.007** | — |
-| OWLv2 | +0.048 | **−0.011** | — |
-| **mean** | **+0.054** | **+0.016** | **30%** |
+| with cross-tile NMS — what the ablation scored | **0.207** | **0.831** | 662 |
+| without — what the first test run executed | 0.174 | 0.643 | 962 |
 
-This is the most useful thing the exercise produced, and it is a negative
-result. Every internal check said the val gains were real: each cleared a noise
-floor set before the results were seen, each was the argmax of its element, and
-the stacks were measured rather than summed precisely because summing them would
-have been wrong. None of that made them generalise. Ninety-six images is enough
-to rank configurations that differ by a lot and not enough to rank ones that
-differ by 0.03, and the two models whose gains came from a broad tiling win
-rather than a specific capability change are exactly the two that regressed.
+`player` is 45% of test instances and has the most overlap between crops, which
+is why the two models whose gains depended on tiling were the two that appeared
+to regress. The harness has a `--verify` mode built specifically to catch
+cache-versus-live divergence; it had only ever been run on untiled arms, so it
+was green and blind at once. It now warns when a verification run covers no
+tiled arm, and the tiled arm it missed verifies to 1.0e-07.
 
-**The published numbers are the test numbers, including the regressions.** It
-would have been easy to look at this table, keep tiling for the three models it
-helped and revert it for the two it hurt, and publish a clean sweep of
-improvements. That is test-set tuning — the thing this whole protocol exists to
-prevent — and it would have made the reported figures the maximum over two
-choices per model rather than one measurement. The configuration was chosen on
-val; the test column is what it is.
-
-**What actually generalised** is the change that fixed something specific rather
-than the change that added resolution everywhere. YOLO-World's per-class
-vocabulary and larger input transferred almost completely (97%), and Florence-2's
-checkpoint swap carried most of its gain. Broad tiling wins transferred worst.
+The table below is the corrected run.
 
 <details markdown="1">
 <summary><strong>How the val configuration was reached</strong> — the interactions that produced it</summary>
