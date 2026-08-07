@@ -2,7 +2,7 @@
 planStatus:
   planId: plan-vlm-fusion-ensemble
   title: Fusing the six zero-shot VLMs — WBF, consensus, and whether any of it makes usable labels
-  status: in-progress
+  status: completed
   planType: research
   priority: medium
   owner: ortizeg
@@ -10,7 +10,7 @@ planStatus:
   tags: [vlm, evaluation, ensembling, wbf, auto-labeling]
   created: "2026-08-07"
   updated: "2026-08-07"
-  progress: 5
+  progress: 100
 ---
 
 # VLM fusion / ensembling
@@ -192,9 +192,35 @@ Fusion is 3.3x the best single model and 55x the mAP champion.
 - The `agree` operator did not exist in the original design. It was added
   because "WBF wins" is unattributable without it.
 
-**Not done:** no test run. The val gain clears the noise floor by 60x so the
-pre-committed rule licenses one, but it needs a fresh forward pass per model on
-the test split (GPU for five, 94 Gemini calls) and that is the user's call.
+**The test run cost nothing.** `results/vlm/{model}.json` already holds every
+detection each model published on test, so fusion -- being downstream of the
+forward pass -- computes from committed files. No GPU, no API calls.
+
+| | test mAP@50:95 |
+| --- | --- |
+| OWLv2 (best single) | 0.3148 |
+| **All six fused** | **0.4061** (+0.0913) |
+
+recall @ 95% precision: **0.546**. The val configuration transferred at a gap of
+0.0024 with nothing re-tuned, and every single-model row reproduces
+`vlm_metrics_merged5.json` exactly.
+
+**How many models: the curve saturates at four or five.** 0.288 -> 0.370 ->
+0.399 -> 0.405 -> 0.408, flat thereafter. The oracle's pair (Gemini + OWLv2) is
+the best two-model subset for fusion too. And label quality *peaks at four*:
+recall@P95 is 0.580 for `florence2+gemini+owlv2+yolo_world` against 0.552 for
+all six -- OmDet-Turbo's 1026 boxes/image cost precision they never repay. The
+adopted all-six configuration is not the best one for labeling, which is
+reported and deliberately not adopted.
+
+**Two pre-existing defects found and fixed:**
+
+1. Gemini's `expected_map5095` had been 0.265 since Phase 5 against a dump
+   scoring 0.2497. The gate passed on a 0.02 tolerance while spending 77% of it,
+   and Gemini's sampling sigma is 0.0056, so the target sat ~3 sigma off-centre.
+2. The report named DAMO-YOLO-M's 0.619 as the lowest-ranked fine-tuned
+   detector; RT-DETRv2-M is below it at 0.581. The quoted ratio was 1.97x and is
+   1.85x.
 
 ## Log
 
@@ -203,4 +229,10 @@ the test split (GPU for five, 94 Gemini calls) and that is the user's call.
 - 2026-08-07 — `fusion.py` + 21 tests; `fuse_vlm.py` with the pass-through
   verifier; `_cluster` vectorised before running (1,900 boxes/image would have
   stalled it, the same failure the NMS work hit). Headline sweep: 96 rows.
-- 2026-08-07 — report section written; three generator-emitted tables wired.
+- 2026-08-07 — report section written; four generator-emitted tables wired.
+- 2026-08-07 — test split scored once (no GPU needed); two pre-existing defects
+  found while verifying the dumps and fixed.
+- 2026-08-07 — the 57-subset sweep was killed at 56/57 and lost ~2h of CPU
+  because the harness only wrote its log at the end. Fixed with an atomic
+  per-subset flush, plus a `--subset-curve` mode that runs only the operator
+  config the table reads (~10x cheaper). Re-ran clean: 151 rows, sizes 1-6.

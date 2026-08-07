@@ -397,7 +397,15 @@ def main() -> int:
     parser.add_argument(
         "--all-subsets",
         action="store_true",
-        help="Sweep every non-empty model subset, not just the pre-committed ones.",
+        help="Sweep every model subset across every operator (~2h CPU).",
+    )
+    parser.add_argument(
+        "--subset-curve",
+        action="store_true",
+        help=(
+            "Sweep every model subset, but only the adopted operator at the "
+            "pre-committed IoU -- exactly what the subset-size table reads."
+        ),
     )
     parser.add_argument(
         "--verify",
@@ -491,47 +499,67 @@ def main() -> int:
 
     headline_subsets = [all_models, top2]
     subsets = headline_subsets
-    if args.all_subsets:
+    if args.all_subsets or args.subset_curve:
         subsets = [
             s for k in range(2, len(all_models) + 1) for s in itertools.combinations(all_models, k)
         ]
 
-    for models in subsets:
-        for method in ("nms", "agree", "wbf", "consensus"):
-            for normalize in (True, False):
-                ious = _IOU_SWEEP if models in headline_subsets else (DEFAULT_FUSION_IOU,)
-                for iou in ious:
-                    min_list = (2, 3) if method == "consensus" else (1,)
-                    for min_models in min_list:
-                        if min_models > len(models):
-                            continue
-                        rows.append(
-                            run_combo(
-                                models,
-                                published,
-                                method=method,
-                                iou=iou,
-                                normalize=normalize,
-                                min_models=min_models,
-                                dims=dims,
-                                gt_map=gt_map,
-                                id_to_name=id_to_name,
-                            )
-                        )
-        logger.info(f"  done {'+'.join(models)} ({len(rows)} rows so far)")
+    def flush() -> None:
+        """Persist after every subset, not once at the end.
 
-    args.out.parent.mkdir(parents=True, exist_ok=True)
-    with open(args.out, "w") as f:
-        json.dump(
-            {
-                "split": args.split,
-                "default_iou": DEFAULT_FUSION_IOU,
-                "adopted_arms": {m: arms[m]["arm"] for m in sorted(published)},
-                "rows": rows,
-            },
-            f,
-            indent=2,
-        )
+        Learned the hard way: a 57-subset run was killed at 56 and lost two
+        hours of CPU because the whole log was written in one go at the finish.
+        A sweep long enough to be worth backgrounding is long enough to be
+        interrupted, so partial results have to survive it.
+        """
+        args.out.parent.mkdir(parents=True, exist_ok=True)
+        tmp = args.out.with_suffix(".json.partial")
+        with open(tmp, "w") as f:
+            json.dump(
+                {
+                    "split": args.split,
+                    "default_iou": DEFAULT_FUSION_IOU,
+                    "adopted_arms": {m: arms[m]["arm"] for m in sorted(published)},
+                    "rows": rows,
+                },
+                f,
+                indent=2,
+            )
+        tmp.replace(args.out)
+
+    flush()
+    for models in subsets:
+        if args.subset_curve and models not in headline_subsets:
+            # Only what the subset-size table reads: the adopted operator at the
+            # pre-committed IoU. The full method x normalise cross-product is
+            # exploration nothing renders, and it costs ~10x as much.
+            combos = [(_FINAL_METHOD, _FINAL_NORMALIZE, DEFAULT_FUSION_IOU, 1)]
+        else:
+            combos = [
+                (method, normalize, iou, min_models)
+                for method in ("nms", "agree", "wbf", "consensus")
+                for normalize in (True, False)
+                for iou in (_IOU_SWEEP if models in headline_subsets else (DEFAULT_FUSION_IOU,))
+                for min_models in ((2, 3) if method == "consensus" else (1,))
+                if min_models <= len(models)
+            ]
+        for method, normalize, iou, min_models in combos:
+            rows.append(
+                run_combo(
+                    models,
+                    published,
+                    method=method,
+                    iou=iou,
+                    normalize=normalize,
+                    min_models=min_models,
+                    dims=dims,
+                    gt_map=gt_map,
+                    id_to_name=id_to_name,
+                )
+            )
+        flush()
+        logger.info(f"  done {'+'.join(models)} ({len(rows)} rows, flushed)")
+
     logger.info(f"wrote {len(rows)} rows -> {args.out}")
     return 0
 

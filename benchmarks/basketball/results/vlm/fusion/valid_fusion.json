@@ -1,0 +1,5607 @@
+{
+  "split": "valid",
+  "default_iou": 0.55,
+  "adopted_arms": {
+    "florence2": "florence2__nms_on_combined__0.4",
+    "gemini": "gemini__baseline",
+    "grounding_dino": "grounding_dino__nms_on_tiles__0.7",
+    "omdet_turbo": "omdet_turbo__combined__2-2",
+    "owlv2": "owlv2__nms_on_tiles__0.5",
+    "yolo_world": "yolo_world__nms_on_combined__0.7"
+  },
+  "rows": [
+    {
+      "models": [
+        "florence2"
+      ],
+      "n_models": 1,
+      "method": "nms",
+      "iou": 1.0,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.23403418064117432,
+      "mAP_50": 0.33124810457229614,
+      "per_class_ap50": {
+        "player": 0.7124185562133789,
+        "ball": 0.23444205522537231,
+        "referee": 0.43433305621147156,
+        "rim": 0.0,
+        "number": 0.27504685521125793
+      },
+      "boxes_per_image": 15.9375,
+      "best_f1": {
+        "threshold": 0.0,
+        "precision": 0.7549019607843137,
+        "recall": 0.5913978494623656,
+        "f1": 0.6632213608957795
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "gemini"
+      ],
+      "n_models": 1,
+      "method": "nms",
+      "iou": 1.0,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.2583131194114685,
+      "mAP_50": 0.44712746143341064,
+      "per_class_ap50": {
+        "player": 0.9162390232086182,
+        "ball": 0.4789702594280243,
+        "referee": 0.6358875036239624,
+        "rim": 0.010331467725336552,
+        "number": 0.19420906901359558
+      },
+      "boxes_per_image": 16.833333333333332,
+      "best_f1": {
+        "threshold": 0.0,
+        "precision": 0.8125,
+        "recall": 0.6722990271377368,
+        "f1": 0.735780330624825
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "grounding_dino"
+      ],
+      "n_models": 1,
+      "method": "nms",
+      "iou": 1.0,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.27792415022850037,
+      "mAP_50": 0.3580132722854614,
+      "per_class_ap50": {
+        "player": 0.8556510806083679,
+        "ball": 0.47689297795295715,
+        "referee": 0.4444389045238495,
+        "rim": 0.0,
+        "number": 0.013083450496196747
+      },
+      "boxes_per_image": 21.583333333333332,
+      "best_f1": {
+        "threshold": 0.3,
+        "precision": 0.6985345429169574,
+        "recall": 0.5125448028673835,
+        "f1": 0.5912581216774955
+      },
+      "recall_at_p90": {
+        "threshold": 0.42,
+        "recall": 0.28827444956477216,
+        "precision": 0.9124797406807131
+      },
+      "recall_at_p95": {
+        "threshold": 0.48,
+        "recall": 0.1679467485919099,
+        "precision": 0.9534883720930233
+      }
+    },
+    {
+      "models": [
+        "omdet_turbo"
+      ],
+      "n_models": 1,
+      "method": "nms",
+      "iou": 1.0,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.21594390273094177,
+      "mAP_50": 0.3206707239151001,
+      "per_class_ap50": {
+        "player": 0.8230910301208496,
+        "ball": 0.27224865555763245,
+        "referee": 0.32061320543289185,
+        "rim": 0.0,
+        "number": 0.187400683760643
+      },
+      "boxes_per_image": 1026.53125,
+      "best_f1": {
+        "threshold": 0.3,
+        "precision": 0.6121621621621621,
+        "recall": 0.46390168970814133,
+        "f1": 0.5278182347800758
+      },
+      "recall_at_p90": {
+        "threshold": 0.48,
+        "recall": 0.1858678955453149,
+        "precision": 0.9097744360902256
+      },
+      "recall_at_p95": {
+        "threshold": 0.58,
+        "recall": 0.0706605222734255,
+        "precision": 0.9517241379310345
+      }
+    },
+    {
+      "models": [
+        "owlv2"
+      ],
+      "n_models": 1,
+      "method": "nms",
+      "iou": 1.0,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.2878813147544861,
+      "mAP_50": 0.46365633606910706,
+      "per_class_ap50": {
+        "player": 0.8815943002700806,
+        "ball": 0.5931745767593384,
+        "referee": 0.2998231053352356,
+        "rim": 0.01192302256822586,
+        "number": 0.5317666530609131
+      },
+      "boxes_per_image": 509.75,
+      "best_f1": {
+        "threshold": 0.3,
+        "precision": 0.5428450823132124,
+        "recall": 0.65847414234511,
+        "f1": 0.5950948634891254
+      },
+      "recall_at_p90": {
+        "threshold": 0.8,
+        "recall": 0.019969278033794162,
+        "precision": 0.9069767441860465
+      },
+      "recall_at_p95": {
+        "threshold": 0.84,
+        "recall": 0.010240655401945725,
+        "precision": 1.0
+      }
+    },
+    {
+      "models": [
+        "yolo_world"
+      ],
+      "n_models": 1,
+      "method": "nms",
+      "iou": 1.0,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.1771405041217804,
+      "mAP_50": 0.2352997362613678,
+      "per_class_ap50": {
+        "player": 0.7933192849159241,
+        "ball": 0.3321632444858551,
+        "referee": 0.0,
+        "rim": 0.0,
+        "number": 0.0510161817073822
+      },
+      "boxes_per_image": 297.4791666666667,
+      "best_f1": {
+        "threshold": 0.24,
+        "precision": 0.7242524916943521,
+        "recall": 0.44649257552483357,
+        "f1": 0.5524231865695279
+      },
+      "recall_at_p90": {
+        "threshold": 0.92,
+        "recall": 0.004608294930875576,
+        "precision": 1.0
+      },
+      "recall_at_p95": {
+        "threshold": 0.92,
+        "recall": 0.004608294930875576,
+        "precision": 1.0
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini"
+      ],
+      "n_models": 2,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3362671732902527,
+      "mAP_50": 0.5033064484596252,
+      "per_class_ap50": {
+        "player": 0.9143139719963074,
+        "ball": 0.5140660405158997,
+        "referee": 0.7185145020484924,
+        "rim": 0.00819392316043377,
+        "number": 0.3614438772201538
+      },
+      "boxes_per_image": 21.895833333333332,
+      "best_f1": {
+        "threshold": 0.3,
+        "precision": 0.689047619047619,
+        "recall": 0.7409114183307731,
+        "f1": 0.7140389834690352
+      },
+      "recall_at_p90": {
+        "threshold": 0.52,
+        "recall": 0.5079365079365079,
+        "precision": 0.9659201557935735
+      },
+      "recall_at_p95": {
+        "threshold": 0.52,
+        "recall": 0.5079365079365079,
+        "precision": 0.9659201557935735
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "grounding_dino"
+      ],
+      "n_models": 2,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.32568904757499695,
+      "mAP_50": 0.4508589804172516,
+      "per_class_ap50": {
+        "player": 0.8830279111862183,
+        "ball": 0.5069151520729065,
+        "referee": 0.5904755592346191,
+        "rim": 0.0,
+        "number": 0.27387627959251404
+      },
+      "boxes_per_image": 25.28125,
+      "best_f1": {
+        "threshold": 0.2,
+        "precision": 0.7477987421383647,
+        "recall": 0.6088069636456733,
+        "f1": 0.6711826136042902
+      },
+      "recall_at_p90": {
+        "threshold": 0.66,
+        "recall": 0.3635432667690732,
+        "precision": 0.9056122448979592
+      },
+      "recall_at_p95": {
+        "threshold": 0.72,
+        "recall": 0.21505376344086022,
+        "precision": 0.9567198177676538
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "omdet_turbo"
+      ],
+      "n_models": 2,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3119247555732727,
+      "mAP_50": 0.45202434062957764,
+      "per_class_ap50": {
+        "player": 0.8643877506256104,
+        "ball": 0.43020859360694885,
+        "referee": 0.587925374507904,
+        "rim": 0.0,
+        "number": 0.3775999844074249
+      },
+      "boxes_per_image": 1026.7916666666667,
+      "best_f1": {
+        "threshold": 0.36,
+        "precision": 0.75359477124183,
+        "recall": 0.590373783922171,
+        "f1": 0.662072925638817
+      },
+      "recall_at_p90": {
+        "threshold": 0.66,
+        "recall": 0.38812083973374295,
+        "precision": 0.9210206561360875
+      },
+      "recall_at_p95": {
+        "threshold": 0.7,
+        "recall": 0.28776241679467485,
+        "precision": 0.9509306260575296
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.36933648586273193,
+      "mAP_50": 0.5248895883560181,
+      "per_class_ap50": {
+        "player": 0.9000060558319092,
+        "ball": 0.5748563408851624,
+        "referee": 0.5843961238861084,
+        "rim": 0.011138614267110825,
+        "number": 0.554050862789154
+      },
+      "boxes_per_image": 511.8854166666667,
+      "best_f1": {
+        "threshold": 0.4,
+        "precision": 0.7552219321148825,
+        "recall": 0.5924219150025601,
+        "f1": 0.6639885222381636
+      },
+      "recall_at_p90": {
+        "threshold": 0.62,
+        "recall": 0.463389656938044,
+        "precision": 0.9104627766599598
+      },
+      "recall_at_p95": {
+        "threshold": 0.72,
+        "recall": 0.37071172555043524,
+        "precision": 0.9640479360852197
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "yolo_world"
+      ],
+      "n_models": 2,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.30567240715026855,
+      "mAP_50": 0.4276403784751892,
+      "per_class_ap50": {
+        "player": 0.886742115020752,
+        "ball": 0.47119948267936707,
+        "referee": 0.43433305621147156,
+        "rim": 0.0,
+        "number": 0.3459272086620331
+      },
+      "boxes_per_image": 274.0208333333333,
+      "best_f1": {
+        "threshold": 0.14,
+        "precision": 0.6795219989136339,
+        "recall": 0.6405529953917051,
+        "f1": 0.6594623089088033
+      },
+      "recall_at_p90": {
+        "threshold": 0.52,
+        "recall": 0.36610343061955963,
+        "precision": 0.9903047091412742
+      },
+      "recall_at_p95": {
+        "threshold": 0.52,
+        "recall": 0.36610343061955963,
+        "precision": 0.9903047091412742
+      }
+    },
+    {
+      "models": [
+        "gemini",
+        "grounding_dino"
+      ],
+      "n_models": 2,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3271799385547638,
+      "mAP_50": 0.5025622844696045,
+      "per_class_ap50": {
+        "player": 0.9472090005874634,
+        "ball": 0.5924586057662964,
+        "referee": 0.7367638349533081,
+        "rim": 0.010331467725336552,
+        "number": 0.2260485291481018
+      },
+      "boxes_per_image": 26.135416666666668,
+      "best_f1": {
+        "threshold": 0.24,
+        "precision": 0.8103975535168195,
+        "recall": 0.6784434203789043,
+        "f1": 0.7385730211817167
+      },
+      "recall_at_p90": {
+        "threshold": 0.52,
+        "recall": 0.5058883768561188,
+        "precision": 0.9860279441117764
+      },
+      "recall_at_p95": {
+        "threshold": 0.52,
+        "recall": 0.5058883768561188,
+        "precision": 0.9860279441117764
+      }
+    },
+    {
+      "models": [
+        "gemini",
+        "omdet_turbo"
+      ],
+      "n_models": 2,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3239632248878479,
+      "mAP_50": 0.5130470395088196,
+      "per_class_ap50": {
+        "player": 0.9454885721206665,
+        "ball": 0.5381194353103638,
+        "referee": 0.7213863134384155,
+        "rim": 0.008035586215555668,
+        "number": 0.35220539569854736
+      },
+      "boxes_per_image": 1028.71875,
+      "best_f1": {
+        "threshold": 0.36,
+        "precision": 0.8153462258265751,
+        "recall": 0.6692268305171531,
+        "f1": 0.735095613048369
+      },
+      "recall_at_p90": {
+        "threshold": 0.52,
+        "recall": 0.5826932923707118,
+        "precision": 0.9358552631578947
+      },
+      "recall_at_p95": {
+        "threshold": 0.56,
+        "recall": 0.5499231950844854,
+        "precision": 0.9640933572710951
+      }
+    },
+    {
+      "models": [
+        "gemini",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.36968594789505005,
+      "mAP_50": 0.5844247341156006,
+      "per_class_ap50": {
+        "player": 0.9529248476028442,
+        "ball": 0.6659541726112366,
+        "referee": 0.7676278352737427,
+        "rim": 0.015836328268051147,
+        "number": 0.5197803974151611
+      },
+      "boxes_per_image": 512.7291666666666,
+      "best_f1": {
+        "threshold": 0.4,
+        "precision": 0.8144009931719429,
+        "recall": 0.6717869943676396,
+        "f1": 0.7362514029180696
+      },
+      "recall_at_p90": {
+        "threshold": 0.52,
+        "recall": 0.5637480798771122,
+        "precision": 0.9167360532889259
+      },
+      "recall_at_p95": {
+        "threshold": 0.7,
+        "recall": 0.42498719918074757,
+        "precision": 0.9540229885057471
+      }
+    },
+    {
+      "models": [
+        "gemini",
+        "yolo_world"
+      ],
+      "n_models": 2,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3069113790988922,
+      "mAP_50": 0.481268972158432,
+      "per_class_ap50": {
+        "player": 0.9450079202651978,
+        "ball": 0.5474035739898682,
+        "referee": 0.6358875036239624,
+        "rim": 0.010183875449001789,
+        "number": 0.26786187291145325
+      },
+      "boxes_per_image": 272.8958333333333,
+      "best_f1": {
+        "threshold": 0.46,
+        "precision": 0.8164842240824212,
+        "recall": 0.6492575524833589,
+        "f1": 0.7233314318311466
+      },
+      "recall_at_p90": {
+        "threshold": 0.52,
+        "recall": 0.431131592421915,
+        "precision": 0.9882629107981221
+      },
+      "recall_at_p95": {
+        "threshold": 0.52,
+        "recall": 0.431131592421915,
+        "precision": 0.9882629107981221
+      }
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "omdet_turbo"
+      ],
+      "n_models": 2,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.29778558015823364,
+      "mAP_50": 0.41132861375808716,
+      "per_class_ap50": {
+        "player": 0.8911010026931763,
+        "ball": 0.46994683146476746,
+        "referee": 0.5544201731681824,
+        "rim": 0.0,
+        "number": 0.14117500185966492
+      },
+      "boxes_per_image": 1028.8854166666667,
+      "best_f1": {
+        "threshold": 0.26,
+        "precision": 0.8026315789473685,
+        "recall": 0.49974398361495137,
+        "f1": 0.6159671820763648
+      },
+      "recall_at_p90": {
+        "threshold": 0.34,
+        "recall": 0.4065540194572453,
+        "precision": 0.9136939010356732
+      },
+      "recall_at_p95": {
+        "threshold": 0.38,
+        "recall": 0.34101382488479265,
+        "precision": 0.9555236728837877
+      }
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "nms",
+      "iou": 0.4,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.2792763411998749,
+      "mAP_50": 0.42218121886253357,
+      "per_class_ap50": {
+        "player": 0.8558050394058228,
+        "ball": 0.37727123498916626,
+        "referee": 0.4693673551082611,
+        "rim": 0.00754361180588603,
+        "number": 0.4009188115596771
+      },
+      "boxes_per_image": 455.3229166666667,
+      "best_f1": {
+        "threshold": 0.96,
+        "precision": 0.4916247906197655,
+        "recall": 0.601126472094214,
+        "f1": 0.5408891960377793
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "nms",
+      "iou": 0.5,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.2822730243206024,
+      "mAP_50": 0.42865487933158875,
+      "per_class_ap50": {
+        "player": 0.8798360228538513,
+        "ball": 0.3771841526031494,
+        "referee": 0.4691128134727478,
+        "rim": 0.010418887250125408,
+        "number": 0.4067225456237793
+      },
+      "boxes_per_image": 511.9375,
+      "best_f1": {
+        "threshold": 0.96,
+        "precision": 0.483633387888707,
+        "recall": 0.6052227342549923,
+        "f1": 0.5376392995224016
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "nms",
+      "iou": 0.55,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.282278835773468,
+      "mAP_50": 0.42856526374816895,
+      "per_class_ap50": {
+        "player": 0.8795509338378906,
+        "ball": 0.3771668076515198,
+        "referee": 0.4691128134727478,
+        "rim": 0.010418887250125408,
+        "number": 0.40657690167427063
+      },
+      "boxes_per_image": 512.40625,
+      "best_f1": {
+        "threshold": 0.96,
+        "precision": 0.48304045770331017,
+        "recall": 0.6052227342549923,
+        "f1": 0.5372727272727272
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "nms",
+      "iou": 0.6,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.2824108898639679,
+      "mAP_50": 0.4283080995082855,
+      "per_class_ap50": {
+        "player": 0.8797448873519897,
+        "ball": 0.3771668076515198,
+        "referee": 0.4691118597984314,
+        "rim": 0.010418887250125408,
+        "number": 0.4050981104373932
+      },
+      "boxes_per_image": 513.0729166666666,
+      "best_f1": {
+        "threshold": 0.96,
+        "precision": 0.48225214198286415,
+        "recall": 0.6052227342549923,
+        "f1": 0.5367847411444142
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "nms",
+      "iou": 0.7,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.28310731053352356,
+      "mAP_50": 0.42667680978775024,
+      "per_class_ap50": {
+        "player": 0.8808899521827698,
+        "ball": 0.37384334206581116,
+        "referee": 0.4666919708251953,
+        "rim": 0.010418887250125408,
+        "number": 0.40153998136520386
+      },
+      "boxes_per_image": 515.1666666666666,
+      "best_f1": {
+        "threshold": 0.96,
+        "precision": 0.4791244426428861,
+        "recall": 0.6052227342549923,
+        "f1": 0.534841628959276
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "nms",
+      "iou": 0.4,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.33205482363700867,
+      "mAP_50": 0.5038079023361206,
+      "per_class_ap50": {
+        "player": 0.8690077662467957,
+        "ball": 0.5931546688079834,
+        "referee": 0.5524224638938904,
+        "rim": 0.009249400347471237,
+        "number": 0.49520525336265564
+      },
+      "boxes_per_image": 455.5104166666667,
+      "best_f1": {
+        "threshold": 0.34,
+        "precision": 0.5943661971830986,
+        "recall": 0.6482334869431644,
+        "f1": 0.6201322556943425
+      },
+      "recall_at_p90": {
+        "threshold": 0.8,
+        "recall": 0.02457757296466974,
+        "precision": 0.9230769230769231
+      },
+      "recall_at_p95": {
+        "threshold": 0.84,
+        "recall": 0.010240655401945725,
+        "precision": 1.0
+      }
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "nms",
+      "iou": 0.5,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3339875042438507,
+      "mAP_50": 0.507259726524353,
+      "per_class_ap50": {
+        "player": 0.8854305148124695,
+        "ball": 0.5930852890014648,
+        "referee": 0.5511064529418945,
+        "rim": 0.011148824356496334,
+        "number": 0.4955276548862457
+      },
+      "boxes_per_image": 511.8333333333333,
+      "best_f1": {
+        "threshold": 0.34,
+        "precision": 0.5757034390352836,
+        "recall": 0.6600102406554019,
+        "f1": 0.6149809160305343
+      },
+      "recall_at_p90": {
+        "threshold": 0.8,
+        "recall": 0.02457757296466974,
+        "precision": 0.9230769230769231
+      },
+      "recall_at_p95": {
+        "threshold": 0.84,
+        "recall": 0.010240655401945725,
+        "precision": 1.0
+      }
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "nms",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3343186676502228,
+      "mAP_50": 0.5074947476387024,
+      "per_class_ap50": {
+        "player": 0.8882381319999695,
+        "ball": 0.5930852890014648,
+        "referee": 0.5508148670196533,
+        "rim": 0.011148824356496334,
+        "number": 0.49418655037879944
+      },
+      "boxes_per_image": 512.3541666666666,
+      "best_f1": {
+        "threshold": 0.34,
+        "precision": 0.5738434163701067,
+        "recall": 0.6605222734254992,
+        "f1": 0.6141394905974767
+      },
+      "recall_at_p90": {
+        "threshold": 0.8,
+        "recall": 0.02457757296466974,
+        "precision": 0.9230769230769231
+      },
+      "recall_at_p95": {
+        "threshold": 0.84,
+        "recall": 0.010240655401945725,
+        "precision": 1.0
+      }
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "nms",
+      "iou": 0.6,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3349730372428894,
+      "mAP_50": 0.5077443718910217,
+      "per_class_ap50": {
+        "player": 0.8911718726158142,
+        "ball": 0.5930852890014648,
+        "referee": 0.5505333542823792,
+        "rim": 0.011148824356496334,
+        "number": 0.4927826523780823
+      },
+      "boxes_per_image": 513.0520833333334,
+      "best_f1": {
+        "threshold": 0.34,
+        "precision": 0.5718073353954927,
+        "recall": 0.6625704045058883,
+        "f1": 0.6138519924098672
+      },
+      "recall_at_p90": {
+        "threshold": 0.8,
+        "recall": 0.02457757296466974,
+        "precision": 0.9230769230769231
+      },
+      "recall_at_p95": {
+        "threshold": 0.84,
+        "recall": 0.010240655401945725,
+        "precision": 1.0
+      }
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "nms",
+      "iou": 0.7,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3370189964771271,
+      "mAP_50": 0.5074295401573181,
+      "per_class_ap50": {
+        "player": 0.8945779204368591,
+        "ball": 0.5930852890014648,
+        "referee": 0.5487842559814453,
+        "rim": 0.011148824356496334,
+        "number": 0.48955127596855164
+      },
+      "boxes_per_image": 515.1770833333334,
+      "best_f1": {
+        "threshold": 0.34,
+        "precision": 0.5633680555555556,
+        "recall": 0.6646185355862775,
+        "f1": 0.6098191214470284
+      },
+      "recall_at_p90": {
+        "threshold": 0.8,
+        "recall": 0.02457757296466974,
+        "precision": 0.9230769230769231
+      },
+      "recall_at_p95": {
+        "threshold": 0.84,
+        "recall": 0.010240655401945725,
+        "precision": 1.0
+      }
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "agree",
+      "iou": 0.4,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.26451945304870605,
+      "mAP_50": 0.39737534523010254,
+      "per_class_ap50": {
+        "player": 0.8551048636436462,
+        "ball": 0.42547407746315,
+        "referee": 0.3799222707748413,
+        "rim": 0.00754361180588603,
+        "number": 0.3188318610191345
+      },
+      "boxes_per_image": 455.3229166666667,
+      "best_f1": {
+        "threshold": 0.48,
+        "precision": 0.5550847457627118,
+        "recall": 0.6707629288274449,
+        "f1": 0.607465801066543
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "agree",
+      "iou": 0.5,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.28009897470474243,
+      "mAP_50": 0.42295151948928833,
+      "per_class_ap50": {
+        "player": 0.8866744041442871,
+        "ball": 0.4322599172592163,
+        "referee": 0.4105735719203949,
+        "rim": 0.010418887250125408,
+        "number": 0.37483084201812744
+      },
+      "boxes_per_image": 511.9375,
+      "best_f1": {
+        "threshold": 0.48,
+        "precision": 0.4965893587994543,
+        "recall": 0.7455197132616488,
+        "f1": 0.5961105424769704
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "agree",
+      "iou": 0.55,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.2808590531349182,
+      "mAP_50": 0.4240245223045349,
+      "per_class_ap50": {
+        "player": 0.8897708654403687,
+        "ball": 0.4343406856060028,
+        "referee": 0.4105735719203949,
+        "rim": 0.010418887250125408,
+        "number": 0.37501853704452515
+      },
+      "boxes_per_image": 512.40625,
+      "best_f1": {
+        "threshold": 0.48,
+        "precision": 0.49644188410708234,
+        "recall": 0.7501280081925243,
+        "f1": 0.5974714518760196
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "agree",
+      "iou": 0.6,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.28196772933006287,
+      "mAP_50": 0.42524734139442444,
+      "per_class_ap50": {
+        "player": 0.894203245639801,
+        "ball": 0.4343406856060028,
+        "referee": 0.4134528934955597,
+        "rim": 0.010418887250125408,
+        "number": 0.373820960521698
+      },
+      "boxes_per_image": 513.0729166666666,
+      "best_f1": {
+        "threshold": 0.48,
+        "precision": 0.49696151249155973,
+        "recall": 0.7537122375832054,
+        "f1": 0.5989827060020346
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "agree",
+      "iou": 0.7,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.28314486145973206,
+      "mAP_50": 0.4216074049472809,
+      "per_class_ap50": {
+        "player": 0.8996766209602356,
+        "ball": 0.4292525351047516,
+        "referee": 0.3994404971599579,
+        "rim": 0.010418887250125408,
+        "number": 0.36924847960472107
+      },
+      "boxes_per_image": 515.1666666666666,
+      "best_f1": {
+        "threshold": 0.48,
+        "precision": 0.49291975724882,
+        "recall": 0.7485919098822325,
+        "f1": 0.5944297621467778
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "agree",
+      "iou": 0.4,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3122578263282776,
+      "mAP_50": 0.4740225076675415,
+      "per_class_ap50": {
+        "player": 0.8802374601364136,
+        "ball": 0.5841028690338135,
+        "referee": 0.5043620467185974,
+        "rim": 0.009287492372095585,
+        "number": 0.39212265610694885
+      },
+      "boxes_per_image": 455.5104166666667,
+      "best_f1": {
+        "threshold": 0.26,
+        "precision": 0.7340579710144928,
+        "recall": 0.5186891961085509,
+        "f1": 0.6078607860786078
+      },
+      "recall_at_p90": {
+        "threshold": 0.58,
+        "recall": 0.02867383512544803,
+        "precision": 0.9032258064516129
+      },
+      "recall_at_p95": {
+        "threshold": 0.64,
+        "recall": 0.01228878648233487,
+        "precision": 1.0
+      }
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "agree",
+      "iou": 0.5,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3203237056732178,
+      "mAP_50": 0.48485127091407776,
+      "per_class_ap50": {
+        "player": 0.9094151854515076,
+        "ball": 0.5934904217720032,
+        "referee": 0.5160037279129028,
+        "rim": 0.011148824356496334,
+        "number": 0.3941981792449951
+      },
+      "boxes_per_image": 511.8333333333333,
+      "best_f1": {
+        "threshold": 0.3,
+        "precision": 0.7653673163418291,
+        "recall": 0.5227854582693292,
+        "f1": 0.6212351688469729
+      },
+      "recall_at_p90": {
+        "threshold": 0.58,
+        "recall": 0.033282130056323606,
+        "precision": 0.9154929577464789
+      },
+      "recall_at_p95": {
+        "threshold": 0.62,
+        "recall": 0.01945724526369688,
+        "precision": 0.95
+      }
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "agree",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3204645812511444,
+      "mAP_50": 0.4842890202999115,
+      "per_class_ap50": {
+        "player": 0.9130615592002869,
+        "ball": 0.5934904217720032,
+        "referee": 0.5166290998458862,
+        "rim": 0.011148824356496334,
+        "number": 0.3871151804924011
+      },
+      "boxes_per_image": 512.3541666666666,
+      "best_f1": {
+        "threshold": 0.32,
+        "precision": 0.7884310618066561,
+        "recall": 0.5094726062467998,
+        "f1": 0.6189735614307932
+      },
+      "recall_at_p90": {
+        "threshold": 0.58,
+        "recall": 0.03430619559651818,
+        "precision": 0.9178082191780822
+      },
+      "recall_at_p95": {
+        "threshold": 0.62,
+        "recall": 0.01945724526369688,
+        "precision": 0.95
+      }
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "agree",
+      "iou": 0.6,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.32073113322257996,
+      "mAP_50": 0.4841546416282654,
+      "per_class_ap50": {
+        "player": 0.916476845741272,
+        "ball": 0.5934904217720032,
+        "referee": 0.5168509483337402,
+        "rim": 0.011148824356496334,
+        "number": 0.3828062117099762
+      },
+      "boxes_per_image": 513.0520833333334,
+      "best_f1": {
+        "threshold": 0.32,
+        "precision": 0.7853736089030207,
+        "recall": 0.5058883768561188,
+        "f1": 0.6153846153846154
+      },
+      "recall_at_p90": {
+        "threshold": 0.58,
+        "recall": 0.035842293906810034,
+        "precision": 0.9210526315789473
+      },
+      "recall_at_p95": {
+        "threshold": 0.62,
+        "recall": 0.01945724526369688,
+        "precision": 0.95
+      }
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "agree",
+      "iou": 0.7,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3233538866043091,
+      "mAP_50": 0.4826037585735321,
+      "per_class_ap50": {
+        "player": 0.9208876490592957,
+        "ball": 0.5876307487487793,
+        "referee": 0.5129721760749817,
+        "rim": 0.011148824356496334,
+        "number": 0.38037946820259094
+      },
+      "boxes_per_image": 515.1770833333334,
+      "best_f1": {
+        "threshold": 0.32,
+        "precision": 0.7864157119476268,
+        "recall": 0.49206349206349204,
+        "f1": 0.6053543307086614
+      },
+      "recall_at_p90": {
+        "threshold": 0.44,
+        "recall": 0.318484383000512,
+        "precision": 0.9014492753623189
+      },
+      "recall_at_p95": {
+        "threshold": 0.62,
+        "recall": 0.01945724526369688,
+        "precision": 0.95
+      }
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "wbf",
+      "iou": 0.4,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.2449798583984375,
+      "mAP_50": 0.4012528359889984,
+      "per_class_ap50": {
+        "player": 0.8590376973152161,
+        "ball": 0.42547407746315,
+        "referee": 0.3902662992477417,
+        "rim": 0.00754361180588603,
+        "number": 0.32394248247146606
+      },
+      "boxes_per_image": 455.3229166666667,
+      "best_f1": {
+        "threshold": 0.48,
+        "precision": 0.5588983050847458,
+        "recall": 0.6753712237583205,
+        "f1": 0.6116392302341758
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "wbf",
+      "iou": 0.5,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.28174060583114624,
+      "mAP_50": 0.4233227074146271,
+      "per_class_ap50": {
+        "player": 0.8885303139686584,
+        "ball": 0.4322599172592163,
+        "referee": 0.4105735719203949,
+        "rim": 0.010418887250125408,
+        "number": 0.37483084201812744
+      },
+      "boxes_per_image": 511.9375,
+      "best_f1": {
+        "threshold": 0.5,
+        "precision": 0.6467780429594272,
+        "recall": 0.5550435227854583,
+        "f1": 0.5974097547533757
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.2832257151603699,
+      "mAP_50": 0.4246525168418884,
+      "per_class_ap50": {
+        "player": 0.892910897731781,
+        "ball": 0.4343406856060028,
+        "referee": 0.4105735719203949,
+        "rim": 0.010418887250125408,
+        "number": 0.37501853704452515
+      },
+      "boxes_per_image": 512.40625,
+      "best_f1": {
+        "threshold": 0.5,
+        "precision": 0.6462908011869436,
+        "recall": 0.5576036866359447,
+        "f1": 0.5986805937328202
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "wbf",
+      "iou": 0.6,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.28483325242996216,
+      "mAP_50": 0.42587465047836304,
+      "per_class_ap50": {
+        "player": 0.8973398804664612,
+        "ball": 0.4343406856060028,
+        "referee": 0.4134528934955597,
+        "rim": 0.010418887250125408,
+        "number": 0.373820960521698
+      },
+      "boxes_per_image": 513.0729166666666,
+      "best_f1": {
+        "threshold": 0.48,
+        "precision": 0.4972991222147198,
+        "recall": 0.7542242703533026,
+        "f1": 0.5993896236012207
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "wbf",
+      "iou": 0.7,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.285427987575531,
+      "mAP_50": 0.42187637090682983,
+      "per_class_ap50": {
+        "player": 0.9010214805603027,
+        "ball": 0.4292525351047516,
+        "referee": 0.3994404971599579,
+        "rim": 0.010418887250125408,
+        "number": 0.36924847960472107
+      },
+      "boxes_per_image": 515.1666666666666,
+      "best_f1": {
+        "threshold": 0.48,
+        "precision": 0.4935940660822657,
+        "recall": 0.7496159754224271,
+        "f1": 0.5952429355560074
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "wbf",
+      "iou": 0.4,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.30813270807266235,
+      "mAP_50": 0.4748936891555786,
+      "per_class_ap50": {
+        "player": 0.8796095252037048,
+        "ball": 0.5841028690338135,
+        "referee": 0.5054792165756226,
+        "rim": 0.009287492372095585,
+        "number": 0.3959892988204956
+      },
+      "boxes_per_image": 455.5104166666667,
+      "best_f1": {
+        "threshold": 0.26,
+        "precision": 0.7355072463768116,
+        "recall": 0.5197132616487455,
+        "f1": 0.6090609060906091
+      },
+      "recall_at_p90": {
+        "threshold": 0.58,
+        "recall": 0.02867383512544803,
+        "precision": 0.9032258064516129
+      },
+      "recall_at_p95": {
+        "threshold": 0.64,
+        "recall": 0.01228878648233487,
+        "precision": 1.0
+      }
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "wbf",
+      "iou": 0.5,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.33183354139328003,
+      "mAP_50": 0.4849192202091217,
+      "per_class_ap50": {
+        "player": 0.9097549915313721,
+        "ball": 0.5934904217720032,
+        "referee": 0.5160037279129028,
+        "rim": 0.011148824356496334,
+        "number": 0.3941981792449951
+      },
+      "boxes_per_image": 511.8333333333333,
+      "best_f1": {
+        "threshold": 0.32,
+        "precision": 0.7923930269413629,
+        "recall": 0.5120327700972862,
+        "f1": 0.6220839813374807
+      },
+      "recall_at_p90": {
+        "threshold": 0.58,
+        "recall": 0.033282130056323606,
+        "precision": 0.9154929577464789
+      },
+      "recall_at_p95": {
+        "threshold": 0.62,
+        "recall": 0.01945724526369688,
+        "precision": 0.95
+      }
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.33280259370803833,
+      "mAP_50": 0.48463770747184753,
+      "per_class_ap50": {
+        "player": 0.9148050546646118,
+        "ball": 0.5934904217720032,
+        "referee": 0.5166290998458862,
+        "rim": 0.011148824356496334,
+        "number": 0.3871151804924011
+      },
+      "boxes_per_image": 512.3541666666666,
+      "best_f1": {
+        "threshold": 0.32,
+        "precision": 0.7892234548335975,
+        "recall": 0.5099846390168971,
+        "f1": 0.6195956454121306
+      },
+      "recall_at_p90": {
+        "threshold": 0.58,
+        "recall": 0.03430619559651818,
+        "precision": 0.9178082191780822
+      },
+      "recall_at_p95": {
+        "threshold": 0.62,
+        "recall": 0.01945724526369688,
+        "precision": 0.95
+      }
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "wbf",
+      "iou": 0.6,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3338959813117981,
+      "mAP_50": 0.4843032956123352,
+      "per_class_ap50": {
+        "player": 0.9172200560569763,
+        "ball": 0.5934904217720032,
+        "referee": 0.5168509483337402,
+        "rim": 0.011148824356496334,
+        "number": 0.3828062117099762
+      },
+      "boxes_per_image": 513.0520833333334,
+      "best_f1": {
+        "threshold": 0.32,
+        "precision": 0.7853736089030207,
+        "recall": 0.5058883768561188,
+        "f1": 0.6153846153846154
+      },
+      "recall_at_p90": {
+        "threshold": 0.58,
+        "recall": 0.035842293906810034,
+        "precision": 0.9210526315789473
+      },
+      "recall_at_p95": {
+        "threshold": 0.62,
+        "recall": 0.01945724526369688,
+        "precision": 0.95
+      }
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "wbf",
+      "iou": 0.7,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.33650708198547363,
+      "mAP_50": 0.4828018546104431,
+      "per_class_ap50": {
+        "player": 0.9218780398368835,
+        "ball": 0.5876307487487793,
+        "referee": 0.5129721760749817,
+        "rim": 0.011148824356496334,
+        "number": 0.38037946820259094
+      },
+      "boxes_per_image": 515.1770833333334,
+      "best_f1": {
+        "threshold": 0.32,
+        "precision": 0.7872340425531915,
+        "recall": 0.49257552483358935,
+        "f1": 0.6059842519685039
+      },
+      "recall_at_p90": {
+        "threshold": 0.44,
+        "recall": 0.31899641577060933,
+        "precision": 0.9028985507246376
+      },
+      "recall_at_p95": {
+        "threshold": 0.62,
+        "recall": 0.01945724526369688,
+        "precision": 0.95
+      }
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "consensus",
+      "iou": 0.4,
+      "normalize": true,
+      "min_models": 2,
+      "mAP_50_95": 0.19320319592952728,
+      "mAP_50": 0.298772931098938,
+      "per_class_ap50": {
+        "player": 0.8325582146644592,
+        "ball": 0.3562989830970764,
+        "referee": 0.2752246558666229,
+        "rim": 0.0,
+        "number": 0.02978275902569294
+      },
+      "boxes_per_image": 16.40625,
+      "best_f1": {
+        "threshold": 0.48,
+        "precision": 0.705547652916074,
+        "recall": 0.5079365079365079,
+        "f1": 0.5906519797558798
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "consensus",
+      "iou": 0.5,
+      "normalize": true,
+      "min_models": 2,
+      "mAP_50_95": 0.21590831875801086,
+      "mAP_50": 0.3004285395145416,
+      "per_class_ap50": {
+        "player": 0.8458089232444763,
+        "ball": 0.36371150612831116,
+        "referee": 0.2703506350517273,
+        "rim": 0.0,
+        "number": 0.022271592170000076
+      },
+      "boxes_per_image": 17.072916666666668,
+      "best_f1": {
+        "threshold": 0.5,
+        "precision": 0.7121102248005802,
+        "recall": 0.5028161802355351,
+        "f1": 0.5894357743097239
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "consensus",
+      "iou": 0.55,
+      "normalize": true,
+      "min_models": 2,
+      "mAP_50_95": 0.21685580909252167,
+      "mAP_50": 0.3004142940044403,
+      "per_class_ap50": {
+        "player": 0.8469956517219543,
+        "ball": 0.3655698001384735,
+        "referee": 0.2703506350517273,
+        "rim": 0.0,
+        "number": 0.019155465066432953
+      },
+      "boxes_per_image": 17.135416666666668,
+      "best_f1": {
+        "threshold": 0.5,
+        "precision": 0.7134587554269175,
+        "recall": 0.5048643113159242,
+        "f1": 0.591304347826087
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "consensus",
+      "iou": 0.6,
+      "normalize": true,
+      "min_models": 2,
+      "mAP_50_95": 0.21711531281471252,
+      "mAP_50": 0.29957765340805054,
+      "per_class_ap50": {
+        "player": 0.8483135104179382,
+        "ball": 0.3655698001384735,
+        "referee": 0.26991501450538635,
+        "rim": 0.0,
+        "number": 0.014090004377067089
+      },
+      "boxes_per_image": 16.958333333333332,
+      "best_f1": {
+        "threshold": 0.5,
+        "precision": 0.7160583941605839,
+        "recall": 0.5023041474654378,
+        "f1": 0.5904303340355102
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "consensus",
+      "iou": 0.7,
+      "normalize": true,
+      "min_models": 2,
+      "mAP_50_95": 0.21052101254463196,
+      "mAP_50": 0.28387999534606934,
+      "per_class_ap50": {
+        "player": 0.8343855142593384,
+        "ball": 0.351127564907074,
+        "referee": 0.22722101211547852,
+        "rim": 0.0,
+        "number": 0.006665864028036594
+      },
+      "boxes_per_image": 16.03125,
+      "best_f1": {
+        "threshold": 0.5,
+        "precision": 0.7146101438304315,
+        "recall": 0.4833589349718382,
+        "f1": 0.5766646304215027
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "consensus",
+      "iou": 0.4,
+      "normalize": false,
+      "min_models": 2,
+      "mAP_50_95": 0.2392377406358719,
+      "mAP_50": 0.3469131886959076,
+      "per_class_ap50": {
+        "player": 0.8378157615661621,
+        "ball": 0.5003198385238647,
+        "referee": 0.35040825605392456,
+        "rim": 0.0,
+        "number": 0.04602210223674774
+      },
+      "boxes_per_image": 16.4375,
+      "best_f1": {
+        "threshold": 0.26,
+        "precision": 0.7844690966719493,
+        "recall": 0.5069124423963134,
+        "f1": 0.6158631415241057
+      },
+      "recall_at_p90": {
+        "threshold": 0.58,
+        "recall": 0.02867383512544803,
+        "precision": 0.9032258064516129
+      },
+      "recall_at_p95": {
+        "threshold": 0.64,
+        "recall": 0.01228878648233487,
+        "precision": 1.0
+      }
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "consensus",
+      "iou": 0.5,
+      "normalize": false,
+      "min_models": 2,
+      "mAP_50_95": 0.2575327754020691,
+      "mAP_50": 0.3511577248573303,
+      "per_class_ap50": {
+        "player": 0.8510456085205078,
+        "ball": 0.509988009929657,
+        "referee": 0.3486577570438385,
+        "rim": 0.0,
+        "number": 0.04609731584787369
+      },
+      "boxes_per_image": 17.09375,
+      "best_f1": {
+        "threshold": 0.3,
+        "precision": 0.7838684416601409,
+        "recall": 0.5125448028673835,
+        "f1": 0.6198142414860681
+      },
+      "recall_at_p90": {
+        "threshold": 0.58,
+        "recall": 0.033282130056323606,
+        "precision": 0.9154929577464789
+      },
+      "recall_at_p95": {
+        "threshold": 0.62,
+        "recall": 0.01945724526369688,
+        "precision": 0.95
+      }
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "consensus",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": 2,
+      "mAP_50_95": 0.2579098045825958,
+      "mAP_50": 0.35100215673446655,
+      "per_class_ap50": {
+        "player": 0.8599736094474792,
+        "ball": 0.509988009929657,
+        "referee": 0.3496386706829071,
+        "rim": 0.0,
+        "number": 0.03541047126054764
+      },
+      "boxes_per_image": 17.125,
+      "best_f1": {
+        "threshold": 0.32,
+        "precision": 0.8022969647251845,
+        "recall": 0.500768049155146,
+        "f1": 0.6166456494325347
+      },
+      "recall_at_p90": {
+        "threshold": 0.58,
+        "recall": 0.03430619559651818,
+        "precision": 0.9178082191780822
+      },
+      "recall_at_p95": {
+        "threshold": 0.62,
+        "recall": 0.01945724526369688,
+        "precision": 0.95
+      }
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "consensus",
+      "iou": 0.6,
+      "normalize": false,
+      "min_models": 2,
+      "mAP_50_95": 0.2572005093097687,
+      "mAP_50": 0.3483562767505646,
+      "per_class_ap50": {
+        "player": 0.8592526912689209,
+        "ball": 0.509988009929657,
+        "referee": 0.34755706787109375,
+        "rim": 0.0,
+        "number": 0.024983622133731842
+      },
+      "boxes_per_image": 16.958333333333332,
+      "best_f1": {
+        "threshold": 0.3,
+        "precision": 0.7777777777777778,
+        "recall": 0.5053763440860215,
+        "f1": 0.6126629422718809
+      },
+      "recall_at_p90": {
+        "threshold": 0.58,
+        "recall": 0.035842293906810034,
+        "precision": 0.9210526315789473
+      },
+      "recall_at_p95": {
+        "threshold": 0.62,
+        "recall": 0.01945724526369688,
+        "precision": 0.95
+      }
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "consensus",
+      "iou": 0.7,
+      "normalize": false,
+      "min_models": 2,
+      "mAP_50_95": 0.24732239544391632,
+      "mAP_50": 0.3293543756008148,
+      "per_class_ap50": {
+        "player": 0.8423818349838257,
+        "ball": 0.49482107162475586,
+        "referee": 0.2997937798500061,
+        "rim": 0.0,
+        "number": 0.009775263257324696
+      },
+      "boxes_per_image": 16.03125,
+      "best_f1": {
+        "threshold": 0.32,
+        "precision": 0.7998289136013687,
+        "recall": 0.4787506400409626,
+        "f1": 0.5989750160153747
+      },
+      "recall_at_p90": {
+        "threshold": 0.44,
+        "recall": 0.31899641577060933,
+        "precision": 0.9028985507246376
+      },
+      "recall_at_p95": {
+        "threshold": 0.62,
+        "recall": 0.01945724526369688,
+        "precision": 0.95
+      }
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "yolo_world"
+      ],
+      "n_models": 2,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.27755922079086304,
+      "mAP_50": 0.3610396683216095,
+      "per_class_ap50": {
+        "player": 0.8940992951393127,
+        "ball": 0.4197409451007843,
+        "referee": 0.4447784423828125,
+        "rim": 0.0,
+        "number": 0.04657958075404167
+      },
+      "boxes_per_image": 275.3645833333333,
+      "best_f1": {
+        "threshold": 0.22,
+        "precision": 0.8091353996737357,
+        "recall": 0.5079365079365079,
+        "f1": 0.6240956275558351
+      },
+      "recall_at_p90": {
+        "threshold": 0.4,
+        "recall": 0.3399897593445981,
+        "precision": 0.908344733242134
+      },
+      "recall_at_p95": {
+        "threshold": 0.46,
+        "recall": 0.2764976958525346,
+        "precision": 0.9782608695652174
+      }
+    },
+    {
+      "models": [
+        "omdet_turbo",
+        "owlv2"
+      ],
+      "n_models": 2,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3386012613773346,
+      "mAP_50": 0.499818354845047,
+      "per_class_ap50": {
+        "player": 0.8721733689308167,
+        "ball": 0.6001670956611633,
+        "referee": 0.449321448802948,
+        "rim": 0.01192302256822586,
+        "number": 0.5655068159103394
+      },
+      "boxes_per_image": 1347.5,
+      "best_f1": {
+        "threshold": 0.28,
+        "precision": 0.7061548643282595,
+        "recall": 0.5463389656938044,
+        "f1": 0.6160508083140878
+      },
+      "recall_at_p90": {
+        "threshold": 0.42,
+        "recall": 0.3236047107014849,
+        "precision": 0.9159420289855073
+      },
+      "recall_at_p95": {
+        "threshold": 0.46,
+        "recall": 0.268305171530978,
+        "precision": 0.9597069597069597
+      }
+    },
+    {
+      "models": [
+        "omdet_turbo",
+        "yolo_world"
+      ],
+      "n_models": 2,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.2512841820716858,
+      "mAP_50": 0.34524691104888916,
+      "per_class_ap50": {
+        "player": 0.8387894034385681,
+        "ball": 0.3821709454059601,
+        "referee": 0.32061320543289185,
+        "rim": 0.0,
+        "number": 0.18466095626354218
+      },
+      "boxes_per_image": 1160.9166666666667,
+      "best_f1": {
+        "threshold": 0.2,
+        "precision": 0.7147262914417888,
+        "recall": 0.47465437788018433,
+        "f1": 0.5704615384615386
+      },
+      "recall_at_p90": {
+        "threshold": 0.54,
+        "recall": 0.21505376344086022,
+        "precision": 0.9090909090909091
+      },
+      "recall_at_p95": {
+        "threshold": 0.6,
+        "recall": 0.16845878136200718,
+        "precision": 0.9508670520231214
+      }
+    },
+    {
+      "models": [
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 2,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.28950637578964233,
+      "mAP_50": 0.4412687122821808,
+      "per_class_ap50": {
+        "player": 0.8550501465797424,
+        "ball": 0.5046619772911072,
+        "referee": 0.2998231053352356,
+        "rim": 0.01192302256822586,
+        "number": 0.5348852276802063
+      },
+      "boxes_per_image": 697.6979166666666,
+      "best_f1": {
+        "threshold": 0.16,
+        "precision": 0.5222453222453223,
+        "recall": 0.6431131592421915,
+        "f1": 0.5764111977971547
+      },
+      "recall_at_p90": {
+        "threshold": 0.64,
+        "recall": 0.17665130568356374,
+        "precision": 0.9007832898172323
+      },
+      "recall_at_p95": {
+        "threshold": 0.7,
+        "recall": 0.09831029185867896,
+        "precision": 0.9504950495049505
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino"
+      ],
+      "n_models": 3,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.36313313245773315,
+      "mAP_50": 0.5290488004684448,
+      "per_class_ap50": {
+        "player": 0.942326545715332,
+        "ball": 0.5874916911125183,
+        "referee": 0.7394359707832336,
+        "rim": 0.00819392316043377,
+        "number": 0.36779576539993286
+      },
+      "boxes_per_image": 29.5625,
+      "best_f1": {
+        "threshold": 0.34,
+        "precision": 0.8899486426999267,
+        "recall": 0.6210957501280082,
+        "f1": 0.7316043425814235
+      },
+      "recall_at_p90": {
+        "threshold": 0.44,
+        "recall": 0.5693804403481822,
+        "precision": 0.9159802306425041
+      },
+      "recall_at_p95": {
+        "threshold": 0.48,
+        "recall": 0.5243215565796211,
+        "precision": 0.9525581395348838
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "omdet_turbo"
+      ],
+      "n_models": 3,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3627418577671051,
+      "mAP_50": 0.5380979776382446,
+      "per_class_ap50": {
+        "player": 0.9381154179573059,
+        "ball": 0.5550397634506226,
+        "referee": 0.7465482354164124,
+        "rim": 0.006373051553964615,
+        "number": 0.444413423538208
+      },
+      "boxes_per_image": 1029.3645833333333,
+      "best_f1": {
+        "threshold": 0.34,
+        "precision": 0.8010625737898465,
+        "recall": 0.6948284690220174,
+        "f1": 0.7441732931176309
+      },
+      "recall_at_p90": {
+        "threshold": 0.44,
+        "recall": 0.5514592933947773,
+        "precision": 0.916595744680851
+      },
+      "recall_at_p95": {
+        "threshold": 0.48,
+        "recall": 0.5176651305683564,
+        "precision": 0.9537735849056603
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "owlv2"
+      ],
+      "n_models": 3,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.39947831630706787,
+      "mAP_50": 0.589747428894043,
+      "per_class_ap50": {
+        "player": 0.9459866881370544,
+        "ball": 0.6523352861404419,
+        "referee": 0.7730551958084106,
+        "rim": 0.013717792928218842,
+        "number": 0.563642144203186
+      },
+      "boxes_per_image": 514.3229166666666,
+      "best_f1": {
+        "threshold": 0.4,
+        "precision": 0.8835800807537012,
+        "recall": 0.6722990271377368,
+        "f1": 0.7635940680430358
+      },
+      "recall_at_p90": {
+        "threshold": 0.42,
+        "recall": 0.6569380440348183,
+        "precision": 0.9009831460674157
+      },
+      "recall_at_p95": {
+        "threshold": 0.52,
+        "recall": 0.5238095238095238,
+        "precision": 0.9641847313854854
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "yolo_world"
+      ],
+      "n_models": 3,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.35999229550361633,
+      "mAP_50": 0.5275669693946838,
+      "per_class_ap50": {
+        "player": 0.9417764544487,
+        "ball": 0.558718740940094,
+        "referee": 0.7185145020484924,
+        "rim": 0.008100810460746288,
+        "number": 0.410724401473999
+      },
+      "boxes_per_image": 277.7395833333333,
+      "best_f1": {
+        "threshold": 0.34,
+        "precision": 0.9584026622296173,
+        "recall": 0.5898617511520737,
+        "f1": 0.73026941362916
+      },
+      "recall_at_p90": {
+        "threshold": 0.34,
+        "recall": 0.5898617511520737,
+        "precision": 0.9584026622296173
+      },
+      "recall_at_p95": {
+        "threshold": 0.34,
+        "recall": 0.5898617511520737,
+        "precision": 0.9584026622296173
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "grounding_dino",
+        "omdet_turbo"
+      ],
+      "n_models": 3,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.33931809663772583,
+      "mAP_50": 0.47783759236335754,
+      "per_class_ap50": {
+        "player": 0.9029906988143921,
+        "ball": 0.5117047429084778,
+        "referee": 0.632924497127533,
+        "rim": 0.0,
+        "number": 0.34156811237335205
+      },
+      "boxes_per_image": 1029.1041666666667,
+      "best_f1": {
+        "threshold": 0.2,
+        "precision": 0.7364985163204748,
+        "recall": 0.6354326676907323,
+        "f1": 0.6822429906542056
+      },
+      "recall_at_p90": {
+        "threshold": 0.5,
+        "recall": 0.4321556579621096,
+        "precision": 0.9124324324324324
+      },
+      "recall_at_p95": {
+        "threshold": 0.58,
+        "recall": 0.3118279569892473,
+        "precision": 0.96513470681458
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 3,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3785397410392761,
+      "mAP_50": 0.5304469466209412,
+      "per_class_ap50": {
+        "player": 0.9167410135269165,
+        "ball": 0.6021525263786316,
+        "referee": 0.6232364773750305,
+        "rim": 0.010311147198081017,
+        "number": 0.49979349970817566
+      },
+      "boxes_per_image": 514.15625,
+      "best_f1": {
+        "threshold": 0.22,
+        "precision": 0.6991480298189563,
+        "recall": 0.6722990271377368,
+        "f1": 0.6854607152179588
+      },
+      "recall_at_p90": {
+        "threshold": 0.48,
+        "recall": 0.452636968766001,
+        "precision": 0.9029622063329928
+      },
+      "recall_at_p95": {
+        "threshold": 0.56,
+        "recall": 0.38556067588325654,
+        "precision": 0.9519595448798989
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "grounding_dino",
+        "yolo_world"
+      ],
+      "n_models": 3,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.340048223733902,
+      "mAP_50": 0.46354883909225464,
+      "per_class_ap50": {
+        "player": 0.9091528654098511,
+        "ball": 0.5100790858268738,
+        "referee": 0.5904755592346191,
+        "rim": 0.0,
+        "number": 0.3080366551876068
+      },
+      "boxes_per_image": 280.15625,
+      "best_f1": {
+        "threshold": 0.16,
+        "precision": 0.69593147751606,
+        "recall": 0.6656426011264721,
+        "f1": 0.6804501439413766
+      },
+      "recall_at_p90": {
+        "threshold": 0.44,
+        "recall": 0.43830005120327703,
+        "precision": 0.9155080213903743
+      },
+      "recall_at_p95": {
+        "threshold": 0.48,
+        "recall": 0.4121863799283154,
+        "precision": 0.971049457177322
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "omdet_turbo",
+        "owlv2"
+      ],
+      "n_models": 3,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3754463791847229,
+      "mAP_50": 0.5300277471542358,
+      "per_class_ap50": {
+        "player": 0.8936833739280701,
+        "ball": 0.5978077054023743,
+        "referee": 0.6032391786575317,
+        "rim": 0.011138614267110825,
+        "number": 0.5442696809768677
+      },
+      "boxes_per_image": 1347.9270833333333,
+      "best_f1": {
+        "threshold": 0.38,
+        "precision": 0.8129963898916968,
+        "recall": 0.5765488991295443,
+        "f1": 0.6746554823247454
+      },
+      "recall_at_p90": {
+        "threshold": 0.5,
+        "recall": 0.4495647721454173,
+        "precision": 0.9117341640706127
+      },
+      "recall_at_p95": {
+        "threshold": 0.54,
+        "recall": 0.39528929851510497,
+        "precision": 0.9530864197530864
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "omdet_turbo",
+        "yolo_world"
+      ],
+      "n_models": 3,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3334648609161377,
+      "mAP_50": 0.4670563042163849,
+      "per_class_ap50": {
+        "player": 0.8913764357566833,
+        "ball": 0.47973713278770447,
+        "referee": 0.587925374507904,
+        "rim": 0.0,
+        "number": 0.3762425482273102
+      },
+      "boxes_per_image": 1161.3333333333333,
+      "best_f1": {
+        "threshold": 0.2,
+        "precision": 0.7027952082144895,
+        "recall": 0.6308243727598566,
+        "f1": 0.6648677819751754
+      },
+      "recall_at_p90": {
+        "threshold": 0.44,
+        "recall": 0.4444444444444444,
+        "precision": 0.9253731343283582
+      },
+      "recall_at_p95": {
+        "threshold": 0.46,
+        "recall": 0.41116231438812084,
+        "precision": 0.9548156956004756
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 3,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3757791817188263,
+      "mAP_50": 0.5254630446434021,
+      "per_class_ap50": {
+        "player": 0.9129530191421509,
+        "ball": 0.5641591548919678,
+        "referee": 0.5843961238861084,
+        "rim": 0.011138614267110825,
+        "number": 0.5546683669090271
+      },
+      "boxes_per_image": 700.0520833333334,
+      "best_f1": {
+        "threshold": 0.2,
+        "precision": 0.6774699424986932,
+        "recall": 0.663594470046083,
+        "f1": 0.6704604242110709
+      },
+      "recall_at_p90": {
+        "threshold": 0.44,
+        "recall": 0.4336917562724014,
+        "precision": 0.9039487726787621
+      },
+      "recall_at_p95": {
+        "threshold": 0.48,
+        "recall": 0.3819764464925755,
+        "precision": 0.9650711513583441
+      }
+    },
+    {
+      "models": [
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo"
+      ],
+      "n_models": 3,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3539859652519226,
+      "mAP_50": 0.5356149673461914,
+      "per_class_ap50": {
+        "player": 0.9538586735725403,
+        "ball": 0.5936585068702698,
+        "referee": 0.7750223875045776,
+        "rim": 0.008035586215555668,
+        "number": 0.3474996089935303
+      },
+      "boxes_per_image": 1031.1666666666667,
+      "best_f1": {
+        "threshold": 0.34,
+        "precision": 0.9339908952959028,
+        "recall": 0.6303123399897593,
+        "f1": 0.7526750229287679
+      },
+      "recall_at_p90": {
+        "threshold": 0.34,
+        "recall": 0.6303123399897593,
+        "precision": 0.9339908952959028
+      },
+      "recall_at_p95": {
+        "threshold": 0.38,
+        "recall": 0.5929339477726574,
+        "precision": 0.9674185463659147
+      }
+    },
+    {
+      "models": [
+        "gemini",
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 3,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.38336247205734253,
+      "mAP_50": 0.5819838047027588,
+      "per_class_ap50": {
+        "player": 0.9627472758293152,
+        "ball": 0.6609342694282532,
+        "referee": 0.784438967704773,
+        "rim": 0.015336313284933567,
+        "number": 0.4864623248577118
+      },
+      "boxes_per_image": 515.1041666666666,
+      "best_f1": {
+        "threshold": 0.34,
+        "precision": 0.8942731277533039,
+        "recall": 0.6236559139784946,
+        "f1": 0.7348416289592761
+      },
+      "recall_at_p90": {
+        "threshold": 0.36,
+        "recall": 0.6144393241167435,
+        "precision": 0.9049773755656109
+      },
+      "recall_at_p95": {
+        "threshold": 0.48,
+        "recall": 0.504352278545827,
+        "precision": 0.9609756097560975
+      }
+    },
+    {
+      "models": [
+        "gemini",
+        "grounding_dino",
+        "yolo_world"
+      ],
+      "n_models": 3,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3418865203857422,
+      "mAP_50": 0.5122483372688293,
+      "per_class_ap50": {
+        "player": 0.9541598558425903,
+        "ball": 0.5857362747192383,
+        "referee": 0.7367638349533081,
+        "rim": 0.010183875449001789,
+        "number": 0.27439793944358826
+      },
+      "boxes_per_image": 280.4375,
+      "best_f1": {
+        "threshold": 0.32,
+        "precision": 0.8187579214195184,
+        "recall": 0.6615463389656938,
+        "f1": 0.7318040215236477
+      },
+      "recall_at_p90": {
+        "threshold": 0.34,
+        "recall": 0.533026113671275,
+        "precision": 0.9692737430167597
+      },
+      "recall_at_p95": {
+        "threshold": 0.34,
+        "recall": 0.533026113671275,
+        "precision": 0.9692737430167597
+      }
+    },
+    {
+      "models": [
+        "gemini",
+        "omdet_turbo",
+        "owlv2"
+      ],
+      "n_models": 3,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.38527703285217285,
+      "mAP_50": 0.5844728350639343,
+      "per_class_ap50": {
+        "player": 0.9513710141181946,
+        "ball": 0.6736160516738892,
+        "referee": 0.7588666677474976,
+        "rim": 0.015836328268051147,
+        "number": 0.5226742029190063
+      },
+      "boxes_per_image": 1349.6041666666667,
+      "best_f1": {
+        "threshold": 0.34,
+        "precision": 0.8935574229691877,
+        "recall": 0.6533538146441372,
+        "f1": 0.7548062703342207
+      },
+      "recall_at_p90": {
+        "threshold": 0.36,
+        "recall": 0.647721454173067,
+        "precision": 0.90421729807005
+      },
+      "recall_at_p95": {
+        "threshold": 0.48,
+        "recall": 0.5140809011776754,
+        "precision": 0.952561669829222
+      }
+    },
+    {
+      "models": [
+        "gemini",
+        "omdet_turbo",
+        "yolo_world"
+      ],
+      "n_models": 3,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.34173494577407837,
+      "mAP_50": 0.5182186961174011,
+      "per_class_ap50": {
+        "player": 0.9482288956642151,
+        "ball": 0.5603453516960144,
+        "referee": 0.7213863134384155,
+        "rim": 0.007920792326331139,
+        "number": 0.3532122075557709
+      },
+      "boxes_per_image": 1163.1666666666667,
+      "best_f1": {
+        "threshold": 0.34,
+        "precision": 0.8943089430894309,
+        "recall": 0.6195596518177163,
+        "f1": 0.7320024198427102
+      },
+      "recall_at_p90": {
+        "threshold": 0.36,
+        "recall": 0.5995903737839222,
+        "precision": 0.9155590304925724
+      },
+      "recall_at_p95": {
+        "threshold": 0.4,
+        "recall": 0.5407066052227343,
+        "precision": 0.9643835616438357
+      }
+    },
+    {
+      "models": [
+        "gemini",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 3,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3777770400047302,
+      "mAP_50": 0.5787453055381775,
+      "per_class_ap50": {
+        "player": 0.9520811438560486,
+        "ball": 0.6350597143173218,
+        "referee": 0.7676278352737427,
+        "rim": 0.015836328268051147,
+        "number": 0.5231215357780457
+      },
+      "boxes_per_image": 700.59375,
+      "best_f1": {
+        "threshold": 0.32,
+        "precision": 0.7676056338028169,
+        "recall": 0.6697388632872504,
+        "f1": 0.7153404429860541
+      },
+      "recall_at_p90": {
+        "threshold": 0.44,
+        "recall": 0.4976958525345622,
+        "precision": 0.9169811320754717
+      },
+      "recall_at_p95": {
+        "threshold": 0.48,
+        "recall": 0.445468509984639,
+        "precision": 0.9623893805309734
+      }
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2"
+      ],
+      "n_models": 3,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.35466811060905457,
+      "mAP_50": 0.498941034078598,
+      "per_class_ap50": {
+        "player": 0.9071604609489441,
+        "ball": 0.6006559133529663,
+        "referee": 0.5841079950332642,
+        "rim": 0.011148824356496334,
+        "number": 0.39163199067115784
+      },
+      "boxes_per_image": 1349.0104166666667,
+      "best_f1": {
+        "threshold": 0.2,
+        "precision": 0.6590782898389783,
+        "recall": 0.6077828981054787,
+        "f1": 0.6323921150772509
+      },
+      "recall_at_p90": {
+        "threshold": 0.36,
+        "recall": 0.409626216077829,
+        "precision": 0.9019165727170236
+      },
+      "recall_at_p95": {
+        "threshold": 0.4,
+        "recall": 0.34408602150537637,
+        "precision": 0.9545454545454546
+      }
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "omdet_turbo",
+        "yolo_world"
+      ],
+      "n_models": 3,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.30570870637893677,
+      "mAP_50": 0.4103895127773285,
+      "per_class_ap50": {
+        "player": 0.897685706615448,
+        "ball": 0.4585511088371277,
+        "referee": 0.5544201731681824,
+        "rim": 0.0,
+        "number": 0.1412905901670456
+      },
+      "boxes_per_image": 1162.6458333333333,
+      "best_f1": {
+        "threshold": 0.2,
+        "precision": 0.7687642153146323,
+        "recall": 0.5192012288786483,
+        "f1": 0.6198044009779952
+      },
+      "recall_at_p90": {
+        "threshold": 0.32,
+        "recall": 0.4126984126984127,
+        "precision": 0.906636670416198
+      },
+      "recall_at_p95": {
+        "threshold": 0.38,
+        "recall": 0.34767025089605735,
+        "precision": 0.9590395480225988
+      }
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 3,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3308829367160797,
+      "mAP_50": 0.4701908230781555,
+      "per_class_ap50": {
+        "player": 0.9113591313362122,
+        "ball": 0.525178074836731,
+        "referee": 0.5166290998458862,
+        "rim": 0.011148824356496334,
+        "number": 0.386638879776001
+      },
+      "boxes_per_image": 700.1041666666666,
+      "best_f1": {
+        "threshold": 0.2,
+        "precision": 0.6947712418300653,
+        "recall": 0.5442908346134152,
+        "f1": 0.6103933390755096
+      },
+      "recall_at_p90": {
+        "threshold": 0.42,
+        "recall": 0.3456221198156682,
+        "precision": 0.9036144578313253
+      },
+      "recall_at_p95": {
+        "threshold": 0.48,
+        "recall": 0.26472094214029696,
+        "precision": 0.9574074074074074
+      }
+    },
+    {
+      "models": [
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 3,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.34126001596450806,
+      "mAP_50": 0.4900369346141815,
+      "per_class_ap50": {
+        "player": 0.8733212947845459,
+        "ball": 0.5480863451957703,
+        "referee": 0.449321448802948,
+        "rim": 0.01192302256822586,
+        "number": 0.5675325989723206
+      },
+      "boxes_per_image": 1465.0625,
+      "best_f1": {
+        "threshold": 0.18,
+        "precision": 0.6389508928571429,
+        "recall": 0.5862775217613927,
+        "f1": 0.6114819759679573
+      },
+      "recall_at_p90": {
+        "threshold": 0.5,
+        "recall": 0.2570404505888377,
+        "precision": 0.9094202898550725
+      },
+      "recall_at_p95": {
+        "threshold": 0.56,
+        "recall": 0.1935483870967742,
+        "precision": 0.9618320610687023
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo"
+      ],
+      "n_models": 4,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3739047348499298,
+      "mAP_50": 0.5479589700698853,
+      "per_class_ap50": {
+        "player": 0.9488703608512878,
+        "ball": 0.5943639874458313,
+        "referee": 0.757429301738739,
+        "rim": 0.006373051553964615,
+        "number": 0.4327581226825714
+      },
+      "boxes_per_image": 1031.6145833333333,
+      "best_f1": {
+        "threshold": 0.26,
+        "precision": 0.801038062283737,
+        "recall": 0.7112135176651305,
+        "f1": 0.7534580960130187
+      },
+      "recall_at_p90": {
+        "threshold": 0.36,
+        "recall": 0.5949820788530465,
+        "precision": 0.9021739130434783
+      },
+      "recall_at_p95": {
+        "threshold": 0.44,
+        "recall": 0.5217613927291347,
+        "precision": 0.9577067669172933
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "owlv2"
+      ],
+      "n_models": 4,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.40399712324142456,
+      "mAP_50": 0.5873149037361145,
+      "per_class_ap50": {
+        "player": 0.9493705034255981,
+        "ball": 0.6668459177017212,
+        "referee": 0.7688921093940735,
+        "rim": 0.013197558932006359,
+        "number": 0.5382683873176575
+      },
+      "boxes_per_image": 516.4895833333334,
+      "best_f1": {
+        "threshold": 0.3,
+        "precision": 0.851291745431632,
+        "recall": 0.6917562724014337,
+        "f1": 0.763276836158192
+      },
+      "recall_at_p90": {
+        "threshold": 0.38,
+        "recall": 0.6041986687147978,
+        "precision": 0.9111969111969112
+      },
+      "recall_at_p95": {
+        "threshold": 0.44,
+        "recall": 0.5535074244751664,
+        "precision": 0.9524229074889868
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "yolo_world"
+      ],
+      "n_models": 4,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.37339040637016296,
+      "mAP_50": 0.5363250970840454,
+      "per_class_ap50": {
+        "player": 0.9473976492881775,
+        "ball": 0.5920581221580505,
+        "referee": 0.7394359707832336,
+        "rim": 0.008100810460746288,
+        "number": 0.39463308453559875
+      },
+      "boxes_per_image": 283.7291666666667,
+      "best_f1": {
+        "threshold": 0.26,
+        "precision": 0.8798283261802575,
+        "recall": 0.6298003072196621,
+        "f1": 0.7341092211280216
+      },
+      "recall_at_p90": {
+        "threshold": 0.32,
+        "recall": 0.6098310291858678,
+        "precision": 0.9002267573696145
+      },
+      "recall_at_p95": {
+        "threshold": 0.36,
+        "recall": 0.5780849974398361,
+        "precision": 0.9519392917369308
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "omdet_turbo",
+        "owlv2"
+      ],
+      "n_models": 4,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.40235966444015503,
+      "mAP_50": 0.5870201587677002,
+      "per_class_ap50": {
+        "player": 0.9424896836280823,
+        "ball": 0.6651405692100525,
+        "referee": 0.7608938813209534,
+        "rim": 0.013717792928218842,
+        "number": 0.5528588891029358
+      },
+      "boxes_per_image": 1349.9791666666667,
+      "best_f1": {
+        "threshold": 0.3,
+        "precision": 0.8191105769230769,
+        "recall": 0.6979006656426011,
+        "f1": 0.7536632568426873
+      },
+      "recall_at_p90": {
+        "threshold": 0.38,
+        "recall": 0.6093189964157706,
+        "precision": 0.9111791730474732
+      },
+      "recall_at_p95": {
+        "threshold": 0.46,
+        "recall": 0.525857654889913,
+        "precision": 0.9562383612662942
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "omdet_turbo",
+        "yolo_world"
+      ],
+      "n_models": 4,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3733549416065216,
+      "mAP_50": 0.5418747663497925,
+      "per_class_ap50": {
+        "player": 0.9414872527122498,
+        "ball": 0.5709238648414612,
+        "referee": 0.7465482354164124,
+        "rim": 0.006300630047917366,
+        "number": 0.44411376118659973
+      },
+      "boxes_per_image": 1163.7916666666667,
+      "best_f1": {
+        "threshold": 0.28,
+        "precision": 0.821875,
+        "recall": 0.6733230926779313,
+        "f1": 0.7402195327891923
+      },
+      "recall_at_p90": {
+        "threshold": 0.34,
+        "recall": 0.5775729646697388,
+        "precision": 0.9330024813895782
+      },
+      "recall_at_p95": {
+        "threshold": 0.36,
+        "recall": 0.5586277521761392,
+        "precision": 0.9528384279475982
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 4,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.40463900566101074,
+      "mAP_50": 0.5881420373916626,
+      "per_class_ap50": {
+        "player": 0.9449486136436462,
+        "ball": 0.6432961821556091,
+        "referee": 0.7730551958084106,
+        "rim": 0.013717792928218842,
+        "number": 0.5656923651695251
+      },
+      "boxes_per_image": 702.21875,
+      "best_f1": {
+        "threshold": 0.32,
+        "precision": 0.8762035763411279,
+        "recall": 0.6523297491039427,
+        "f1": 0.747872028177282
+      },
+      "recall_at_p90": {
+        "threshold": 0.36,
+        "recall": 0.5924219150025601,
+        "precision": 0.9293172690763052
+      },
+      "recall_at_p95": {
+        "threshold": 0.38,
+        "recall": 0.5801331285202252,
+        "precision": 0.9537037037037037
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2"
+      ],
+      "n_models": 4,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3826653063297272,
+      "mAP_50": 0.5339483618736267,
+      "per_class_ap50": {
+        "player": 0.9119759202003479,
+        "ball": 0.6115983128547668,
+        "referee": 0.640974223613739,
+        "rim": 0.010311147198081017,
+        "number": 0.4948822259902954
+      },
+      "boxes_per_image": 1349.4375,
+      "best_f1": {
+        "threshold": 0.26,
+        "precision": 0.761993769470405,
+        "recall": 0.626216077828981,
+        "f1": 0.6874648679033165
+      },
+      "recall_at_p90": {
+        "threshold": 0.4,
+        "recall": 0.48591909882232465,
+        "precision": 0.9046711153479504
+      },
+      "recall_at_p95": {
+        "threshold": 0.5,
+        "recall": 0.38402457757296465,
+        "precision": 0.9566326530612245
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "grounding_dino",
+        "omdet_turbo",
+        "yolo_world"
+      ],
+      "n_models": 4,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3477550148963928,
+      "mAP_50": 0.47952157258987427,
+      "per_class_ap50": {
+        "player": 0.9085301160812378,
+        "ball": 0.5157817602157593,
+        "referee": 0.632924497127533,
+        "rim": 0.0,
+        "number": 0.3403715193271637
+      },
+      "boxes_per_image": 1163.03125,
+      "best_f1": {
+        "threshold": 0.26,
+        "precision": 0.7760898282694848,
+        "recall": 0.6016385048643114,
+        "f1": 0.6778194404384194
+      },
+      "recall_at_p90": {
+        "threshold": 0.38,
+        "recall": 0.4551971326164875,
+        "precision": 0.9146090534979424
+      },
+      "recall_at_p95": {
+        "threshold": 0.44,
+        "recall": 0.40860215053763443,
+        "precision": 0.9708029197080292
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "grounding_dino",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 4,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.38042306900024414,
+      "mAP_50": 0.5282922387123108,
+      "per_class_ap50": {
+        "player": 0.9221327304840088,
+        "ball": 0.5863508582115173,
+        "referee": 0.6232364773750305,
+        "rim": 0.010311147198081017,
+        "number": 0.4994300901889801
+      },
+      "boxes_per_image": 702.0729166666666,
+      "best_f1": {
+        "threshold": 0.22,
+        "precision": 0.6995100707675558,
+        "recall": 0.6579621095750128,
+        "f1": 0.6781002638522428
+      },
+      "recall_at_p90": {
+        "threshold": 0.38,
+        "recall": 0.4470046082949309,
+        "precision": 0.9027921406411582
+      },
+      "recall_at_p95": {
+        "threshold": 0.44,
+        "recall": 0.40040962621607784,
+        "precision": 0.9678217821782178
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 4,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3804641366004944,
+      "mAP_50": 0.5299583673477173,
+      "per_class_ap50": {
+        "player": 0.9071808457374573,
+        "ball": 0.5821565389633179,
+        "referee": 0.6032391786575317,
+        "rim": 0.011138614267110825,
+        "number": 0.546076774597168
+      },
+      "boxes_per_image": 1465.5729166666667,
+      "best_f1": {
+        "threshold": 0.28,
+        "precision": 0.7576142131979695,
+        "recall": 0.6113671274961597,
+        "f1": 0.676678945877019
+      },
+      "recall_at_p90": {
+        "threshold": 0.4,
+        "recall": 0.42345110087045573,
+        "precision": 0.9281705948372615
+      },
+      "recall_at_p95": {
+        "threshold": 0.44,
+        "recall": 0.3824884792626728,
+        "precision": 0.9528061224489796
+      }
+    },
+    {
+      "models": [
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2"
+      ],
+      "n_models": 4,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.39632487297058105,
+      "mAP_50": 0.5841360092163086,
+      "per_class_ap50": {
+        "player": 0.9540313482284546,
+        "ball": 0.6653316020965576,
+        "referee": 0.7953441739082336,
+        "rim": 0.015336313284933567,
+        "number": 0.4906364977359772
+      },
+      "boxes_per_image": 1351.125,
+      "best_f1": {
+        "threshold": 0.28,
+        "precision": 0.8732782369146006,
+        "recall": 0.6492575524833589,
+        "f1": 0.7447870778267255
+      },
+      "recall_at_p90": {
+        "threshold": 0.3,
+        "recall": 0.6303123399897593,
+        "precision": 0.9044819985304923
+      },
+      "recall_at_p95": {
+        "threshold": 0.38,
+        "recall": 0.5463389656938044,
+        "precision": 0.9656108597285068
+      }
+    },
+    {
+      "models": [
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "yolo_world"
+      ],
+      "n_models": 4,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3627411127090454,
+      "mAP_50": 0.5358008742332458,
+      "per_class_ap50": {
+        "player": 0.9537847638130188,
+        "ball": 0.5936715006828308,
+        "referee": 0.7750223875045776,
+        "rim": 0.007920792326331139,
+        "number": 0.34860509634017944
+      },
+      "boxes_per_image": 1165.0,
+      "best_f1": {
+        "threshold": 0.26,
+        "precision": 0.8994211287988423,
+        "recall": 0.6364567332309268,
+        "f1": 0.7454272863568215
+      },
+      "recall_at_p90": {
+        "threshold": 0.28,
+        "recall": 0.6134152585765489,
+        "precision": 0.9315707620528771
+      },
+      "recall_at_p95": {
+        "threshold": 0.3,
+        "recall": 0.5750128008192524,
+        "precision": 0.9581911262798635
+      }
+    },
+    {
+      "models": [
+        "gemini",
+        "grounding_dino",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 4,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3878815770149231,
+      "mAP_50": 0.5760976076126099,
+      "per_class_ap50": {
+        "player": 0.9564715027809143,
+        "ball": 0.6352809071540833,
+        "referee": 0.784438967704773,
+        "rim": 0.015336313284933567,
+        "number": 0.4889604151248932
+      },
+      "boxes_per_image": 702.78125,
+      "best_f1": {
+        "threshold": 0.24,
+        "precision": 0.7531073446327684,
+        "recall": 0.6825396825396826,
+        "f1": 0.7160891753961859
+      },
+      "recall_at_p90": {
+        "threshold": 0.34,
+        "recall": 0.5468509984639017,
+        "precision": 0.9104859335038363
+      },
+      "recall_at_p95": {
+        "threshold": 0.38,
+        "recall": 0.5048643113159242,
+        "precision": 0.9638318670576735
+      }
+    },
+    {
+      "models": [
+        "gemini",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 4,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3908976912498474,
+      "mAP_50": 0.5783340930938721,
+      "per_class_ap50": {
+        "player": 0.9467394948005676,
+        "ball": 0.646054744720459,
+        "referee": 0.7588666677474976,
+        "rim": 0.015836328268051147,
+        "number": 0.5241732001304626
+      },
+      "boxes_per_image": 1467.125,
+      "best_f1": {
+        "threshold": 0.26,
+        "precision": 0.8307593307593307,
+        "recall": 0.6610343061955966,
+        "f1": 0.7362418021100655
+      },
+      "recall_at_p90": {
+        "threshold": 0.38,
+        "recall": 0.5012800819252432,
+        "precision": 0.9270833333333334
+      },
+      "recall_at_p95": {
+        "threshold": 0.4,
+        "recall": 0.47107014848950335,
+        "precision": 0.9643605870020965
+      }
+    },
+    {
+      "models": [
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 4,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.35534682869911194,
+      "mAP_50": 0.4908389747142792,
+      "per_class_ap50": {
+        "player": 0.9078216552734375,
+        "ball": 0.5590818524360657,
+        "referee": 0.5841079950332642,
+        "rim": 0.011148824356496334,
+        "number": 0.39203453063964844
+      },
+      "boxes_per_image": 1466.4791666666667,
+      "best_f1": {
+        "threshold": 0.16,
+        "precision": 0.6462053571428571,
+        "recall": 0.5929339477726574,
+        "f1": 0.6184245660881176
+      },
+      "recall_at_p90": {
+        "threshold": 0.38,
+        "recall": 0.36507936507936506,
+        "precision": 0.9283854166666666
+      },
+      "recall_at_p95": {
+        "threshold": 0.4,
+        "recall": 0.3399897593445981,
+        "precision": 0.9540229885057471
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2"
+      ],
+      "n_models": 5,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.4058709144592285,
+      "mAP_50": 0.5861804485321045,
+      "per_class_ap50": {
+        "player": 0.9454715847969055,
+        "ball": 0.6736487746238708,
+        "referee": 0.7661880850791931,
+        "rim": 0.013197558932006359,
+        "number": 0.5323962569236755
+      },
+      "boxes_per_image": 1351.40625,
+      "best_f1": {
+        "threshold": 0.28,
+        "precision": 0.854639844256976,
+        "recall": 0.674347158218126,
+        "f1": 0.7538637664567831
+      },
+      "recall_at_p90": {
+        "threshold": 0.32,
+        "recall": 0.6267281105990783,
+        "precision": 0.9039881831610044
+      },
+      "recall_at_p95": {
+        "threshold": 0.42,
+        "recall": 0.5314900153609831,
+        "precision": 0.953168044077135
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "yolo_world"
+      ],
+      "n_models": 5,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3798389136791229,
+      "mAP_50": 0.5478284358978271,
+      "per_class_ap50": {
+        "player": 0.9467388391494751,
+        "ball": 0.5970261693000793,
+        "referee": 0.757429301738739,
+        "rim": 0.006300630047917366,
+        "number": 0.43164709210395813
+      },
+      "boxes_per_image": 1165.4791666666667,
+      "best_f1": {
+        "threshold": 0.22,
+        "precision": 0.7987089201877934,
+        "recall": 0.6968766001024066,
+        "f1": 0.744325950232431
+      },
+      "recall_at_p90": {
+        "threshold": 0.3,
+        "recall": 0.6016385048643114,
+        "precision": 0.9101471727343144
+      },
+      "recall_at_p95": {
+        "threshold": 0.36,
+        "recall": 0.5504352278545827,
+        "precision": 0.9606791778373548
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 5,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.4078811705112457,
+      "mAP_50": 0.5860892534255981,
+      "per_class_ap50": {
+        "player": 0.951065719127655,
+        "ball": 0.657899022102356,
+        "referee": 0.7688921093940735,
+        "rim": 0.013197558932006359,
+        "number": 0.5393919348716736
+      },
+      "boxes_per_image": 704.21875,
+      "best_f1": {
+        "threshold": 0.24,
+        "precision": 0.8066825775656324,
+        "recall": 0.6922683051715309,
+        "f1": 0.7451088454119591
+      },
+      "recall_at_p90": {
+        "threshold": 0.32,
+        "recall": 0.6041986687147978,
+        "precision": 0.9161490683229814
+      },
+      "recall_at_p95": {
+        "threshold": 0.36,
+        "recall": 0.5780849974398361,
+        "precision": 0.9543533389687235
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 5,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.4071962833404541,
+      "mAP_50": 0.5851404666900635,
+      "per_class_ap50": {
+        "player": 0.9421061277389526,
+        "ball": 0.6542094349861145,
+        "referee": 0.7608938813209534,
+        "rim": 0.013717792928218842,
+        "number": 0.5547751784324646
+      },
+      "boxes_per_image": 1467.5104166666667,
+      "best_f1": {
+        "threshold": 0.26,
+        "precision": 0.8051869722557298,
+        "recall": 0.6835637480798771,
+        "f1": 0.7394073663805041
+      },
+      "recall_at_p90": {
+        "threshold": 0.32,
+        "recall": 0.604710701484895,
+        "precision": 0.9248238057948316
+      },
+      "recall_at_p95": {
+        "threshold": 0.38,
+        "recall": 0.5504352278545827,
+        "precision": 0.9615384615384616
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 5,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.38406211137771606,
+      "mAP_50": 0.532295823097229,
+      "per_class_ap50": {
+        "player": 0.9160728454589844,
+        "ball": 0.5977924466133118,
+        "referee": 0.640974223613739,
+        "rim": 0.010311147198081017,
+        "number": 0.4963286221027374
+      },
+      "boxes_per_image": 1466.9479166666667,
+      "best_f1": {
+        "threshold": 0.22,
+        "precision": 0.7309027777777778,
+        "recall": 0.6466973886328725,
+        "f1": 0.6862265688671557
+      },
+      "recall_at_p90": {
+        "threshold": 0.36,
+        "recall": 0.45212493599590375,
+        "precision": 0.9131334022750776
+      },
+      "recall_at_p95": {
+        "threshold": 0.4,
+        "recall": 0.41321044546851,
+        "precision": 0.9527744982290437
+      }
+    },
+    {
+      "models": [
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 5,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.398286908864975,
+      "mAP_50": 0.5797107815742493,
+      "per_class_ap50": {
+        "player": 0.9520442485809326,
+        "ball": 0.6441859006881714,
+        "referee": 0.7953441739082336,
+        "rim": 0.015336313284933567,
+        "number": 0.49164316058158875
+      },
+      "boxes_per_image": 1468.5729166666667,
+      "best_f1": {
+        "threshold": 0.22,
+        "precision": 0.8038485412787089,
+        "recall": 0.6630824372759857,
+        "f1": 0.7267115600448933
+      },
+      "recall_at_p90": {
+        "threshold": 0.3,
+        "recall": 0.5596518177163339,
+        "precision": 0.9123539232053423
+      },
+      "recall_at_p95": {
+        "threshold": 0.32,
+        "recall": 0.5407066052227343,
+        "precision": 0.9556561085972851
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "nms",
+      "iou": 0.4,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.23361778259277344,
+      "mAP_50": 0.3610824942588806,
+      "per_class_ap50": {
+        "player": 0.7906168699264526,
+        "ball": 0.23848652839660645,
+        "referee": 0.4864746332168579,
+        "rim": 0.005478336941450834,
+        "number": 0.2843560576438904
+      },
+      "boxes_per_image": 1203.4583333333333,
+      "best_f1": {
+        "threshold": 0.98,
+        "precision": 0.40106635071090047,
+        "recall": 0.6932923707117256,
+        "f1": 0.5081628823419029
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "nms",
+      "iou": 0.5,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.23606188595294952,
+      "mAP_50": 0.36557021737098694,
+      "per_class_ap50": {
+        "player": 0.8077940344810486,
+        "ball": 0.23804883658885956,
+        "referee": 0.48795390129089355,
+        "rim": 0.007099361624568701,
+        "number": 0.28695493936538696
+      },
+      "boxes_per_image": 1438.0729166666667,
+      "best_f1": {
+        "threshold": 0.98,
+        "precision": 0.39269535673839184,
+        "recall": 0.710189452124936,
+        "f1": 0.505742935278031
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "nms",
+      "iou": 0.55,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.23916657269001007,
+      "mAP_50": 0.36653387546539307,
+      "per_class_ap50": {
+        "player": 0.8123884797096252,
+        "ball": 0.23832421004772186,
+        "referee": 0.48780152201652527,
+        "rim": 0.00708751892670989,
+        "number": 0.2870677411556244
+      },
+      "boxes_per_image": 1468.0520833333333,
+      "best_f1": {
+        "threshold": 0.98,
+        "precision": 0.39035333707235,
+        "recall": 0.7127496159754224,
+        "f1": 0.5044392100018119
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "nms",
+      "iou": 0.6,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.24209675192832947,
+      "mAP_50": 0.3647228181362152,
+      "per_class_ap50": {
+        "player": 0.8133521676063538,
+        "ball": 0.23145215213298798,
+        "referee": 0.48749426007270813,
+        "rim": 0.007027267012745142,
+        "number": 0.2842882573604584
+      },
+      "boxes_per_image": 1502.4166666666667,
+      "best_f1": {
+        "threshold": 0.98,
+        "precision": 0.3859162739118381,
+        "recall": 0.7127496159754224,
+        "f1": 0.5007194244604316
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "nms",
+      "iou": 0.7,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.2445429563522339,
+      "mAP_50": 0.3602251410484314,
+      "per_class_ap50": {
+        "player": 0.8194303512573242,
+        "ball": 0.21820564568042755,
+        "referee": 0.47823548316955566,
+        "rim": 0.007245079148560762,
+        "number": 0.2780091166496277
+      },
+      "boxes_per_image": 1587.53125,
+      "best_f1": {
+        "threshold": 0.98,
+        "precision": 0.3758425451604206,
+        "recall": 0.713773681515617,
+        "f1": 0.49240551042034614
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "nms",
+      "iou": 0.4,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.2839903235435486,
+      "mAP_50": 0.4489499032497406,
+      "per_class_ap50": {
+        "player": 0.8876504898071289,
+        "ball": 0.36410075426101685,
+        "referee": 0.5402194261550903,
+        "rim": 0.013752151280641556,
+        "number": 0.4390266239643097
+      },
+      "boxes_per_image": 1203.8020833333333,
+      "best_f1": {
+        "threshold": 0.98,
+        "precision": 0.7055276381909548,
+        "recall": 0.7188940092165899,
+        "f1": 0.7121481105757038
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "nms",
+      "iou": 0.5,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.28850775957107544,
+      "mAP_50": 0.4536548852920532,
+      "per_class_ap50": {
+        "player": 0.9110225439071655,
+        "ball": 0.36408016085624695,
+        "referee": 0.540905237197876,
+        "rim": 0.01586264744400978,
+        "number": 0.43640387058258057
+      },
+      "boxes_per_image": 1437.2916666666667,
+      "best_f1": {
+        "threshold": 0.98,
+        "precision": 0.6991670749632533,
+        "recall": 0.7306707629288275,
+        "f1": 0.7145718577866801
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "nms",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.29040148854255676,
+      "mAP_50": 0.4518045485019684,
+      "per_class_ap50": {
+        "player": 0.9164914488792419,
+        "ball": 0.35991182923316956,
+        "referee": 0.5408202409744263,
+        "rim": 0.01577947475016117,
+        "number": 0.4260197877883911
+      },
+      "boxes_per_image": 1468.8645833333333,
+      "best_f1": {
+        "threshold": 0.98,
+        "precision": 0.6949152542372882,
+        "recall": 0.7347670250896058,
+        "f1": 0.7142857142857143
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "nms",
+      "iou": 0.6,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.2919512391090393,
+      "mAP_50": 0.444538414478302,
+      "per_class_ap50": {
+        "player": 0.9151991605758667,
+        "ball": 0.34179988503456116,
+        "referee": 0.5391114950180054,
+        "rim": 0.01568678207695484,
+        "number": 0.4108947515487671
+      },
+      "boxes_per_image": 1503.4895833333333,
+      "best_f1": {
+        "threshold": 0.98,
+        "precision": 0.6848859315589354,
+        "recall": 0.7378392217101895,
+        "f1": 0.7103771259551395
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "nms",
+      "iou": 0.7,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.2906525731086731,
+      "mAP_50": 0.4308306574821472,
+      "per_class_ap50": {
+        "player": 0.8998194336891174,
+        "ball": 0.31946977972984314,
+        "referee": 0.5327503681182861,
+        "rim": 0.016239318996667862,
+        "number": 0.3858744204044342
+      },
+      "boxes_per_image": 1587.2916666666667,
+      "best_f1": {
+        "threshold": 0.98,
+        "precision": 0.6622425629290618,
+        "recall": 0.7409114183307731,
+        "f1": 0.6993716771387144
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "agree",
+      "iou": 0.4,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.3169156014919281,
+      "mAP_50": 0.5058856010437012,
+      "per_class_ap50": {
+        "player": 0.8775433301925659,
+        "ball": 0.5797771215438843,
+        "referee": 0.624782145023346,
+        "rim": 0.009999120607972145,
+        "number": 0.43732622265815735
+      },
+      "boxes_per_image": 1203.4583333333333,
+      "best_f1": {
+        "threshold": 0.48,
+        "precision": 0.859472049689441,
+        "recall": 0.5668202764976958,
+        "f1": 0.6831224930576982
+      },
+      "recall_at_p90": {
+        "threshold": 0.5,
+        "recall": 0.5355862775217614,
+        "precision": 0.9032815198618307
+      },
+      "recall_at_p95": {
+        "threshold": 0.54,
+        "recall": 0.4976958525345622,
+        "precision": 0.9529411764705882
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "agree",
+      "iou": 0.5,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.32698559761047363,
+      "mAP_50": 0.5161886215209961,
+      "per_class_ap50": {
+        "player": 0.9180203080177307,
+        "ball": 0.5778204202651978,
+        "referee": 0.6611544489860535,
+        "rim": 0.008034961298108101,
+        "number": 0.4159129559993744
+      },
+      "boxes_per_image": 1438.0729166666667,
+      "best_f1": {
+        "threshold": 0.48,
+        "precision": 0.8250728862973761,
+        "recall": 0.579621095750128,
+        "f1": 0.6809022556390977
+      },
+      "recall_at_p90": {
+        "threshold": 0.5,
+        "recall": 0.5391705069124424,
+        "precision": 0.9108996539792388
+      },
+      "recall_at_p95": {
+        "threshold": 0.54,
+        "recall": 0.5135688684075781,
+        "precision": 0.9507109004739337
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "agree",
+      "iou": 0.55,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.3283086121082306,
+      "mAP_50": 0.5090857148170471,
+      "per_class_ap50": {
+        "player": 0.9192768335342407,
+        "ball": 0.5762036442756653,
+        "referee": 0.6605178117752075,
+        "rim": 0.00802311860024929,
+        "number": 0.3814072906970978
+      },
+      "boxes_per_image": 1468.0520833333333,
+      "best_f1": {
+        "threshold": 0.48,
+        "precision": 0.8247576435495898,
+        "recall": 0.5663082437275986,
+        "f1": 0.6715239829993928
+      },
+      "recall_at_p90": {
+        "threshold": 0.5,
+        "recall": 0.5304659498207885,
+        "precision": 0.9127753303964757
+      },
+      "recall_at_p95": {
+        "threshold": 0.54,
+        "recall": 0.5074244751664106,
+        "precision": 0.9565637065637066
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "agree",
+      "iou": 0.6,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.326302707195282,
+      "mAP_50": 0.4920313358306885,
+      "per_class_ap50": {
+        "player": 0.9133191108703613,
+        "ball": 0.5603567361831665,
+        "referee": 0.6444133520126343,
+        "rim": 0.007508132141083479,
+        "number": 0.3345593810081482
+      },
+      "boxes_per_image": 1502.4166666666667,
+      "best_f1": {
+        "threshold": 0.5,
+        "precision": 0.9124087591240876,
+        "recall": 0.5120327700972862,
+        "f1": 0.6559527714004592
+      },
+      "recall_at_p90": {
+        "threshold": 0.5,
+        "recall": 0.5120327700972862,
+        "precision": 0.9124087591240876
+      },
+      "recall_at_p95": {
+        "threshold": 0.54,
+        "recall": 0.48591909882232465,
+        "precision": 0.9528112449799196
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "agree",
+      "iou": 0.7,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.3139570355415344,
+      "mAP_50": 0.450918972492218,
+      "per_class_ap50": {
+        "player": 0.8944960832595825,
+        "ball": 0.5128437876701355,
+        "referee": 0.5895143747329712,
+        "rim": 0.007245079148560762,
+        "number": 0.250495582818985
+      },
+      "boxes_per_image": 1587.53125,
+      "best_f1": {
+        "threshold": 0.48,
+        "precision": 0.8309137489325363,
+        "recall": 0.4982078853046595,
+        "f1": 0.6229193341869398
+      },
+      "recall_at_p90": {
+        "threshold": 0.5,
+        "recall": 0.4690220174091142,
+        "precision": 0.9141716566866267
+      },
+      "recall_at_p95": {
+        "threshold": 0.54,
+        "recall": 0.4444444444444444,
+        "precision": 0.9570011025358324
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "agree",
+      "iou": 0.4,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.37124282121658325,
+      "mAP_50": 0.5730215907096863,
+      "per_class_ap50": {
+        "player": 0.9075403809547424,
+        "ball": 0.6521969437599182,
+        "referee": 0.7483192682266235,
+        "rim": 0.014533239416778088,
+        "number": 0.5425180792808533
+      },
+      "boxes_per_image": 1203.8020833333333,
+      "best_f1": {
+        "threshold": 0.24,
+        "precision": 0.8537087912087912,
+        "recall": 0.6364567332309268,
+        "f1": 0.729246113229686
+      },
+      "recall_at_p90": {
+        "threshold": 0.28,
+        "recall": 0.5934459805427548,
+        "precision": 0.9183835182250396
+      },
+      "recall_at_p95": {
+        "threshold": 0.34,
+        "recall": 0.5304659498207885,
+        "precision": 0.9646182495344506
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "agree",
+      "iou": 0.5,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3822023868560791,
+      "mAP_50": 0.5824731588363647,
+      "per_class_ap50": {
+        "player": 0.9374029040336609,
+        "ball": 0.6503099203109741,
+        "referee": 0.7632094621658325,
+        "rim": 0.015447396785020828,
+        "number": 0.5459960699081421
+      },
+      "boxes_per_image": 1437.2916666666667,
+      "best_f1": {
+        "threshold": 0.24,
+        "precision": 0.828353464717101,
+        "recall": 0.667178699436764,
+        "f1": 0.73908111174135
+      },
+      "recall_at_p90": {
+        "threshold": 0.3,
+        "recall": 0.6036866359447005,
+        "precision": 0.913953488372093
+      },
+      "recall_at_p95": {
+        "threshold": 0.36,
+        "recall": 0.5422427035330261,
+        "precision": 0.9636032757051866
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "agree",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.38516122102737427,
+      "mAP_50": 0.582937479019165,
+      "per_class_ap50": {
+        "player": 0.9464324116706848,
+        "ball": 0.6514043211936951,
+        "referee": 0.7661880850791931,
+        "rim": 0.015452112071216106,
+        "number": 0.535210371017456
+      },
+      "boxes_per_image": 1468.8645833333333,
+      "best_f1": {
+        "threshold": 0.26,
+        "precision": 0.8732590529247911,
+        "recall": 0.642089093701997,
+        "f1": 0.7400413101209796
+      },
+      "recall_at_p90": {
+        "threshold": 0.3,
+        "recall": 0.6041986687147978,
+        "precision": 0.913312693498452
+      },
+      "recall_at_p95": {
+        "threshold": 0.36,
+        "recall": 0.5524833589349718,
+        "precision": 0.9608192341941229
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "agree",
+      "iou": 0.6,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3880455195903778,
+      "mAP_50": 0.5744903087615967,
+      "per_class_ap50": {
+        "player": 0.9522576928138733,
+        "ball": 0.6329512000083923,
+        "referee": 0.7634976506233215,
+        "rim": 0.015360333025455475,
+        "number": 0.508384644985199
+      },
+      "boxes_per_image": 1503.4895833333333,
+      "best_f1": {
+        "threshold": 0.26,
+        "precision": 0.8678847505270555,
+        "recall": 0.6323604710701485,
+        "f1": 0.7316350710900474
+      },
+      "recall_at_p90": {
+        "threshold": 0.3,
+        "recall": 0.5919098822324629,
+        "precision": 0.9102362204724409
+      },
+      "recall_at_p95": {
+        "threshold": 0.36,
+        "recall": 0.5407066052227343,
+        "precision": 0.9582577132486388
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "agree",
+      "iou": 0.7,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3921760618686676,
+      "mAP_50": 0.5556095838546753,
+      "per_class_ap50": {
+        "player": 0.9523482918739319,
+        "ball": 0.575995683670044,
+        "referee": 0.7529560327529907,
+        "rim": 0.016089122742414474,
+        "number": 0.48065873980522156
+      },
+      "boxes_per_image": 1587.2916666666667,
+      "best_f1": {
+        "threshold": 0.2,
+        "precision": 0.7515598411798071,
+        "recall": 0.6784434203789043,
+        "f1": 0.7131324004305706
+      },
+      "recall_at_p90": {
+        "threshold": 0.3,
+        "recall": 0.5555555555555556,
+        "precision": 0.9140690817186183
+      },
+      "recall_at_p95": {
+        "threshold": 0.34,
+        "recall": 0.5232974910394266,
+        "precision": 0.954248366013072
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "wbf",
+      "iou": 0.4,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.32465702295303345,
+      "mAP_50": 0.5232124328613281,
+      "per_class_ap50": {
+        "player": 0.8901349306106567,
+        "ball": 0.5997295379638672,
+        "referee": 0.6560736894607544,
+        "rim": 0.005688800942152739,
+        "number": 0.4644353687763214
+      },
+      "boxes_per_image": 1203.4583333333333,
+      "best_f1": {
+        "threshold": 0.48,
+        "precision": 0.8711180124223602,
+        "recall": 0.5745007680491552,
+        "f1": 0.6923788954026534
+      },
+      "recall_at_p90": {
+        "threshold": 0.5,
+        "recall": 0.5427547363031234,
+        "precision": 0.9153713298791019
+      },
+      "recall_at_p95": {
+        "threshold": 0.52,
+        "recall": 0.5197132616487455,
+        "precision": 0.9539473684210527
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "wbf",
+      "iou": 0.5,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.3699491620063782,
+      "mAP_50": 0.5246281027793884,
+      "per_class_ap50": {
+        "player": 0.9222987294197083,
+        "ball": 0.5977072715759277,
+        "referee": 0.6618565320968628,
+        "rim": 0.007336814422160387,
+        "number": 0.4339410364627838
+      },
+      "boxes_per_image": 1438.0729166666667,
+      "best_f1": {
+        "threshold": 0.48,
+        "precision": 0.8287172011661808,
+        "recall": 0.5821812596006144,
+        "f1": 0.6839097744360902
+      },
+      "recall_at_p90": {
+        "threshold": 0.5,
+        "recall": 0.5412186379928315,
+        "precision": 0.9143598615916955
+      },
+      "recall_at_p95": {
+        "threshold": 0.54,
+        "recall": 0.5156169994879672,
+        "precision": 0.9545023696682464
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.36815720796585083,
+      "mAP_50": 0.5143030881881714,
+      "per_class_ap50": {
+        "player": 0.9247187972068787,
+        "ball": 0.5876734852790833,
+        "referee": 0.6605178117752075,
+        "rim": 0.007324971724301577,
+        "number": 0.3912803530693054
+      },
+      "boxes_per_image": 1468.0520833333333,
+      "best_f1": {
+        "threshold": 0.48,
+        "precision": 0.8262490678598061,
+        "recall": 0.5673323092677931,
+        "f1": 0.6727383120825744
+      },
+      "recall_at_p90": {
+        "threshold": 0.5,
+        "recall": 0.5314900153609831,
+        "precision": 0.9145374449339208
+      },
+      "recall_at_p95": {
+        "threshold": 0.54,
+        "recall": 0.5084485407066052,
+        "precision": 0.9584942084942085
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "wbf",
+      "iou": 0.6,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.35869795083999634,
+      "mAP_50": 0.49579760432243347,
+      "per_class_ap50": {
+        "player": 0.9159924983978271,
+        "ball": 0.5670966506004333,
+        "referee": 0.6444133520126343,
+        "rim": 0.0073268781416118145,
+        "number": 0.34415876865386963
+      },
+      "boxes_per_image": 1502.4166666666667,
+      "best_f1": {
+        "threshold": 0.48,
+        "precision": 0.8255813953488372,
+        "recall": 0.5453149001536098,
+        "f1": 0.6567992599444958
+      },
+      "recall_at_p90": {
+        "threshold": 0.5,
+        "recall": 0.5125448028673835,
+        "precision": 0.9133211678832117
+      },
+      "recall_at_p95": {
+        "threshold": 0.54,
+        "recall": 0.4869431643625192,
+        "precision": 0.9548192771084337
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "wbf",
+      "iou": 0.7,
+      "normalize": true,
+      "min_models": null,
+      "mAP_50_95": 0.33727627992630005,
+      "mAP_50": 0.45343175530433655,
+      "per_class_ap50": {
+        "player": 0.894863486289978,
+        "ball": 0.5187731385231018,
+        "referee": 0.5895143747329712,
+        "rim": 0.0080817686393857,
+        "number": 0.2559259533882141
+      },
+      "boxes_per_image": 1587.53125,
+      "best_f1": {
+        "threshold": 0.48,
+        "precision": 0.8317677198975235,
+        "recall": 0.4987199180747568,
+        "f1": 0.6235595390524968
+      },
+      "recall_at_p90": {
+        "threshold": 0.5,
+        "recall": 0.46953405017921146,
+        "precision": 0.9151696606786427
+      },
+      "recall_at_p95": {
+        "threshold": 0.54,
+        "recall": 0.44495647721454173,
+        "precision": 0.958103638368247
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "wbf",
+      "iou": 0.4,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3888908624649048,
+      "mAP_50": 0.5840460062026978,
+      "per_class_ap50": {
+        "player": 0.9124818444252014,
+        "ball": 0.6637576818466187,
+        "referee": 0.7531644105911255,
+        "rim": 0.007742292247712612,
+        "number": 0.5830836892127991
+      },
+      "boxes_per_image": 1203.8020833333333,
+      "best_f1": {
+        "threshold": 0.2,
+        "precision": 0.7924305144884684,
+        "recall": 0.6861239119303636,
+        "f1": 0.7354555433589463
+      },
+      "recall_at_p90": {
+        "threshold": 0.26,
+        "recall": 0.6149513568868408,
+        "precision": 0.9050489826676714
+      },
+      "recall_at_p95": {
+        "threshold": 0.32,
+        "recall": 0.5550435227854583,
+        "precision": 0.954225352112676
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "wbf",
+      "iou": 0.5,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.4068276882171631,
+      "mAP_50": 0.5856813788414001,
+      "per_class_ap50": {
+        "player": 0.9396910071372986,
+        "ball": 0.6618401408195496,
+        "referee": 0.764380693435669,
+        "rim": 0.013206982053816319,
+        "number": 0.5492879152297974
+      },
+      "boxes_per_image": 1437.2916666666667,
+      "best_f1": {
+        "threshold": 0.24,
+        "precision": 0.8321678321678322,
+        "recall": 0.6702508960573477,
+        "f1": 0.7424844015882021
+      },
+      "recall_at_p90": {
+        "threshold": 0.28,
+        "recall": 0.6144393241167435,
+        "precision": 0.9009009009009009
+      },
+      "recall_at_p95": {
+        "threshold": 0.36,
+        "recall": 0.5432667690732207,
+        "precision": 0.9654231119199272
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "wbf",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.4084668755531311,
+      "mAP_50": 0.5843074917793274,
+      "per_class_ap50": {
+        "player": 0.9451048970222473,
+        "ball": 0.6632026433944702,
+        "referee": 0.7661880850791931,
+        "rim": 0.013197558932006359,
+        "number": 0.5338444113731384
+      },
+      "boxes_per_image": 1468.8645833333333,
+      "best_f1": {
+        "threshold": 0.26,
+        "precision": 0.8725626740947076,
+        "recall": 0.6415770609318996,
+        "f1": 0.7394511655355561
+      },
+      "recall_at_p90": {
+        "threshold": 0.3,
+        "recall": 0.6041986687147978,
+        "precision": 0.913312693498452
+      },
+      "recall_at_p95": {
+        "threshold": 0.36,
+        "recall": 0.5524833589349718,
+        "precision": 0.9608192341941229
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "wbf",
+      "iou": 0.6,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.40732091665267944,
+      "mAP_50": 0.5766213536262512,
+      "per_class_ap50": {
+        "player": 0.9522271752357483,
+        "ball": 0.6464095115661621,
+        "referee": 0.7634976506233215,
+        "rim": 0.015360333025455475,
+        "number": 0.5056120753288269
+      },
+      "boxes_per_image": 1503.4895833333333,
+      "best_f1": {
+        "threshold": 0.26,
+        "precision": 0.8685874912157414,
+        "recall": 0.6328725038402457,
+        "f1": 0.7322274881516588
+      },
+      "recall_at_p90": {
+        "threshold": 0.3,
+        "recall": 0.5919098822324629,
+        "precision": 0.9102362204724409
+      },
+      "recall_at_p95": {
+        "threshold": 0.36,
+        "recall": 0.5407066052227343,
+        "precision": 0.9582577132486388
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "wbf",
+      "iou": 0.7,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.4027680456638336,
+      "mAP_50": 0.5581351518630981,
+      "per_class_ap50": {
+        "player": 0.9543792009353638,
+        "ball": 0.5887516736984253,
+        "referee": 0.7529560327529907,
+        "rim": 0.016089122742414474,
+        "number": 0.47849971055984497
+      },
+      "boxes_per_image": 1587.2916666666667,
+      "best_f1": {
+        "threshold": 0.2,
+        "precision": 0.7532614861032332,
+        "recall": 0.6799795186891961,
+        "f1": 0.7147470398277719
+      },
+      "recall_at_p90": {
+        "threshold": 0.3,
+        "recall": 0.5565796210957501,
+        "precision": 0.9157540016849199
+      },
+      "recall_at_p95": {
+        "threshold": 0.34,
+        "recall": 0.5238095238095238,
+        "precision": 0.9551820728291317
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "consensus",
+      "iou": 0.4,
+      "normalize": true,
+      "min_models": 2,
+      "mAP_50_95": 0.32245248556137085,
+      "mAP_50": 0.5184658765792847,
+      "per_class_ap50": {
+        "player": 0.8901349306106567,
+        "ball": 0.5891472697257996,
+        "referee": 0.6509707570075989,
+        "rim": 0.002376237651333213,
+        "number": 0.45970022678375244
+      },
+      "boxes_per_image": 294.8541666666667,
+      "best_f1": {
+        "threshold": 0.48,
+        "precision": 0.8711180124223602,
+        "recall": 0.5745007680491552,
+        "f1": 0.6923788954026534
+      },
+      "recall_at_p90": {
+        "threshold": 0.5,
+        "recall": 0.5427547363031234,
+        "precision": 0.9153713298791019
+      },
+      "recall_at_p95": {
+        "threshold": 0.52,
+        "recall": 0.5197132616487455,
+        "precision": 0.9539473684210527
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "consensus",
+      "iou": 0.4,
+      "normalize": true,
+      "min_models": 3,
+      "mAP_50_95": 0.30917853116989136,
+      "mAP_50": 0.48998111486434937,
+      "per_class_ap50": {
+        "player": 0.8887473940849304,
+        "ball": 0.5464696288108826,
+        "referee": 0.6234436631202698,
+        "rim": 0.0,
+        "number": 0.39124488830566406
+      },
+      "boxes_per_image": 75.35416666666667,
+      "best_f1": {
+        "threshold": 0.48,
+        "precision": 0.8711180124223602,
+        "recall": 0.5745007680491552,
+        "f1": 0.6923788954026534
+      },
+      "recall_at_p90": {
+        "threshold": 0.5,
+        "recall": 0.5427547363031234,
+        "precision": 0.9153713298791019
+      },
+      "recall_at_p95": {
+        "threshold": 0.52,
+        "recall": 0.5197132616487455,
+        "precision": 0.9539473684210527
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "consensus",
+      "iou": 0.5,
+      "normalize": true,
+      "min_models": 2,
+      "mAP_50_95": 0.36742937564849854,
+      "mAP_50": 0.5190102458000183,
+      "per_class_ap50": {
+        "player": 0.9222987294197083,
+        "ball": 0.5880075097084045,
+        "referee": 0.6565685868263245,
+        "rim": 0.0012376237427815795,
+        "number": 0.4269389510154724
+      },
+      "boxes_per_image": 294.5,
+      "best_f1": {
+        "threshold": 0.48,
+        "precision": 0.8287172011661808,
+        "recall": 0.5821812596006144,
+        "f1": 0.6839097744360902
+      },
+      "recall_at_p90": {
+        "threshold": 0.5,
+        "recall": 0.5412186379928315,
+        "precision": 0.9143598615916955
+      },
+      "recall_at_p95": {
+        "threshold": 0.54,
+        "recall": 0.5156169994879672,
+        "precision": 0.9545023696682464
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "consensus",
+      "iou": 0.5,
+      "normalize": true,
+      "min_models": 3,
+      "mAP_50_95": 0.3515705168247223,
+      "mAP_50": 0.48673081398010254,
+      "per_class_ap50": {
+        "player": 0.9207382798194885,
+        "ball": 0.5414483547210693,
+        "referee": 0.6177316308021545,
+        "rim": 0.0,
+        "number": 0.3537357747554779
+      },
+      "boxes_per_image": 73.3125,
+      "best_f1": {
+        "threshold": 0.48,
+        "precision": 0.8287172011661808,
+        "recall": 0.5821812596006144,
+        "f1": 0.6839097744360902
+      },
+      "recall_at_p90": {
+        "threshold": 0.5,
+        "recall": 0.5412186379928315,
+        "precision": 0.9143598615916955
+      },
+      "recall_at_p95": {
+        "threshold": 0.54,
+        "recall": 0.5156169994879672,
+        "precision": 0.9545023696682464
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "consensus",
+      "iou": 0.55,
+      "normalize": true,
+      "min_models": 2,
+      "mAP_50_95": 0.3648293912410736,
+      "mAP_50": 0.5082777142524719,
+      "per_class_ap50": {
+        "player": 0.9247187972068787,
+        "ball": 0.5785669088363647,
+        "referee": 0.6544301509857178,
+        "rim": 0.0012376237427815795,
+        "number": 0.3824350833892822
+      },
+      "boxes_per_image": 281.15625,
+      "best_f1": {
+        "threshold": 0.48,
+        "precision": 0.8262490678598061,
+        "recall": 0.5673323092677931,
+        "f1": 0.6727383120825744
+      },
+      "recall_at_p90": {
+        "threshold": 0.5,
+        "recall": 0.5314900153609831,
+        "precision": 0.9145374449339208
+      },
+      "recall_at_p95": {
+        "threshold": 0.54,
+        "recall": 0.5084485407066052,
+        "precision": 0.9584942084942085
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "consensus",
+      "iou": 0.55,
+      "normalize": true,
+      "min_models": 3,
+      "mAP_50_95": 0.34812697768211365,
+      "mAP_50": 0.4744037091732025,
+      "per_class_ap50": {
+        "player": 0.9232064485549927,
+        "ball": 0.5270714163780212,
+        "referee": 0.6188206672668457,
+        "rim": 0.0,
+        "number": 0.30292007327079773
+      },
+      "boxes_per_image": 70.5625,
+      "best_f1": {
+        "threshold": 0.48,
+        "precision": 0.8262490678598061,
+        "recall": 0.5673323092677931,
+        "f1": 0.6727383120825744
+      },
+      "recall_at_p90": {
+        "threshold": 0.5,
+        "recall": 0.5314900153609831,
+        "precision": 0.9145374449339208
+      },
+      "recall_at_p95": {
+        "threshold": 0.54,
+        "recall": 0.5084485407066052,
+        "precision": 0.9584942084942085
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "consensus",
+      "iou": 0.6,
+      "normalize": true,
+      "min_models": 2,
+      "mAP_50_95": 0.3544451594352722,
+      "mAP_50": 0.4881024658679962,
+      "per_class_ap50": {
+        "player": 0.9159924983978271,
+        "ball": 0.554611325263977,
+        "referee": 0.6376184225082397,
+        "rim": 0.001291433465667069,
+        "number": 0.3309986889362335
+      },
+      "boxes_per_image": 262.2708333333333,
+      "best_f1": {
+        "threshold": 0.48,
+        "precision": 0.8255813953488372,
+        "recall": 0.5453149001536098,
+        "f1": 0.6567992599444958
+      },
+      "recall_at_p90": {
+        "threshold": 0.5,
+        "recall": 0.5125448028673835,
+        "precision": 0.9133211678832117
+      },
+      "recall_at_p95": {
+        "threshold": 0.54,
+        "recall": 0.4869431643625192,
+        "precision": 0.9548192771084337
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "consensus",
+      "iou": 0.6,
+      "normalize": true,
+      "min_models": 3,
+      "mAP_50_95": 0.3335159122943878,
+      "mAP_50": 0.44779929518699646,
+      "per_class_ap50": {
+        "player": 0.9144651889801025,
+        "ball": 0.48251795768737793,
+        "referee": 0.6001539826393127,
+        "rim": 0.0,
+        "number": 0.2418593466281891
+      },
+      "boxes_per_image": 66.35416666666667,
+      "best_f1": {
+        "threshold": 0.48,
+        "precision": 0.8255813953488372,
+        "recall": 0.5453149001536098,
+        "f1": 0.6567992599444958
+      },
+      "recall_at_p90": {
+        "threshold": 0.5,
+        "recall": 0.5125448028673835,
+        "precision": 0.9133211678832117
+      },
+      "recall_at_p95": {
+        "threshold": 0.54,
+        "recall": 0.4869431643625192,
+        "precision": 0.9548192771084337
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "consensus",
+      "iou": 0.7,
+      "normalize": true,
+      "min_models": 2,
+      "mAP_50_95": 0.33054372668266296,
+      "mAP_50": 0.4410942494869232,
+      "per_class_ap50": {
+        "player": 0.8938851356506348,
+        "ball": 0.5025732517242432,
+        "referee": 0.5804757475852966,
+        "rim": 0.0014851485611870885,
+        "number": 0.22705194354057312
+      },
+      "boxes_per_image": 216.07291666666666,
+      "best_f1": {
+        "threshold": 0.48,
+        "precision": 0.8317677198975235,
+        "recall": 0.4987199180747568,
+        "f1": 0.6235595390524968
+      },
+      "recall_at_p90": {
+        "threshold": 0.5,
+        "recall": 0.46953405017921146,
+        "precision": 0.9151696606786427
+      },
+      "recall_at_p95": {
+        "threshold": 0.54,
+        "recall": 0.44495647721454173,
+        "precision": 0.958103638368247
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "consensus",
+      "iou": 0.7,
+      "normalize": true,
+      "min_models": 3,
+      "mAP_50_95": 0.3073342442512512,
+      "mAP_50": 0.39911529421806335,
+      "per_class_ap50": {
+        "player": 0.8886350393295288,
+        "ball": 0.44619062542915344,
+        "referee": 0.5351489782333374,
+        "rim": 0.0,
+        "number": 0.1256018579006195
+      },
+      "boxes_per_image": 54.885416666666664,
+      "best_f1": {
+        "threshold": 0.48,
+        "precision": 0.8317677198975235,
+        "recall": 0.4987199180747568,
+        "f1": 0.6235595390524968
+      },
+      "recall_at_p90": {
+        "threshold": 0.5,
+        "recall": 0.46953405017921146,
+        "precision": 0.9151696606786427
+      },
+      "recall_at_p95": {
+        "threshold": 0.54,
+        "recall": 0.44495647721454173,
+        "precision": 0.958103638368247
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "consensus",
+      "iou": 0.4,
+      "normalize": false,
+      "min_models": 2,
+      "mAP_50_95": 0.38552480936050415,
+      "mAP_50": 0.5768892168998718,
+      "per_class_ap50": {
+        "player": 0.9123704433441162,
+        "ball": 0.6443586945533752,
+        "referee": 0.7524024844169617,
+        "rim": 0.0012639561900869012,
+        "number": 0.5740505456924438
+      },
+      "boxes_per_image": 294.5208333333333,
+      "best_f1": {
+        "threshold": 0.2,
+        "precision": 0.7924305144884684,
+        "recall": 0.6861239119303636,
+        "f1": 0.7354555433589463
+      },
+      "recall_at_p90": {
+        "threshold": 0.26,
+        "recall": 0.6149513568868408,
+        "precision": 0.9050489826676714
+      },
+      "recall_at_p95": {
+        "threshold": 0.32,
+        "recall": 0.5550435227854583,
+        "precision": 0.954225352112676
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "consensus",
+      "iou": 0.4,
+      "normalize": false,
+      "min_models": 3,
+      "mAP_50_95": 0.36328139901161194,
+      "mAP_50": 0.5293539762496948,
+      "per_class_ap50": {
+        "player": 0.9079809784889221,
+        "ball": 0.580381453037262,
+        "referee": 0.692420244216919,
+        "rim": 0.0,
+        "number": 0.4659871757030487
+      },
+      "boxes_per_image": 75.19791666666667,
+      "best_f1": {
+        "threshold": 0.2,
+        "precision": 0.8255741775294848,
+        "recall": 0.6810035842293907,
+        "f1": 0.7463524130190796
+      },
+      "recall_at_p90": {
+        "threshold": 0.26,
+        "recall": 0.6129032258064516,
+        "precision": 0.9047619047619048
+      },
+      "recall_at_p95": {
+        "threshold": 0.32,
+        "recall": 0.554531490015361,
+        "precision": 0.9541850220264317
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "consensus",
+      "iou": 0.5,
+      "normalize": false,
+      "min_models": 2,
+      "mAP_50_95": 0.4027402997016907,
+      "mAP_50": 0.5765978097915649,
+      "per_class_ap50": {
+        "player": 0.93837571144104,
+        "ball": 0.6423954367637634,
+        "referee": 0.765171468257904,
+        "rim": 0.0004950495203956962,
+        "number": 0.5365514159202576
+      },
+      "boxes_per_image": 294.6875,
+      "best_f1": {
+        "threshold": 0.24,
+        "precision": 0.8321678321678322,
+        "recall": 0.6702508960573477,
+        "f1": 0.7424844015882021
+      },
+      "recall_at_p90": {
+        "threshold": 0.28,
+        "recall": 0.6144393241167435,
+        "precision": 0.9009009009009009
+      },
+      "recall_at_p95": {
+        "threshold": 0.36,
+        "recall": 0.5432667690732207,
+        "precision": 0.9654231119199272
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "consensus",
+      "iou": 0.5,
+      "normalize": false,
+      "min_models": 3,
+      "mAP_50_95": 0.37700679898262024,
+      "mAP_50": 0.5253000855445862,
+      "per_class_ap50": {
+        "player": 0.9351431727409363,
+        "ball": 0.5736188888549805,
+        "referee": 0.7025917768478394,
+        "rim": 0.0,
+        "number": 0.41514667868614197
+      },
+      "boxes_per_image": 73.27083333333333,
+      "best_f1": {
+        "threshold": 0.22,
+        "precision": 0.8196221815965874,
+        "recall": 0.68868407578085,
+        "f1": 0.7484696716750139
+      },
+      "recall_at_p90": {
+        "threshold": 0.28,
+        "recall": 0.6129032258064516,
+        "precision": 0.9006772009029346
+      },
+      "recall_at_p95": {
+        "threshold": 0.36,
+        "recall": 0.5432667690732207,
+        "precision": 0.9654231119199272
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "consensus",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": 2,
+      "mAP_50_95": 0.40266236662864685,
+      "mAP_50": 0.5732812285423279,
+      "per_class_ap50": {
+        "player": 0.9442096948623657,
+        "ball": 0.6439904570579529,
+        "referee": 0.7631301283836365,
+        "rim": 0.000521104724612087,
+        "number": 0.5145547389984131
+      },
+      "boxes_per_image": 281.2708333333333,
+      "best_f1": {
+        "threshold": 0.26,
+        "precision": 0.8725626740947076,
+        "recall": 0.6415770609318996,
+        "f1": 0.7394511655355561
+      },
+      "recall_at_p90": {
+        "threshold": 0.3,
+        "recall": 0.6041986687147978,
+        "precision": 0.913312693498452
+      },
+      "recall_at_p95": {
+        "threshold": 0.36,
+        "recall": 0.5524833589349718,
+        "precision": 0.9608192341941229
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "consensus",
+      "iou": 0.55,
+      "normalize": false,
+      "min_models": 3,
+      "mAP_50_95": 0.37604185938835144,
+      "mAP_50": 0.5193635821342468,
+      "per_class_ap50": {
+        "player": 0.9380083084106445,
+        "ball": 0.575239360332489,
+        "referee": 0.7043138742446899,
+        "rim": 0.0,
+        "number": 0.3792564272880554
+      },
+      "boxes_per_image": 70.33333333333333,
+      "best_f1": {
+        "threshold": 0.22,
+        "precision": 0.8142076502732241,
+        "recall": 0.6866359447004609,
+        "f1": 0.745
+      },
+      "recall_at_p90": {
+        "threshold": 0.3,
+        "recall": 0.6026625704045059,
+        "precision": 0.9138198757763976
+      },
+      "recall_at_p95": {
+        "threshold": 0.36,
+        "recall": 0.5524833589349718,
+        "precision": 0.9608192341941229
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "consensus",
+      "iou": 0.6,
+      "normalize": false,
+      "min_models": 2,
+      "mAP_50_95": 0.3993381857872009,
+      "mAP_50": 0.5618076920509338,
+      "per_class_ap50": {
+        "player": 0.9499161839485168,
+        "ball": 0.6249141693115234,
+        "referee": 0.7589786648750305,
+        "rim": 0.0016501650679856539,
+        "number": 0.4735793173313141
+      },
+      "boxes_per_image": 262.8333333333333,
+      "best_f1": {
+        "threshold": 0.26,
+        "precision": 0.8685874912157414,
+        "recall": 0.6328725038402457,
+        "f1": 0.7322274881516588
+      },
+      "recall_at_p90": {
+        "threshold": 0.3,
+        "recall": 0.5919098822324629,
+        "precision": 0.9102362204724409
+      },
+      "recall_at_p95": {
+        "threshold": 0.36,
+        "recall": 0.5407066052227343,
+        "precision": 0.9582577132486388
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "consensus",
+      "iou": 0.6,
+      "normalize": false,
+      "min_models": 3,
+      "mAP_50_95": 0.36486440896987915,
+      "mAP_50": 0.4936445653438568,
+      "per_class_ap50": {
+        "player": 0.9420819282531738,
+        "ball": 0.5248749852180481,
+        "referee": 0.6879599690437317,
+        "rim": 0.0014144271844998002,
+        "number": 0.3118915557861328
+      },
+      "boxes_per_image": 66.26041666666667,
+      "best_f1": {
+        "threshold": 0.22,
+        "precision": 0.8128872366790583,
+        "recall": 0.6717869943676396,
+        "f1": 0.735632183908046
+      },
+      "recall_at_p90": {
+        "threshold": 0.3,
+        "recall": 0.5893497183819765,
+        "precision": 0.9113222486144101
+      },
+      "recall_at_p95": {
+        "threshold": 0.36,
+        "recall": 0.5407066052227343,
+        "precision": 0.9582577132486388
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "consensus",
+      "iou": 0.7,
+      "normalize": false,
+      "min_models": 2,
+      "mAP_50_95": 0.3884982764720917,
+      "mAP_50": 0.5327244400978088,
+      "per_class_ap50": {
+        "player": 0.9527439475059509,
+        "ball": 0.5604889988899231,
+        "referee": 0.7424493432044983,
+        "rim": 0.0007616146467626095,
+        "number": 0.40717819333076477
+      },
+      "boxes_per_image": 215.78125,
+      "best_f1": {
+        "threshold": 0.2,
+        "precision": 0.7532614861032332,
+        "recall": 0.6799795186891961,
+        "f1": 0.7147470398277719
+      },
+      "recall_at_p90": {
+        "threshold": 0.3,
+        "recall": 0.5565796210957501,
+        "precision": 0.9157540016849199
+      },
+      "recall_at_p95": {
+        "threshold": 0.34,
+        "recall": 0.5238095238095238,
+        "precision": 0.9551820728291317
+      }
+    },
+    {
+      "models": [
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "omdet_turbo",
+        "owlv2",
+        "yolo_world"
+      ],
+      "n_models": 6,
+      "method": "consensus",
+      "iou": 0.7,
+      "normalize": false,
+      "min_models": 3,
+      "mAP_50_95": 0.3424469828605652,
+      "mAP_50": 0.44954079389572144,
+      "per_class_ap50": {
+        "player": 0.9352514743804932,
+        "ball": 0.4940251410007477,
+        "referee": 0.6352258324623108,
+        "rim": 0.0,
+        "number": 0.18320146203041077
+      },
+      "boxes_per_image": 54.65625,
+      "best_f1": {
+        "threshold": 0.24,
+        "precision": 0.8420679886685553,
+        "recall": 0.6088069636456733,
+        "f1": 0.7066864784546805
+      },
+      "recall_at_p90": {
+        "threshold": 0.28,
+        "recall": 0.5683563748079877,
+        "precision": 0.9039087947882736
+      },
+      "recall_at_p95": {
+        "threshold": 0.34,
+        "recall": 0.5238095238095238,
+        "precision": 0.9551820728291317
+      }
+    }
+  ]
+}

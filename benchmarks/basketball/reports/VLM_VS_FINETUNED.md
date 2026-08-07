@@ -383,10 +383,16 @@ its hand-tuned prompt. Configuration, not prompting, closed it.
 
 **"Below half the worst fine-tuned detector" is no longer true.** That sentence
 appeared here for months and was correct when the ceiling was 0.250. At 0.315
-against the lowest-ranked fine-tuned detector's 0.619 the ratio is **1.97×**, not
-the 2.5× this report used to quote — see
+against the lowest-ranked fine-tuned detector's **0.581** (RT-DETRv2-M) the ratio
+is **1.85×**, not the 2.5× this report used to quote — see
 [FINAL_COMPARISON_640.md](FINAL_COMPARISON_640.md) for the fine-tuned figures
 rather than re-tabulating them here.
+
+> A revision of this paragraph dated 2026-08-05 named DAMO-YOLO-M's 0.619 as the
+> lowest-ranked fine-tuned detector and computed 1.97× from it. That was the
+> *second*-lowest row; RT-DETRv2-M sits below it at 0.581. Corrected here — the
+> gap is slightly smaller than this report claimed, which is the same direction
+> as every other correction the ablation forced.
 
 What has *not* changed is the conclusion. A near-2× gap is still decisive, it is
 still the gap between "usable for bootstrapping labels" and "usable in
@@ -593,6 +599,249 @@ small, domain-specific object it was never really trained to find (`rim`).
 Fine-tuning closes exactly those gaps, which is why the fine-tuned detectors
 clear the zero-shot ceiling by such a wide margin.
 
+## Can the six be combined?
+
+Every number above scores one model running one forward pass. This section asks
+a different question — what happens if you run all six and merge their output —
+and the answer splits depending on which question you are really asking.
+
+**All numbers in this section are on the 96-image `valid` split.** The main
+tables above are on `test`; these are not comparable to them, and nothing here
+has been scored on `test`.
+
+### The rule, fixed before the results
+
+57 non-empty model subsets times several operators times several IoU thresholds
+is far more selection freedom than any single-element sweep in the ablation had,
+so the adoption rule was written into
+`nimbalyst-local/plans/vlm-fusion-ensemble.md` before anything was fused:
+
+- Cluster IoU is **pre-committed to 0.55**, the WBF paper's default. Values
+  around it are reported as sensitivity and their argmax is never adopted.
+- The headline configuration carries **zero selection freedom: all six models**.
+- One pre-registered alternative, **the top two by already-published val mAP**,
+  chosen from numbers that existed before this section did.
+- The full subset sweep is reported as exploration and is an inflated upper
+  bound, not a result.
+
+### Why this should not have worked
+
+The six models do not publish confidences on a common scale. They do not even
+emit the same kind of output:
+
+| model | boxes/img | conf = 1.0 | unique conf values |
+| --- | --- | --- | --- |
+| Florence-2 | 15.9 | **100%** | **1** |
+| Gemini | 16.8 | **91%** | 52 |
+| Grounding-DINO | 21.6 | 0% | 392 |
+| YOLO-World | 297.5 | 0% | 794 |
+| OWLv2 | 509.8 | 0% | 731 |
+| OmDet-Turbo | 1026.5 | 0% | 636 |
+
+The generative models answer a question — about 16 boxes, no expressed
+uncertainty. The discriminative detectors emit a *ranked candidate list* of
+hundreds of boxes, because average precision rewards a long low-confidence tail
+at almost no cost. Weighted box fusion averages coordinates weighted by
+confidence, so Florence-2's box carries roughly 32x OWLv2's weight purely
+because Florence-2 declines to say it is unsure.
+
+The prediction written down before measuring was that naive fusion would
+therefore *lose*, and that replacing each confidence with its within-class
+percentile rank — monotone, so it preserves each model's own AP exactly, and
+free of fitted parameters — would be required to make fusion work at all.
+
+**That prediction was wrong, and the control beat the treatment.** Rank
+normalisation cost 0.040 mAP@50:95 against leaving the raw confidences alone.
+The scale mismatch turns out to encode something real: a model that emits only
+16 boxes emits *better* boxes, and its saturated confidence puts them at the
+head of the merged ranking, which is where they belong. Rank normalisation
+destroys that by promoting OmDet-Turbo's best-of-1026 to the same score as
+Gemini's best-of-17. Both variants are in the committed log.
+
+### What fusion is worth, and which mechanism produced it
+
+"Ensembling helps" is not a finding — pooling six models' boxes raises recall by
+itself, and that has nothing to do with fusion. Each row below adds exactly one
+mechanism to the row above it:
+
+<!-- TABLE:vlm_fusion_headline START -->
+| Configuration | mAP@50:95 | Δ | mAP@50 | Boxes/img | Adds |
+| --- | --- | --- | --- | --- | --- |
+| Best single model (owlv2) | 0.288 | — | 0.464 | 510 | — |
+| Pool all six, suppress duplicates | 0.290 | +0.0025 | 0.452 | 1469 | more candidate boxes |
+| + re-score by how many models agreed | 0.385 | +0.0973 | 0.583 | 1469 | ranking |
+| + average the agreeing boxes (WBF) | **0.408** | +0.1206 | 0.584 | 1469 | localisation |
+<!-- TABLE:vlm_fusion_headline END -->
+
+Pooling is worth essentially nothing: +0.0025, inside the noise floor. **Four
+fifths of the gain is the re-ranking** — +0.0973 for scoring each box by how
+many models found it, before a single coordinate is averaged. Averaging the
+boxes adds a further +0.0233, real but secondary.
+
+That split matters more than the total, because the two mechanisms pay off in
+different places. Agreement re-scoring is a *correctness* signal and it is what
+moves the label-quality numbers below. Coordinate averaging only tightens boxes,
+so it shows up in mAP@50:95 — which averages over IoU thresholds up to 0.95 —
+and contributes nothing at all at IoU 0.5. **If you want the ensemble for
+labeling rather than for the benchmark, you do not need WBF; you need the vote
+count.**
+
+Note also that the fused result *exceeds* the per-class routing oracle (0.5378
+mAP@50), which picking the best single model per class cannot do: fusion
+improves boxes *within* a class rather than choosing between models.
+
+Two smaller results worth keeping:
+
+- **The pre-registered two-model subset lost badly.** The rule picked OWLv2 +
+  Grounding-DINO, the top two by val mAP, and reached 0.334 against all-six's
+  0.409. This is exactly what pre-registration is for: the rule chose before the
+  answer was visible, and it chose a loser.
+- **Consensus filtering is just thresholding on the fused score.** Requiring
+  agreement from at least *k* models produced numerically identical operating
+  points to plain WBF, because WBF's score already contains
+  `contributors / n_models`. The `k` knob is redundant, which is a small,
+  genuine simplification rather than a null result.
+
+### How many models do you actually need?
+
+A per-class oracle — take whichever single model scores each class best —
+saturates at **two**: Gemini holds `player` and `referee`, OWLv2 holds `ball`,
+`rim` and `number`, nobody else wins anything, and a third model adds exactly
+0.0000. If routing were the mechanism, two models would be the whole story.
+
+Fusion is not routing, so it does not have to behave that way:
+
+<!-- TABLE:vlm_fusion_subsets START -->
+| Models | Best subset at this size | mAP@50:95 | Recall @ 95% precision |
+| --- | --- | --- | --- |
+| 1 | owlv2 | 0.288 | 0.010 |
+| 2 | gemini, owlv2 | 0.370 | 0.425 |
+| 3 | florence2, gemini, owlv2 | 0.399 | 0.524 |
+| 4 | florence2, gemini, owlv2, yolo_world | 0.405 | 0.580 |
+| 5 | florence2, gemini, grounding_dino, owlv2, yolo_world | 0.408 | 0.578 |
+| 6 | florence2, gemini, grounding_dino, omdet_turbo, owlv2, yolo_world | **0.408** | 0.552 |
+<!-- TABLE:vlm_fusion_subsets END -->
+
+These are argmaxes over 57 subsets on 96 images and are therefore inflated —
+they are the shape of the curve, not configurations anyone should adopt. The
+adopted configuration remains all six, which chose nothing.
+
+Three things the shape says:
+
+- **The oracle's pair is the right pair.** Gemini + OWLv2 is the best two-model
+  subset for fusion too, at 0.370 — well clear of the 0.334 the pre-registered
+  rule's pair managed. The oracle identified the complementary models correctly;
+  what it got wrong was that complementarity is where fusion *starts*, not where
+  it stops.
+- **mAP saturates around four or five models.** 0.288 → 0.370 → 0.399 → 0.405 →
+  0.408, then flat. The sixth model earns nothing, and even the fifth is inside
+  the noise floor. Voters help until they stop.
+- **Label quality peaks at four models, not six** — recall at 95% precision is
+  **0.580** with `florence2 + gemini + owlv2 + yolo_world` against 0.552 for all
+  six. Adding OmDet-Turbo, which publishes 1026 boxes per image, costs precision
+  it never repays. The adopted all-six configuration is *not* the best one for
+  labeling, and this table is how you would find that out.
+
+That last point is the practical one. If the output of this pipeline is going to
+a human annotator, the configuration to run is a subset — but choosing it on 96
+val images is the selection freedom this whole protocol refuses to spend, so it
+is reported here and not adopted.
+
+### The number auto-labeling actually cares about
+
+mAP integrates over the entire ranking, which rewards speculation: a wrong box
+at confidence 0.01 costs a detector almost nothing. A label set is judged by how
+much of it a human has to undo. The right question is *how much recall survives
+once precision is held at 95%* — that converts directly into boxes nobody has to
+draw.
+
+<!-- TABLE:vlm_fusion_label_quality START -->
+| Configuration | mAP@50:95 | Boxes/img | Best F1 | Recall @ 95% precision |
+| --- | --- | --- | --- | --- |
+| owlv2 | 0.288 | 510 | 0.595 | 0.010 |
+| grounding_dino | 0.278 | 22 | 0.591 | 0.168 |
+| gemini | 0.258 | 17 | 0.736 | never reaches 95% |
+| florence2 | 0.234 | 16 | 0.663 | never reaches 95% |
+| omdet_turbo | 0.216 | 1027 | 0.528 | 0.071 |
+| yolo_world | 0.177 | 297 | 0.552 | 0.005 |
+| All 6 — pooled + NMS | 0.290 | 1469 | 0.714 | never reaches 95% |
+| All 6 — agreement re-scoring | 0.385 | 1469 | 0.740 | **0.552** |
+| All 6 — weighted box fusion | 0.408 | 1469 | 0.739 | **0.552** |
+<!-- TABLE:vlm_fusion_label_quality END -->
+
+**The two orderings disagree completely.** OWLv2 has the best mAP of any single
+model and retains **1.0% recall at 95% precision** — as a labeler it is close to
+useless, because its 510 boxes per image are mostly a speculative tail that mAP
+pays it for. Grounding-DINO, third by mAP, is the best single model here at
+16.8%. Fusing all six reaches **55.2%**, which is 3.3x the best single model and
+55x the model that wins the benchmark.
+
+**Florence-2 and Gemini have no operating point at all.** With every confidence
+pinned at 1.0 there is nothing to threshold, so they offer exactly one
+precision/recall pair — Gemini's is 81.2% / 67.2%, take it or leave it. Fusion's
+practical contribution for labeling is not only the higher number: it is that
+the fused score is a **dial**, and a flat-confidence model does not have one.
+
+**Agreement re-scoring alone matches full WBF here** — both reach 0.552, and
+pooling without re-scoring never reaches 95% precision at any threshold. That is
+the same split as above seen from the other side: at IoU 0.5 the averaged box
+buys nothing, so the cheaper operator is the right one for labeling and the
+extra arithmetic only earns its keep against mAP@50:95.
+
+### On the test split, scored once
+
+The val gain clears the 0.002 noise floor by sixty times, so the pre-committed
+rule licenses a single test scoring. It cost nothing to run: `results/vlm/*.json`
+already holds every detection each model published on test, and fusion is
+downstream of the forward pass — **no GPU, no API calls, and reproducible by a
+reader with no key.**
+
+<!-- TABLE:vlm_fusion_test START -->
+| Model | mAP@50:95 | Boxes/img | Recall @ 95% precision |
+| --- | --- | --- | --- |
+| owlv2 | 0.315 | 580 | 0.013 |
+| grounding_dino | 0.293 | 22 | 0.180 |
+| gemini | 0.250 | 18 | never reaches 95% |
+| florence2 | 0.238 | 17 | never reaches 95% |
+| omdet_turbo | 0.211 | 1013 | 0.059 |
+| yolo_world | 0.189 | 299 | never reaches 95% |
+| **All 6 fused** | **0.406** (+0.0913) | 1519 | **0.546** |
+<!-- TABLE:vlm_fusion_test END -->
+
+**The val configuration transferred.** Val 0.4085 against test 0.4061 — a gap of
+0.0024, well inside the noise floor. Recall at 95% precision moved 0.552 to
+0.546. Nothing was re-tuned between the two.
+
+The delta over the best single model is smaller on test (+0.091) than on val
+(+0.121) for a reason worth stating: OWLv2 is simply *better* on test (0.315 vs
+0.288), so the ensemble is clearing a higher bar, not degrading. The absolute
+ensemble number is the one that transferred essentially unchanged.
+
+Against the fine-tuned detectors in
+[FINAL_COMPARISON_640.md](FINAL_COMPARISON_640.md), the ensemble narrows the gap
+to the lowest-ranked row (RT-DETRv2-M, 0.581) from **1.85× to 1.43×**. That is
+the closest zero-shot has come in this project, and it still is not close: it
+costs six forward passes to get there, and `rim` is still zero.
+
+The per-model rows above come from the same dumps the test table earlier in this
+report renders, through the same scorer, so the two cannot disagree without one
+of them being wrong.
+
+### What this does not do
+
+- **It does not touch `rim`.** Every model sits between 0.000 and 0.012, and
+  fusing six failures gives a failure. A fifth of the taxonomy is untouched.
+- **It costs six forward passes per image.** That is why this is a section
+  rather than a seventh row in the comparison table above — those rows are
+  one-model, one-pass, and quietly adding a 6x-compute row would change what the
+  table is comparing.
+- **The ensemble containing Gemini is not free to reproduce.** A reader can
+  re-score it from the committed dumps with no key, but re-*generating* those
+  dumps needs one.
+- **1,519 boxes per image is not a label set.** The mAP number is achieved by a
+  long speculative tail. The recall-at-95%-precision column is the one to read
+  if the output is going to a human.
+
 ## Reproducing these tables
 
 Every table here is emitted by the report generator from committed files, so
@@ -620,3 +869,23 @@ value):
 pixi run -e vlm python scripts/ablate_vlm.py                    # the whole sweep
 pixi run -e vlm python scripts/ablate_vlm.py --verify --only owlv2   # cache vs live
 ```
+
+The fusion sweep is downstream of the forward pass entirely, so it replays that
+same cache and needs **no GPU and no API calls** — it runs in the torch-free
+default environment:
+
+```bash
+pixi run python scripts/fuse_vlm.py --verify        # pass-through == published mAP
+pixi run python scripts/fuse_vlm.py                 # pre-committed configurations
+pixi run python scripts/fuse_vlm.py --all-subsets   # + all 57 subsets (~2h CPU)
+```
+
+`--verify` is not optional politeness. Fusion is a *second* offline path stacked
+on the replay, and PR #17 published a wrong tiling number precisely because the
+cache-versus-live check had only ever been pointed at the configurations that
+could not break. Running a single model through the fusion plumbing with
+suppression disabled must reproduce that model's published val mAP exactly; all
+six currently agree to `0.00e+00`.
+
+Both `ablate_vlm.py` and `fuse_vlm.py` refuse `--split test` at the CLI and in
+the schema, and `load_fusion_log` refuses to render a log that records it.
