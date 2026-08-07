@@ -55,13 +55,18 @@ def iou_xywh(a: Detection, b: Detection) -> float:
     return inter / max(union, 1e-9)
 
 
-def _iou_one_to_many(
+def iou_one_to_many(
     box: npt.NDArray[np.float64],
     others: npt.NDArray[np.float64],
     area: float,
     areas: npt.NDArray[np.float64],
 ) -> npt.NDArray[np.float64]:
-    """IoU of one xyxy box against many, matching :func:`iou_xywh` term for term."""
+    """IoU of one xyxy box against many, matching :func:`iou_xywh` term for term.
+
+    Public because ``fusion.py`` clusters cross-model boxes with the same greedy
+    walk and must use the same arithmetic -- a second copy is exactly the
+    duplication this module was created to remove.
+    """
     ix1 = np.maximum(box[0], others[:, 0])
     iy1 = np.maximum(box[1], others[:, 1])
     ix2 = np.minimum(box[2], others[:, 2])
@@ -125,7 +130,7 @@ def per_class_nms(detections: list[Detection], iou_threshold: float) -> list[Det
         if not candidates.any():
             continue
         positions = np.nonzero(candidates)[0]
-        ious = _iou_one_to_many(boxes[i], boxes[tail][positions], areas[i], areas[tail][positions])
+        ious = iou_one_to_many(boxes[i], boxes[tail][positions], areas[i], areas[tail][positions])
         suppressed[positions[ious > iou_threshold] + i + 1] = True
 
     return keep
