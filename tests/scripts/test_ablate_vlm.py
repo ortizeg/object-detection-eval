@@ -162,7 +162,13 @@ def test_only_the_checkpoint_re_search_pins_a_second_field(manifest: Any) -> Non
     several accepted things at once and check they compose.
     """
     pinned = {e.name for e in manifest.elements if e.fixed}
-    assert pinned <= {"vocabulary_on_new_checkpoint", "combined", "nms_on_tiles", "nms_on_combined"}
+    assert pinned <= {
+        "vocabulary_on_new_checkpoint",
+        "combined",
+        "nms_on_tiles",
+        "nms_on_combined",
+        "tiles",
+    }
 
 
 def test_every_model_gets_exactly_one_baseline_arm(manifest: Any) -> None:

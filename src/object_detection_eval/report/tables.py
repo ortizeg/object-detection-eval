@@ -685,6 +685,24 @@ def ablation_headline_table(
         base = baselines.get(model)
         if base is None:  # pragma: no cover - every model has a baseline
             continue
+        delta = arm.map_50_95 - base.map_50_95
+
+        # A model whose baseline beat every arm tried has adopted nothing, and
+        # the row must say so. Reporting the best *alternative* with its negative
+        # delta would read as a change that was kept, which is the opposite of
+        # what happened — Gemini is exactly this case.
+        if delta < ABLATION_NOISE_FLOOR:
+            rows.append(
+                [
+                    model,
+                    _fmt3(base.map_50_95),
+                    _fmt3(base.map_50_95),
+                    "—",
+                    "none — baseline beat every arm tried",
+                ]
+            )
+            continue
+
         changed = [
             _describe_change(key, value)
             for key, value in arm.config.items()
@@ -695,7 +713,7 @@ def ablation_headline_table(
                 model,
                 _fmt3(base.map_50_95),
                 f"**{_fmt3(arm.map_50_95)}**",
-                _fmt_delta(arm.map_50_95 - base.map_50_95),
+                _fmt_delta(delta),
                 ", ".join(changed) or _EM_DASH,
             ]
         )
@@ -711,6 +729,8 @@ _CHANGE_LABELS = {
     "imgsz": "input size",
     "box_threshold": "box threshold",
     "processor_nms_threshold": "processor NMS",
+    "prompt_template": "prompt",
+    "sample": "repeat draw",
 }
 
 
@@ -719,7 +739,10 @@ def _describe_change(key: str, value: Any) -> str:
     label = _CHANGE_LABELS.get(key, key)
     if key == "tiles":
         return f"{label} {value[0]}x{value[1]}" if value else f"no {label}"
-    if key == "classes":
+    if key in ("classes", "prompt_template"):
+        # Never inline the value: a class list is long and a Gemini prompt is
+        # several hundred characters, either of which turns a table cell into a
+        # wall of text.
         return label
     if key == "model_name":
         return f"{label} `{str(value).split('/')[-1]}`"

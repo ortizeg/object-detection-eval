@@ -64,10 +64,20 @@ CLIP-encoded once and baked into the model. Given the compound phrase
 images, against 101 for `"person"`), while `basketball hoop` returns an identical
 box in both. Uniformity would have looked fairer and been less accurate.
 
-Gemini is excluded from the search: it is a billed API and its prompt is a
-free-text instruction rather than a class vocabulary. It keeps its hand-tuned
-prompt, and that remains an advantage over the open-weights rows — stated here
-rather than smoothed over.
+Gemini was excluded from the *prompt* search — billed API, free-text instruction
+rather than a class vocabulary — and that exclusion was fair when it applied to
+one search. It stopped being fair after the 2026-08-04 ablation moved the five
+open-weights rows by +0.067 and left Gemini the only row still on its July
+configuration, at which point the table was reporting tuned against untuned and
+calling it a model ranking.
+
+**So Gemini was given the same treatment on 2026-08-06, and nothing helped.**
+Fifteen arms on val — a cap-free prompt, three model variants including the
+current Pro release and the spatially-specialised Robotics-ER line, 2x2 tiling,
+and an NMS sweep inside the tiled regime. **Its published configuration beat
+every alternative tried.** Details in the ablation table below; the row is
+unchanged because the search said to leave it alone, which is a different and
+more defensible statement than leaving it alone because nobody looked.
 
 ### What prompt engineering did *not* fix
 
@@ -87,6 +97,18 @@ Two hypotheses this work set out to test, both refuted by measurement:
   one (OWLv2 at 0.039). "basketball hoop", "basketball hoop and backboard",
   "rim", "hoop": none of them work. The rim collapse is not a vocabulary
   problem, so no amount of prompt engineering is going to close it.
+
+  **It is, however, a *model* problem rather than an impossible one** — a
+  distinction this report previously got wrong. The 2026-08-06 Gemini sweep
+  tried two models from Google's Robotics-ER line, built for spatial grounding
+  rather than general multimodal chat, and both scored `rim` at **0.118–0.122
+  AP@50 on val**: roughly **twelve times** the best figure any of the six
+  published models reaches, and the highest `rim` number anywhere in this
+  project. They are far worse at everything else — `player` collapses from 0.916
+  to below 0.55, which is why neither was adopted — but they demonstrate that
+  the rim is findable by a model with the right inductive bias. Earlier
+  revisions here described the rim collapse as a capability ceiling for
+  zero-shot detection generally. It is a ceiling for *these* models.
 
 Both results are the reason the per-class analysis below still reads as a
 failure analysis rather than a tuning success story.
@@ -143,6 +165,7 @@ adopting a smaller "win" is fitting the val split.
 | --- | --- | --- | --- | --- |
 | owlv2 | 0.240 | **0.288** | +0.0479 | NMS IoU 0.5, tiling 2x2 |
 | grounding_dino | 0.244 | **0.278** | +0.0338 | NMS IoU 0.7, tiling 2x2 |
+| gemini | 0.258 | 0.258 | — | none — baseline beat every arm tried |
 | florence2 | 0.125 | **0.234** | +0.1094 | checkpoint `Florence-2-large`, NMS IoU 0.4, tiling 2x2 |
 | omdet_turbo | 0.181 | **0.216** | +0.0353 | vocabulary, tiling 2x2 |
 | yolo_world | 0.132 | **0.177** | +0.0453 | vocabulary, box threshold 0.001, NMS IoU 0.7, input size 1280 |
@@ -264,11 +287,13 @@ re-rendering fails the drift gate.
 | florence2 | Add NMS | 4 | `0.3` | 0.125 | +0.0000 | reverted (within noise) |
 | florence2 | Vocabulary re-search (new checkpoint) | 6 | `microsoft/Florence-2-large` | 0.155 | +0.0300 | **kept** |
 | florence2 | Overlapping tiles 2x2 | 1 | `[2, 2]` | 0.135 | +0.0104 | **kept** |
+| gemini | Overlapping tiles 2x2 | 1 | `[2, 2]` | 0.160 | -0.0981 | reverted (within noise) |
 | grounding_dino | Overlapping tiles 2x2 | 1 | `[2, 2]` | 0.278 | +0.0337 | **kept** |
 | omdet_turbo | Overlapping tiles 2x2 | 1 | `[2, 2]` | 0.207 | +0.0260 | **kept** |
 | owlv2 | Overlapping tiles 2x2 | 1 | `[2, 2]` | 0.283 | +0.0431 | **kept** |
 | yolo_world | Overlapping tiles 2x2 | 1 | `[2, 2]` | 0.079 | -0.0528 | reverted (within noise) |
 | florence2 | NMS re-swept under tiling | 4 | `?` | 0.189 | +0.0646 | reverted |
+| gemini | NMS re-swept under tiling | 7 | `?` | 0.238 | -0.0207 | reverted (within noise) |
 | grounding_dino | NMS re-swept under tiling | 9 | `?` | 0.278 | +0.0338 | reverted |
 | omdet_turbo | NMS re-swept under tiling | 9 | `?` | 0.207 | +0.0263 | reverted |
 | owlv2 | NMS re-swept under tiling | 9 | `?` | 0.288 | +0.0479 | reverted |
@@ -291,6 +316,32 @@ the tables in this report. Both the ablation manifest schema and its CLI refuse
 `--split test`, as the prompt search already did, because selecting a setting on
 the split the report publishes would make the published number the maximum over
 the ~130 arms tried rather than a measurement.
+
+**One row's number is not as precise as the other five look**
+
+Every open-weights model here is deterministic: run it twice on the same image
+and it returns the same boxes, so its published figure has no sampling error of
+its own. Gemini is generative and does not. Running the **unchanged**
+configuration three times on val gives:
+
+| draw | val mAP@50:95 |
+| --- | --- |
+| 1 | 0.2583 |
+| 2 | 0.2479 |
+| 3 | 0.2565 |
+
+σ = 0.0056, so a 2σ band of **±0.011** — five times the resolution limit that
+applies to the deterministic rows. Almost all of it is `ball`, which swings
+±0.058 between draws while `player`, `referee` and `number` hold to ±0.004:
+88 val instances of a single small object, found or missed on a per-call coin
+flip, while the high-count classes average out.
+
+**The practical consequence is that Gemini's published figure is one draw from a
+distribution that wide**, and the table above presents it beside five numbers
+that carry no such spread. That is not a reason to distrust the comparison —
+0.011 does not reorder anything here — but a difference of 0.01 between Gemini
+and another row is not a difference, and this report previously gave no way to
+know that.
 
 **Still not searched**
 
