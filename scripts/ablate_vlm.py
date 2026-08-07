@@ -113,6 +113,16 @@ class Arm(BaseModel, frozen=True):
     classes: list[str] = Field(min_length=1)
     task: str | None = None
 
+    #: Gemini only: the free-text instruction it is steered by. Its analogue of
+    #: the class vocabulary the open-weights models receive.
+    prompt_template: str | None = None
+    #: Which independent draw this arm is. Changes nothing about the
+    #: configuration and everything about the cache key, so a generative model
+    #: can be run twice under identical settings to measure its own
+    #: run-to-run spread. Deterministic models will always return the same
+    #: numbers here, which is exactly what makes the comparison meaningful.
+    sample: int = 0
+
     box_threshold: float = 0.01
     #: ``None`` means "this model runs no NMS", which is Florence-2's real
     #: behaviour and distinct from "NMS at some IoU".
@@ -173,6 +183,8 @@ class Arm(BaseModel, frozen=True):
             f"imgsz{self.imgsz}",
             f"tiles{self.tiles}@{self.tile_overlap}",
             f"maxdet{self.max_det}",
+            f"prompt{hashlib.sha256((self.prompt_template or '-').encode()).hexdigest()[:8]}",
+            f"sample{self.sample}",
         ]
         if not self.replayable:
             parts += [f"box{self.box_threshold}", f"nms{self.nms_iou_threshold}"]
@@ -314,10 +326,24 @@ class AblationManifest(BaseModel, frozen=True):
         return arms
 
 
+#: Longest element value rendered verbatim into an arm id before being digested.
+#:
+#: Most values are short — a threshold, a grid, a checkpoint name. Gemini's
+#: prompt is several hundred characters, and spelling it into the id produced
+#: something unreadable in every log line and report row it appeared in. Long
+#: values keep a readable prefix plus a digest, so ids stay both distinguishable
+#: and legible.
+_MAX_SLUG = 40
+
+
 def _slug(value: Any) -> str:
     """Filesystem- and id-safe rendering of an element value."""
     text = "-".join(str(v) for v in value) if isinstance(value, list) else str(value)
-    return "".join(c if c.isalnum() or c in "._-" else "-" for c in text)
+    safe = "".join(c if c.isalnum() or c in "._-" else "-" for c in text)
+    if len(safe) <= _MAX_SLUG:
+        return safe
+    digest = hashlib.sha256(text.encode()).hexdigest()[:8]
+    return f"{safe[:_MAX_SLUG].rstrip('-')}-{digest}"
 
 
 def load_ablation_manifest(path: Path) -> AblationManifest:
@@ -479,6 +505,18 @@ def build_inferencer(arm: Arm, *, raw_mode: bool) -> Any:
             nms_iou_threshold=nms_iou,
             imgsz=arm.imgsz if arm.imgsz is not None else 640,
             max_det=arm.max_det if arm.max_det is not None else 300,
+        )
+    if arm.inferencer == "gemini":
+        from object_detection_eval.inference.vlm.gemini import GeminiInferencer
+
+        # No raw_mode branch: Gemini applies neither a score threshold nor NMS
+        # of its own, so its output is already the un-suppressed set the replay
+        # wants. The knobs it does have — prompt, model, tiling — are all part
+        # of the forward-pass signature.
+        return GeminiInferencer(
+            model_name=arm.model_name,
+            classes=arm.classes,
+            prompt_template=arm.prompt_template,
         )
     msg = f"unknown inferencer {arm.inferencer!r}"
     raise ValueError(msg)

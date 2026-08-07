@@ -26,7 +26,7 @@ import time
 import numpy as np
 import numpy.typing as npt
 from google import genai
-from google.genai.types import GenerateContentConfig
+from google.genai.types import GenerateContentConfig, HttpOptions
 from loguru import logger
 from PIL import Image
 from pydantic import BaseModel, Field
@@ -79,6 +79,19 @@ class GeminiInferencer(BaseInferencer):
     _MAX_RETRIES: int = 5
     _INITIAL_BACKOFF: float = 5.0
 
+    #: Per-request wall-clock ceiling, in milliseconds.
+    #:
+    #: Without it the SDK blocks on the socket indefinitely and the retry loop
+    #: below never runs, because a request that never returns never raises. A
+    #: 2026-08-06 val sweep sat silent for 31 minutes on one image against
+    #: `gemini-pro-latest` while it was returning 503s to everyone else — the
+    #: whole retry ladder tops out at 155 seconds, so any stall longer than that
+    #: is the transport, not the backoff.
+    #:
+    #: 120s is generous for a single image (observed calls take 2-8s) and still
+    #: bounds a stalled sweep at retries x timeout rather than forever.
+    _REQUEST_TIMEOUT_MS: int = 120_000
+
     def __init__(
         self,
         model_name: str,
@@ -106,6 +119,7 @@ class GeminiInferencer(BaseInferencer):
         self._config = GenerateContentConfig(
             response_mime_type="application/json",
             response_schema=list[GeminiDetection],
+            http_options=HttpOptions(timeout=self._REQUEST_TIMEOUT_MS),
         )
 
         self._prompt = prompt_template or (

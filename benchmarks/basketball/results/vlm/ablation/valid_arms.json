@@ -7263,6 +7263,645 @@
         "tile_overlap": 0.2
       },
       "delta_map5095": 0.04279036819934845
+    },
+    {
+      "arm": "gemini__baseline",
+      "substrate": "mps",
+      "model": "gemini",
+      "element": "baseline",
+      "baseline": null,
+      "mAP_50_95": 0.2583131194114685,
+      "mAP_50": 0.44712746143341064,
+      "per_class_ap50": {
+        "player": 0.9162390232086182,
+        "ball": 0.4789702594280243,
+        "referee": 0.6358875036239624,
+        "rim": 0.010331467725336552,
+        "number": 0.19420906901359558
+      },
+      "config": {
+        "inferencer": "gemini",
+        "model_name": "gemini-3.1-pro-preview",
+        "classes": [
+          "ball",
+          "number",
+          "player",
+          "referee",
+          "rim"
+        ],
+        "task": null,
+        "prompt_template": "Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - At most 10 players, 3 referees, 1 rim, and 1 ball per image. - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - \"player\" for any basketball player on the court - \"referee\" for game officials - \"ball\" for the basketball (only when NOT going through the rim) - \"rim\" for the basketball hoop rim - \"number\" for visible jersey numbers (tight box around the digits only)\n",
+        "sample": 0,
+        "box_threshold": 0.01,
+        "nms_iou_threshold": null,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": null,
+        "imgsz": null,
+        "tiles": null,
+        "tile_overlap": 0.2
+      },
+      "delta_map5095": null
+    },
+    {
+      "arm": "gemini__noise_floor__1",
+      "substrate": "mps",
+      "model": "gemini",
+      "element": "noise_floor",
+      "baseline": "gemini__baseline",
+      "mAP_50_95": 0.24791042506694794,
+      "mAP_50": 0.435691237449646,
+      "per_class_ap50": {
+        "player": 0.9126400947570801,
+        "ball": 0.4210458993911743,
+        "referee": 0.6352525949478149,
+        "rim": 0.014665252529084682,
+        "number": 0.19485242664813995
+      },
+      "config": {
+        "inferencer": "gemini",
+        "model_name": "gemini-3.1-pro-preview",
+        "classes": [
+          "ball",
+          "number",
+          "player",
+          "referee",
+          "rim"
+        ],
+        "task": null,
+        "prompt_template": "Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - At most 10 players, 3 referees, 1 rim, and 1 ball per image. - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - \"player\" for any basketball player on the court - \"referee\" for game officials - \"ball\" for the basketball (only when NOT going through the rim) - \"rim\" for the basketball hoop rim - \"number\" for visible jersey numbers (tight box around the digits only)\n",
+        "sample": 1,
+        "box_threshold": 0.01,
+        "nms_iou_threshold": null,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": null,
+        "imgsz": null,
+        "tiles": null,
+        "tile_overlap": 0.2
+      },
+      "delta_map5095": -0.010402694344520569
+    },
+    {
+      "arm": "gemini__noise_floor__2",
+      "substrate": "mps",
+      "model": "gemini",
+      "element": "noise_floor",
+      "baseline": "gemini__baseline",
+      "mAP_50_95": 0.25651833415031433,
+      "mAP_50": 0.4395560324192047,
+      "per_class_ap50": {
+        "player": 0.932992696762085,
+        "ball": 0.3894927203655243,
+        "referee": 0.6642027497291565,
+        "rim": 0.02087235637009144,
+        "number": 0.19021961092948914
+      },
+      "config": {
+        "inferencer": "gemini",
+        "model_name": "gemini-3.1-pro-preview",
+        "classes": [
+          "ball",
+          "number",
+          "player",
+          "referee",
+          "rim"
+        ],
+        "task": null,
+        "prompt_template": "Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - At most 10 players, 3 referees, 1 rim, and 1 ball per image. - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - \"player\" for any basketball player on the court - \"referee\" for game officials - \"ball\" for the basketball (only when NOT going through the rim) - \"rim\" for the basketball hoop rim - \"number\" for visible jersey numbers (tight box around the digits only)\n",
+        "sample": 2,
+        "box_threshold": 0.01,
+        "nms_iou_threshold": null,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": null,
+        "imgsz": null,
+        "tiles": null,
+        "tile_overlap": 0.2
+      },
+      "delta_map5095": -0.0017947852611541748
+    },
+    {
+      "arm": "gemini__prompt_no_caps__Detect-all-basketball-players--referees-58dcbb83",
+      "substrate": "mps",
+      "model": "gemini",
+      "element": "prompt_no_caps",
+      "baseline": "gemini__baseline",
+      "mAP_50_95": 0.25749847292900085,
+      "mAP_50": 0.450933575630188,
+      "per_class_ap50": {
+        "player": 0.912388801574707,
+        "ball": 0.441006600856781,
+        "referee": 0.6496667861938477,
+        "rim": 0.025346532464027405,
+        "number": 0.226259246468544
+      },
+      "config": {
+        "inferencer": "gemini",
+        "model_name": "gemini-3.1-pro-preview",
+        "classes": [
+          "ball",
+          "number",
+          "player",
+          "referee",
+          "rim"
+        ],
+        "task": null,
+        "prompt_template": "Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - \"player\" for any basketball player on the court - \"referee\" for game officials - \"ball\" for the basketball (only when NOT going through the rim) - \"rim\" for the basketball hoop rim - \"number\" for visible jersey numbers (tight box around the digits only)\n",
+        "sample": 0,
+        "box_threshold": 0.01,
+        "nms_iou_threshold": null,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": null,
+        "imgsz": null,
+        "tiles": null,
+        "tile_overlap": 0.2
+      },
+      "delta_map5095": -0.0008146464824676514
+    },
+    {
+      "arm": "gemini__model__gemini-pro-latest",
+      "substrate": "mps",
+      "model": "gemini",
+      "element": "model",
+      "baseline": "gemini__baseline",
+      "mAP_50_95": 0.24851953983306885,
+      "mAP_50": 0.43901172280311584,
+      "per_class_ap50": {
+        "player": 0.8897804021835327,
+        "ball": 0.37542349100112915,
+        "referee": 0.6847220659255981,
+        "rim": 0.046744756400585175,
+        "number": 0.19838790595531464
+      },
+      "config": {
+        "inferencer": "gemini",
+        "model_name": "gemini-pro-latest",
+        "classes": [
+          "ball",
+          "number",
+          "player",
+          "referee",
+          "rim"
+        ],
+        "task": null,
+        "prompt_template": "Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - At most 10 players, 3 referees, 1 rim, and 1 ball per image. - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - \"player\" for any basketball player on the court - \"referee\" for game officials - \"ball\" for the basketball (only when NOT going through the rim) - \"rim\" for the basketball hoop rim - \"number\" for visible jersey numbers (tight box around the digits only)\n",
+        "sample": 0,
+        "box_threshold": 0.01,
+        "nms_iou_threshold": null,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": null,
+        "imgsz": null,
+        "tiles": null,
+        "tile_overlap": 0.2
+      },
+      "delta_map5095": -0.009793579578399658
+    },
+    {
+      "arm": "gemini__model__gemini-3.6-flash",
+      "substrate": "mps",
+      "model": "gemini",
+      "element": "model",
+      "baseline": "gemini__baseline",
+      "mAP_50_95": 0.16957858204841614,
+      "mAP_50": 0.3034813404083252,
+      "per_class_ap50": {
+        "player": 0.547012448310852,
+        "ball": 0.36375150084495544,
+        "referee": 0.43801748752593994,
+        "rim": 0.1224011480808258,
+        "number": 0.04622415825724602
+      },
+      "config": {
+        "inferencer": "gemini",
+        "model_name": "gemini-3.6-flash",
+        "classes": [
+          "ball",
+          "number",
+          "player",
+          "referee",
+          "rim"
+        ],
+        "task": null,
+        "prompt_template": "Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - At most 10 players, 3 referees, 1 rim, and 1 ball per image. - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - \"player\" for any basketball player on the court - \"referee\" for game officials - \"ball\" for the basketball (only when NOT going through the rim) - \"rim\" for the basketball hoop rim - \"number\" for visible jersey numbers (tight box around the digits only)\n",
+        "sample": 0,
+        "box_threshold": 0.01,
+        "nms_iou_threshold": null,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": null,
+        "imgsz": null,
+        "tiles": null,
+        "tile_overlap": 0.2
+      },
+      "delta_map5095": -0.08873453736305237
+    },
+    {
+      "arm": "gemini__model__gemini-robotics-er-2-preview",
+      "substrate": "mps",
+      "model": "gemini",
+      "element": "model",
+      "baseline": "gemini__baseline",
+      "mAP_50_95": 0.1689305454492569,
+      "mAP_50": 0.2821992337703705,
+      "per_class_ap50": {
+        "player": 0.4883858561515808,
+        "ball": 0.3236878514289856,
+        "referee": 0.3840460181236267,
+        "rim": 0.11805522441864014,
+        "number": 0.09682129323482513
+      },
+      "config": {
+        "inferencer": "gemini",
+        "model_name": "gemini-robotics-er-2-preview",
+        "classes": [
+          "ball",
+          "number",
+          "player",
+          "referee",
+          "rim"
+        ],
+        "task": null,
+        "prompt_template": "Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - At most 10 players, 3 referees, 1 rim, and 1 ball per image. - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - \"player\" for any basketball player on the court - \"referee\" for game officials - \"ball\" for the basketball (only when NOT going through the rim) - \"rim\" for the basketball hoop rim - \"number\" for visible jersey numbers (tight box around the digits only)\n",
+        "sample": 0,
+        "box_threshold": 0.01,
+        "nms_iou_threshold": null,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": null,
+        "imgsz": null,
+        "tiles": null,
+        "tile_overlap": 0.2
+      },
+      "delta_map5095": -0.08938257396221161
+    },
+    {
+      "arm": "gemini__tiles__2-2",
+      "substrate": "mps",
+      "model": "gemini",
+      "element": "tiles",
+      "baseline": "gemini__baseline",
+      "mAP_50_95": 0.1602153182029724,
+      "mAP_50": 0.27570641040802,
+      "per_class_ap50": {
+        "player": 0.3338989317417145,
+        "ball": 0.32366180419921875,
+        "referee": 0.39522144198417664,
+        "rim": 0.0728696957230568,
+        "number": 0.2528800964355469
+      },
+      "config": {
+        "inferencer": "gemini",
+        "model_name": "gemini-3.1-pro-preview",
+        "classes": [
+          "ball",
+          "number",
+          "player",
+          "referee",
+          "rim"
+        ],
+        "task": null,
+        "prompt_template": "Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - At most 10 players, 3 referees, 1 rim, and 1 ball per image. - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - \"player\" for any basketball player on the court - \"referee\" for game officials - \"ball\" for the basketball (only when NOT going through the rim) - \"rim\" for the basketball hoop rim - \"number\" for visible jersey numbers (tight box around the digits only)\n",
+        "sample": 0,
+        "box_threshold": 0.01,
+        "nms_iou_threshold": null,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": null,
+        "imgsz": null,
+        "tiles": [
+          2,
+          2
+        ],
+        "tile_overlap": 0.2
+      },
+      "delta_map5095": -0.0980978012084961
+    },
+    {
+      "arm": "gemini__nms_on_tiles__0.2",
+      "substrate": "mps",
+      "model": "gemini",
+      "element": "nms_on_tiles",
+      "baseline": "gemini__baseline",
+      "mAP_50_95": 0.23760709166526794,
+      "mAP_50": 0.44008582830429077,
+      "per_class_ap50": {
+        "player": 0.6908149123191833,
+        "ball": 0.4606495499610901,
+        "referee": 0.7157220840454102,
+        "rim": 0.03689560666680336,
+        "number": 0.2963469326496124
+      },
+      "config": {
+        "inferencer": "gemini",
+        "model_name": "gemini-3.1-pro-preview",
+        "classes": [
+          "ball",
+          "number",
+          "player",
+          "referee",
+          "rim"
+        ],
+        "task": null,
+        "prompt_template": "Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - At most 10 players, 3 referees, 1 rim, and 1 ball per image. - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - \"player\" for any basketball player on the court - \"referee\" for game officials - \"ball\" for the basketball (only when NOT going through the rim) - \"rim\" for the basketball hoop rim - \"number\" for visible jersey numbers (tight box around the digits only)\n",
+        "sample": 0,
+        "box_threshold": 0.01,
+        "nms_iou_threshold": 0.2,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": null,
+        "imgsz": null,
+        "tiles": [
+          2,
+          2
+        ],
+        "tile_overlap": 0.2
+      },
+      "delta_map5095": -0.02070602774620056
+    },
+    {
+      "arm": "gemini__nms_on_tiles__0.3",
+      "substrate": "mps",
+      "model": "gemini",
+      "element": "nms_on_tiles",
+      "baseline": "gemini__baseline",
+      "mAP_50_95": 0.23609301447868347,
+      "mAP_50": 0.44070079922676086,
+      "per_class_ap50": {
+        "player": 0.677906334400177,
+        "ball": 0.4606495499610901,
+        "referee": 0.7097969651222229,
+        "rim": 0.05393519252538681,
+        "number": 0.3012159764766693
+      },
+      "config": {
+        "inferencer": "gemini",
+        "model_name": "gemini-3.1-pro-preview",
+        "classes": [
+          "ball",
+          "number",
+          "player",
+          "referee",
+          "rim"
+        ],
+        "task": null,
+        "prompt_template": "Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - At most 10 players, 3 referees, 1 rim, and 1 ball per image. - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - \"player\" for any basketball player on the court - \"referee\" for game officials - \"ball\" for the basketball (only when NOT going through the rim) - \"rim\" for the basketball hoop rim - \"number\" for visible jersey numbers (tight box around the digits only)\n",
+        "sample": 0,
+        "box_threshold": 0.01,
+        "nms_iou_threshold": 0.3,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": null,
+        "imgsz": null,
+        "tiles": [
+          2,
+          2
+        ],
+        "tile_overlap": 0.2
+      },
+      "delta_map5095": -0.022220104932785034
+    },
+    {
+      "arm": "gemini__nms_on_tiles__0.4",
+      "substrate": "mps",
+      "model": "gemini",
+      "element": "nms_on_tiles",
+      "baseline": "gemini__baseline",
+      "mAP_50_95": 0.23496337234973907,
+      "mAP_50": 0.44566595554351807,
+      "per_class_ap50": {
+        "player": 0.6665442585945129,
+        "ball": 0.4606495499610901,
+        "referee": 0.6950048804283142,
+        "rim": 0.06758943200111389,
+        "number": 0.33854159712791443
+      },
+      "config": {
+        "inferencer": "gemini",
+        "model_name": "gemini-3.1-pro-preview",
+        "classes": [
+          "ball",
+          "number",
+          "player",
+          "referee",
+          "rim"
+        ],
+        "task": null,
+        "prompt_template": "Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - At most 10 players, 3 referees, 1 rim, and 1 ball per image. - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - \"player\" for any basketball player on the court - \"referee\" for game officials - \"ball\" for the basketball (only when NOT going through the rim) - \"rim\" for the basketball hoop rim - \"number\" for visible jersey numbers (tight box around the digits only)\n",
+        "sample": 0,
+        "box_threshold": 0.01,
+        "nms_iou_threshold": 0.4,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": null,
+        "imgsz": null,
+        "tiles": [
+          2,
+          2
+        ],
+        "tile_overlap": 0.2
+      },
+      "delta_map5095": -0.02334974706172943
+    },
+    {
+      "arm": "gemini__nms_on_tiles__0.5",
+      "substrate": "mps",
+      "model": "gemini",
+      "element": "nms_on_tiles",
+      "baseline": "gemini__baseline",
+      "mAP_50_95": 0.23154766857624054,
+      "mAP_50": 0.43666037917137146,
+      "per_class_ap50": {
+        "player": 0.6343255043029785,
+        "ball": 0.45856472849845886,
+        "referee": 0.6717853546142578,
+        "rim": 0.08050951361656189,
+        "number": 0.33811676502227783
+      },
+      "config": {
+        "inferencer": "gemini",
+        "model_name": "gemini-3.1-pro-preview",
+        "classes": [
+          "ball",
+          "number",
+          "player",
+          "referee",
+          "rim"
+        ],
+        "task": null,
+        "prompt_template": "Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - At most 10 players, 3 referees, 1 rim, and 1 ball per image. - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - \"player\" for any basketball player on the court - \"referee\" for game officials - \"ball\" for the basketball (only when NOT going through the rim) - \"rim\" for the basketball hoop rim - \"number\" for visible jersey numbers (tight box around the digits only)\n",
+        "sample": 0,
+        "box_threshold": 0.01,
+        "nms_iou_threshold": 0.5,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": null,
+        "imgsz": null,
+        "tiles": [
+          2,
+          2
+        ],
+        "tile_overlap": 0.2
+      },
+      "delta_map5095": -0.026765450835227966
+    },
+    {
+      "arm": "gemini__nms_on_tiles__0.6",
+      "substrate": "mps",
+      "model": "gemini",
+      "element": "nms_on_tiles",
+      "baseline": "gemini__baseline",
+      "mAP_50_95": 0.22398152947425842,
+      "mAP_50": 0.4128871262073517,
+      "per_class_ap50": {
+        "player": 0.5853738784790039,
+        "ball": 0.44029220938682556,
+        "referee": 0.658817708492279,
+        "rim": 0.07939153164625168,
+        "number": 0.3005603551864624
+      },
+      "config": {
+        "inferencer": "gemini",
+        "model_name": "gemini-3.1-pro-preview",
+        "classes": [
+          "ball",
+          "number",
+          "player",
+          "referee",
+          "rim"
+        ],
+        "task": null,
+        "prompt_template": "Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - At most 10 players, 3 referees, 1 rim, and 1 ball per image. - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - \"player\" for any basketball player on the court - \"referee\" for game officials - \"ball\" for the basketball (only when NOT going through the rim) - \"rim\" for the basketball hoop rim - \"number\" for visible jersey numbers (tight box around the digits only)\n",
+        "sample": 0,
+        "box_threshold": 0.01,
+        "nms_iou_threshold": 0.6,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": null,
+        "imgsz": null,
+        "tiles": [
+          2,
+          2
+        ],
+        "tile_overlap": 0.2
+      },
+      "delta_map5095": -0.03433158993721008
+    },
+    {
+      "arm": "gemini__nms_on_tiles__0.7",
+      "substrate": "mps",
+      "model": "gemini",
+      "element": "nms_on_tiles",
+      "baseline": "gemini__baseline",
+      "mAP_50_95": 0.21662676334381104,
+      "mAP_50": 0.38795533776283264,
+      "per_class_ap50": {
+        "player": 0.5412895679473877,
+        "ball": 0.4076339304447174,
+        "referee": 0.6354715824127197,
+        "rim": 0.08045520633459091,
+        "number": 0.2749263644218445
+      },
+      "config": {
+        "inferencer": "gemini",
+        "model_name": "gemini-3.1-pro-preview",
+        "classes": [
+          "ball",
+          "number",
+          "player",
+          "referee",
+          "rim"
+        ],
+        "task": null,
+        "prompt_template": "Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - At most 10 players, 3 referees, 1 rim, and 1 ball per image. - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - \"player\" for any basketball player on the court - \"referee\" for game officials - \"ball\" for the basketball (only when NOT going through the rim) - \"rim\" for the basketball hoop rim - \"number\" for visible jersey numbers (tight box around the digits only)\n",
+        "sample": 0,
+        "box_threshold": 0.01,
+        "nms_iou_threshold": 0.7,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": null,
+        "imgsz": null,
+        "tiles": [
+          2,
+          2
+        ],
+        "tile_overlap": 0.2
+      },
+      "delta_map5095": -0.04168635606765747
+    },
+    {
+      "arm": "gemini__nms_on_tiles__0.9",
+      "substrate": "mps",
+      "model": "gemini",
+      "element": "nms_on_tiles",
+      "baseline": "gemini__baseline",
+      "mAP_50_95": 0.17246033251285553,
+      "mAP_50": 0.2959460914134979,
+      "per_class_ap50": {
+        "player": 0.38053691387176514,
+        "ball": 0.33021748065948486,
+        "referee": 0.4422048330307007,
+        "rim": 0.0728696957230568,
+        "number": 0.25390154123306274
+      },
+      "config": {
+        "inferencer": "gemini",
+        "model_name": "gemini-3.1-pro-preview",
+        "classes": [
+          "ball",
+          "number",
+          "player",
+          "referee",
+          "rim"
+        ],
+        "task": null,
+        "prompt_template": "Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - At most 10 players, 3 referees, 1 rim, and 1 ball per image. - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - \"player\" for any basketball player on the court - \"referee\" for game officials - \"ball\" for the basketball (only when NOT going through the rim) - \"rim\" for the basketball hoop rim - \"number\" for visible jersey numbers (tight box around the digits only)\n",
+        "sample": 0,
+        "box_threshold": 0.01,
+        "nms_iou_threshold": 0.9,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": null,
+        "imgsz": null,
+        "tiles": [
+          2,
+          2
+        ],
+        "tile_overlap": 0.2
+      },
+      "delta_map5095": -0.08585278689861298
     }
   ]
 }

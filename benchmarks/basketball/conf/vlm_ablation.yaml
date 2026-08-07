@@ -84,6 +84,41 @@ models:
       imgsz: 640
       max_det: 300
 
+  # Gemini, added 2026-08-06. Excluded from every earlier search because it is a
+  # billed API whose prompt is a free-text instruction rather than a class
+  # vocabulary — which left it the ONLY row still running its July
+  # configuration after the 2026-08-04 ablation moved the other five by +0.067
+  # on test. It went from first place to third without anyone measuring it, so
+  # the comparison currently reports tuned-against-untuned and calls it a model
+  # ranking.
+  #
+  # Two things make this row different from the other five, and both are handled
+  # rather than ignored:
+  #
+  # 1. IT IS GENERATIVE. Two identical runs disagree. The 0.002 noise floor the
+  #    deterministic models used is a statement about the metric alone and does
+  #    not transfer, so the `noise_floor` element below re-runs the unchanged
+  #    baseline as a second independent draw and the observed spread becomes the
+  #    floor for every later decision here.
+  # 2. EVERY ARM COSTS MONEY. The raw-detection cache is what makes this
+  #    affordable: a new prompt, model or tiling is real API calls, and every
+  #    NMS / threshold / top-k sweep replayed over the result is free.
+  - name: gemini
+    config:
+      inferencer: gemini
+      model_name: gemini-3.1-pro-preview
+      classes: [ball, number, player, referee, rim]
+      box_threshold: 0.01
+      # Gemini applies no suppression of its own, exactly like Florence-2 — and
+      # 93% of its detections carry confidence exactly 1.0, so NMS has almost no
+      # ranking to exploit. Florence-2's lesson was that this makes NMS worth
+      # +0.0000 untiled and its single largest lever once tiling starts
+      # producing the same object in several crops. That is the hypothesis this
+      # row exists to test.
+      nms_iou_threshold: null
+      prompt_template: |
+        Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - At most 10 players, 3 referees, 1 rim, and 1 ball per image. - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - "player" for any basketball player on the court - "referee" for game officials - "ball" for the basketball (only when NOT going through the rim) - "rim" for the basketball hoop rim - "number" for visible jersey numbers (tight box around the digits only)
+
 # ---------------------------------------------------------------------------
 # Elements. One knob each; arms are generated as baseline-plus-one-change.
 # ---------------------------------------------------------------------------
@@ -440,3 +475,79 @@ elements:
       imgsz: 1280
       box_threshold: 0.001
     values: [0.6, 0.7, 0.8, 0.9]
+
+  # ROUND 0 -- the noise floor, measured rather than inherited.
+  #
+  # `sample` changes nothing about the configuration and everything about the
+  # cache key, so this is the identical baseline run a second time. For a
+  # deterministic model the delta would be exactly 0.0000; for Gemini it is the
+  # model's own run-to-run spread, and that spread is the smallest difference
+  # any later Gemini arm is allowed to claim as real.
+  #
+  # If it comes back larger than the effects being hunted, that is the finding
+  # and this exploration stops rather than sweeping arms the noise cannot
+  # separate.
+  - name: noise_floor
+    knob: sample
+    applies_to: [gemini]
+    values: [1, 2]
+
+  # ROUND 1a -- drop the per-image count caps.
+  #
+  # The published prompt caps output at "10 players, 3 referees, 1 rim, 1 ball
+  # per image". Current output is 17.7 detections/image against roughly 21
+  # ground-truth objects, so the caps may be binding on the full frame — and
+  # under tiling the instruction describes something the model is not looking
+  # at, since each call sees a crop. Exactly one line is removed; everything
+  # else about the prompt is byte-identical.
+  - name: prompt_no_caps
+    knob: prompt_template
+    applies_to: [gemini]
+    values:
+      - |
+        Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - "player" for any basketball player on the court - "referee" for game officials - "ball" for the basketball (only when NOT going through the rim) - "rim" for the basketball hoop rim - "number" for visible jersey numbers (tight box around the digits only)
+
+  # ROUND 1b -- model variants. Gemini's analogue of the checkpoint element.
+  #
+  # The published row pins a July `-preview` model. Two reasons to look:
+  # `gemini-pro-latest` tracks the current Pro release and removes the
+  # preview-pin reproducibility risk, and `gemini-robotics-er-2-preview` is from
+  # the Embodied Reasoning line — built for spatial grounding and object
+  # localisation rather than general multimodal chat, which on a detection
+  # benchmark is a substantially more relevant candidate than a general model.
+  # Nobody had considered it.
+  - name: model
+    knob: model_name
+    applies_to: [gemini]
+    values:
+      - gemini-pro-latest
+      - gemini-3.6-flash
+      - gemini-robotics-er-2-preview
+
+  # ROUND 2 -- 2x2 overlapping tiles plus the full frame.
+  #
+  # The biggest lever for every open-weights model that took it (+0.026 to
+  # +0.043), and the specific hypothesis for Gemini: like Florence-2 it applies
+  # no suppression and 93% of its detections carry confidence exactly 1.0, so
+  # NMS has nothing to rank until tiling starts producing the same object in
+  # several crops. The NMS sweep that follows replays over this cache for free.
+  - name: tiles
+    knob: tiles
+    applies_to: [gemini]
+    values:
+      - [2, 2]
+
+  # ROUND 3 -- NMS swept INSIDE the tiled regime. Free: replays the cache above.
+  #
+  # Gemini applies no suppression and 93% of its detections carry confidence
+  # exactly 1.0, so untiled there is nothing for NMS to rank — the same
+  # situation that made it worth exactly +0.0000 for Florence-2. Once tiling
+  # produces the same object in five overlapping crops there is something to
+  # suppress, and for Florence-2 that turned NMS from worthless into its single
+  # largest lever (+0.054). This is the test of whether that generalises.
+  - name: nms_on_tiles
+    knob: nms_iou_threshold
+    applies_to: [gemini]
+    fixed:
+      tiles: [2, 2]
+    values: [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.9]
