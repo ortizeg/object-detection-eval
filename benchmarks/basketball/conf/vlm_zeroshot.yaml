@@ -68,7 +68,16 @@ models:
       - "ball" for the basketball (only when NOT going through the rim)
       - "rim" for the basketball hoop rim
       - "number" for visible jersey numbers (tight box around the digits only)
-    expected_map5095: 0.265
+    # 0.250, not the 0.265 this line carried from Phase 5 until 2026-08-07.
+    # `results/vlm/gemini.json` -- the dump every published Gemini number is
+    # computed from, and which no later work re-ran -- scores 0.2497. The stale
+    # target sat 0.0153 away from it, inside the 0.02 tolerance, so the
+    # reproduction gate passed and nothing surfaced the drift. It also spent 77%
+    # of the tolerance budget before a run started, which would have masked a
+    # real regression and could have failed a legitimate re-run in the other
+    # direction. The published report was always correct: it renders from the
+    # dump, not from this value.
+    expected_map5095: 0.250
 
   # ABLATION (2026-08-04). 2x2 overlapping tiles plus the full frame, and NMS
   # re-tuned INSIDE that regime. val 0.2400 -> 0.2879.
