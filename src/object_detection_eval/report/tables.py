@@ -747,3 +747,222 @@ def _describe_change(key: str, value: Any) -> str:
     if key == "model_name":
         return f"{label} `{str(value).split('/')[-1]}`"
     return f"{label} {value}"
+
+
+# --------------------------------------------------------------------------- #
+# Fusion / ensembling
+# --------------------------------------------------------------------------- #
+
+#: Fusion operators in the order they compose, with what each one adds. The
+#: table reads as an attribution: every step keeps the previous step's inputs
+#: and changes exactly one thing, so the deltas are additive by construction
+#: rather than by hope. This project has been bitten by assuming otherwise.
+_FUSION_STEPS = (
+    ("nms", "Pool all six, suppress duplicates", "more candidate boxes"),
+    ("agree", "+ re-score by how many models agreed", "ranking"),
+    ("wbf", "+ average the agreeing boxes (WBF)", "localisation"),
+)
+
+_FUSION_METHOD_LABELS = {
+    "nms": "pooled + NMS",
+    "agree": "agreement re-scoring",
+    "wbf": "weighted box fusion",
+    "consensus": "consensus",
+}
+
+
+def _fusion_pick(
+    log: Any, *, models: int, method: str, normalize: bool, min_models: int | None = None
+) -> Any | None:
+    """The row for one configuration at the log's pre-committed IoU."""
+    for row in log.rows:
+        if (
+            row.n_models == models
+            and row.method == method
+            and row.normalize is normalize
+            and row.iou == log.default_iou
+            and row.min_models == min_models
+        ):
+            return row
+    return None
+
+
+def _fusion_best_single(log: Any) -> Any:
+    """The strongest individual model, as measured through the fusion plumbing.
+
+    Taken from the log rather than from the ablation's numbers so the comparison
+    is like-for-like; ``fuse_vlm.py --verify`` pins the two to be identical.
+    """
+    singles = [r for r in log.rows if r.n_models == 1]
+    return max(singles, key=lambda r: r.map_50_95)
+
+
+def fusion_headline_table(log: Any) -> str:
+    """Attribute the ensemble's gain to the mechanism that produced it.
+
+    "Ensembling helps" is not a finding — pooling six models' boxes raises
+    recall on its own, and that has nothing to do with fusion. Each row adds one
+    mechanism to the row above it, so the reader can see that pooling is worth
+    almost nothing and the fusion arithmetic is worth almost everything.
+    """
+    base = _fusion_best_single(log)
+    n = max(r.n_models for r in log.rows)
+
+    header = ["Configuration", "mAP@50:95", "Δ", "mAP@50", "Boxes/img", "Adds"]
+    rows: list[list[str]] = [
+        [
+            f"Best single model ({base.models[0]})",
+            _fmt3(base.map_50_95),
+            _EM_DASH,
+            _fmt3(base.map_50),
+            f"{base.boxes_per_image:.0f}",
+            _EM_DASH,
+        ]
+    ]
+    for method, label, adds in _FUSION_STEPS:
+        row = _fusion_pick(log, models=n, method=method, normalize=False)
+        if row is None:  # pragma: no cover - every step is swept
+            continue
+        delta = row.map_50_95 - base.map_50_95
+        best = method == _FUSION_STEPS[-1][0]
+        rows.append(
+            [
+                label,
+                f"**{_fmt3(row.map_50_95)}**" if best else _fmt3(row.map_50_95),
+                _fmt_delta(delta),
+                _fmt3(row.map_50),
+                f"{row.boxes_per_image:.0f}",
+                adds,
+            ]
+        )
+    return _table(header, rows)
+
+
+def fusion_label_quality_table(log: Any) -> str:
+    """Rank every configuration by the number auto-labeling actually cares about.
+
+    mAP integrates over the whole ranking, which rewards a speculative tail: a
+    wrong box at confidence 0.01 costs a detector almost nothing. A label set is
+    judged by how much of it a human has to undo, so the operating point is what
+    matters — how much recall survives once precision is held at 95%.
+
+    The two orderings disagree sharply, which is the point of showing both.
+    """
+    n = max(r.n_models for r in log.rows)
+    picks: list[tuple[str, Any]] = [
+        (r.models[0], r) for r in sorted(log.rows, key=lambda r: -r.map_50_95) if r.n_models == 1
+    ]
+    for method in ("nms", "agree", "wbf"):
+        row = _fusion_pick(log, models=n, method=method, normalize=False)
+        if row is not None:
+            picks.append((f"All {n} — {_FUSION_METHOD_LABELS[method]}", row))
+
+    header = ["Configuration", "mAP@50:95", "Boxes/img", "Best F1", "Recall @ 95% precision"]
+    rows: list[list[str]] = []
+    for label, row in picks:
+        at95 = row.recall_at_p95
+        cell = (
+            f"**{at95.recall:.3f}**"
+            if at95 and row.n_models > 1
+            else f"{at95.recall:.3f}"
+            if at95
+            else "never reaches 95%"
+        )
+        rows.append(
+            [
+                label,
+                _fmt3(row.map_50_95),
+                f"{row.boxes_per_image:.0f}",
+                _fmt3(row.best_f1.f1) if row.best_f1.f1 is not None else _EM_DASH,
+                cell,
+            ]
+        )
+    return _table(header, rows)
+
+
+def fusion_subset_table(log: Any) -> str:
+    """Best subset at each size — how much of the gain a smaller ensemble keeps.
+
+    Reported as exploration, not as a result. Picking the argmax over 57 subsets
+    on 96 val images is exactly the selection freedom the adoption rule refuses
+    to spend, so every row here is an inflated upper bound and the adopted
+    configuration remains the all-models one, which chose nothing.
+
+    Its value is the *shape*: whether the curve saturates early (a cheap
+    two-model ensemble would do) or keeps climbing (voters matter more than
+    winners). The per-class routing oracle saturates at two models; this does
+    not have to, and the difference is the whole argument for fusing rather than
+    routing.
+    """
+    by_size: dict[int, Any] = {}
+    for row in log.rows:
+        if row.method != "wbf" or row.normalize or row.iou != log.default_iou:
+            continue
+        if row.n_models not in by_size or row.map_50_95 > by_size[row.n_models].map_50_95:
+            by_size[row.n_models] = row
+
+    singles = [r for r in log.rows if r.n_models == 1]
+    if singles:
+        by_size[1] = max(singles, key=lambda r: r.map_50_95)
+
+    best_overall = max(by_size.values(), key=lambda r: r.map_50_95) if by_size else None
+
+    header = ["Models", "Best subset at this size", "mAP@50:95", "Recall @ 95% precision"]
+    rows: list[list[str]] = []
+    for size in sorted(by_size):
+        row = by_size[size]
+        at95 = row.recall_at_p95
+        value = _fmt3(row.map_50_95)
+        rows.append(
+            [
+                str(size),
+                ", ".join(row.models),
+                f"**{value}**" if row is best_overall else value,
+                f"{at95.recall:.3f}" if at95 else "never reaches 95%",
+            ]
+        )
+    return _table(header, rows)
+
+
+def fusion_test_table(log: Any) -> str:
+    """The single test-split scoring of the pre-committed ensemble.
+
+    Separate renderer from :func:`fusion_headline_table` because it answers a
+    different question. The headline attributes a val gain to a mechanism across
+    several operators; this reports one configuration, scored once, against the
+    six rows the rest of the report publishes — so the comparison a reader will
+    make anyway is made for them, on the split those rows live on.
+
+    The per-model rows are not decoration: they come from the same dumps
+    ``vlm_summary_table`` renders, through the same scorer, so a divergence
+    between the two tables would mean the fusion plumbing altered detections on
+    its way past.
+    """
+    singles = [r for r in log.rows if r.n_models == 1]
+    ensemble = max(log.rows, key=lambda r: r.n_models)
+    best = max(singles, key=lambda r: r.map_50_95) if singles else None
+
+    header = ["Model", "mAP@50:95", "Boxes/img", "Recall @ 95% precision"]
+    rows: list[list[str]] = []
+    for row in sorted(singles, key=lambda r: -r.map_50_95):
+        at95 = row.recall_at_p95
+        rows.append(
+            [
+                row.models[0],
+                _fmt3(row.map_50_95),
+                f"{row.boxes_per_image:.0f}",
+                f"{at95.recall:.3f}" if at95 else "never reaches 95%",
+            ]
+        )
+
+    at95 = ensemble.recall_at_p95
+    delta = f" ({_fmt_delta(ensemble.map_50_95 - best.map_50_95)})" if best else ""
+    rows.append(
+        [
+            f"**All {ensemble.n_models} fused**",
+            f"**{_fmt3(ensemble.map_50_95)}**{delta}",
+            f"{ensemble.boxes_per_image:.0f}",
+            f"**{at95.recall:.3f}**" if at95 else "never reaches 95%",
+        ]
+    )
+    return _table(header, rows)

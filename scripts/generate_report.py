@@ -44,6 +44,10 @@ from object_detection_eval.report import (
     clip_structure_note,
     cpu_latency_section,
     dataset_split_table,
+    fusion_headline_table,
+    fusion_label_quality_table,
+    fusion_subset_table,
+    fusion_test_table,
     image_geometry_note,
     inject_table,
     latency_section,
@@ -52,6 +56,8 @@ from object_detection_eval.report import (
     load_bootstrap_report,
     load_cpu_latency_results,
     load_dataset_stats,
+    load_fusion_log,
+    load_fusion_test_log,
     load_latency_results,
     load_vlm_metrics,
     load_zeroshot_config,
@@ -187,6 +193,8 @@ def build_registry(
     vlm_metrics_path = results_dir / "vlm" / "vlm_metrics_merged5.json"
     dataset_stats_path = results_dir / "dataset" / "dataset_stats.json"
     ablation_path = results_dir / "vlm" / "ablation" / "valid_arms.json"
+    fusion_path = results_dir / "vlm" / "fusion" / "valid_fusion.json"
+    fusion_test_path = results_dir / "vlm" / "fusion" / "test_fusion.json"
     zeroshot_conf = conf_dir / "vlm_zeroshot.yaml"
 
     # Load the precomputed VLM metrics once per render and share them across the
@@ -259,6 +267,25 @@ def build_registry(
                     load_ablation_log(ablation_path),
                     load_zeroshot_config(zeroshot_conf),
                 ),
+            ),
+            # Both fusion slots read one log. Kept as separate slots because
+            # they answer different questions of it -- the headline attributes
+            # the mAP gain to a mechanism, the label-quality table reports the
+            # operating point, and the two orderings disagree.
+            Slot(
+                "vlm_fusion_headline",
+                lambda: fusion_headline_table(load_fusion_log(fusion_path)),
+            ),
+            Slot(
+                "vlm_fusion_label_quality",
+                lambda: fusion_label_quality_table(load_fusion_log(fusion_path)),
+            ),
+            Slot("vlm_fusion_subsets", lambda: fusion_subset_table(load_fusion_log(fusion_path))),
+            # The one test-split scoring. load_fusion_log refuses split="test"
+            # for the sweep, so this reads the file the --final mode writes.
+            Slot(
+                "vlm_fusion_test",
+                lambda: fusion_test_table(load_fusion_test_log(fusion_test_path)),
             ),
         ],
     )

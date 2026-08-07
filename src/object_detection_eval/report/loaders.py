@@ -480,6 +480,120 @@ def load_ablation_log(path: Path | str) -> AblationLog:
 
 
 # --------------------------------------------------------------------------- #
+# The fusion / ensembling sweep: results/vlm/fusion/{split}_fusion.json
+# --------------------------------------------------------------------------- #
+
+
+class FusionOperatingPoint(BaseModel):
+    """Precision/recall at one confidence threshold."""
+
+    model_config = _STRICT
+
+    threshold: float
+    precision: float
+    recall: float
+    f1: float | None = None
+
+
+class FusionRow(BaseModel):
+    """One fused configuration: which models, which operator, what it scored."""
+
+    model_config = _STRICT
+
+    models: list[str]
+    n_models: int
+    method: str
+    iou: float
+    #: Whether confidences were replaced by within-class percentile rank before
+    #: fusing. Kept as a reported dimension rather than a fixed choice because
+    #: the measured answer contradicted the hypothesis that motivated it.
+    normalize: bool
+    min_models: int | None
+    map_50_95: float = Field(alias="mAP_50_95")
+    map_50: float = Field(alias="mAP_50")
+    per_class_ap50: dict[str, float]
+    #: Detections per image. The number that separates "scores well" from
+    #: "usable as labels" — mAP is indifferent to a thousand-box tail and a
+    #: human reviewing the output is not.
+    boxes_per_image: float
+    best_f1: FusionOperatingPoint
+    recall_at_p90: FusionOperatingPoint | None
+    recall_at_p95: FusionOperatingPoint | None
+
+
+class FusionLog(BaseModel):
+    """The accumulated fusion sweep for one split."""
+
+    model_config = _STRICT
+
+    split: str
+    default_iou: float
+    adopted_arms: dict[str, str]
+    rows: list[FusionRow]
+
+
+def load_fusion_log(path: Path | str) -> FusionLog:
+    """Load the committed VLM fusion sweep.
+
+    Raises:
+        ReportLoadError: on a schema mismatch, or if the log records ``test``.
+            Fusion configurations are searched over 57 model subsets and several
+            operators; a sweep of that width scored on the published split would
+            make the reported number a maximum over the search rather than a
+            measurement, which is the failure both prior ablations were built to
+            prevent.
+    """
+    try:
+        log = FusionLog.model_validate(_read_json(path))
+    except ValidationError as exc:
+        raise ReportLoadError(f"{path}: {exc}") from exc
+    if log.split == "test":
+        msg = (
+            f"{path}: fusion log records split='test'. The sweep covers dozens "
+            f"of subsets and operators; run on test it would report its own "
+            f"argmax, not a result."
+        )
+        raise ReportLoadError(msg)
+    return log
+
+
+def load_fusion_test_log(path: Path | str) -> FusionLog:
+    """Load the ONE test-split scoring of the pre-committed ensemble.
+
+    The mirror image of :func:`load_fusion_log`'s guard, and deliberately a
+    separate function rather than a flag. The sweep must never be on test; this
+    file must never be anything else, and it must contain exactly one fused
+    configuration. A test log holding several ensembles would mean the split had
+    been scored against more than one candidate, which is the definition of
+    turning it into a second validation split — so that fails at load rather
+    than rendering a table whose best row a reader would reasonably assume was
+    chosen honestly.
+
+    Raises:
+        ReportLoadError: schema mismatch, a split other than ``test``, or more
+            than one multi-model row.
+    """
+    try:
+        log = FusionLog.model_validate(_read_json(path))
+    except ValidationError as exc:
+        raise ReportLoadError(f"{path}: {exc}") from exc
+
+    if log.split != "test":
+        msg = f"{path}: expected split='test' for the final scoring, got {log.split!r}."
+        raise ReportLoadError(msg)
+
+    ensembles = [row for row in log.rows if row.n_models > 1]
+    if len(ensembles) != 1:
+        msg = (
+            f"{path}: holds {len(ensembles)} fused configurations; the test split is "
+            f"scored once, for one configuration fixed on val. More than one means "
+            f"the published number is a maximum over candidates."
+        )
+        raise ReportLoadError(msg)
+    return log
+
+
+# --------------------------------------------------------------------------- #
 # The published zero-shot configuration: conf/vlm_zeroshot.yaml
 # --------------------------------------------------------------------------- #
 
