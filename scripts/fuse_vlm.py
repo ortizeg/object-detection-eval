@@ -14,9 +14,20 @@ it replays the same raw-detection cache ``scripts/ablate_vlm.py`` built. No GPU,
 no API calls: each model's adopted config is replayed to its published detection
 set once, and every subset/method/threshold combination is fused from that.
 
-TEST-SPLIT DISCIPLINE. Exploration is val-only, as in both prior ablations. The
-CLI refuses ``--split test`` outright rather than trusting the caller, mirroring
-``ablate_vlm.py`` and ``search_vlm_prompts.py``.
+TEST-SPLIT DISCIPLINE. The *sweep* is val-only, as in both prior ablations, and
+``--split test`` is refused outright for it. The single pre-committed
+configuration is scored on test through ``--final``, which takes no
+configuration arguments at all: the models, operator and IoU are module
+constants, so the mode structurally cannot be turned into a search. It also
+refuses to overwrite an existing test result without ``--force``, because
+scoring test twice against two different configurations is what makes it a
+second validation split.
+
+WHY THE TEST RUN NEEDS NO GPU. ``results/vlm/{model}.json`` already holds every
+detection each model published on the test split, written by
+``run_vlm_benchmark.py``. Fusion is downstream of the forward pass, so the
+ensemble's test number is computable from committed files -- no rented box, no
+billed API calls, and reproducible by a reader with no key.
 
 CACHE KEY DRIFT. PR #19 appended ``prompt``/``sample`` parts to the forward-pass
 signature so Gemini's arms could differ by prompt. That silently re-keyed every
@@ -83,6 +94,20 @@ _PRECISION_TARGETS = (0.90, 0.95)
 #: model's already-published number. Non-zero only because supervision's metric
 #: is float32 internally.
 _VERIFY_TOLERANCE = 1e-6
+
+#: The ONE configuration scored on test, fixed here rather than taken from the
+#: CLI. ``--final`` accepts no configuration arguments, so the mode cannot be
+#: swept -- which is the whole reason the test split stays a single unbiased
+#: measurement rather than the maximum over the 57 subsets the val sweep tried.
+#: All six models, no subset chosen; raw confidences, because rank normalisation
+#: lost on val; the WBF paper's default IoU, never tuned.
+_FINAL_METHOD = "wbf"
+_FINAL_NORMALIZE = False
+
+#: Per-model published detections on the test split, written by
+#: run_vlm_benchmark.py. Already thresholded, suppressed, remapped and filtered
+#: -- exactly what each row of the comparison table reports.
+_TEST_DUMP_DIR = Path("benchmarks/basketball/results/vlm")
 
 
 # ---------------------------------------------------------------------------
@@ -217,6 +242,45 @@ def _sv_to_normalised(det: sv.Detections, width: int, height: int) -> list[Detec
     ]
 
 
+def load_test_dumps(
+    dump_dir: Path, models: list[str], dims: dict[str, tuple[int, int]]
+) -> dict[str, dict[str, list[Detection]]]:
+    """Each model's published test-split detections, normalised for fusion.
+
+    These files are written by ``run_vlm_benchmark.py`` and are already through
+    the full publish path, so no replay applies -- unlike val, where the cache
+    is a pre-NMS dump the harness re-derives the published set from. Boxes are
+    pixel xyxy in the eval label space and are converted to the normalised xywh
+    the fusion operators work in.
+    """
+    out: dict[str, dict[str, list[Detection]]] = {}
+    for model in models:
+        path = dump_dir / f"{model}.json"
+        if not path.exists():
+            logger.warning(f"{model}: no test dump at {path} -- excluded")
+            continue
+        with open(path) as f:
+            blob = json.load(f)
+        per_image: dict[str, list[Detection]] = {}
+        for filename, dets in blob.items():
+            width, height = dims[filename]
+            per_image[filename] = [
+                Detection(
+                    bbox=BoundingBox(
+                        x=d["bbox_xyxy"][0] / width,
+                        y=d["bbox_xyxy"][1] / height,
+                        w=(d["bbox_xyxy"][2] - d["bbox_xyxy"][0]) / width,
+                        h=(d["bbox_xyxy"][3] - d["bbox_xyxy"][1]) / height,
+                    ),
+                    confidence=float(d["confidence"]),
+                    class_id=int(d["class_id"]),
+                )
+                for d in dets
+            ]
+        out[model] = per_image
+    return out
+
+
 # ---------------------------------------------------------------------------
 # Scoring
 # ---------------------------------------------------------------------------
@@ -340,14 +404,30 @@ def main() -> int:
         action="store_true",
         help="Check a single-model pass-through reproduces its published val mAP.",
     )
+    parser.add_argument(
+        "--final",
+        action="store_true",
+        help=(
+            "Score the ONE pre-committed configuration on test. Takes no "
+            "configuration arguments; see _FINAL_METHOD."
+        ),
+    )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Allow --final to overwrite an existing test result.",
+    )
     args = parser.parse_args()
 
-    if args.split == "test":
+    if args.split == "test" and not args.final:
         logger.error(
-            "fuse_vlm.py refuses --split test. Fusion configurations are chosen on "
-            "valid; the test split is scored once, by run_vlm_benchmark.py, for a "
-            "configuration already fixed."
+            "fuse_vlm.py refuses --split test for the sweep. 57 subsets x 4 operators "
+            "scored on the published split would report their own argmax. The single "
+            "pre-committed configuration is scored with --final."
         )
+        return 2
+    if args.final and args.split != "test":
+        logger.error("--final scores the test split; pass --split test explicitly.")
         return 2
 
     split_dir = args.data_root / args.split
@@ -365,12 +445,15 @@ def main() -> int:
         dims[filename] = (loader.width, loader.height)
 
     published: dict[str, dict[str, list[Detection]]] = {}
-    for model, arm in sorted(arms.items()):
-        blob = resolve_cache(args.cache_dir, args.split, model, arm["config"])
-        if blob is None:
-            logger.warning(f"{model}: no cache -- excluded from fusion")
-            continue
-        published[model] = published_detections(model, arm, blob, dims, name_to_id)
+    if args.final:
+        published = load_test_dumps(_TEST_DUMP_DIR, sorted(arms), dims)
+    else:
+        for model, arm in sorted(arms.items()):
+            blob = resolve_cache(args.cache_dir, args.split, model, arm["config"])
+            if blob is None:
+                logger.warning(f"{model}: no cache -- excluded from fusion")
+                continue
+            published[model] = published_detections(model, arm, blob, dims, name_to_id)
 
     if len(published) < 2:
         logger.error(f"only {len(published)} model(s) resolved; fusion needs at least 2")
@@ -380,6 +463,9 @@ def main() -> int:
 
     if args.verify:
         return _verify(published, arms, dims, gt_map, id_to_name)
+
+    if args.final:
+        return _final(published, dims, gt_map, id_to_name, out=args.out, force=args.force)
 
     rows: list[dict[str, Any]] = []
 
@@ -447,6 +533,88 @@ def main() -> int:
             indent=2,
         )
     logger.info(f"wrote {len(rows)} rows -> {args.out}")
+    return 0
+
+
+def _final(
+    published: dict[str, dict[str, list[Detection]]],
+    dims: dict[str, tuple[int, int]],
+    gt_map: dict[str, sv.Detections],
+    id_to_name: dict[int, str],
+    *,
+    out: Path,
+    force: bool,
+) -> int:
+    """Score the one pre-committed configuration on test, once.
+
+    Emits each model alone alongside the ensemble, so the published delta is
+    computed from numbers in the same file rather than quoted across artifacts.
+    The single-model rows double as a check: they must reproduce
+    ``vlm_metrics_merged5.json``, since both are the same detections through the
+    same scorer.
+    """
+    if out.exists() and not force:
+        logger.error(
+            f"{out} already exists. The test split is scored ONCE for a configuration "
+            f"fixed on val; re-running it against a changed configuration turns test "
+            f"into a second search split. Pass --force only to re-score the SAME "
+            f"configuration after a scorer change."
+        )
+        return 2
+
+    models = tuple(sorted(published))
+    rows: list[dict[str, Any]] = [
+        run_combo(
+            (model,),
+            published,
+            method="nms",
+            iou=1.0,
+            normalize=False,
+            min_models=1,
+            dims=dims,
+            gt_map=gt_map,
+            id_to_name=id_to_name,
+        )
+        for model in models
+    ]
+    for row in rows:
+        logger.info(f"  {row['models'][0]:16s} {row['mAP_50_95']:.4f}")
+
+    ensemble = run_combo(
+        models,
+        published,
+        method=_FINAL_METHOD,
+        iou=DEFAULT_FUSION_IOU,
+        normalize=_FINAL_NORMALIZE,
+        min_models=1,
+        dims=dims,
+        gt_map=gt_map,
+        id_to_name=id_to_name,
+    )
+    rows.append(ensemble)
+
+    best = max(r["mAP_50_95"] for r in rows[:-1])
+    logger.info(
+        f"  ENSEMBLE ({_FINAL_METHOD}, iou={DEFAULT_FUSION_IOU}, {len(models)} models) "
+        f"{ensemble['mAP_50_95']:.4f}  delta vs best single {ensemble['mAP_50_95'] - best:+.4f}"
+    )
+    at95 = ensemble.get("recall_at_p95")
+    if at95:
+        logger.info(f"  recall @ 95% precision: {at95['recall']:.3f}")
+
+    out.parent.mkdir(parents=True, exist_ok=True)
+    with open(out, "w") as f:
+        json.dump(
+            {
+                "split": "test",
+                "default_iou": DEFAULT_FUSION_IOU,
+                "adopted_arms": dict.fromkeys(models, "published test dump"),
+                "rows": rows,
+            },
+            f,
+            indent=2,
+        )
+    logger.info(f"wrote {len(rows)} rows -> {out}")
     return 0
 
 
