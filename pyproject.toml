@@ -75,6 +75,10 @@ llmdet = [
     "torch",
     "torchvision",
     "transformers>=4.55.0,<4.58.0",
+    # Required explicitly here: `vlm`'s rows get this transitively via `peft`,
+    # but this extra doesn't pull peft. `from_pretrained(..., device_map="auto")`
+    # (llmdet.py, ported verbatim from grounding_dino.py) raises without it.
+    "accelerate",
 ]
 # TensorRT latency benchmarking. Linux-64 + NVIDIA only.
 # Versions pinned to the 06-RESEARCH.md-verified releases (2026-07-28). CRUCIALLY

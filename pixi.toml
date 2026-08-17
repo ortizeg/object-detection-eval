@@ -90,6 +90,10 @@ torchvision = "*"
 
 [feature.llmdet.pypi-dependencies]
 transformers = ">=4.55.0, <4.58.0"
+# Required explicitly: `vlm`'s rows get this transitively via `peft`, but this
+# extra doesn't pull peft. `from_pretrained(..., device_map="auto")` raises
+# without it.
+accelerate = "*"
 
 # Cross-platform ONNX graph-surgery tooling (LAT-03). onnx + onnx-graphsurgeon
 # both ship osx-arm64 AND linux-64 wheels (onnx-graphsurgeon is a pure-Python
