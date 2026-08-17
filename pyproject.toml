@@ -56,6 +56,19 @@ vlm = [
     # at runtime and mutates the environment. MIT.
     "clip-anytorch",
 ]
+# Qwen3-VL-8B zero-shot inferencer. SEPARATE from [vlm], not merged into it:
+# Qwen3-VL requires transformers>=4.57.0, while [vlm]'s pin (<4.52.0, see its
+# comment) is load-bearing for the six already-published zero-shot rows —
+# `pip install -e .[vlm,vlm-qwen3vl]` together is expected to fail to resolve,
+# which correctly reflects that the two pins are mutually exclusive rather
+# than papering over it. Mirrors pixi.toml's `qwen3vl` feature /
+# `vlm-qwen3vl` environment.
+vlm-qwen3vl = [
+    "torch",
+    "torchvision",
+    "transformers>=4.57.0,<5",
+]
+
 # TensorRT latency benchmarking. Linux-64 + NVIDIA only.
 # Versions pinned to the 06-RESEARCH.md-verified releases (2026-07-28). CRUCIALLY
 # onnx-graphsurgeon>=0.6.1: 0.5.8 calls the removed onnx.helper.float32_to_bfloat16

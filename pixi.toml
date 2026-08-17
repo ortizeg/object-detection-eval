@@ -74,6 +74,21 @@ ultralytics = ">=8.3, <9"
 # PyPI packaging (MIT) here keeps the env solved and locked.
 clip-anytorch = "*"
 
+# Qwen3-VL-8B zero-shot inferencer. A SEPARATE feature from [feature.vlm],
+# not an addition to it: Qwen3-VL requires transformers>=4.57.0, and
+# [feature.vlm]'s pin (`<4.52.0`, see its comment) is explicitly load-bearing
+# for the six already-published zero-shot rows — bumping it would mean
+# re-validating their whole reproduction gate on GPU to add one new row. The
+# two pins cannot coexist in one pixi environment, so this is a second,
+# fully-isolated one: `pixi run -e vlm ...` never sees transformers>=4.57, and
+# `pixi run -e vlm-qwen3vl ...` never sees the <4.52 pin.
+[feature.qwen3vl.dependencies]
+pytorch = "*"
+torchvision = "*"
+
+[feature.qwen3vl.pypi-dependencies]
+transformers = ">=4.57.0,<5"
+
 # Cross-platform ONNX graph-surgery tooling (LAT-03). onnx + onnx-graphsurgeon
 # both ship osx-arm64 AND linux-64 wheels (onnx-graphsurgeon is a pure-Python
 # universal wheel), so the EfficientNMS_TRT graft script develops and CPU-unit-
@@ -110,6 +125,12 @@ onnx-graphsurgeon = ">=0.6.1"
 #
 # then `pixi install -e vlm-cuda`. Verify with torch.cuda.is_available() before
 # trusting any timing or believing a run used the GPU.
+#
+# `vlmcuda` composes with `qwen3vl` exactly the same way — it only pins
+# `pytorch-gpu` and has no opinion on the transformers version, so the same
+# feature covers both zero-shot environments' GPU needs:
+#
+#   vlm-qwen3vl-cuda = ["dev", "qwen3vl", "vlmcuda"]
 [feature.vlmcuda]
 platforms = ["linux-64"]
 
@@ -183,6 +204,10 @@ onnx-graphsurgeon = ">=0.6.1"
 [environments]
 default = ["dev"]
 vlm = ["dev", "vlm"]
+# Qwen3-VL-8B only — isolated from `vlm` because it needs a newer transformers
+# than the other six zero-shot rows are pinned to. See [feature.qwen3vl]'s
+# comment above.
+vlm-qwen3vl = ["dev", "qwen3vl"]
 # Cross-platform: core (CPU onnxruntime) + dev + the graph-surgery tooling.
 # This is the env the LAT-03 graft script + its graphsurgeon-marked test use on
 # THIS macOS machine (no GPU needed for offline graph surgery).
