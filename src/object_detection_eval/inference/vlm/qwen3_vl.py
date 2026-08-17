@@ -137,9 +137,14 @@ class Qwen3VLInferencer(BaseInferencer):
 
         logger.info(f"Loading Qwen3-VL model {model_name} on {self._device}")
         self._processor = AutoProcessor.from_pretrained(model_name)
+        # dtype="auto", not torch.float32 like the smaller HF inferencers here
+        # (Grounding DINO ~172M params, Florence-2 ~830M): forcing fp32 on an
+        # 8B model doubles memory for no accuracy benefit this repo needs, and
+        # is not what Qwen3-VL's own model card recommends. "auto" loads the
+        # checkpoint's native storage dtype (bf16).
         self._model = Qwen3VLForConditionalGeneration.from_pretrained(
             model_name,
-            dtype=torch.float32,
+            dtype="auto",
             device_map="auto",
         )
 

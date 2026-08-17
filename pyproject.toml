@@ -67,6 +67,7 @@ vlm-qwen3vl = [
     "torch",
     "torchvision",
     "transformers>=4.57.0,<5",
+    "accelerate",  # required for from_pretrained(device_map=...)
 ]
 
 # TensorRT latency benchmarking. Linux-64 + NVIDIA only.

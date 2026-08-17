@@ -88,6 +88,9 @@ torchvision = "*"
 
 [feature.qwen3vl.pypi-dependencies]
 transformers = ">=4.57.0,<5"
+# Required for Qwen3VLForConditionalGeneration.from_pretrained(device_map=...)
+# -- transformers raises ValueError without it.
+accelerate = "*"
 
 # Cross-platform ONNX graph-surgery tooling (LAT-03). onnx + onnx-graphsurgeon
 # both ship osx-arm64 AND linux-64 wheels (onnx-graphsurgeon is a pure-Python
