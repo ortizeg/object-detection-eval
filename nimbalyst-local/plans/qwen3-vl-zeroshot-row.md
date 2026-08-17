@@ -132,18 +132,19 @@ negative result exactly like SmolVLM2's removal note at the bottom of
 ## Phases
 
 ### Phase 0 — Dependency/environment scaffolding
-- [ ] Add `[feature.qwen3vl]` to `pixi.toml` (torch, torchvision,
-      `transformers>=4.57.0,<5`), with a comment explaining the isolation
-      from `feature.vlm`.
-- [ ] Add `vlm-qwen3vl = ["dev", "qwen3vl"]` to `[environments]`, plus the
+- [x] Add `[feature.qwen3vl]` to `pixi.toml` (torch, torchvision,
+      `transformers>=4.57.0,<5`, `accelerate` — needed for
+      `device_map=...`, discovered while running the decision gate), with a
+      comment explaining the isolation from `feature.vlm`.
+- [x] Add `vlm-qwen3vl = ["dev", "qwen3vl"]` to `[environments]`, plus the
       GPU-host `vlm-qwen3vl-cuda` note mirroring `vlm-cuda`'s.
-- [ ] Add matching `vlm-qwen3vl` optional-dependencies group to
+- [x] Add matching `vlm-qwen3vl` optional-dependencies group to
       `pyproject.toml`, same comment.
-- [ ] `pixi install -e vlm-qwen3vl` locally (CPU/MPS) to confirm the lock
+- [x] `pixi install -e vlm-qwen3vl` locally (CPU/MPS) to confirm the lock
       solves before anything else depends on it.
 
 ### Phase 1 — Inferencer module + offline tests
-- [ ] `src/object_detection_eval/inference/vlm/qwen3_vl.py`:
+- [x] `src/object_detection_eval/inference/vlm/qwen3_vl.py`:
       `Qwen3VLInferencer(BaseInferencer)`. Constructor: `model_name`,
       `classes`, device resolution (mirror `grounding_dino.py`'s
       cuda/mps/cpu auto pattern). `predict()`: mechanical prompt from
@@ -151,49 +152,67 @@ negative result exactly like SmolVLM2's removal note at the bottom of
       parse, `bbox_2d` (0-1000 xyxy) → normalized xywh `Detection`,
       Gemini-style label resolution, constant confidence 1.0, empty list
       + loguru warning on parse failure (never raise out of `predict()`,
-      matching every existing row's failure posture).
-- [ ] Factor the pure JSON-parsing / label-resolution logic so it's
-      reachable by a torch-gated unit test even if it can't be made fully
-      torch-free (that's fine — `filters.py`'s torch-free split is the
-      ideal, not a hard requirement here since the parsing lives naturally
-      on the class holding `classes`/`_name_to_id`).
-- [ ] `tests/inference/vlm/test_qwen3_vl.py` mirroring `test_gemini.py`:
-      `importorskip` before SUT import, mocked processor/model, fenced and
-      unfenced JSON parsing, label resolution (exact + substring +
-      unmapped), malformed/empty response → `[]`, 0-1000 xyxy → normalized
-      xywh conversion correctness.
-- [ ] `pixi run -e vlm-qwen3vl pytest -m vlm --no-cov -q -k qwen3_vl` green.
+      matching every existing row's failure posture). `dtype="auto"`, not
+      `torch.float32` like the smaller inferencers — an 8B model doesn't
+      want fp32.
+- [x] Factored the JSON-parsing helpers (`strip_json_fence`,
+      `parse_detection_json`) as module-level pure functions — fully
+      torch-free, though the test file itself still needs
+      `importorskip("transformers", minversion="4.57.0")` since it imports
+      the SUT module.
+- [x] `tests/inference/vlm/test_qwen3_vl.py` mirroring `test_gemini.py` /
+      `test_grounding_dino.py`: 20 tests covering fenced/unfenced JSON,
+      label resolution, malformed/empty response, coordinate conversion.
+      Version-gated import so collecting this file under the OLD `vlm` env
+      (transformers 4.51.x) skips cleanly instead of breaking that env's
+      whole `-m vlm` suite.
+- [x] `pixi run -e vlm-qwen3vl pytest -m vlm --no-cov -q -k qwen3_vl` — 20
+      passed.
 
 ### Phase 2 — Registration + decision gate
-- [ ] `_qwen3_vl_factory` in `scripts/run_vlm_benchmark.py`, added to
-      `_INFERENCER_FACTORIES`.
-- [ ] Manifest row in `vlm_zeroshot.yaml`: `expected_map5095: null`
-      (VLM-02 informational-only mode), placeholder `classes`, comment
-      covering the hybrid shape, the transformers isolation, the license,
-      and (once known) the search winner + tiling decision.
-- [ ] Add `qwen3_vl` to `vlm_prompt_search.yaml`'s `models:` list.
-- [ ] Add `"qwen3_vl"` to `_EXPECTED_NAMES` in
-      `tests/scripts/test_run_vlm_benchmark.py`, and to `_UNTARGETED`
-      (its `expected_map5095` is null).
-- [ ] **Decision gate.** Locally (CPU/MPS, `vlm-qwen3vl` env), run
-      `Qwen3VLInferencer` over ~10 val images with a plain canonical prompt
-      and eyeball the boxes against the images. Boxes must land on
-      players/ball/referee/rim/numbers, not be scattered — a real
-      pass/fail check, not a formality.
-  - **If it fails**: stop. Write up the negative result (what was tried,
-    what came back, why it doesn't clear the bar) in this plan's Outcome
-    section and in a `vlm_zeroshot.yaml` removal-style note per the
-    SmolVLM2 precedent. Do not rent a GPU. Do not add a manifest row with
-    a fabricated number.
-  - **If it passes**: continue to Phase 3.
+- [x] `_qwen3_vl_factory` in `scripts/run_vlm_benchmark.py`, added to
+      `_INFERENCER_FACTORIES`. Also added the matching branch in
+      `search_vlm_prompts.py`'s `_build_inferencer`.
+- [x] Manifest row in `vlm_zeroshot.yaml`: `expected_map5095: null`
+      (VLM-02 informational-only mode), placeholder `classes` (bare
+      canonical names), comment covering the hybrid shape, the
+      transformers isolation, and the license. Winner + tiling decision to
+      be added after Phase 3.
+- [x] Added `qwen3_vl` to `vlm_prompt_search.yaml`'s `models:` list.
+- [x] Added `"qwen3_vl"` to `_EXPECTED_NAMES` in
+      `tests/scripts/test_run_vlm_benchmark.py`, and to `_UNTARGETED`.
+      (Noted, not fixed — out of scope: two OTHER tests in this file were
+      already failing before this work, from stale hardcoded targets for
+      the six existing rows; confirmed via `git stash`.)
+- [ ] **Decision gate — NOT YET RESOLVED.** Attempted `Qwen3VLInferencer`
+      locally (Apple Silicon MPS) over val images with the plain canonical
+      prompt three times. Every attempt either errored (missing
+      `accelerate`, fixed) or had its background process killed across
+      turn/session boundaries before producing output (an environment
+      quirk in this local harness, not a model problem — confirmed the
+      Python process was alive and burning real CPU/IO each time, just
+      never survived to completion). No annotated image or detection
+      output was ever actually produced locally — `/tmp/qwen3vl_sanity_out`
+      is empty. Moving the actual gate check to Phase 3 on the rented GPU
+      box, where a single foreground SSH command can run it to completion
+      without the turn-boundary kill issue. Do NOT treat this as passed
+      until that run actually produces and confirms spatially plausible
+      boxes.
 
 ### Phase 3 — GPU rental + val-split search
-- [ ] Read `docs/provenance/training-runs.md` and
+- [x] Read `docs/provenance/training-runs.md` and
       `.planning/phases/05-zero-shot-vlm/05-03-PLAN.md` (lines ~16-28,
       110-123) for the exact prior vast.ai SSH pattern before renting.
-- [ ] Rent one vast.ai instance, RTX 4090/A4000-class, 24GB+ VRAM floor.
+- [x] Rented a vast.ai RTX 4090 (24GB), contract 47959934 — this instance
+      disappeared entirely mid-setup (SSH refused, then vanished from
+      `vastai show instances`; likely a host failure). Rented a
+      replacement, contract 47960424 (Nevada, US, reliability 0.9986),
+      currently provisioning.
 - [ ] Stage val + test images and COCO GT json on the box; set up
       `vlm-qwen3vl` (not `vlm`) via pixi.
+- [ ] Run the 3-image decision-gate sanity check on the box (this IS the
+      gate — local attempts never completed, see Phase 2). Actually
+      inspect the output before committing to the full sweep.
 - [ ] `pixi run -e vlm-qwen3vl python scripts/search_vlm_prompts.py --only
       qwen3_vl` on val (96 images) — the 6-candidate equal-effort sweep.
 - [ ] Measure 2x2 tiling (`tiled.py`) vs untiled on val for the winning
