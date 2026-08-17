@@ -155,6 +155,18 @@ def _grounding_dino_factory(entry: ManifestEntry) -> BaseInferencer:
     )
 
 
+def _llmdet_factory(entry: ManifestEntry) -> BaseInferencer:
+    from object_detection_eval.inference.vlm.llmdet import LLMDetInferencer
+
+    return LLMDetInferencer(
+        model_name=entry.model_name,
+        classes=entry.classes,
+        box_threshold=entry.box_threshold if entry.box_threshold is not None else 0.01,
+        text_threshold=entry.text_threshold if entry.text_threshold is not None else 0.25,
+        nms_iou_threshold=(entry.nms_iou_threshold if entry.nms_iou_threshold is not None else 0.5),
+    )
+
+
 def _omdet_turbo_factory(entry: ManifestEntry) -> BaseInferencer:
     from object_detection_eval.inference.vlm.omdet_turbo import OmDetTurboInferencer
 
@@ -211,6 +223,7 @@ _INFERENCER_FACTORIES: dict[str, Callable[[ManifestEntry], BaseInferencer]] = {
     "grounding_dino": _grounding_dino_factory,
     "florence2": _florence2_factory,
     "yolo_world": _yolo_world_factory,
+    "llmdet": _llmdet_factory,
 }
 
 
