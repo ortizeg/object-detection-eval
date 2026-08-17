@@ -59,6 +59,10 @@ pytorch = "*"
 torchvision = "*"
 
 [feature.vlm.pypi-dependencies]
+# transformers >=4.55.0 (LLMDet-large's requirement) is deliberately NOT pulled
+# in here -- see pyproject.toml's [project.optional-dependencies].vlm comment
+# and [feature.llmdet] below for why LLMDet runs in its own isolated pixi
+# environment instead of sharing this one.
 transformers = ">=4.49.0, <4.52.0"
 timm = "*"
 einops = "*"
@@ -73,6 +77,19 @@ ultralytics = ">=8.3, <9"
 # mutates a pixi-locked environment and is not reproducible. Declaring the
 # PyPI packaging (MIT) here keeps the env solved and locked.
 clip-anytorch = "*"
+
+# LLMDet-large. ISOLATED from [feature.vlm] above rather than sharing it: LLMDet
+# needs transformers>=4.55.0 and vlm's six other rows are pinned <4.52.0 to
+# guard HF post-processing drift their reproduction gate is sensitive to.
+# Bumping the shared pin would force re-validating all six existing rows on a
+# GPU for the sake of adding a seventh. See pyproject.toml's [project.optional-
+# dependencies].llmdet for the full note.
+[feature.llmdet.dependencies]
+pytorch = "*"
+torchvision = "*"
+
+[feature.llmdet.pypi-dependencies]
+transformers = ">=4.55.0, <4.58.0"
 
 # Cross-platform ONNX graph-surgery tooling (LAT-03). onnx + onnx-graphsurgeon
 # both ship osx-arm64 AND linux-64 wheels (onnx-graphsurgeon is a pure-Python
@@ -125,6 +142,25 @@ cuda = "12"
 [feature.vlmcuda.dependencies]
 # Unpinned, `pytorch-gpu = "*"` resolves to pytorch 1.6.0 and then fails on
 # python >=3.6,<3.7. The lower bound keeps the solve on a modern build.
+pytorch-gpu = ">=2.5,<3"
+
+# LLMDet's CUDA counterpart to [feature.vlmcuda] above, same reason: conda-forge's
+# `pytorch` resolves to the CPU build on linux-64 unless `pytorch-gpu` is
+# requested explicitly. Fully specified here but DELIBERATELY NOT composed into
+# [environments] (pixi cannot solve a linux-64-only env from this macOS host).
+# Activate on the GPU host by adding this line to [environments] there:
+#
+#   llmdet-cuda = ["dev", "llmdet", "llmdetcuda"]
+#
+# then `pixi install -e llmdet-cuda`. Verify with torch.cuda.is_available()
+# before trusting any timing or believing a run used the GPU.
+[feature.llmdetcuda]
+platforms = ["linux-64"]
+
+[feature.llmdetcuda.system-requirements]
+cuda = "12"
+
+[feature.llmdetcuda.dependencies]
 pytorch-gpu = ">=2.5,<3"
 
 [feature.trt]
@@ -183,6 +219,8 @@ onnx-graphsurgeon = ">=0.6.1"
 [environments]
 default = ["dev"]
 vlm = ["dev", "vlm"]
+# LLMDet-large only, isolated from `vlm` (see [feature.llmdet] for why).
+llmdet = ["dev", "llmdet"]
 # Cross-platform: core (CPU onnxruntime) + dev + the graph-surgery tooling.
 # This is the env the LAT-03 graft script + its graphsurgeon-marked test use on
 # THIS macOS machine (no GPU needed for offline graph surgery).

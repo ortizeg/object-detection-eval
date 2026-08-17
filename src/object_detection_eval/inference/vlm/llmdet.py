@@ -12,9 +12,11 @@ try/except-on-failure -> ``[]`` behaviour. Not re-exported from
 ``inference/vlm/__init__.py`` (VLM-04).
 
 REQUIRES ``transformers>=4.55.0`` -- LLMDet was merged upstream 2025-08-06 and
-is unavailable on the ``[vlm]`` extra's pre-existing ``<4.52.0`` pin. See the
-pin's own comment in ``pyproject.toml``/``pixi.toml`` for why that ceiling
-existed and what re-validating it against the other six rows involved.
+is unavailable on the ``[vlm]`` extra's ``<4.52.0`` pin. Rather than bump that
+shared pin (which would force re-validating the other six rows' published
+numbers on a GPU), LLMDet gets its OWN pixi environment/extra: ``[llmdet]`` in
+pyproject.toml, ``pixi run -e llmdet`` instead of ``-e vlm``. See that extra's
+comment for the isolation rationale.
 """
 
 from __future__ import annotations

@@ -2,6 +2,10 @@
 
 BLOCKER-1 fix: ``importorskip`` for torch/transformers MUST run before the
 SUT import so this module stays collection-safe in default (torch-free) CI.
+
+Marked ``llmdet``, not ``vlm``: LLMDet lives in its own isolated pixi
+environment (``pixi run -e llmdet``), separate from the six ``vlm``-marked
+models -- see ``inference/vlm/llmdet.py``'s module docstring for why.
 """
 
 from __future__ import annotations
@@ -18,7 +22,7 @@ from object_detection_eval.inference.vlm.llmdet import LLMDetInferencer  # noqa:
 from object_detection_eval.inference.vlm.nms import per_class_nms  # noqa: E402
 from object_detection_eval.schemas.detection import BoundingBox, Detection  # noqa: E402
 
-pytestmark = pytest.mark.vlm
+pytestmark = pytest.mark.llmdet
 
 
 @pytest.fixture()

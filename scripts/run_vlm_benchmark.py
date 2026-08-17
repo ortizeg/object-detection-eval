@@ -33,6 +33,10 @@ Usage::
 
     pixi run -e vlm python scripts/run_vlm_benchmark.py --data-root /root/data/basketball
     pixi run -e vlm python scripts/run_vlm_benchmark.py --only gemini
+
+    # LLMDet-large needs its own environment (transformers>=4.55.0, isolated
+    # from `vlm`'s <4.52.0 pin -- see inference/vlm/llmdet.py):
+    pixi run -e llmdet python scripts/run_vlm_benchmark.py --only llmdet
 """
 
 from __future__ import annotations
