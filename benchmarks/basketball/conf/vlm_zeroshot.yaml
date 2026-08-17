@@ -244,6 +244,40 @@ models:
     imgsz: 1280
     expected_map5095: 0.189
 
+  # Qwen3-VL-8B (added 2026-08-17). Apache-2.0. A NEW model with no prior
+  # published number -- expected_map5095 is deliberately null (VLM-02
+  # informational-only mode), not a target to reproduce.
+  #
+  # HYBRID ROW, documented so it is not misfiled as either precedent it
+  # resembles. The CODE is Gemini-shaped: no HF detection processor exists for
+  # a generative model, so `Qwen3VLInferencer` does a chat `generate()` call
+  # and parses a JSON text response (`{"bbox_2d": [x1,y1,x2,y2], "label":
+  # ...}` in 0-1000 normalised coordinates -- confirmed from the official
+  # QwenLM/Qwen3-VL cookbook's `2d_grounding.ipynb`, not guessed). But the
+  # PROTOCOL TREATMENT is a detector's, not Gemini's: `classes` below drives a
+  # MECHANICALLY built prompt, not hand-tuned free text, so this row goes
+  # through the same equal-effort vocabulary search
+  # (`vlm_prompt_search.yaml`) the open-weights detectors face -- it is not
+  # exempted the way Gemini's billed, hand-tuned prompt is.
+  #
+  # `classes` below is a placeholder (bare canonical names) pending that
+  # search; update this comment with the winner and its val score once run,
+  # matching every other row's convention.
+  #
+  # ENVIRONMENT: requires transformers>=4.57.0, newer than the <4.52.0 ceiling
+  # the other six rows share. Run this row under `pixi run -e vlm-qwen3vl`,
+  # NOT `-e vlm` -- see pixi.toml's `[feature.qwen3vl]` comment.
+  - name: qwen3_vl
+    inferencer: qwen3_vl
+    model_name: Qwen/Qwen3-VL-8B-Instruct
+    classes:
+      - player
+      - ball
+      - referee
+      - rim
+      - number
+    expected_map5095: null
+
 # SmolVLM2 was removed 2026-07-30. It has no bounding-box grounding head: it was
 # prompted for JSON boxes, emitted 1176 detections across the 94 test images all
 # labelled `player`, and scored 0.000 AP on every class — the boxes did not land
