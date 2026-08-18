@@ -2,7 +2,7 @@
 planStatus:
   planId: plan-qwen3-vl-zeroshot-row
   title: "Qwen3-VL-8B: a 7th zero-shot VLM benchmark row"
-  status: in-development
+  status: in-review
   planType: feature
   priority: medium
   owner: ortizeg
@@ -10,8 +10,8 @@ planStatus:
   tags: [vlm, evaluation, qwen3-vl, zero-shot]
   created: "2026-08-17"
   startDate: "2026-08-17"
-  updated: "2026-08-17T16:14:49.000Z"
-  progress: 0
+  updated: "2026-08-18T18:50:00.000Z"
+  progress: 100
 ---
 
 # Qwen3-VL-8B: a 7th zero-shot VLM benchmark row
@@ -283,19 +283,36 @@ negative result exactly like SmolVLM2's removal note at the bottom of
 - [x] Committing results JSON (this update).
 
 ### Phase 5 — Reports + full verification
-- [ ] Regenerate reports (`scripts/generate_report.py`); confirm Qwen3-VL
-      appears correctly in `benchmarks/basketball/reports/` and mirrored
-      `site_src/reports/`. Fix `tables.py`'s `vlm_summary_table` /
-      `vlm_per_class_table` only if either hardcodes the model list.
-- [ ] `pixi run pytest --no-cov -q` (default env, must stay green and
-      torch-free).
-- [ ] `pixi run -e vlm-qwen3vl pytest -m vlm --no-cov -q` (new env; the
-      other six rows' vlm-marked tests are not expected to run here — they
-      live in `-e vlm`).
-- [ ] `pixi run lint`, `pixi run typecheck` — fix anything this work
-      introduced.
-- [ ] Small, atomic commits throughout, matching `git log --oneline`'s
-      existing tone. No push, no PR.
+- [x] Regenerated reports. `tables.py`'s `vlm_summary_table` /
+      `vlm_per_class_table` are generic (no model list to fix), but
+      `scripts/write_vlm_metrics.py`'s `_VLM_FILES` dict WAS hardcoded —
+      added the `qwen3_vl.json` entry, re-ran it, then
+      `generate_report.py --write`. Confirmed in `VLM_VS_FINETUNED.md`:
+      mAP@50:95=0.188, mAP@50=0.298, mAP@75=0.199; per-class
+      player=0.710/ball=0.196/referee=0.579/rim=0.000/number=0.005 — same
+      rim/number collapse every other row shows. (`site_src/` is a
+      gitignored, generated-on-demand mirror; nothing to commit there.)
+- [x] `pixi run pytest --no-cov -q` — **548 passed, 9 skipped**, default
+      env, torch-free.
+- [x] `pixi run -e vlm-qwen3vl pytest -m vlm --no-cov -q` — qwen3_vl's own
+      24 tests pass (+3 skipped). 15 pre-existing failures unrelated to
+      this work (confirmed via `git stash` before touching anything):
+      13 are `GroundingDINOInferencer`/`OmDetTurboInferencer`/
+      `OWLv2Inferencer` objects missing a `_nms` method their own tests
+      expect (a drift predating this session, in files never touched
+      here), and 2 are `test_run_vlm_benchmark.py`'s hardcoded
+      `_EXPECTED_TARGETS` being stale against the manifest's current
+      published numbers for the other six rows. Left as-is, out of scope.
+- [x] Regenerating reports surfaced one REAL, in-scope failure:
+      `test_fusion_table.py` asserted every model in
+      `vlm_metrics_merged5.json` also appears in the committed
+      fusion/ensembling test log — a sweep that predates Qwen3-VL and
+      never included it. Fixed with an explicit, documented exception
+      (not a broadened tolerance).
+- [x] `pixi run lint`, `pixi run format-check`, `pixi run typecheck` — all
+      clean, nothing introduced by this work needed fixing.
+- [x] Small, atomic commits throughout (9 commits total for this plan),
+      matching `git log --oneline`'s existing tone. No push, no PR.
 
 ## Deliverables
 
@@ -310,6 +327,35 @@ negative result exactly like SmolVLM2's removal note at the bottom of
 - Regenerated reports showing the 7th row
 - **Or**, if the gate fails: a documented negative result, no manifest row,
   no GPU spend beyond the local sanity check.
+
+## Outcome (2026-08-18): shipped as the 7th row
+
+Qwen3-VL-8B is now a committed zero-shot row: **test mAP@50:95 = 0.1878**
+(mAP@50 = 0.2979), informational-only (no prior published number to
+reproduce). Lands last of the 7 rows by mAP@50:95, essentially tied with
+YOLO-World (0.1892 vs 0.1878 — well inside this table's noise floor).
+Same story as every model in this table: strong on `player` (0.710),
+collapses on `rim` (0.000) and `number` (0.005).
+
+Three environment bugs and two real code bugs had to be found and fixed to
+get a trustworthy number, all documented inline where they were fixed:
+missing `accelerate` + wrong dtype (`bb878dd`), AppleDouble junk in a
+macOS-built tarball, a missing CUDA compiler for a Triton JIT kernel
+(`db455c1`), and JSON-truncation discarding valid detections plus
+non-deterministic sampling (`2211846`). The isolated `vlm-qwen3vl`/
+`vlm-qwen3vl-cuda` pixi environment (never touching the other six rows'
+`transformers<4.52` pin) held up as designed throughout.
+
+A brief window mid-task had a duplicate session accidentally pointed at
+this same worktree and vast.ai box; its commits were reviewed in full and
+kept — they were correct, well-tested continuations of the same work, not
+a fork to reconcile.
+
+Two categories of pre-existing, out-of-scope issues were found and
+explicitly left alone (documented in commit messages and above): 13 NMS
+tests failing on the other six models' `_nms`-method drift, and 2 stale
+hardcoded target-value tests — neither touched by, nor caused by, this
+work.
 
 ## Open questions
 
