@@ -244,6 +244,52 @@ models:
     imgsz: 1280
     expected_map5095: 0.189
 
+  # LLMDet-large (added 2026-08-17) -- the seventh row. Architecturally
+  # mm-grounding-dino: same HF calling convention as Grounding DINO
+  # (AutoModelForZeroShotObjectDetection + post_process_grounded_object_detection),
+  # confirmed via its own model card ("inference is identical to Grounding
+  # DINO's") and its HF config (model_type "mm-grounding-dino"). Apache-2.0.
+  #
+  # Needs transformers>=4.55.0, unavailable on the `vlm` extra's <4.52.0 pin
+  # (guards HF post-processing drift the other six rows' gate is sensitive
+  # to) -- runs in its own isolated `llmdet` pixi extra instead of bumping
+  # that shared pin. See inference/vlm/llmdet.py and pyproject.toml's
+  # `llmdet` extra for the isolation rationale.
+  #
+  # PROMPT SEARCH (2026-08-17, RTX 4090). Six-candidate search on val:
+  # c5_bare_canonical (bare class names) won at 0.3369, ahead of c1_domain's
+  # 0.2958 and c0_coco_control's 0.2418 -- the two "add descriptive words"
+  # candidates (c2/c4, contrastive phrasing) both collapsed player and
+  # referee to 0.000, the same fragile-prompt failure mode YOLO-World's row
+  # documents for compound phrases. Full results:
+  # results/vlm/prompt_search/llmdet.json.
+  #
+  # TILING (2026-08-17, val, same box). 2x2 overlapping tiles: 0.3369 ->
+  # 0.3589 (+0.0220), and the first configuration in this file to get `rim`
+  # off exactly 0.000 (0.0238) -- `number` also jumped 0.4717 -> 0.6741.
+  # Adopted. NMS was NOT re-swept under tiling (the lesson every other tiled
+  # row in this file learned the hard way) -- kept at 0.5, the untiled
+  # starting value, as a scoped time-boxed decision rather than an
+  # exhaustively re-tuned one; a future pass should re-sweep it the way
+  # owlv2/grounding_dino/omdet_turbo did.
+  #
+  # No expected_map5095: a new model has no prior published number to
+  # reproduce against (VLM-02's informational-only mode).
+  - name: llmdet
+    inferencer: llmdet
+    model_name: iSEE-Laboratory/llmdet_large
+    classes:
+      - player
+      - ball
+      - referee
+      - rim
+      - number
+    box_threshold: 0.01
+    text_threshold: 0.25
+    nms_iou_threshold: 0.5
+    tiles: [2, 2]
+    expected_map5095: null
+
 # SmolVLM2 was removed 2026-07-30. It has no bounding-box grounding head: it was
 # prompted for JSON boxes, emitted 1176 detections across the 94 test images all
 # labelled `player`, and scored 0.000 AP on every class — the boxes did not land
