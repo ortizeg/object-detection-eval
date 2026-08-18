@@ -150,6 +150,19 @@ cuda = "12"
 # Unpinned, `pytorch-gpu = "*"` resolves to pytorch 1.6.0 and then fails on
 # python >=3.6,<3.7. The lower bound keeps the solve on a modern build.
 pytorch-gpu = ">=2.5,<3"
+# Required for Qwen3-VL specifically (not the other five GPU-eligible rows):
+# its rotary-embedding forward path (transformers>=4.57's
+# modeling_qwen3_vl.py) JIT-compiles a Triton kernel at generate() time, and
+# Triton's build shells out to `gcc` for `cuda_utils.c`, which needs the CUDA
+# *driver API* header (`cuda.h`) -- something the `pytorch-gpu` runtime alone
+# does not ship. Without it, `predict()`'s catch-all exception handler
+# silently swallows a `subprocess.CalledProcessError` and returns `[]`, which
+# reads exactly like a model failing to ground rather than an environment gap
+# (confirmed on the rented RTX 4090, 2026-08-18). `cuda-compiler` lives here
+# rather than in `[feature.qwen3vl]` because it is linux-64-only and would
+# break solving the cross-platform `vlm-qwen3vl` (CPU/MPS) environment on
+# macOS; `vlmcuda` is already linux-64-gated.
+cuda-compiler = "12.*"
 
 [feature.trt]
 platforms = ["linux-64"]
