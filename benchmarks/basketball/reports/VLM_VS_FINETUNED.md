@@ -372,6 +372,7 @@ from the committed prediction dumps in `results/vlm/*.json` (never transcribed):
 | OmDet-Turbo | 0.211 | 0.297 | 0.219 |
 | Florence-2 | 0.238 | 0.323 | 0.255 |
 | YOLO-World | 0.189 | 0.241 | 0.209 |
+| Qwen3-VL | 0.188 | 0.298 | 0.199 |
 <!-- TABLE:vlm_summary END -->
 
 Two things about this table changed with the 2026-08-05 ablation, and both are
@@ -422,6 +423,7 @@ makes the pattern unmistakable:
 | OmDet-Turbo | 0.805 | 0.187 | 0.369 | 0.000 | 0.127 |
 | Florence-2 | 0.749 | 0.151 | 0.560 | 0.000 | 0.152 |
 | YOLO-World | 0.840 | 0.311 | 0.000 | 0.005 | 0.051 |
+| Qwen3-VL | 0.710 | 0.196 | 0.579 | 0.000 | 0.005 |
 <!-- TABLE:vlm_per_class END -->
 
 Read down the columns and one story emerges: **open-vocabulary VLMs recognise

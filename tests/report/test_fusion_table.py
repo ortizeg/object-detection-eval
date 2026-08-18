@@ -322,6 +322,12 @@ def test_committed_test_log_matches_the_published_per_model_numbers() -> None:
 
     by_key = {key(k): v for k, v in published.items()}
 
+    # Qwen3-VL was added after the fusion/ensembling sweep (test_fusion.json)
+    # was run and has never gone through that separate exercise -- it is not
+    # missing by mistake, it postdates the file. Everything that WAS a
+    # candidate in the fusion sweep must still match exactly.
+    not_in_fusion_sweep = {"qwen3vl"}
+
     log = load_fusion_test_log(_COMMITTED_TEST)
     checked = 0
     for row in log.rows:
@@ -331,4 +337,5 @@ def test_committed_test_log_matches_the_published_per_model_numbers() -> None:
         assert entry is not None, f"no published metrics for {row.models[0]}"
         assert row.map_50_95 == pytest.approx(entry["mAP_50_95"], abs=1e-6)
         checked += 1
-    assert checked == len(by_key), "every published model must appear in the test scoring"
+    expected = len(by_key) - len(not_in_fusion_sweep & by_key.keys())
+    assert checked == expected, "every published model must appear in the test scoring"
