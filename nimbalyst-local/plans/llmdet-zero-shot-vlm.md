@@ -2,7 +2,7 @@
 planStatus:
   planId: plan-llmdet-zero-shot-vlm
   title: LLMDet-large as the seventh zero-shot VLM row
-  status: in-development
+  status: completed
   planType: feature
   priority: medium
   owner: ortizeg
@@ -10,7 +10,7 @@ planStatus:
   tags: [vlm, evaluation, zero-shot, llmdet]
   created: "2026-08-17"
   updated: "2026-08-17T00:00:00.000Z"
-  progress: 0
+  progress: 100
 ---
 
 # LLMDet-large: the seventh zero-shot VLM row
@@ -105,7 +105,7 @@ but not the only reasonable one.
 
 ## Phase 1 — Scaffolding (no GPU, no dependency changes yet)
 
-- [ ] `src/object_detection_eval/inference/vlm/llmdet.py`: port of
+- [x] `src/object_detection_eval/inference/vlm/llmdet.py`: port of
   `grounding_dino.py`. Same `_resolve_label` ambiguity guard (drop concatenated
   labels rather than guess — the documented fix for the 533-detections/image
   collapse), same `per_class_nms` (`inference/vlm/nms.py`) usage, same BGR->RGB
@@ -116,26 +116,26 @@ but not the only reasonable one.
   rediscover it).
   - Do NOT add it to `inference/vlm/__init__.py`'s exports (stays torch-free by
     default, VLM-04 convention).
-- [ ] `tests/inference/vlm/test_llmdet.py`: same shape as
+- [x] `tests/inference/vlm/test_llmdet.py`: same shape as
   `test_grounding_dino.py` — `_mock_transformers` fixture, init test, text
   prompt formatting, name-to-id mapping, predict with results / unknown label /
   text_labels key / integer labels / exception handling, `_resolve_label`
   ambiguity-guard test class, size-check test class, NMS test class.
   `pytest.importorskip("torch")` / `("transformers")` before the SUT import,
   `pytestmark = pytest.mark.vlm`.
-- [ ] `scripts/run_vlm_benchmark.py`: add `_llmdet_factory` (mirrors
+- [x] `scripts/run_vlm_benchmark.py`: add `_llmdet_factory` (mirrors
   `_grounding_dino_factory` at line 146), lazy-imports `llmdet` module inside
   the function body. Add `"llmdet": _llmdet_factory` to `_INFERENCER_FACTORIES`
   (line 207).
-- [ ] `tests/scripts/test_run_vlm_benchmark.py`: add `"llmdet"` to
+- [x] `tests/scripts/test_run_vlm_benchmark.py`: add `"llmdet"` to
   `_EXPECTED_NAMES` (7 entries now, order = manifest order). Do **not** add it
   to `_EXPECTED_TARGETS` (it has no published target). Add `"llmdet"` to
   `_UNTARGETED` and update that set's docstring/comment — it currently reads
   "No row runs untargeted" and needs to explain llmdet is the first row that
   legitimately does, per the VLM-02 informational pattern.
-- [ ] Run `pixi run pytest --no-cov -q` (default env must stay green,
+- [x] Run `pixi run pytest --no-cov -q` (default env must stay green,
   torch-free) — confirms scaffolding doesn't break default CI.
-- [ ] Commit: scaffolding + tests, no manifest row yet (nothing runnable
+- [x] Commit: scaffolding + tests, no manifest row yet (nothing runnable
   without the dependency bump).
 
 ## Phase 2 — Isolated `llmdet` pixi environment (DONE, no GPU needed)
@@ -156,25 +156,25 @@ but not the only reasonable one.
   pre-existing `_nms` bug + the expected temporary mismatch from
   `test_run_vlm_benchmark.py`'s `_EXPECTED_NAMES` already listing `llmdet`
   before Phase 3 adds its manifest row).
-- [ ] Add the `llmdet` entry to `benchmarks/basketball/conf/vlm_prompt_search.yaml`'s
+- [x] Add the `llmdet` entry to `benchmarks/basketball/conf/vlm_prompt_search.yaml`'s
   `models` list, mirroring the `grounding_dino` entry's fields
   (`box_threshold: 0.01`, `text_threshold: 0.25`, `nms_iou_threshold: 0.5` as
   starting values matching Grounding DINO's committed defaults). It
   automatically faces the same six candidates (`budget_per_model: 6` — do not
   add a seventh candidate). Also add an `llmdet` branch to
   `search_vlm_prompts.py`'s `_build_inferencer`.
-- [ ] Rent a vast.ai GPU instance (RTX 4090-class), stage a `pixi run -e
+- [x] Rent a vast.ai GPU instance (RTX 4090-class), stage a `pixi run -e
   llmdet-cuda`-capable checkout + val/test images + COCO GT, per the
   documented pattern in `docs/provenance/training-runs.md` /
   `.planning/phases/05-zero-shot-vlm/05-03-PLAN.md` (adapted: `llmdet-cuda`
   env, not `vlm-cuda`).
-- [ ] Commit: the isolated-environment scaffolding above.
+- [x] Commit: the isolated-environment scaffolding above.
 
 ## Phase 3 — Equal-effort tuning on val (GPU, same rented box)
 
-- [ ] `pixi run -e llmdet-cuda python scripts/search_vlm_prompts.py --only llmdet`
+- [x] `pixi run -e llmdet-cuda python scripts/search_vlm_prompts.py --only llmdet`
   (val split, 96 images). Record the winning candidate id + val mAP@50:95.
-- [ ] Tiling: sweep 2x2 overlapping tiles vs. no tiles on val for llmdet.
+- [x] Tiling: sweep 2x2 overlapping tiles vs. no tiles on val for llmdet.
   Prefer wiring it into the existing ablation manifest/harness
   (`vlm_ablation.yaml` + `scripts/ablate_vlm.py` + `inference/vlm/ablation.py`)
   if that's cheap given the harness already exists for this exact grid; fall
@@ -183,45 +183,76 @@ but not the only reasonable one.
   manifest is disproportionate. Either way, keep or revert on the measured
   delta and write down the number — a documented null result is as valuable as
   a win (see florence2/owlv2 rows' ablation comments).
-- [ ] Add the `llmdet` row to `benchmarks/basketball/conf/vlm_zeroshot.yaml`:
+- [x] Add the `llmdet` row to `benchmarks/basketball/conf/vlm_zeroshot.yaml`:
   winning `classes`, `box_threshold`, `text_threshold`, `nms_iou_threshold`
   (re-tuned under tiling if tiling was adopted, per the repo's established
   lesson that NMS tuned on whole frames is wrong once tiling manufactures
   duplicates), `tiles` if adopted, `expected_map5095: null`. Comment block
   matches the tone/specificity of the existing six rows' comments (dates,
   measured deltas, candidate ids, no hedging).
-- [ ] Commit: prompt-search + ablation artifacts under
+- [x] Commit: prompt-search + ablation artifacts under
   `benchmarks/basketball/results/vlm/prompt_search/llmdet.json` (and wherever
   the ablation output lands) + the manifest row.
 
 ## Phase 4 — Test-split number (once, GPU)
 
-- [ ] `pixi run -e llmdet-cuda python scripts/run_vlm_benchmark.py --only llmdet`
+- [x] `pixi run -e llmdet-cuda python scripts/run_vlm_benchmark.py --only llmdet`
   on the test split (94 images). This is the number that goes in results — run
   once, not iterated.
-- [ ] Copy `benchmarks/basketball/results/vlm/llmdet.json` back to the local
+- [x] Copy `benchmarks/basketball/results/vlm/llmdet.json` back to the local
   worktree.
-- [ ] Terminate the vast.ai instance.
-- [ ] Commit: test-split result.
+- [x] Terminate the vast.ai instance.
+- [x] Commit: test-split result.
 
 ## Phase 5 — Reports + final validation (local, no GPU)
 
-- [ ] `scripts/write_vlm_metrics.py`: add `"LLMDet-large": "llmdet.json"` to
+- [x] `scripts/write_vlm_metrics.py`: add `"LLMDet-large": "llmdet.json"` to
   the hardcoded `_VLM_FILES` dict (the one place reports don't pick up new
   rows automatically — verified by reading the file). Re-run it to regenerate
   `benchmarks/basketball/results/vlm/vlm_metrics_merged5.json`.
-- [ ] Regenerate reports (`scripts/generate_report.py`) and confirm LLMDet
+- [x] Regenerate reports (`scripts/generate_report.py`) and confirm LLMDet
   renders correctly in `benchmarks/basketball/reports/` and the mirrored
   `site_src/reports/`. `report/tables.py`'s `vlm_summary_table` /
   `vlm_per_class_table` should need no changes — verify, don't assume.
   Explicitly leave `fusion.py`/`fuse_vlm.py` and their six-model report slots
   untouched.
-- [ ] `pixi run pytest --no-cov -q` (default env, torch-free, green),
+- [x] `pixi run pytest --no-cov -q` (default env, torch-free, green),
   `pixi run -e vlm pytest -m vlm --no-cov -q` (six existing rows, green), and
   `pixi run -e llmdet pytest -m llmdet --no-cov -q` (llmdet's own tests,
   green).
-- [ ] `pixi run lint` and `pixi run typecheck`, fix anything introduced.
-- [ ] Commit: reports + final green-suite confirmation.
+- [x] `pixi run lint` and `pixi run typecheck`, fix anything introduced.
+- [x] Commit: reports + final green-suite confirmation.
+
+## Result
+
+LLMDet-large is the seventh committed zero-shot VLM row, and the strongest
+single model in the comparison so far:
+
+| | val (search winner) | test |
+| --- | --- | --- |
+| mAP@50:95 | 0.3589 (tiled, c5_bare_canonical) | **0.3883** |
+| mAP@50 | 0.5158 | 0.5062 |
+
+Ahead of every other individually-reported row (Gemini 0.250, OWLv2 0.315,
+Grounding-DINO 0.293, Florence-2 0.238, OmDet-Turbo 0.211, YOLO-World
+0.189 — test mAP@50:95), still below the six-model fusion ensemble's
+0.406 (#20), which this row is not yet part of.
+
+Also found and fixed one real, non-pre-existing test bug this change
+surfaced: `test_fusion_table.py`'s cross-check assumed every published VLM
+model appears in the fusion committed log, which stopped being true the
+moment a published-but-not-fused model existed. See the Phase 5 commit.
+
+Two pre-existing, unrelated issues were found and explicitly NOT fixed
+(out of this task's scope, documented for the record):
+- `GroundingDINOInferencer`/`OWLv2Inferencer`/`OmDetTurboInferencer` have no
+  `_nms` method, but their test files call `inferencer._nms(...)` — 13
+  failing tests in the `vlm`-marked suite, reproduces identically before any
+  of this session's changes.
+- `tests/scripts/test_run_vlm_benchmark.py`'s `_EXPECTED_TARGETS` dict is
+  stale against the currently-committed `vlm_zeroshot.yaml` values for
+  gemini/florence2/yolo_world (post-ablation numbers were never synced back
+  into the test file) — 2 failing tests, also pre-existing.
 
 ## Explicitly out of scope
 
