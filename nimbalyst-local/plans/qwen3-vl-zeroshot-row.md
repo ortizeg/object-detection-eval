@@ -239,18 +239,37 @@ negative result exactly like SmolVLM2's removal note at the bottom of
       `vastai show instances`; likely a host failure). Rented a
       replacement, contract 47960424 (Nevada, US, reliability 0.9986),
       currently provisioning.
-- [ ] Stage val + test images and COCO GT json on the box; set up
-      `vlm-qwen3vl` (not `vlm`) via pixi.
-- [ ] Run the 3-image decision-gate sanity check on the box (this IS the
-      gate — local attempts never completed, see Phase 2). Actually
-      inspect the output before committing to the full sweep.
-- [ ] `pixi run -e vlm-qwen3vl python scripts/search_vlm_prompts.py --only
-      qwen3_vl` on val (96 images) — the 6-candidate equal-effort sweep.
-- [ ] Measure 2x2 tiling (`tiled.py`) vs untiled on val for the winning
-      vocabulary — one comparison, not the full ablation grid.
-- [ ] Update `vlm_zeroshot.yaml`'s `classes`/`tiles` with the winner and a
-      comment recording both the search result and the tiling decision
-      (with numbers), same style as the other five rows' comments.
+- [x] Staged val + test images and COCO GT json on the box (`/root/data/
+      basketball-player-detection-3`); set up `vlm-qwen3vl` via pixi.
+      Found and cleaned macOS AppleDouble junk (`._*.jpg`) picked up by the
+      tarball transfer — see Phase 2's decision-gate notes.
+- [x] Also discovered plain `pytorch` (conda-forge) resolves CPU-only on
+      Linux — added the `vlm-qwen3vl-cuda` environment (`["dev", "qwen3vl",
+      "vlmcuda"]`, box-only, not committed to `[environments]`, same
+      pattern as the existing `vlm-cuda`) and `cuda-compiler` to
+      `[feature.vlmcuda]` (Qwen3-VL JIT-compiles a Triton kernel for its
+      rotary-embedding path at `generate()` time and silently fails without
+      it — see `db455c1`).
+- [x] Ran the decision-gate sanity check on the box — **PASSED**, with real
+      spatially-accurate grounding confirmed (see Phase 2 above for the
+      full account, including the JSON-truncation-salvage and
+      non-determinism fixes this run surfaced).
+- [x] `search_vlm_prompts.py --only qwen3_vl` on val (96 images), the
+      6-candidate equal-effort sweep. Results: c0_coco_control 0.0745,
+      c1_domain 0.1592, c2_contrastive 0.1483, **c3_small_object 0.1861
+      (winner)**, c4_contrastive_small_object 0.1699, c5_bare_canonical
+      0.1189.
+- [x] Measured 2x2 tiling vs untiled for the winning vocabulary, on a
+      24-image val subsample (not the full 96 — ~45-90s/image generative
+      latency makes a 5-pass-per-image full-split ablation cost several
+      GPU-hours for one secondary check). Untiled 0.1939, tiled 2x2 0.1157
+      — **tiling regresses by -0.0782**, consistent with the
+      crowd-mislabeling weakness found in the decision gate (tiling
+      multiplies exposure to crowded crops). Row does NOT tile, same
+      posture as YOLO-World's measured non-adoption.
+- [x] Updated `vlm_zeroshot.yaml`'s `classes` (c3_small_object) with a
+      comment recording the search table, the tiling measurement, and the
+      environment gotchas (CUDA compiler, isolated env).
 
 ### Phase 4 — Test-split run (once) + artifacts
 - [ ] `pixi run -e vlm-qwen3vl python scripts/run_vlm_benchmark.py --only

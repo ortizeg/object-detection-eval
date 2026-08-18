@@ -260,22 +260,43 @@ models:
   # (`vlm_prompt_search.yaml`) the open-weights detectors face -- it is not
   # exempted the way Gemini's billed, hand-tuned prompt is.
   #
-  # `classes` below is a placeholder (bare canonical names) pending that
-  # search; update this comment with the winner and its val score once run,
-  # matching every other row's convention.
+  # PROMPT SEARCH (2026-08-18, on the rented RTX 4090). All six candidates
+  # from vlm_prompt_search.yaml, val mAP@50:95: c0_coco_control 0.0745,
+  # c1_domain 0.1592, c2_contrastive 0.1483, c3_small_object 0.1861 (winner),
+  # c4_contrastive_small_object 0.1699, c5_bare_canonical 0.1189. Same "name
+  # colour/structure" pattern seen elsewhere in this table (OWLv2,
+  # Grounding-DINO): naming the ball's colour and the rim's structure carries
+  # signal a general model's prior can use.
+  #
+  # TILING (2026-08-18). Measured on a 24-image val subsample (not the full 96
+  # -- Qwen3-VL is ~45-90s/image, generative, unlike the sub-second HF
+  # detectors the original full-split tiling ablation was built around; five
+  # forward passes/image over 96 images would cost several GPU-hours for one
+  # secondary check). 2x2 + full frame, merge NMS 0.5: mAP@50:95 0.1939 (this
+  # subsample's untiled score) -> 0.1157, a clear regression (-0.0782). This
+  # row does NOT tile -- a measured decision, not an omission, in the same
+  # spirit as YOLO-World's (which tiling also hurt, -0.0529). Consistent with
+  # the crowd-mislabeling weakness found during the decision-gate sanity
+  # check: this model already over-labels bench/spectator regions as
+  # `player` on busy frames, and tiling multiplies how many crops it sees a
+  # crowd in, compounding rather than fixing that.
   #
   # ENVIRONMENT: requires transformers>=4.57.0, newer than the <4.52.0 ceiling
   # the other six rows share. Run this row under `pixi run -e vlm-qwen3vl`,
-  # NOT `-e vlm` -- see pixi.toml's `[feature.qwen3vl]` comment.
+  # NOT `-e vlm` -- see pixi.toml's `[feature.qwen3vl]` comment. On a rented
+  # CUDA box, `vlm-qwen3vl-cuda` additionally needs `cuda-compiler` (see
+  # `[feature.vlmcuda]`'s comment) -- Qwen3-VL JIT-compiles a Triton kernel
+  # for its rotary-embedding path at `generate()` time, and without it that
+  # compile fails silently, indistinguishable from the model finding nothing.
   - name: qwen3_vl
     inferencer: qwen3_vl
     model_name: Qwen/Qwen3-VL-8B-Instruct
     classes:
-      - player
-      - ball
+      - basketball player
+      - orange basketball
       - referee
-      - rim
-      - number
+      - basketball hoop and backboard
+      - jersey number on a uniform
     expected_map5095: null
 
 # SmolVLM2 was removed 2026-07-30. It has no bounding-box grounding head: it was
