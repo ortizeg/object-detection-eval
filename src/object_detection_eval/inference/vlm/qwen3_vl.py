@@ -33,6 +33,7 @@ isolated environment rather than bumping that shared pin). ``torch``/
 from __future__ import annotations
 
 import json
+from collections.abc import Iterator
 from typing import Any
 
 import numpy as np
@@ -71,14 +72,75 @@ def strip_json_fence(text: str) -> str:
     return "\n".join(lines[start + 1 : end])
 
 
+def _iter_balanced_objects(text: str) -> Iterator[str]:
+    """Yield each top-level, brace-balanced ``{...}`` substring of ``text``.
+
+    Quote- and escape-aware so a ``}`` inside a string value (e.g. a label
+    like ``"a}b"``) does not close an object early.
+    """
+    depth = 0
+    start: int | None = None
+    in_string = False
+    escape = False
+    for i, ch in enumerate(text):
+        if in_string:
+            if escape:
+                escape = False
+            elif ch == "\\":
+                escape = True
+            elif ch == '"':
+                in_string = False
+            continue
+        if ch == '"':
+            in_string = True
+        elif ch == "{":
+            if depth == 0:
+                start = i
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0 and start is not None:
+                yield text[start : i + 1]
+                start = None
+
+
 def parse_detection_json(text: str) -> list[dict[str, Any]]:
     """Parse Qwen3-VL's fenced-or-not JSON detection response.
 
+    On crowded scenes the model sometimes hits ``max_new_tokens`` before
+    closing its JSON list -- observed on the rented GPU box, 2026-08-18: 5 of
+    8 sanity-check images produced a well-formed-until-truncated response
+    like ``[{...}, {...}, {...`` where discarding the whole response would
+    also discard the detections it DID finish emitting. On a top-level parse
+    failure this salvages every complete ``{...}`` object from the text
+    instead of giving up outright; a truncated FINAL object is naturally
+    excluded since it never closes.
+
     Raises:
-        json.JSONDecodeError: If the fence-stripped text is not valid JSON.
-        ValueError: If the parsed JSON is not a list.
+        json.JSONDecodeError: If the fence-stripped text is not valid JSON
+            AND no complete objects could be salvaged from it either.
+        ValueError: If the top-level JSON parses but is not a list.
     """
-    data = json.loads(strip_json_fence(text))
+    stripped = strip_json_fence(text)
+    try:
+        data = json.loads(stripped)
+    except json.JSONDecodeError:
+        salvaged: list[dict[str, Any]] = []
+        for obj_text in _iter_balanced_objects(stripped):
+            try:
+                obj = json.loads(obj_text)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(obj, dict):
+                salvaged.append(obj)
+        if not salvaged:
+            raise
+        logger.warning(
+            f"Qwen3-VL response was truncated or malformed JSON; salvaged "
+            f"{len(salvaged)} complete detection object(s) from it"
+        )
+        return salvaged
+
     if not isinstance(data, list):
         msg = f"expected a JSON list, got {type(data).__name__}"
         raise ValueError(msg)
@@ -184,7 +246,20 @@ class Qwen3VLInferencer(BaseInferencer):
             ).to(self._device)
 
             with torch.no_grad():
-                generated_ids = self._model.generate(**inputs, max_new_tokens=self.max_new_tokens)
+                # do_sample=False overrides the checkpoint's shipped
+                # generation_config.json (do_sample=True, temperature=0.7,
+                # top_p=0.8) -- confirmed on the rented RTX 4090, 2026-08-18:
+                # with sampling on, re-running the SAME image produced wildly
+                # different detection counts (e.g. 21 vs 63) run to run, which
+                # both breaks this repo's reproducibility requirement and
+                # measurably worsens quality (higher sample counts correlated
+                # with more crowd/background boxes labelled "player" -- the
+                # model over-enumerating under sampling, not finding more real
+                # objects). Greedy decoding is the reproducible choice for a
+                # structured-extraction task like this one.
+                generated_ids = self._model.generate(
+                    **inputs, max_new_tokens=self.max_new_tokens, do_sample=False
+                )
 
             # Drop the prompt tokens the model echoes back, keeping only the
             # newly generated continuation.

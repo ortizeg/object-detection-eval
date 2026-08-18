@@ -190,6 +190,22 @@ class TestQwen3VLInferencerPredict:
         assert len(dets) == 1
         assert dets[0].class_id == 0
 
+    def test_predict_salvages_truncated_response(self, _mock_transformers) -> None:
+        mock_processor, mock_model, _mock_torch = _mock_transformers
+        response = (
+            '```json\n[\n\t{"bbox_2d": [100, 200, 300, 400], "label": "player"},\n'
+            '\t{"bbox_2d": [10, 20,'
+        )
+        _wire_generate(mock_processor, mock_model, response)
+
+        inferencer = Qwen3VLInferencer(classes=["player", "ball"], device="cpu")
+
+        fake_image = np.zeros((480, 640, 3), dtype=np.uint8)
+        dets = inferencer.predict(fake_image, 640, 480)
+
+        assert len(dets) == 1
+        assert dets[0].class_id == 0
+
     def test_predict_handles_exception(self, _mock_transformers) -> None:
         mock_processor, _mock_model, _mock_torch = _mock_transformers
         mock_processor.apply_chat_template.side_effect = RuntimeError("boom")
@@ -251,3 +267,26 @@ class TestJSONParsingHelpers:
     def test_parse_detection_json_raises_on_invalid_json(self) -> None:
         with pytest.raises(json.JSONDecodeError):
             parse_detection_json("not json")
+
+    def test_parse_detection_json_salvages_truncated_list(self) -> None:
+        # No closing `]` -- and the final object itself is cut off mid-value,
+        # simulating hitting max_new_tokens mid-generation.
+        text = (
+            '```json\n[\n\t{"bbox_2d": [1, 2, 3, 4], "label": "player"},\n'
+            '\t{"bbox_2d": [5, 6, 7, 8], "label": "ball"},\n'
+            '\t{"bbox_2d": [9, 10, 11,'
+        )
+        result = parse_detection_json(text)
+        assert result == [
+            {"bbox_2d": [1, 2, 3, 4], "label": "player"},
+            {"bbox_2d": [5, 6, 7, 8], "label": "ball"},
+        ]
+
+    def test_parse_detection_json_salvage_finds_nothing_reraises(self) -> None:
+        with pytest.raises(json.JSONDecodeError):
+            parse_detection_json("not json at all, no braces here")
+
+    def test_parse_detection_json_salvage_ignores_brace_in_label_string(self) -> None:
+        text = '[{"bbox_2d": [1, 2, 3, 4], "label": "a}b"}, {"bbox_2d": [5,'
+        result = parse_detection_json(text)
+        assert result == [{"bbox_2d": [1, 2, 3, 4], "label": "a}b"}]
