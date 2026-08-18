@@ -184,20 +184,51 @@ negative result exactly like SmolVLM2's removal note at the bottom of
       (Noted, not fixed — out of scope: two OTHER tests in this file were
       already failing before this work, from stale hardcoded targets for
       the six existing rows; confirmed via `git stash`.)
-- [ ] **Decision gate — NOT YET RESOLVED.** Attempted `Qwen3VLInferencer`
-      locally (Apple Silicon MPS) over val images with the plain canonical
-      prompt three times. Every attempt either errored (missing
-      `accelerate`, fixed) or had its background process killed across
-      turn/session boundaries before producing output (an environment
-      quirk in this local harness, not a model problem — confirmed the
-      Python process was alive and burning real CPU/IO each time, just
-      never survived to completion). No annotated image or detection
-      output was ever actually produced locally — `/tmp/qwen3vl_sanity_out`
-      is empty. Moving the actual gate check to Phase 3 on the rented GPU
-      box, where a single foreground SSH command can run it to completion
-      without the turn-boundary kill issue. Do NOT treat this as passed
-      until that run actually produces and confirms spatially plausible
-      boxes.
+- [x] **Decision gate — PASSED, with two real bugs found and fixed along the
+      way.** Ran the 8-image sanity check on the rented RTX 4090 (contract
+      47960424). Three separate problems had to be diagnosed before the gate
+      produced a trustworthy signal:
+      1. The staged tarball was built on macOS and included AppleDouble
+         resource-fork junk (`._foo.jpg`), which `sorted(VAL_DIR.glob("*.jpg"))`
+         picked up and `cv2.imread` returned `None` for — fixed by deleting
+         `._*` from the staged data dir.
+      2. The box's `vlm-qwen3vl-cuda` environment had `pytorch-gpu` but no
+         CUDA *driver-API* dev header (`cuda.h`) — Qwen3-VL's rotary-embedding
+         forward path JIT-compiles a Triton kernel at `generate()` time, and
+         without `cuda.h` that compile fails, silently caught by `predict()`'s
+         catch-all handler and returned as `[]`. Reads exactly like "the model
+         found nothing," not an environment gap. Fixed: added
+         `cuda-compiler = "12.*"` to `[feature.vlmcuda.dependencies]` in
+         `pixi.toml` (linux-64-gated, so it doesn't touch the CPU/MPS
+         `vlm-qwen3vl` env's macOS solve).
+      3. Once bug 2 was fixed, crowded frames still hit `max_new_tokens`
+         (2048) before their JSON list closed, and the parser discarded the
+         WHOLE response rather than the detections it never got to write —
+         5 of 8 images scored 0 detections despite genuinely correct partial
+         output. Fixed in `qwen3_vl.py`: `parse_detection_json` now salvages
+         every complete, brace-balanced `{...}` object from a truncated list
+         instead of requiring the whole thing to parse (see its docstring
+         and the new `_iter_balanced_objects` helper; 4 new tests in
+         `test_qwen3_vl.py`).
+      Also found and fixed along the way: the checkpoint's shipped
+      `generation_config.json` defaults to `do_sample=True,
+      temperature=0.7`, which made repeat runs of the SAME image produce
+      wildly different detection counts (21 vs 63) — a reproducibility
+      violation for this repo. Fixed with `do_sample=False` in the
+      `generate()` call (greedy decoding), documented inline.
+      **Gate verdict, post-fixes**: real, spatially accurate grounding on
+      the primary subjects — e.g. image `...0000...jpg` landed 18 tight,
+      correctly-labelled boxes on real players/numbers/ball/rim with no
+      false positives, visually confirmed. This is NOT SmolVLM2-shaped
+      (that scored 0.000 AP with boxes spraying across the frame). BUT: a
+      genuine, deterministic weakness surfaced on crowded frames — the
+      model boxes bench/spectator members as `"player"` (a long strip of
+      narrow vertical boxes along the crowd baseline in image `...0122...jpg`,
+      consistent across greedy-decoded reruns), which will cost `player`-class
+      precision and is exactly the kind of "who's the worst labeler" finding
+      this project's reports have surfaced before for other rows. Proceeding
+      to Phase 3's prompt search with this documented as a known limitation
+      to watch in the per-class breakdown, not as a gate failure.
 
 ### Phase 3 — GPU rental + val-split search
 - [x] Read `docs/provenance/training-runs.md` and
