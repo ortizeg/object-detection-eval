@@ -272,13 +272,15 @@ negative result exactly like SmolVLM2's removal note at the bottom of
       environment gotchas (CUDA compiler, isolated env).
 
 ### Phase 4 — Test-split run (once) + artifacts
-- [ ] `pixi run -e vlm-qwen3vl python scripts/run_vlm_benchmark.py --only
-      qwen3_vl` on test, **exactly once** — no iterating on this number.
-- [ ] Copy `benchmarks/basketball/results/vlm/qwen3_vl.json` (+ prompt-
-      search/tiling artifacts under `results/vlm/prompt_search/`) back to
-      the local worktree.
-- [ ] Terminate the vast.ai instance.
-- [ ] Commit results JSON.
+- [x] `run_vlm_benchmark.py --only qwen3_vl` on the 94-image test split,
+      **exactly once**. **Result: mAP@50:95 = 0.1878, mAP@50 = 0.2979.**
+      Informational-only (`expected_map5095: null`, VLM-02) — gate PASSED
+      by definition, no target to reproduce. 3843 total detections across
+      94 images.
+- [x] Copied `benchmarks/basketball/results/vlm/qwen3_vl.json` and
+      `results/vlm/prompt_search/qwen3_vl.json` back to the local worktree.
+- [x] Terminated the vast.ai instance (contract 47960424).
+- [x] Committing results JSON (this update).
 
 ### Phase 5 — Reports + full verification
 - [ ] Regenerate reports (`scripts/generate_report.py`); confirm Qwen3-VL
