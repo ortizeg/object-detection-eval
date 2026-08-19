@@ -10,7 +10,7 @@ planStatus:
   tags: [vlm, evaluation, qwen3-vl, zero-shot]
   created: "2026-08-17"
   startDate: "2026-08-17"
-  updated: "2026-08-18T18:50:00.000Z"
+  updated: "2026-08-19T03:30:00.000Z"
   progress: 100
 ---
 
@@ -356,6 +356,65 @@ explicitly left alone (documented in commit messages and above): 13 NMS
 tests failing on the other six models' `_nms`-method drift, and 2 stale
 hardcoded target-value tests — neither touched by, nor caused by, this
 work.
+
+## Follow-up round (2026-08-19): resolution fix takes it to first place
+
+After review, two follow-up investigations were requested: a resolution
+hyperparameter check (rim/number's collapse looked like it could be a
+downscaling artifact) and a disclosed prompt-constraint experiment
+targeting the crowd-mislabeling weakness the decision gate found. Both
+were run on a freshly-rented vast.ai box (contract 48073322 — the original
+47960424 was long since terminated; a second orphaned rental attempt,
+48073206, was found unreachable and destroyed without ever being used).
+
+**Resolution — real, substantial, adopted.** Qwen3-VL's image processor
+resizes to fit a total-pixel budget; the checkpoint's own default bounds
+already comfortably contained this dataset's native 1920x1080 frames, so
+nothing was silently downscaled. But forcing genuine *upscaling* (2x,
+`min_pixels=4,096,000` / `max_pixels=8,192,000`, confirmed via
+`image_grid_thw`) fixed something real: **visually confirmed before
+trusting any metric** — at native resolution the model floods images with
+~40-60 "jersey number" detections of which only ~1 renders as a real,
+distinct, correctly-placed box (the rest degenerate/duplicate noise); at
+2x upscale, far fewer detections, all correctly placed. Measured on a
+24-image val subsample: **mAP@50:95 0.1939 → 0.2624, +0.0685**. `number`
+AP50 alone: ~0 → 0.278. `rim` stayed at 0.000 either way — confirmed not
+a resolution problem (it collapses across every row in this whole
+comparison, not just this one). Now `Qwen3VLInferencer`'s default.
+
+**Tiling — re-verified by reasoning, not re-run.** Its earlier -0.0782
+regression traced to crowd-mislabeling (tiling's 5 overlapping crops
+multiplying exposure to bench/spectator regions the model already
+mislabels as `player`) — a labelling failure mode resolution doesn't
+touch. The untiled decision stands; not worth another ~90 GPU-minutes to
+confirm what the mechanism already explains.
+
+**Prompt-constraint experiment — honest negative result.** Added an
+optional `prompt_template` override to `Qwen3VLInferencer` (mirrors
+`gemini.py`'s), then tried three DISCLOSED, non-equal-effort candidate
+prompts (same posture as Gemini's row, not from the shared 6-candidate
+pool) adding explicit court-only / spectator-exclusion language, mirroring
+Gemini's own "At most N players... exactly ONE bounding box" constraint
+style. All three landed at or slightly below the mechanical-prompt
+baseline (0.2599, 0.2601, 0.2551 vs baseline 0.2624) — inside noise, no
+real improvement. The model already "knows" what a player looks like;
+telling it to exclude spectators adds instruction-following overhead
+without adding discriminating signal. Mechanical prompt kept, documented
+as a negative result in the manifest, exactly as the search table above
+documents which vocabulary candidates lost.
+
+**Final published number: test mAP@50:95 = 0.3175** (mAP@50 = 0.4522),
+re-measured once with the fully adopted config (2x-upscale resolution, no
+tiling, mechanical prompt) — up **+0.1297** from the original 0.1878.
+Qwen3-VL-8B now leads the whole 7-row table, narrowly ahead of OWLv2
+(0.3148), having started in last place tied with YOLO-World. Per-class:
+player 0.934, ball 0.334, referee 0.727, rim 0.000, number 0.266 — every
+class but `rim` improved substantially; `rim` remains this row's one
+unresolved weakness, shared with the rest of the table.
+
+GPU instance terminated after copying results back. Full test suite green
+throughout (548 default + 29/29 qwen3_vl-specific), lint/format/typecheck
+clean.
 
 ## Open questions
 
