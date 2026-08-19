@@ -52,6 +52,10 @@ def _mock_transformers():
         mock_torch.no_grad.return_value.__exit__ = MagicMock()
 
         mock_processor = MagicMock()
+        mock_processor.image_processor.size = {
+            "shortest_edge": 65536,
+            "longest_edge": 16777216,
+        }
         mock_proc_cls.from_pretrained.return_value = mock_processor
 
         mock_model = MagicMock()
@@ -103,6 +107,49 @@ class TestQwen3VLInferencerConstruction:
             device="cpu",
         )
         assert inferencer._name_to_id == {"player": 0, "ball": 1, "referee": 2}
+
+
+class TestResolutionOverride:
+    """Tests for the min_pixels/max_pixels image-processor size override."""
+
+    def test_default_forces_upscale_size(self, _mock_transformers) -> None:
+        mock_processor, _mock_model, _mock_torch = _mock_transformers
+        Qwen3VLInferencer(classes=["player"], device="cpu")
+        assert mock_processor.image_processor.size == {
+            "shortest_edge": 4_096_000,
+            "longest_edge": 8_192_000,
+        }
+
+    def test_explicit_min_and_max_pixels(self, _mock_transformers) -> None:
+        mock_processor, _mock_model, _mock_torch = _mock_transformers
+        Qwen3VLInferencer(
+            classes=["player"],
+            min_pixels=1_000_000,
+            max_pixels=2_000_000,
+            device="cpu",
+        )
+        assert mock_processor.image_processor.size == {
+            "shortest_edge": 1_000_000,
+            "longest_edge": 2_000_000,
+        }
+
+    def test_none_none_leaves_processor_default_untouched(self, _mock_transformers) -> None:
+        mock_processor, _mock_model, _mock_torch = _mock_transformers
+        Qwen3VLInferencer(classes=["player"], min_pixels=None, max_pixels=None, device="cpu")
+        assert mock_processor.image_processor.size == {
+            "shortest_edge": 65536,
+            "longest_edge": 16777216,
+        }
+
+    def test_partial_override_keeps_other_bound_from_processor_default(
+        self, _mock_transformers
+    ) -> None:
+        mock_processor, _mock_model, _mock_torch = _mock_transformers
+        Qwen3VLInferencer(classes=["player"], min_pixels=3_000_000, max_pixels=None, device="cpu")
+        assert mock_processor.image_processor.size == {
+            "shortest_edge": 3_000_000,
+            "longest_edge": 16777216,
+        }
 
 
 class TestQwen3VLInferencerPredict:

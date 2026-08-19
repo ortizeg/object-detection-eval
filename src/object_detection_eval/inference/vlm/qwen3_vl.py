@@ -147,6 +147,32 @@ def parse_detection_json(text: str) -> list[dict[str, Any]]:
     return data
 
 
+#: Qwen3-VL's image processor computes a per-image token budget from a
+#: ``size`` dict (``shortest_edge``/``longest_edge``, in TOTAL pixels, both
+#: rounded to a multiple of ``patch_size * merge_size`` = 32) and resizes the
+#: image to fit inside it -- upscaling if the source is smaller than
+#: ``shortest_edge``, downscaling if larger than ``longest_edge``, otherwise
+#: leaving it alone.
+#:
+#: The DEFAULT bounds (65536 to 16777216, i.e. roughly 256x256 to 4096x4096)
+#: already comfortably contain this dataset's native 1920x1080 broadcast
+#: frames (~2.07M px) -- confirmed empirically (``image_grid_thw`` identical
+#: with and without explicit bounds at this pixel count). So there is no
+#: silent DOWNSCALING happening by default; the lever that actually matters
+#: for small objects (``rim``, ``number``) is setting ``shortest_edge`` ABOVE
+#: native resolution to force genuine UPSCALING, which measurably increases
+#: patch count (confirmed: 68x120 patches at native -> 96x170, exactly 2x,
+#: with ``shortest_edge=4096000``) and therefore gives the vision encoder more
+#: tokens per small object.
+#:
+#: Applied via ``processor.image_processor.size`` after ``from_pretrained``
+#: (the officially documented way to override it -- passing
+#: ``min_pixels``/``max_pixels`` through ``apply_chat_template`` was tested
+#: and confirmed to have NO EFFECT in this transformers version).
+_DEFAULT_MIN_PIXELS = 4_096_000  # ~2x this dataset's native 1920x1080
+_DEFAULT_MAX_PIXELS = 8_192_000  # headroom above the floor
+
+
 class Qwen3VLInferencer(BaseInferencer):
     """Run zero-shot object detection using Qwen3-VL's native grounding mode.
 
@@ -158,6 +184,12 @@ class Qwen3VLInferencer(BaseInferencer):
             list of basketball-scene detections (typically well under 30
             objects); raising it only matters if a prompt/class list produces
             a longer response than that.
+        min_pixels: Floor on the image processor's total-pixel budget (see
+            module-level note above). ``None`` uses the checkpoint's own
+            default (no forced upscaling). Default forces ~2x upscaling of
+            this dataset's native-resolution frames, aimed at small classes.
+        max_pixels: Ceiling on the same budget. ``None`` uses the
+            checkpoint's own default.
         device: Device string (``"cuda"``, ``"cpu"``, ``"mps"``, or ``"auto"``).
     """
 
@@ -166,11 +198,15 @@ class Qwen3VLInferencer(BaseInferencer):
         model_name: str = "Qwen/Qwen3-VL-8B-Instruct",
         classes: list[str] | None = None,
         max_new_tokens: int = 2048,
+        min_pixels: int | None = _DEFAULT_MIN_PIXELS,
+        max_pixels: int | None = _DEFAULT_MAX_PIXELS,
         device: str = "auto",
     ) -> None:
         self.model_name = model_name
         self.classes = classes or []
         self.max_new_tokens = max_new_tokens
+        self.min_pixels = min_pixels
+        self.max_pixels = max_pixels
 
         # Build normalised lookup: lower-cased class name -> class index
         self._name_to_id: dict[str, int] = {
@@ -199,6 +235,18 @@ class Qwen3VLInferencer(BaseInferencer):
 
         logger.info(f"Loading Qwen3-VL model {model_name} on {self._device}")
         self._processor = AutoProcessor.from_pretrained(model_name)
+        if self.min_pixels is not None or self.max_pixels is not None:
+            current = self._processor.image_processor.size
+            new_size = {
+                "shortest_edge": self.min_pixels
+                if self.min_pixels is not None
+                else current["shortest_edge"],
+                "longest_edge": self.max_pixels
+                if self.max_pixels is not None
+                else current["longest_edge"],
+            }
+            self._processor.image_processor.size = new_size
+            logger.info(f"Qwen3-VL image processor size overridden to {new_size}")
         # dtype="auto", not torch.float32 like the smaller HF inferencers here
         # (Grounding DINO ~172M params, Florence-2 ~830M): forcing fp32 on an
         # 8B model doubles memory for no accuracy benefit this repo needs, and
