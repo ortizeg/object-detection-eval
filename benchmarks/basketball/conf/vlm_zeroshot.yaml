@@ -230,6 +230,59 @@ models:
   # resolution knob, and raising imgsz does for it what tiling does for the
   # others — without feeding a 640-trained detector crops at a scale its
   # training never saw.
+  #
+  # REFEREE-WORD INVESTIGATION (2026-08-19, targeted, NOT equal-effort). Pulled
+  # from the six committed rows' per-class AP50: YOLO-World is the ONLY model
+  # with a complete `referee` collapse (0.000) — every other model, including
+  # the four other phrase-grounding detectors scoring the identical bare word
+  # "referee", gets 0.37-0.72. That rules out "referee is a bad word" as the
+  # explanation on its own, so this was a further, single-class, DISCLOSED
+  # follow-up (more tuning attention than the equal-effort process gives every
+  # model — see vlm_prompt_search.yaml's header), not a repeat of it.
+  #
+  # Sanity check first (10 val images, 30 GT referee boxes, box_threshold
+  # dropped to 0.0001 so nothing was threshold-filtered before looking): every
+  # single GT referee box had an overlapping raw detection at IoU 0.61-0.98,
+  # often at high confidence (up to 0.91) — and EVERY one of them was labelled
+  # `person`, never `referee`. So this is not a missing-box or a
+  # threshold/NMS-filtering problem; it is a labelling collision inside the
+  # model's own argmax over its CLIP-encoded vocabulary.
+  #
+  # That predicts a vocabulary swap should be able to fix it. It didn't. Five
+  # candidate referee-class words were swept on val (person/basketball/
+  # basketball hoop/jersey number on a uniform held fixed at the values below;
+  # `vlm_ablation.yaml`'s `referee_word` element, reproducible via
+  # `ablate_vlm.py --only yolo_world --element referee_word --split valid`):
+  #
+  #     word                          referee AP50   overall val mAP@50:95
+  #     referee (current, published)  0.000          0.1771
+  #     official                      0.000          0.1846
+  #     basketball official           0.000          0.1828
+  #     black and white striped shirt 0.000          0.1811
+  #     man in a striped shirt        0.000          0.1779
+  #     umpire                        0.000          0.1777
+  #
+  # `referee` AP50 is EXACTLY 0.000 for every candidate, including the four
+  # that never previously touched the word "referee" at all (official, umpire,
+  # basketball official, black and white striped shirt) — the same outcome
+  # ELEMENT 8 of vlm_ablation.yaml already recorded for "referee in a striped
+  # shirt". Combined with the sanity check, this is not a wording problem:
+  # `person` wins the argmax over every referee phrasing tried, which reads as
+  # a genuine CLIP-encoder blind spot for this checkpoint rather than a missing
+  # prompt.
+  #
+  # `official`'s higher OVERALL mAP (0.1846 vs 0.1771) is real but NOT a
+  # referee fix — it comes entirely from `number` (AP50 0.051 -> 0.113, a
+  # vocabulary-context side effect on an unrelated class, the same
+  # neighbouring-word sensitivity the COCO-control paragraph above documents),
+  # with `referee` unchanged at 0.000. Adopting it under this investigation's
+  # banner would misrepresent a `number`-class coincidence as a referee result,
+  # so it is disclosed here and NOT adopted; the published vocabulary is
+  # unchanged. A `number`-class win would need its own targeted investigation
+  # to be trusted, not a byproduct of a referee sweep.
+  #
+  # NET RESULT: negative. The published vocabulary is unchanged; test was not
+  # re-run (the config did not change).
   - name: yolo_world
     inferencer: yolo_world
     model_name: yolov8x-worldv2.pt

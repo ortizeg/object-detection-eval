@@ -3798,14 +3798,14 @@
     },
     {
       "arm": "yolo_world__baseline",
-      "substrate": "mps",
+      "substrate": "cuda:NVIDIA GeForce RTX 3090",
       "model": "yolo_world",
       "element": "baseline",
       "baseline": null,
-      "mAP_50_95": 0.1318090260028839,
-      "mAP_50": 0.174406036734581,
+      "mAP_50_95": 0.13188858330249786,
+      "mAP_50": 0.174479678273201,
       "per_class_ap50": {
-        "player": 0.7771730422973633,
+        "player": 0.7775412797927856,
         "ball": 0.08825646340847015,
         "referee": 0.0,
         "rim": 0.0,
@@ -3822,6 +3822,8 @@
           "jersey number"
         ],
         "task": null,
+        "prompt_template": null,
+        "sample": 0,
         "box_threshold": 0.01,
         "nms_iou_threshold": 0.5,
         "processor_nms_threshold": null,
@@ -7902,6 +7904,211 @@
         "tile_overlap": 0.2
       },
       "delta_map5095": -0.08585278689861298
+    },
+    {
+      "arm": "yolo_world__referee_word__person-basketball-official-basketball-ho-47c6e449",
+      "substrate": "cuda:NVIDIA GeForce RTX 3090",
+      "model": "yolo_world",
+      "element": "referee_word",
+      "baseline": "yolo_world__baseline",
+      "mAP_50_95": 0.18459182977676392,
+      "mAP_50": 0.24876628816127777,
+      "per_class_ap50": {
+        "player": 0.7977653741836548,
+        "ball": 0.3329989016056061,
+        "referee": 0.0,
+        "rim": 0.0,
+        "number": 0.1130671501159668
+      },
+      "config": {
+        "inferencer": "yolo_world",
+        "model_name": "yolov8x-worldv2.pt",
+        "classes": [
+          "person",
+          "basketball",
+          "official",
+          "basketball hoop",
+          "jersey number on a uniform"
+        ],
+        "task": null,
+        "prompt_template": null,
+        "sample": 0,
+        "box_threshold": 0.001,
+        "nms_iou_threshold": 0.7,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": 300,
+        "imgsz": 1280,
+        "tiles": null,
+        "tile_overlap": 0.2
+      },
+      "delta_map5095": 0.05270324647426605
+    },
+    {
+      "arm": "yolo_world__referee_word__person-basketball-umpire-basketball-hoop-9ce04bd3",
+      "substrate": "cuda:NVIDIA GeForce RTX 3090",
+      "model": "yolo_world",
+      "element": "referee_word",
+      "baseline": "yolo_world__baseline",
+      "mAP_50_95": 0.17774464190006256,
+      "mAP_50": 0.23629434406757355,
+      "per_class_ap50": {
+        "player": 0.7928597331047058,
+        "ball": 0.33498525619506836,
+        "referee": 0.0,
+        "rim": 0.0,
+        "number": 0.053626738488674164
+      },
+      "config": {
+        "inferencer": "yolo_world",
+        "model_name": "yolov8x-worldv2.pt",
+        "classes": [
+          "person",
+          "basketball",
+          "umpire",
+          "basketball hoop",
+          "jersey number on a uniform"
+        ],
+        "task": null,
+        "prompt_template": null,
+        "sample": 0,
+        "box_threshold": 0.001,
+        "nms_iou_threshold": 0.7,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": 300,
+        "imgsz": 1280,
+        "tiles": null,
+        "tile_overlap": 0.2
+      },
+      "delta_map5095": 0.0458560585975647
+    },
+    {
+      "arm": "yolo_world__referee_word__person-basketball-man-in-a-striped-shirt-deaac31d",
+      "substrate": "cuda:NVIDIA GeForce RTX 3090",
+      "model": "yolo_world",
+      "element": "referee_word",
+      "baseline": "yolo_world__baseline",
+      "mAP_50_95": 0.17790979146957397,
+      "mAP_50": 0.23644821345806122,
+      "per_class_ap50": {
+        "player": 0.7938448786735535,
+        "ball": 0.338300496339798,
+        "referee": 0.0,
+        "rim": 0.0,
+        "number": 0.05009571835398674
+      },
+      "config": {
+        "inferencer": "yolo_world",
+        "model_name": "yolov8x-worldv2.pt",
+        "classes": [
+          "person",
+          "basketball",
+          "man in a striped shirt",
+          "basketball hoop",
+          "jersey number on a uniform"
+        ],
+        "task": null,
+        "prompt_template": null,
+        "sample": 0,
+        "box_threshold": 0.001,
+        "nms_iou_threshold": 0.7,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": 300,
+        "imgsz": 1280,
+        "tiles": null,
+        "tile_overlap": 0.2
+      },
+      "delta_map5095": 0.04602120816707611
+    },
+    {
+      "arm": "yolo_world__referee_word__person-basketball-basketball-official-ba-36a1cdd2",
+      "substrate": "cuda:NVIDIA GeForce RTX 3090",
+      "model": "yolo_world",
+      "element": "referee_word",
+      "baseline": "yolo_world__baseline",
+      "mAP_50_95": 0.18276144564151764,
+      "mAP_50": 0.2434386909008026,
+      "per_class_ap50": {
+        "player": 0.7946081757545471,
+        "ball": 0.37395626306533813,
+        "referee": 0.0,
+        "rim": 0.0,
+        "number": 0.048629030585289
+      },
+      "config": {
+        "inferencer": "yolo_world",
+        "model_name": "yolov8x-worldv2.pt",
+        "classes": [
+          "person",
+          "basketball",
+          "basketball official",
+          "basketball hoop",
+          "jersey number on a uniform"
+        ],
+        "task": null,
+        "prompt_template": null,
+        "sample": 0,
+        "box_threshold": 0.001,
+        "nms_iou_threshold": 0.7,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": 300,
+        "imgsz": 1280,
+        "tiles": null,
+        "tile_overlap": 0.2
+      },
+      "delta_map5095": 0.050872862339019775
+    },
+    {
+      "arm": "yolo_world__referee_word__person-basketball-black-and-white-stripe-719b9839",
+      "substrate": "cuda:NVIDIA GeForce RTX 3090",
+      "model": "yolo_world",
+      "element": "referee_word",
+      "baseline": "yolo_world__baseline",
+      "mAP_50_95": 0.1811048984527588,
+      "mAP_50": 0.24162141978740692,
+      "per_class_ap50": {
+        "player": 0.7996336221694946,
+        "ball": 0.33869385719299316,
+        "referee": 0.0,
+        "rim": 0.0,
+        "number": 0.0697796493768692
+      },
+      "config": {
+        "inferencer": "yolo_world",
+        "model_name": "yolov8x-worldv2.pt",
+        "classes": [
+          "person",
+          "basketball",
+          "black and white striped shirt",
+          "basketball hoop",
+          "jersey number on a uniform"
+        ],
+        "task": null,
+        "prompt_template": null,
+        "sample": 0,
+        "box_threshold": 0.001,
+        "nms_iou_threshold": 0.7,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": 300,
+        "imgsz": 1280,
+        "tiles": null,
+        "tile_overlap": 0.2
+      },
+      "delta_map5095": 0.049216315150260925
     }
   ]
 }

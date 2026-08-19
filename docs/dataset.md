@@ -230,6 +230,11 @@ up front.
 | `orange basketball` | ball |
 | `basketball hoop and backboard` | rim |
 | `jersey number on a uniform` | number |
+| `official` | referee |
+| `umpire` | referee |
+| `man in a striped shirt` | referee |
+| `basketball official` | referee |
+| `black and white striped shirt` | referee |
 <!-- TABLE:taxonomy_aliases END -->
 
 ### Annotation counts, 10 raw categories
