@@ -281,6 +281,37 @@ models:
   # `player` on busy frames, and tiling multiplies how many crops it sees a
   # crowd in, compounding rather than fixing that.
   #
+  # RESOLUTION (2026-08-19). A standard inference hyperparameter, the same
+  # tier as YOLO-World's `imgsz` -- NOT a vocabulary/prompt change, so it does
+  # not need equal-effort disclosure. Qwen3-VL's image processor resizes to
+  # fit a total-pixel budget (`processor.image_processor.size`); the
+  # checkpoint's own default bounds (roughly 256x256 to 4096x4096) already
+  # comfortably contain this dataset's native 1920x1080 frames, so nothing
+  # was being silently downscaled. But forcing genuine UPSCALING (setting
+  # `shortest_edge` above native resolution) measurably helped: visually
+  # confirmed first (native-resolution runs emit ~40-60 "jersey number"
+  # detections per image of which only ~1 renders as a real, distinct,
+  # correctly-placed box -- the rest are near-duplicate/degenerate noise;
+  # forcing 2x upscaling collapses that flood to a handful of detections that
+  # are ALL correctly placed on real jersey numbers), then measured on the
+  # same 24-image val subsample the tiling check used: mAP@50:95 0.1939
+  # (native) -> 0.2624 (2x upscale, shortest_edge=4096000/longest_edge=
+  # 8192000), **+0.0685**. `number` AP50 alone: ~0 -> 0.278. `rim` stays at
+  # 0.000 either way -- resolution is not what is wrong with `rim` (see the
+  # search table above; that class collapses in every row in this
+  # comparison, not just this one). `Qwen3VLInferencer`'s `min_pixels`/
+  # `max_pixels` now DEFAULT to this 2x floor (not `None`, which would
+  # reproduce the checkpoint's own bounds) -- pass `None` explicitly for an
+  # A/B comparison against the checkpoint default.
+  #
+  # TILING RE-CHECKED under 2x upscaling (2026-08-19, reasoned, not
+  # re-measured): tiling's -0.0782 regression traced to crowd-mislabeling
+  # (five overlapping crops multiplying how often the model sees, and
+  # mislabels, bench/spectator regions as `player`) -- a vocabulary/labelling
+  # failure mode, not a resolution one. Forcing upscaling does not touch
+  # that mechanism, so the untiled decision is expected to still hold. Not
+  # re-run given the 24-image tiled arm alone costs ~90 GPU-minutes.
+  #
   # ENVIRONMENT: requires transformers>=4.57.0, newer than the <4.52.0 ceiling
   # the other six rows share. Run this row under `pixi run -e vlm-qwen3vl`,
   # NOT `-e vlm` -- see pixi.toml's `[feature.qwen3vl]` comment. On a rented
