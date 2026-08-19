@@ -312,6 +312,29 @@ models:
   # that mechanism, so the untiled decision is expected to still hold. Not
   # re-run given the 24-image tiled arm alone costs ~90 GPU-minutes.
   #
+  # PROMPT-CONSTRAINT EXPERIMENT (2026-08-19) -- DISCLOSED, NON-EQUAL-EFFORT.
+  # Unlike the vocabulary search above, this is a BESPOKE exploration, same
+  # posture as Gemini's hand-tuned row: not drawn from the shared 6-candidate
+  # vlm_prompt_search.yaml pool, and stated so explicitly here.
+  #
+  # The decision-gate sanity check found this model boxes bench/spectator
+  # regions as `player` on crowded frames. Tried fixing it directly: three
+  # candidate prompts, each adding explicit court-only / spectator-exclusion
+  # constraint language to the mechanical template (mirroring Gemini's own
+  # "At most N players... Each person gets exactly ONE bounding box"
+  # constraint style), scored on the same 24-image val subsample as the
+  # resolution and tiling checks, at 2x upscale resolution:
+  #   baseline (mechanical prompt)              0.2624
+  #   c_court_only   (exclude non-court people)  0.2599  (-0.0025)
+  #   c_numeric_cap  (+ explicit count caps)      0.2601  (-0.0023)
+  #   c_uniform_cue  (uniform-based cue)          0.2551  (-0.0073)
+  # All three land at or slightly below baseline, inside this experiment's
+  # noise band. NEGATIVE RESULT: explicit constraint language does not fix
+  # the crowd-mislabeling weakness -- the model already "knows" what a
+  # player looks like well enough that telling it to exclude spectators adds
+  # instruction-following overhead without adding discriminating signal.
+  # `prompt_template` is NOT set on this row; the mechanical prompt stands.
+  #
   # ENVIRONMENT: requires transformers>=4.57.0, newer than the <4.52.0 ceiling
   # the other six rows share. Run this row under `pixi run -e vlm-qwen3vl`,
   # NOT `-e vlm` -- see pixi.toml's `[feature.qwen3vl]` comment. On a rented

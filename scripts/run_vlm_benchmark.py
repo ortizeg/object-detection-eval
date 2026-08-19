@@ -210,6 +210,7 @@ def _qwen3_vl_factory(entry: ManifestEntry) -> BaseInferencer:
     return Qwen3VLInferencer(
         model_name=entry.model_name,
         classes=entry.classes,
+        prompt_template=entry.prompt_template,
     )
 
 
