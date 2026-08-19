@@ -190,6 +190,13 @@ class Qwen3VLInferencer(BaseInferencer):
             this dataset's native-resolution frames, aimed at small classes.
         max_pixels: Ceiling on the same budget. ``None`` uses the
             checkpoint's own default.
+        prompt_template: Optional full override of the mechanically-built
+            prompt (mirrors ``gemini.py``'s constructor). ``None`` (the
+            default) keeps this row on the mechanical, equal-effort-eligible
+            prompt described above. Passing an explicit template is a
+            BESPOKE, non-equal-effort exploration -- same posture as
+            Gemini's hand-tuned prompt -- and any manifest row that adopts
+            one must disclose that plainly, the way Gemini's row does.
         device: Device string (``"cuda"``, ``"cpu"``, ``"mps"``, or ``"auto"``).
     """
 
@@ -200,6 +207,7 @@ class Qwen3VLInferencer(BaseInferencer):
         max_new_tokens: int = 2048,
         min_pixels: int | None = _DEFAULT_MIN_PIXELS,
         max_pixels: int | None = _DEFAULT_MAX_PIXELS,
+        prompt_template: str | None = None,
         device: str = "auto",
     ) -> None:
         self.model_name = model_name
@@ -215,8 +223,9 @@ class Qwen3VLInferencer(BaseInferencer):
 
         # Mechanical prompt, verbatim shape from the official cookbook -- this
         # is what makes the row eligible for the equal-effort vocabulary
-        # search rather than a hand-tuned exemption like Gemini's.
-        self._prompt = (
+        # search rather than a hand-tuned exemption like Gemini's. An explicit
+        # prompt_template overrides it (see the docstring's disclosure note).
+        self._prompt = prompt_template or (
             'Locate every instance that belongs to the following categories: "'
             + ", ".join(self.classes)
             + '". Report bbox coordinates in JSON format.'

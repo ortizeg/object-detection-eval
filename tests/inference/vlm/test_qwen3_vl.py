@@ -101,6 +101,15 @@ class TestQwen3VLInferencerConstruction:
         )
 
     @pytest.mark.usefixtures("_mock_transformers")
+    def test_prompt_template_overrides_mechanical_prompt(self) -> None:
+        inferencer = Qwen3VLInferencer(
+            classes=["player", "ball"],
+            prompt_template="Find only the players actively on the court.",
+            device="cpu",
+        )
+        assert inferencer._prompt == "Find only the players actively on the court."
+
+    @pytest.mark.usefixtures("_mock_transformers")
     def test_name_to_id_mapping(self) -> None:
         inferencer = Qwen3VLInferencer(
             classes=["player", "ball", "referee"],
