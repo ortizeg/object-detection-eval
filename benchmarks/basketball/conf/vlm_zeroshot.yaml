@@ -244,6 +244,83 @@ models:
     imgsz: 1280
     expected_map5095: 0.189
 
+  # LLMDet-large (added 2026-08-17) -- the seventh row. Architecturally
+  # mm-grounding-dino: same HF calling convention as Grounding DINO
+  # (AutoModelForZeroShotObjectDetection + post_process_grounded_object_detection),
+  # confirmed via its own model card ("inference is identical to Grounding
+  # DINO's") and its HF config (model_type "mm-grounding-dino"). Apache-2.0.
+  #
+  # Needs transformers>=4.55.0, unavailable on the `vlm` extra's <4.52.0 pin
+  # (guards HF post-processing drift the other six rows' gate is sensitive
+  # to) -- runs in its own isolated `llmdet` pixi extra instead of bumping
+  # that shared pin. See inference/vlm/llmdet.py and pyproject.toml's
+  # `llmdet` extra for the isolation rationale.
+  #
+  # PROMPT SEARCH (2026-08-17, RTX 4090). Six-candidate search on val:
+  # c5_bare_canonical (bare class names) won at 0.3369, ahead of c1_domain's
+  # 0.2958 and c0_coco_control's 0.2418 -- the two "add descriptive words"
+  # candidates (c2/c4, contrastive phrasing) both collapsed player and
+  # referee to 0.000, the same fragile-prompt failure mode YOLO-World's row
+  # documents for compound phrases. Full results:
+  # results/vlm/prompt_search/llmdet.json.
+  #
+  # TILING (2026-08-17, val, same box). 2x2 overlapping tiles: 0.3369 ->
+  # 0.3589 (+0.0220), and the first configuration in this file to get `rim`
+  # off exactly 0.000 (0.0238) -- `number` also jumped 0.4717 -> 0.6741.
+  # Adopted.
+  #
+  # NMS RE-SWEPT UNDER TILING (2026-08-20, val, RTX 4090). Unlike
+  # Grounding-DINO (0.5 -> 0.7, +0.0332, "almost all of it referee") or
+  # OWLv2, tiling did NOT manufacture a cross-tile-duplicate problem worth
+  # correcting here: {0.2, 0.3, 0.5, 0.7, 0.9, 1.0} scores 0.3567/0.3596/
+  # 0.3590/0.3583/0.3522/0.2716 -- flat across 0.2-0.7 (a 0.0028 span, inside
+  # measurement noise) and only degrading sharply once suppression is
+  # disabled entirely at 1.0. The nominal optimum (0.3, 0.3596) beats the
+  # untiled starting value (0.5, 0.3590) by +0.0006 -- not a real signal.
+  # nms_iou_threshold KEPT at 0.5: results/vlm/prompt_search/llmdet_nms_sweep.json.
+  #
+  # SENTENCE-STYLE PROMPT EXPLORATION (2026-08-20, val, RTX 4090).
+  # EXPLICITLY NOT equal-effort -- four hand-written candidates outside the
+  # shared 6-candidate pool in vlm_prompt_search.yaml, tried because LLMDet
+  # is trained under LLM-generated CAPTION supervision and might respond
+  # better to descriptive sentences than bare category words. It doesn't:
+  # article-prefixed bare words ("a player", "a referee", ...) scored 0.2793,
+  # below the adopted vocabulary's 0.3589, and three genuinely sentence-style
+  # candidates (short declarative / long descriptive caption / scene-context,
+  # all multi-clause) collapsed to exactly 0.0000 on every class -- LLMDet's
+  # phrase-grounding head (same family as Grounding DINO, built to align
+  # short noun phrases to boxes) could not resolve a coherent span for a
+  # multi-clause sentence and emitted empty labels almost every time. A
+  # phrase-grounding architecture limit, not a generic "sentences don't help
+  # VLMs" finding. classes kept unchanged (c5_bare_canonical):
+  # results/vlm/prompt_search/llmdet_sentence_prompts.json.
+  #
+  # TEST-SPLIT RESULT (2026-08-18, RTX 4090, run once via
+  # `run_vlm_benchmark.py --only llmdet`): mAP@50:95 0.3883, mAP@50 0.5062 --
+  # the strongest single zero-shot row in this comparison, ahead of every
+  # other model's individually reported test mAP@50:95. Neither follow-up
+  # experiment above beat the config this number was measured under, so it
+  # was not re-run.
+  #
+  # No expected_map5095: a new model has no prior published number to
+  # reproduce against (VLM-02's informational-only mode). See
+  # results/vlm/llmdet.json for the committed prediction dump the 0.3883
+  # figure above is computed from.
+  - name: llmdet
+    inferencer: llmdet
+    model_name: iSEE-Laboratory/llmdet_large
+    classes:
+      - player
+      - ball
+      - referee
+      - rim
+      - number
+    box_threshold: 0.01
+    text_threshold: 0.25
+    nms_iou_threshold: 0.5
+    tiles: [2, 2]
+    expected_map5095: null
+
   # Qwen3-VL-8B (added 2026-08-17). Apache-2.0. A NEW model with no prior
   # published number -- expected_map5095 is deliberately null (VLM-02
   # informational-only mode), not a target to reproduce.

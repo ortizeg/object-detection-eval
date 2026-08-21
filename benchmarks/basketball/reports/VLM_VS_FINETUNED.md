@@ -372,6 +372,7 @@ from the committed prediction dumps in `results/vlm/*.json` (never transcribed):
 | OmDet-Turbo | 0.211 | 0.297 | 0.219 |
 | Florence-2 | 0.238 | 0.323 | 0.255 |
 | YOLO-World | 0.189 | 0.241 | 0.209 |
+| LLMDet-large | 0.388 | 0.506 | 0.432 |
 | Qwen3-VL | 0.318 | 0.452 | 0.337 |
 <!-- TABLE:vlm_summary END -->
 
@@ -423,6 +424,7 @@ makes the pattern unmistakable:
 | OmDet-Turbo | 0.805 | 0.187 | 0.369 | 0.000 | 0.127 |
 | Florence-2 | 0.749 | 0.151 | 0.560 | 0.000 | 0.152 |
 | YOLO-World | 0.840 | 0.311 | 0.000 | 0.005 | 0.051 |
+| LLMDet-large | 0.880 | 0.407 | 0.673 | 0.001 | 0.571 |
 | Qwen3-VL | 0.934 | 0.334 | 0.727 | 0.000 | 0.266 |
 <!-- TABLE:vlm_per_class END -->
 

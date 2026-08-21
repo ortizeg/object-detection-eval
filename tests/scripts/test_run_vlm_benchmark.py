@@ -47,6 +47,7 @@ _EXPECTED_NAMES = [
     "grounding_dino",
     "florence2",
     "yolo_world",
+    "llmdet",
     "qwen3_vl",
 ]
 #: Every row now carries a target. grounding_dino, florence2, omdet_turbo and
@@ -61,11 +62,13 @@ _EXPECTED_TARGETS = {
     "florence2": 0.108,
     "yolo_world": 0.145,
 }
-#: qwen3_vl is a NEW model with no prior published number (VLM-02
-#: informational-only mode) -- its expected_map5095 is deliberately null, not
-#: dropped. Everything else still runs targeted, so a row silently losing its
-#: target remains exactly the drift this set is here to catch.
-_UNTARGETED: set[str] = {"qwen3_vl"}
+#: llmdet and qwen3_vl are both new models with no prior published number
+#: (VLM-02's informational-only mode -- see the None-check in
+#: `_print_result`) -- their expected_map5095 is deliberately null, not
+#: dropped. Every OTHER row losing its target would be drift worth catching,
+#: which is why this stays an explicit named set rather than being widened
+#: generically.
+_UNTARGETED: set[str] = {"llmdet", "qwen3_vl"}
 
 
 def _load_run_vlm_benchmark_module() -> types.ModuleType:

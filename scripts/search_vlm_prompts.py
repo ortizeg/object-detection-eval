@@ -35,6 +35,10 @@ Usage::
 
     PYTORCH_ENABLE_MPS_FALLBACK=1 pixi run -e vlm python scripts/search_vlm_prompts.py
     pixi run -e vlm python scripts/search_vlm_prompts.py --only owlv2
+
+    # LLMDet-large needs its own environment (transformers>=4.55.0, isolated
+    # from `vlm`'s <4.52.0 pin -- see inference/vlm/llmdet.py):
+    pixi run -e llmdet python scripts/search_vlm_prompts.py --only llmdet
 """
 
 from __future__ import annotations
@@ -174,6 +178,18 @@ def _build_inferencer(model: SearchModel, classes: list[str]) -> SupportsPredict
         from object_detection_eval.inference.vlm.grounding_dino import GroundingDINOInferencer
 
         return GroundingDINOInferencer(
+            model_name=model.model_name,
+            classes=classes,
+            box_threshold=model.box_threshold if model.box_threshold is not None else 0.01,
+            text_threshold=model.text_threshold if model.text_threshold is not None else 0.25,
+            nms_iou_threshold=(
+                model.nms_iou_threshold if model.nms_iou_threshold is not None else 0.5
+            ),
+        )
+    if model.inferencer == "llmdet":
+        from object_detection_eval.inference.vlm.llmdet import LLMDetInferencer
+
+        return LLMDetInferencer(
             model_name=model.model_name,
             classes=classes,
             box_threshold=model.box_threshold if model.box_threshold is not None else 0.01,
