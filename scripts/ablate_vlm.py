@@ -143,6 +143,17 @@ class Arm(BaseModel, frozen=True):
     tiles: list[int] | None = None
     tile_overlap: float = 0.2
 
+    #: Qwen3-VL only: floor/ceiling on the image processor's total-pixel budget
+    #: (see ``Qwen3VLInferencer``'s module-level note). ``None`` means "use the
+    #: checkpoint's own default", NOT "no resolution override was requested" --
+    #: an arm that leaves both unset silently builds the checkpoint-default,
+    #: *pre-fix* inferencer rather than the adopted ~2x-upscale configuration.
+    #: Both belong in the forward-pass signature: they change what the model
+    #: sees, not how its output is post-processed, so two arms differing only
+    #: here must not share a raw-detection cache.
+    min_pixels: int | None = None
+    max_pixels: int | None = None
+
     @model_validator(mode="after")
     def _check_threshold_above_cache_floor(self) -> Arm:
         """A threshold below the cache floor would score a truncated detection set."""
@@ -183,6 +194,8 @@ class Arm(BaseModel, frozen=True):
             f"imgsz{self.imgsz}",
             f"tiles{self.tiles}@{self.tile_overlap}",
             f"maxdet{self.max_det}",
+            f"minpx{self.min_pixels}",
+            f"maxpx{self.max_pixels}",
             f"prompt{hashlib.sha256((self.prompt_template or '-').encode()).hexdigest()[:8]}",
             f"sample{self.sample}",
         ]
@@ -482,6 +495,16 @@ def build_inferencer(arm: Arm, *, raw_mode: bool) -> Any:
             text_threshold=arm.text_threshold if arm.text_threshold is not None else 0.25,
             nms_iou_threshold=nms_iou,
         )
+    if arm.inferencer == "llmdet":
+        from object_detection_eval.inference.vlm.llmdet import LLMDetInferencer
+
+        return LLMDetInferencer(
+            model_name=arm.model_name,
+            classes=arm.classes,
+            box_threshold=box_threshold,
+            text_threshold=arm.text_threshold if arm.text_threshold is not None else 0.25,
+            nms_iou_threshold=nms_iou,
+        )
     if arm.inferencer == "florence2":
         from object_detection_eval.inference.vlm.florence2 import Florence2Inferencer
 
@@ -516,6 +539,21 @@ def build_inferencer(arm: Arm, *, raw_mode: bool) -> Any:
         return GeminiInferencer(
             model_name=arm.model_name,
             classes=arm.classes,
+            prompt_template=arm.prompt_template,
+        )
+    if arm.inferencer == "qwen3_vl":
+        from object_detection_eval.inference.vlm.qwen3_vl import Qwen3VLInferencer
+
+        # No raw_mode branch, same reasoning as Gemini above: Qwen3-VL applies
+        # neither a score threshold nor NMS of its own. min_pixels/max_pixels
+        # DO need to be threaded through in both modes -- they are the arm's
+        # forward-pass signature knobs (see Arm.min_pixels), not something
+        # raw_mode should strip.
+        return Qwen3VLInferencer(
+            model_name=arm.model_name,
+            classes=arm.classes,
+            min_pixels=arm.min_pixels,
+            max_pixels=arm.max_pixels,
             prompt_template=arm.prompt_template,
         )
     msg = f"unknown inferencer {arm.inferencer!r}"
