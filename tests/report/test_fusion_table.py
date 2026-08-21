@@ -310,6 +310,13 @@ def test_committed_test_log_matches_the_published_per_model_numbers() -> None:
     through the same scorer, so any divergence means one of the two tables in
     the report is describing a pipeline the other does not use -- which is
     exactly how PR #17 shipped a wrong number.
+
+    The two files are NOT expected to cover the same model SET, only to agree
+    on whichever models they share: `vlm_metrics_merged5.json` holds every
+    published VLM row, while this log holds only the models `adopted_arms`
+    names as fused (six, as of LLMDet-large's addition -- it is not yet part
+    of fusion, a documented follow-up, so it appears in the former but not
+    the latter).
     """
     published = load_vlm_metrics(
         _REPO_ROOT / "benchmarks" / "basketball" / "results" / "vlm" / "vlm_metrics_merged5.json"
@@ -331,4 +338,4 @@ def test_committed_test_log_matches_the_published_per_model_numbers() -> None:
         assert entry is not None, f"no published metrics for {row.models[0]}"
         assert row.map_50_95 == pytest.approx(entry["mAP_50_95"], abs=1e-6)
         checked += 1
-    assert checked == len(by_key), "every published model must appear in the test scoring"
+    assert checked == len(log.adopted_arms), "every fused model must appear in the test scoring"

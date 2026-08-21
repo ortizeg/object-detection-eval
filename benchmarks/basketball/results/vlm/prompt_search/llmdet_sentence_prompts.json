@@ -1,0 +1,77 @@
+{
+  "results": {
+    "s1_article": {
+      "classes": [
+        "a player",
+        "a ball",
+        "a referee",
+        "a rim",
+        "a number"
+      ],
+      "mAP_50_95": 0.2793230414390564,
+      "mAP_50": 0.48094362020492554,
+      "per_class_ap50": {
+        "player": 0.8684498071670532,
+        "ball": 0.305735319852829,
+        "referee": 0.7390874624252319,
+        "rim": 0.010457564145326614,
+        "number": 0.4809880256652832
+      }
+    },
+    "s2_short_sentence": {
+      "classes": [
+        "a basketball player is on the court",
+        "a basketball is in play",
+        "a referee is officiating the game",
+        "the rim of a basketball hoop",
+        "a number is printed on a player's jersey"
+      ],
+      "mAP_50_95": 0.0,
+      "mAP_50": 0.0,
+      "per_class_ap50": {
+        "player": 0.0,
+        "ball": 0.0,
+        "referee": 0.0,
+        "rim": 0.0,
+        "number": 0.0
+      }
+    },
+    "s3_long_caption": {
+      "classes": [
+        "a basketball player wearing a team uniform standing or running on the court",
+        "an orange basketball being held, dribbled, or in the air",
+        "a referee wearing a striped shirt officiating the basketball game",
+        "the circular metal rim of the basketball hoop mounted on the backboard",
+        "a number printed on the back of a player's jersey identifying them"
+      ],
+      "mAP_50_95": 0.0,
+      "mAP_50": 0.0,
+      "per_class_ap50": {
+        "player": 0.0,
+        "ball": 0.0,
+        "referee": 0.0,
+        "rim": 0.0,
+        "number": 0.0
+      }
+    },
+    "s4_scene_context": {
+      "classes": [
+        "a basketball player running down the court during a game",
+        "the basketball flying through the air toward the hoop",
+        "the referee standing on the sideline watching the play",
+        "the hoop's rim where the ball goes through to score",
+        "the jersey number worn by a player on the team"
+      ],
+      "mAP_50_95": 0.0,
+      "mAP_50": 0.0,
+      "per_class_ap50": {
+        "player": 0.0,
+        "ball": 0.0,
+        "referee": 0.0,
+        "rim": 0.0,
+        "number": 0.0
+      }
+    }
+  },
+  "best": "s1_article"
+}
