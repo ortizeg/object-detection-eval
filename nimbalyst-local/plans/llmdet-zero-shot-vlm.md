@@ -254,6 +254,33 @@ Two pre-existing, unrelated issues were found and explicitly NOT fixed
   gemini/florence2/yolo_world (post-ablation numbers were never synced back
   into the test file) — 2 failing tests, also pre-existing.
 
+## Follow-up round (2026-08-20/21)
+
+Requested after review: actually do the NMS re-sweep under tiling the
+original Phase 3 checklist claimed but never ran, backfill the manifest's
+missing comment block, and explore (disclosed, non-equal-effort)
+sentence-style prompts given LLMDet's LLM-caption training supervision.
+
+- **NMS re-sweep**: near-null. Flat across 0.2-0.7 (0.3567-0.3596), only
+  degrades sharply with no suppression at all (1.0: 0.2716). Kept 0.5.
+  `results/vlm/prompt_search/llmdet_nms_sweep.json`.
+- **Sentence-style prompts**: negative, and informative about *why* — three
+  genuinely sentence-style candidates collapsed to exactly 0.0000 (LLMDet's
+  phrase-grounding head cannot resolve a coherent span for a multi-clause
+  sentence), while an article-prefixed bare-word variant scored 0.2793,
+  still below the adopted vocabulary's 0.3589. `classes` unchanged.
+  `results/vlm/prompt_search/llmdet_sentence_prompts.json`.
+- **Manifest comment block**: backfilled with the full record (prompt
+  search, tiling, NMS re-sweep, sentence-prompt exploration, test-split
+  number), matching the other six rows' tone.
+- Neither experiment beat the already-published config, so the test-split
+  number (0.3883) and committed reports are unchanged — no re-run needed.
+- Used a fresh vast.ai instance (48141718) for this round (the original,
+  47957488, was already terminated); destroyed when done. One instance
+  from a *prior* attempt (48054761) died before any work ran on it and was
+  cleaned up; one unrelated instance on the shared account (48124756,
+  a different, unrelated project) was correctly left untouched throughout.
+
 ## Explicitly out of scope
 
 - Adding LLMDet to `fusion.py` / `fuse_vlm.py`'s ensemble — separate follow-up.
