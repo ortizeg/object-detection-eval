@@ -47,6 +47,8 @@ _EXPECTED_NAMES = [
     "grounding_dino",
     "florence2",
     "yolo_world",
+    "llmdet",
+    "qwen3_vl",
 ]
 #: Every row now carries a target. grounding_dino, florence2, omdet_turbo and
 #: yolo_world were re-measured on CUDA (RTX A4000) on 2026-08-01 under the
@@ -60,10 +62,13 @@ _EXPECTED_TARGETS = {
     "florence2": 0.108,
     "yolo_world": 0.145,
 }
-#: No row runs untargeted. Kept as an explicit empty set rather than deleting
-#: the test: a row silently losing its target is exactly the drift worth
-#: catching, and an empty expectation still fails loudly if one appears.
-_UNTARGETED: set[str] = set()
+#: llmdet and qwen3_vl are both new models with no prior published number
+#: (VLM-02's informational-only mode -- see the None-check in
+#: `_print_result`) -- their expected_map5095 is deliberately null, not
+#: dropped. Every OTHER row losing its target would be drift worth catching,
+#: which is why this stays an explicit named set rather than being widened
+#: generically.
+_UNTARGETED: set[str] = {"llmdet", "qwen3_vl"}
 
 
 def _load_run_vlm_benchmark_module() -> types.ModuleType:

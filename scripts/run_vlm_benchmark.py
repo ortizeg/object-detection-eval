@@ -33,6 +33,10 @@ Usage::
 
     pixi run -e vlm python scripts/run_vlm_benchmark.py --data-root /root/data/basketball
     pixi run -e vlm python scripts/run_vlm_benchmark.py --only gemini
+
+    # LLMDet-large needs its own environment (transformers>=4.55.0, isolated
+    # from `vlm`'s <4.52.0 pin -- see inference/vlm/llmdet.py):
+    pixi run -e llmdet python scripts/run_vlm_benchmark.py --only llmdet
 """
 
 from __future__ import annotations
@@ -155,6 +159,18 @@ def _grounding_dino_factory(entry: ManifestEntry) -> BaseInferencer:
     )
 
 
+def _llmdet_factory(entry: ManifestEntry) -> BaseInferencer:
+    from object_detection_eval.inference.vlm.llmdet import LLMDetInferencer
+
+    return LLMDetInferencer(
+        model_name=entry.model_name,
+        classes=entry.classes,
+        box_threshold=entry.box_threshold if entry.box_threshold is not None else 0.01,
+        text_threshold=entry.text_threshold if entry.text_threshold is not None else 0.25,
+        nms_iou_threshold=(entry.nms_iou_threshold if entry.nms_iou_threshold is not None else 0.5),
+    )
+
+
 def _omdet_turbo_factory(entry: ManifestEntry) -> BaseInferencer:
     from object_detection_eval.inference.vlm.omdet_turbo import OmDetTurboInferencer
 
@@ -204,6 +220,16 @@ def _gemini_factory(entry: ManifestEntry) -> BaseInferencer:
     )
 
 
+def _qwen3_vl_factory(entry: ManifestEntry) -> BaseInferencer:
+    from object_detection_eval.inference.vlm.qwen3_vl import Qwen3VLInferencer
+
+    return Qwen3VLInferencer(
+        model_name=entry.model_name,
+        classes=entry.classes,
+        prompt_template=entry.prompt_template,
+    )
+
+
 _INFERENCER_FACTORIES: dict[str, Callable[[ManifestEntry], BaseInferencer]] = {
     "gemini": _gemini_factory,
     "owlv2": _owlv2_factory,
@@ -211,6 +237,8 @@ _INFERENCER_FACTORIES: dict[str, Callable[[ManifestEntry], BaseInferencer]] = {
     "grounding_dino": _grounding_dino_factory,
     "florence2": _florence2_factory,
     "yolo_world": _yolo_world_factory,
+    "qwen3_vl": _qwen3_vl_factory,
+    "llmdet": _llmdet_factory,
 }
 
 

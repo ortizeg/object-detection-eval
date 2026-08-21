@@ -35,6 +35,12 @@ vlm = [
     # unrevalidated: the 4 remaining VLMs may need it, and <4.52 guards the
     # HF post-processing drift the VLM gate is sensitive to. Relaxing it
     # requires re-running the VLM reproduction gate on a GPU.
+    #
+    # LLMDet-large needs transformers>=4.55.0 and therefore CANNOT share this
+    # pin -- it runs in the separate `llmdet` extra below instead of being
+    # bumped in here. See that extra's comment for why isolation (not a
+    # shared-pin bump) was chosen. Do not "fix" this by widening this range;
+    # that re-opens the exact re-validation risk this note describes.
     "transformers>=4.49.0,<4.52.0",
     "timm",                          # OmDet-Turbo backbone (AutoBackbone)
     "einops",                        # Florence-2
@@ -55,6 +61,38 @@ vlm = [
     # not vendor — without this, set_classes() pip-installs CLIP from a git URL
     # at runtime and mutates the environment. MIT.
     "clip-anytorch",
+]
+# Qwen3-VL-8B zero-shot inferencer. SEPARATE from [vlm], not merged into it:
+# Qwen3-VL requires transformers>=4.57.0, while [vlm]'s pin (<4.52.0, see its
+# comment) is load-bearing for the six already-published zero-shot rows —
+# `pip install -e .[vlm,vlm-qwen3vl]` together is expected to fail to resolve,
+# which correctly reflects that the two pins are mutually exclusive rather
+# than papering over it. Mirrors pixi.toml's `qwen3vl` feature /
+# `vlm-qwen3vl` environment.
+vlm-qwen3vl = [
+    "torch",
+    "torchvision",
+    "transformers>=4.57.0,<5",
+    "accelerate",  # required for from_pretrained(device_map=...)
+]
+
+# LLMDet-large ISOLATED from `vlm` above, not merged into it. LLMDet was merged
+# into transformers upstream 2025-08-06 and needs >=4.55.0; `vlm`'s six other
+# rows are pinned <4.52.0 specifically to guard HF post-processing drift the
+# VLM reproduction gate is sensitive to (see that pin's comment). Bumping the
+# SHARED pin would force re-validating all six existing rows' published
+# numbers on a GPU for the sake of adding a seventh -- real, but disproportionate,
+# risk to land on unrelated rows. A second, small, torch-heavy extra is a
+# repeated cost this repo already accepts for exactly this kind of conflict
+# (see `trt` isolated from the core CPU onnxruntime for the same reason).
+llmdet = [
+    "torch",
+    "torchvision",
+    "transformers>=4.55.0,<4.58.0",
+    # Required explicitly here: `vlm`'s rows get this transitively via `peft`,
+    # but this extra doesn't pull peft. `from_pretrained(..., device_map="auto")`
+    # (llmdet.py, ported verbatim from grounding_dino.py) raises without it.
+    "accelerate",
 ]
 # TensorRT latency benchmarking. Linux-64 + NVIDIA only.
 # Versions pinned to the 06-RESEARCH.md-verified releases (2026-07-28). CRUCIALLY
@@ -167,6 +205,7 @@ python_functions = ["test_*"]
 addopts = "--cov=src --cov-report=term --cov-report=xml --cov-fail-under=80"
 markers = [
     "vlm: requires the [vlm] optional dependency group",
+    "llmdet: requires the [llmdet] optional dependency group (isolated from [vlm], see inference/vlm/llmdet.py)",
     "trt: requires a CUDA GPU and the [trt] optional dependency group",
     "graphsurgeon: requires onnx + onnx-graphsurgeon CPU graph tooling (the [trt] extra's graph-surgery subset), but NOT a CUDA GPU",
     "external: hits an external API (needs credentials)",

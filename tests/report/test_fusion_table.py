@@ -310,6 +310,13 @@ def test_committed_test_log_matches_the_published_per_model_numbers() -> None:
     through the same scorer, so any divergence means one of the two tables in
     the report is describing a pipeline the other does not use -- which is
     exactly how PR #17 shipped a wrong number.
+
+    The two files are NOT expected to cover the same model SET, only to agree
+    on whichever models they share: `vlm_metrics_merged5.json` holds every
+    published VLM row, while this log holds only the models `adopted_arms`
+    names as fused (six, as of LLMDet-large's and Qwen3-VL's additions --
+    neither is yet part of fusion, a documented follow-up, so they appear in
+    the former but not the latter).
     """
     published = load_vlm_metrics(
         _REPO_ROOT / "benchmarks" / "basketball" / "results" / "vlm" / "vlm_metrics_merged5.json"
@@ -322,6 +329,14 @@ def test_committed_test_log_matches_the_published_per_model_numbers() -> None:
 
     by_key = {key(k): v for k, v in published.items()}
 
+    # LLMDet-large and Qwen3-VL were both added after the fusion/ensembling
+    # sweep (test_fusion.json) was run and have never gone through that
+    # separate exercise -- they are not missing by mistake, they postdate the
+    # file. Everything that WAS a candidate in the fusion sweep must still
+    # match exactly, which is what `adopted_arms` names -- checking against it
+    # directly (rather than a hardcoded exclude-list of published-but-unfused
+    # models) means this assertion does not need updating every time another
+    # model is published ahead of its own fusion follow-up.
     log = load_fusion_test_log(_COMMITTED_TEST)
     checked = 0
     for row in log.rows:
@@ -331,4 +346,4 @@ def test_committed_test_log_matches_the_published_per_model_numbers() -> None:
         assert entry is not None, f"no published metrics for {row.models[0]}"
         assert row.map_50_95 == pytest.approx(entry["mAP_50_95"], abs=1e-6)
         checked += 1
-    assert checked == len(by_key), "every published model must appear in the test scoring"
+    assert checked == len(log.adopted_arms), "every fused model must appear in the test scoring"

@@ -297,6 +297,192 @@ models:
     imgsz: 1280
     expected_map5095: 0.189
 
+  # LLMDet-large (added 2026-08-17) -- the seventh row. Architecturally
+  # mm-grounding-dino: same HF calling convention as Grounding DINO
+  # (AutoModelForZeroShotObjectDetection + post_process_grounded_object_detection),
+  # confirmed via its own model card ("inference is identical to Grounding
+  # DINO's") and its HF config (model_type "mm-grounding-dino"). Apache-2.0.
+  #
+  # Needs transformers>=4.55.0, unavailable on the `vlm` extra's <4.52.0 pin
+  # (guards HF post-processing drift the other six rows' gate is sensitive
+  # to) -- runs in its own isolated `llmdet` pixi extra instead of bumping
+  # that shared pin. See inference/vlm/llmdet.py and pyproject.toml's
+  # `llmdet` extra for the isolation rationale.
+  #
+  # PROMPT SEARCH (2026-08-17, RTX 4090). Six-candidate search on val:
+  # c5_bare_canonical (bare class names) won at 0.3369, ahead of c1_domain's
+  # 0.2958 and c0_coco_control's 0.2418 -- the two "add descriptive words"
+  # candidates (c2/c4, contrastive phrasing) both collapsed player and
+  # referee to 0.000, the same fragile-prompt failure mode YOLO-World's row
+  # documents for compound phrases. Full results:
+  # results/vlm/prompt_search/llmdet.json.
+  #
+  # TILING (2026-08-17, val, same box). 2x2 overlapping tiles: 0.3369 ->
+  # 0.3589 (+0.0220), and the first configuration in this file to get `rim`
+  # off exactly 0.000 (0.0238) -- `number` also jumped 0.4717 -> 0.6741.
+  # Adopted.
+  #
+  # NMS RE-SWEPT UNDER TILING (2026-08-20, val, RTX 4090). Unlike
+  # Grounding-DINO (0.5 -> 0.7, +0.0332, "almost all of it referee") or
+  # OWLv2, tiling did NOT manufacture a cross-tile-duplicate problem worth
+  # correcting here: {0.2, 0.3, 0.5, 0.7, 0.9, 1.0} scores 0.3567/0.3596/
+  # 0.3590/0.3583/0.3522/0.2716 -- flat across 0.2-0.7 (a 0.0028 span, inside
+  # measurement noise) and only degrading sharply once suppression is
+  # disabled entirely at 1.0. The nominal optimum (0.3, 0.3596) beats the
+  # untiled starting value (0.5, 0.3590) by +0.0006 -- not a real signal.
+  # nms_iou_threshold KEPT at 0.5: results/vlm/prompt_search/llmdet_nms_sweep.json.
+  #
+  # SENTENCE-STYLE PROMPT EXPLORATION (2026-08-20, val, RTX 4090).
+  # EXPLICITLY NOT equal-effort -- four hand-written candidates outside the
+  # shared 6-candidate pool in vlm_prompt_search.yaml, tried because LLMDet
+  # is trained under LLM-generated CAPTION supervision and might respond
+  # better to descriptive sentences than bare category words. It doesn't:
+  # article-prefixed bare words ("a player", "a referee", ...) scored 0.2793,
+  # below the adopted vocabulary's 0.3589, and three genuinely sentence-style
+  # candidates (short declarative / long descriptive caption / scene-context,
+  # all multi-clause) collapsed to exactly 0.0000 on every class -- LLMDet's
+  # phrase-grounding head (same family as Grounding DINO, built to align
+  # short noun phrases to boxes) could not resolve a coherent span for a
+  # multi-clause sentence and emitted empty labels almost every time. A
+  # phrase-grounding architecture limit, not a generic "sentences don't help
+  # VLMs" finding. classes kept unchanged (c5_bare_canonical):
+  # results/vlm/prompt_search/llmdet_sentence_prompts.json.
+  #
+  # TEST-SPLIT RESULT (2026-08-18, RTX 4090, run once via
+  # `run_vlm_benchmark.py --only llmdet`): mAP@50:95 0.3883, mAP@50 0.5062 --
+  # the strongest single zero-shot row in this comparison, ahead of every
+  # other model's individually reported test mAP@50:95. Neither follow-up
+  # experiment above beat the config this number was measured under, so it
+  # was not re-run.
+  #
+  # No expected_map5095: a new model has no prior published number to
+  # reproduce against (VLM-02's informational-only mode). See
+  # results/vlm/llmdet.json for the committed prediction dump the 0.3883
+  # figure above is computed from.
+  - name: llmdet
+    inferencer: llmdet
+    model_name: iSEE-Laboratory/llmdet_large
+    classes:
+      - player
+      - ball
+      - referee
+      - rim
+      - number
+    box_threshold: 0.01
+    text_threshold: 0.25
+    nms_iou_threshold: 0.5
+    tiles: [2, 2]
+    expected_map5095: null
+
+  # Qwen3-VL-8B (added 2026-08-17). Apache-2.0. A NEW model with no prior
+  # published number -- expected_map5095 is deliberately null (VLM-02
+  # informational-only mode), not a target to reproduce.
+  #
+  # HYBRID ROW, documented so it is not misfiled as either precedent it
+  # resembles. The CODE is Gemini-shaped: no HF detection processor exists for
+  # a generative model, so `Qwen3VLInferencer` does a chat `generate()` call
+  # and parses a JSON text response (`{"bbox_2d": [x1,y1,x2,y2], "label":
+  # ...}` in 0-1000 normalised coordinates -- confirmed from the official
+  # QwenLM/Qwen3-VL cookbook's `2d_grounding.ipynb`, not guessed). But the
+  # PROTOCOL TREATMENT is a detector's, not Gemini's: `classes` below drives a
+  # MECHANICALLY built prompt, not hand-tuned free text, so this row goes
+  # through the same equal-effort vocabulary search
+  # (`vlm_prompt_search.yaml`) the open-weights detectors face -- it is not
+  # exempted the way Gemini's billed, hand-tuned prompt is.
+  #
+  # PROMPT SEARCH (2026-08-18, on the rented RTX 4090). All six candidates
+  # from vlm_prompt_search.yaml, val mAP@50:95: c0_coco_control 0.0745,
+  # c1_domain 0.1592, c2_contrastive 0.1483, c3_small_object 0.1861 (winner),
+  # c4_contrastive_small_object 0.1699, c5_bare_canonical 0.1189. Same "name
+  # colour/structure" pattern seen elsewhere in this table (OWLv2,
+  # Grounding-DINO): naming the ball's colour and the rim's structure carries
+  # signal a general model's prior can use.
+  #
+  # TILING (2026-08-18). Measured on a 24-image val subsample (not the full 96
+  # -- Qwen3-VL is ~45-90s/image, generative, unlike the sub-second HF
+  # detectors the original full-split tiling ablation was built around; five
+  # forward passes/image over 96 images would cost several GPU-hours for one
+  # secondary check). 2x2 + full frame, merge NMS 0.5: mAP@50:95 0.1939 (this
+  # subsample's untiled score) -> 0.1157, a clear regression (-0.0782). This
+  # row does NOT tile -- a measured decision, not an omission, in the same
+  # spirit as YOLO-World's (which tiling also hurt, -0.0529). Consistent with
+  # the crowd-mislabeling weakness found during the decision-gate sanity
+  # check: this model already over-labels bench/spectator regions as
+  # `player` on busy frames, and tiling multiplies how many crops it sees a
+  # crowd in, compounding rather than fixing that.
+  #
+  # RESOLUTION (2026-08-19). A standard inference hyperparameter, the same
+  # tier as YOLO-World's `imgsz` -- NOT a vocabulary/prompt change, so it does
+  # not need equal-effort disclosure. Qwen3-VL's image processor resizes to
+  # fit a total-pixel budget (`processor.image_processor.size`); the
+  # checkpoint's own default bounds (roughly 256x256 to 4096x4096) already
+  # comfortably contain this dataset's native 1920x1080 frames, so nothing
+  # was being silently downscaled. But forcing genuine UPSCALING (setting
+  # `shortest_edge` above native resolution) measurably helped: visually
+  # confirmed first (native-resolution runs emit ~40-60 "jersey number"
+  # detections per image of which only ~1 renders as a real, distinct,
+  # correctly-placed box -- the rest are near-duplicate/degenerate noise;
+  # forcing 2x upscaling collapses that flood to a handful of detections that
+  # are ALL correctly placed on real jersey numbers), then measured on the
+  # same 24-image val subsample the tiling check used: mAP@50:95 0.1939
+  # (native) -> 0.2624 (2x upscale, shortest_edge=4096000/longest_edge=
+  # 8192000), **+0.0685**. `number` AP50 alone: ~0 -> 0.278. `rim` stays at
+  # 0.000 either way -- resolution is not what is wrong with `rim` (see the
+  # search table above; that class collapses in every row in this
+  # comparison, not just this one). `Qwen3VLInferencer`'s `min_pixels`/
+  # `max_pixels` now DEFAULT to this 2x floor (not `None`, which would
+  # reproduce the checkpoint's own bounds) -- pass `None` explicitly for an
+  # A/B comparison against the checkpoint default.
+  #
+  # TILING RE-CHECKED under 2x upscaling (2026-08-19, reasoned, not
+  # re-measured): tiling's -0.0782 regression traced to crowd-mislabeling
+  # (five overlapping crops multiplying how often the model sees, and
+  # mislabels, bench/spectator regions as `player`) -- a vocabulary/labelling
+  # failure mode, not a resolution one. Forcing upscaling does not touch
+  # that mechanism, so the untiled decision is expected to still hold. Not
+  # re-run given the 24-image tiled arm alone costs ~90 GPU-minutes.
+  #
+  # PROMPT-CONSTRAINT EXPERIMENT (2026-08-19) -- DISCLOSED, NON-EQUAL-EFFORT.
+  # Unlike the vocabulary search above, this is a BESPOKE exploration, same
+  # posture as Gemini's hand-tuned row: not drawn from the shared 6-candidate
+  # vlm_prompt_search.yaml pool, and stated so explicitly here.
+  #
+  # The decision-gate sanity check found this model boxes bench/spectator
+  # regions as `player` on crowded frames. Tried fixing it directly: three
+  # candidate prompts, each adding explicit court-only / spectator-exclusion
+  # constraint language to the mechanical template (mirroring Gemini's own
+  # "At most N players... Each person gets exactly ONE bounding box"
+  # constraint style), scored on the same 24-image val subsample as the
+  # resolution and tiling checks, at 2x upscale resolution:
+  #   baseline (mechanical prompt)              0.2624
+  #   c_court_only   (exclude non-court people)  0.2599  (-0.0025)
+  #   c_numeric_cap  (+ explicit count caps)      0.2601  (-0.0023)
+  #   c_uniform_cue  (uniform-based cue)          0.2551  (-0.0073)
+  # All three land at or slightly below baseline, inside this experiment's
+  # noise band. NEGATIVE RESULT: explicit constraint language does not fix
+  # the crowd-mislabeling weakness -- the model already "knows" what a
+  # player looks like well enough that telling it to exclude spectators adds
+  # instruction-following overhead without adding discriminating signal.
+  # `prompt_template` is NOT set on this row; the mechanical prompt stands.
+  #
+  # ENVIRONMENT: requires transformers>=4.57.0, newer than the <4.52.0 ceiling
+  # the other six rows share. Run this row under `pixi run -e vlm-qwen3vl`,
+  # NOT `-e vlm` -- see pixi.toml's `[feature.qwen3vl]` comment. On a rented
+  # CUDA box, `vlm-qwen3vl-cuda` additionally needs `cuda-compiler` (see
+  # `[feature.vlmcuda]`'s comment) -- Qwen3-VL JIT-compiles a Triton kernel
+  # for its rotary-embedding path at `generate()` time, and without it that
+  # compile fails silently, indistinguishable from the model finding nothing.
+  - name: qwen3_vl
+    inferencer: qwen3_vl
+    model_name: Qwen/Qwen3-VL-8B-Instruct
+    classes:
+      - basketball player
+      - orange basketball
+      - referee
+      - basketball hoop and backboard
+      - jersey number on a uniform
+    expected_map5095: null
+
 # SmolVLM2 was removed 2026-07-30. It has no bounding-box grounding head: it was
 # prompted for JSON boxes, emitted 1176 detections across the 94 test images all
 # labelled `player`, and scored 0.000 AP on every class — the boxes did not land
