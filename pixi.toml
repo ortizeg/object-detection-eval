@@ -78,6 +78,24 @@ ultralytics = ">=8.3, <9"
 # PyPI packaging (MIT) here keeps the env solved and locked.
 clip-anytorch = "*"
 
+# Qwen3-VL-8B zero-shot inferencer. A SEPARATE feature from [feature.vlm],
+# not an addition to it: Qwen3-VL requires transformers>=4.57.0, and
+# [feature.vlm]'s pin (`<4.52.0`, see its comment) is explicitly load-bearing
+# for the six already-published zero-shot rows — bumping it would mean
+# re-validating their whole reproduction gate on GPU to add one new row. The
+# two pins cannot coexist in one pixi environment, so this is a second,
+# fully-isolated one: `pixi run -e vlm ...` never sees transformers>=4.57, and
+# `pixi run -e vlm-qwen3vl ...` never sees the <4.52 pin.
+[feature.qwen3vl.dependencies]
+pytorch = "*"
+torchvision = "*"
+
+[feature.qwen3vl.pypi-dependencies]
+transformers = ">=4.57.0,<5"
+# Required for Qwen3VLForConditionalGeneration.from_pretrained(device_map=...)
+# -- transformers raises ValueError without it.
+accelerate = "*"
+
 # LLMDet-large. ISOLATED from [feature.vlm] above rather than sharing it: LLMDet
 # needs transformers>=4.55.0 and vlm's six other rows are pinned <4.52.0 to
 # guard HF post-processing drift their reproduction gate is sensitive to.
@@ -131,6 +149,12 @@ onnx-graphsurgeon = ">=0.6.1"
 #
 # then `pixi install -e vlm-cuda`. Verify with torch.cuda.is_available() before
 # trusting any timing or believing a run used the GPU.
+#
+# `vlmcuda` composes with `qwen3vl` exactly the same way — it only pins
+# `pytorch-gpu` and has no opinion on the transformers version, so the same
+# feature covers both zero-shot environments' GPU needs:
+#
+#   vlm-qwen3vl-cuda = ["dev", "qwen3vl", "vlmcuda"]
 [feature.vlmcuda]
 platforms = ["linux-64"]
 
@@ -147,6 +171,19 @@ cuda = "12"
 # Unpinned, `pytorch-gpu = "*"` resolves to pytorch 1.6.0 and then fails on
 # python >=3.6,<3.7. The lower bound keeps the solve on a modern build.
 pytorch-gpu = ">=2.5,<3"
+# Required for Qwen3-VL specifically (not the other five GPU-eligible rows):
+# its rotary-embedding forward path (transformers>=4.57's
+# modeling_qwen3_vl.py) JIT-compiles a Triton kernel at generate() time, and
+# Triton's build shells out to `gcc` for `cuda_utils.c`, which needs the CUDA
+# *driver API* header (`cuda.h`) -- something the `pytorch-gpu` runtime alone
+# does not ship. Without it, `predict()`'s catch-all exception handler
+# silently swallows a `subprocess.CalledProcessError` and returns `[]`, which
+# reads exactly like a model failing to ground rather than an environment gap
+# (confirmed on the rented RTX 4090, 2026-08-18). `cuda-compiler` lives here
+# rather than in `[feature.qwen3vl]` because it is linux-64-only and would
+# break solving the cross-platform `vlm-qwen3vl` (CPU/MPS) environment on
+# macOS; `vlmcuda` is already linux-64-gated.
+cuda-compiler = "12.*"
 
 # LLMDet's CUDA counterpart to [feature.vlmcuda] above, same reason: conda-forge's
 # `pytorch` resolves to the CPU build on linux-64 unless `pytorch-gpu` is
@@ -223,6 +260,10 @@ onnx-graphsurgeon = ">=0.6.1"
 [environments]
 default = ["dev"]
 vlm = ["dev", "vlm"]
+# Qwen3-VL-8B only — isolated from `vlm` because it needs a newer transformers
+# than the other six zero-shot rows are pinned to. See [feature.qwen3vl]'s
+# comment above.
+vlm-qwen3vl = ["dev", "qwen3vl"]
 # LLMDet-large only, isolated from `vlm` (see [feature.llmdet] for why).
 llmdet = ["dev", "llmdet"]
 # Cross-platform: core (CPU onnxruntime) + dev + the graph-surgery tooling.

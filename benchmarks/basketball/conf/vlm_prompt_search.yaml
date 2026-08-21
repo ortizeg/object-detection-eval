@@ -148,3 +148,13 @@ models:
     model_name: yolov8x-worldv2.pt
     box_threshold: 0.01
     nms_iou_threshold: 0.5
+
+  # Qwen3-VL-8B (added 2026-08-17). Generative, not a HF detection processor,
+  # but its prompt is built MECHANICALLY from `classes` (see qwen3_vl.py's
+  # module docstring), so it faces the same six candidates as every
+  # open-weights model here rather than a Gemini-style hand-tuned exemption.
+  # Requires the `vlm-qwen3vl` pixi environment (transformers>=4.57), not
+  # `vlm` -- see pixi.toml.
+  - name: qwen3_vl
+    inferencer: qwen3_vl
+    model_name: Qwen/Qwen3-VL-8B-Instruct

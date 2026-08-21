@@ -62,6 +62,20 @@ vlm = [
     # at runtime and mutates the environment. MIT.
     "clip-anytorch",
 ]
+# Qwen3-VL-8B zero-shot inferencer. SEPARATE from [vlm], not merged into it:
+# Qwen3-VL requires transformers>=4.57.0, while [vlm]'s pin (<4.52.0, see its
+# comment) is load-bearing for the six already-published zero-shot rows —
+# `pip install -e .[vlm,vlm-qwen3vl]` together is expected to fail to resolve,
+# which correctly reflects that the two pins are mutually exclusive rather
+# than papering over it. Mirrors pixi.toml's `qwen3vl` feature /
+# `vlm-qwen3vl` environment.
+vlm-qwen3vl = [
+    "torch",
+    "torchvision",
+    "transformers>=4.57.0,<5",
+    "accelerate",  # required for from_pretrained(device_map=...)
+]
+
 # LLMDet-large ISOLATED from `vlm` above, not merged into it. LLMDet was merged
 # into transformers upstream 2025-08-06 and needs >=4.55.0; `vlm`'s six other
 # rows are pinned <4.52.0 specifically to guard HF post-processing drift the

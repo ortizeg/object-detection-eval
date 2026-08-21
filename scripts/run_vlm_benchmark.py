@@ -220,6 +220,16 @@ def _gemini_factory(entry: ManifestEntry) -> BaseInferencer:
     )
 
 
+def _qwen3_vl_factory(entry: ManifestEntry) -> BaseInferencer:
+    from object_detection_eval.inference.vlm.qwen3_vl import Qwen3VLInferencer
+
+    return Qwen3VLInferencer(
+        model_name=entry.model_name,
+        classes=entry.classes,
+        prompt_template=entry.prompt_template,
+    )
+
+
 _INFERENCER_FACTORIES: dict[str, Callable[[ManifestEntry], BaseInferencer]] = {
     "gemini": _gemini_factory,
     "owlv2": _owlv2_factory,
@@ -227,6 +237,7 @@ _INFERENCER_FACTORIES: dict[str, Callable[[ManifestEntry], BaseInferencer]] = {
     "grounding_dino": _grounding_dino_factory,
     "florence2": _florence2_factory,
     "yolo_world": _yolo_world_factory,
+    "qwen3_vl": _qwen3_vl_factory,
     "llmdet": _llmdet_factory,
 }
 

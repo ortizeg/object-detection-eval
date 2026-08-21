@@ -314,9 +314,9 @@ def test_committed_test_log_matches_the_published_per_model_numbers() -> None:
     The two files are NOT expected to cover the same model SET, only to agree
     on whichever models they share: `vlm_metrics_merged5.json` holds every
     published VLM row, while this log holds only the models `adopted_arms`
-    names as fused (six, as of LLMDet-large's addition -- it is not yet part
-    of fusion, a documented follow-up, so it appears in the former but not
-    the latter).
+    names as fused (six, as of LLMDet-large's and Qwen3-VL's additions --
+    neither is yet part of fusion, a documented follow-up, so they appear in
+    the former but not the latter).
     """
     published = load_vlm_metrics(
         _REPO_ROOT / "benchmarks" / "basketball" / "results" / "vlm" / "vlm_metrics_merged5.json"
@@ -329,6 +329,14 @@ def test_committed_test_log_matches_the_published_per_model_numbers() -> None:
 
     by_key = {key(k): v for k, v in published.items()}
 
+    # LLMDet-large and Qwen3-VL were both added after the fusion/ensembling
+    # sweep (test_fusion.json) was run and have never gone through that
+    # separate exercise -- they are not missing by mistake, they postdate the
+    # file. Everything that WAS a candidate in the fusion sweep must still
+    # match exactly, which is what `adopted_arms` names -- checking against it
+    # directly (rather than a hardcoded exclude-list of published-but-unfused
+    # models) means this assertion does not need updating every time another
+    # model is published ahead of its own fusion follow-up.
     log = load_fusion_test_log(_COMMITTED_TEST)
     checked = 0
     for row in log.rows:
