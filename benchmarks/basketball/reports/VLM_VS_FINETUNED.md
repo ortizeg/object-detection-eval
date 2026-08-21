@@ -376,37 +376,96 @@ from the committed prediction dumps in `results/vlm/*.json` (never transcribed):
 | Qwen3-VL | 0.318 | 0.452 | 0.337 |
 <!-- TABLE:vlm_summary END -->
 
-Two things about this table changed with the 2026-08-05 ablation, and both are
-worth stating plainly because earlier revisions of this report said otherwise.
+This table has changed twice since the 2026-08-05 ablation, and both changes
+are worth stating plainly because earlier revisions of this report said
+otherwise.
 
-**An open-weights model now leads.** OWLv2 at 0.315 is ahead of Gemini's 0.250.
-Every previous revision had Gemini on top, and the gap was routinely explained by
-its hand-tuned prompt. Configuration, not prompting, closed it.
+**LLMDet-large now leads, by the widest margin anywhere in this table.** Added
+2026-08-19 through the identical equal-effort search every open-weights row
+here goes through, it scores 0.388 — 0.073 clear of OWLv2's 0.315, the
+previous leader. Qwen3-VL-8B (0.318) passed OWLv2 too, on the strength of one
+fix: forcing 2x upscaling before inference took it from 0.188 (tied for last)
+to 0.318. Both rows' tuning is summarised in [Two more rows: LLMDet-large and
+Qwen3-VL-8B](#two-more-rows-llmdet-large-and-qwen3-vl-8b) below. Configuration
+and model choice, not prompting, moved this table again; every row here still
+goes through the same prompt-fairness process Gemini does not.
 
-**"Below half the worst fine-tuned detector" is no longer true.** That sentence
-appeared here for months and was correct when the ceiling was 0.250. At 0.315
-against the lowest-ranked fine-tuned detector's **0.581** (RT-DETRv2-M) the ratio
-is **1.85×**, not the 2.5× this report used to quote — see
+**"Below half the worst fine-tuned detector" has now been retracted twice.** It
+was correct when the ceiling was Gemini's 0.250 (2.5×), then OWLv2's 0.315
+(1.85×), and is smaller again now: at 0.388 against the lowest-ranked
+fine-tuned detector's **0.581** (RT-DETRv2-M) the ratio is **1.50×** — see
 [FINAL_COMPARISON_640.md](FINAL_COMPARISON_640.md) for the fine-tuned figures
-rather than re-tabulating them here.
+rather than re-tabulating them here. Each retraction shrank the gap because a
+stronger zero-shot model entered the comparison, not because the fine-tuned
+figures moved.
 
 > A revision of this paragraph dated 2026-08-05 named DAMO-YOLO-M's 0.619 as the
 > lowest-ranked fine-tuned detector and computed 1.97× from it. That was the
-> *second*-lowest row; RT-DETRv2-M sits below it at 0.581. Corrected here — the
-> gap is slightly smaller than this report claimed, which is the same direction
-> as every other correction the ablation forced.
+> *second*-lowest row; RT-DETRv2-M sits below it at 0.581. Corrected then, and
+> unchanged since — RT-DETRv2-M is still the reference for every ratio in this
+> report.
 
-What has *not* changed is the conclusion. A near-2× gap is still decisive, it is
-still the gap between "usable for bootstrapping labels" and "usable in
-production", and closing it took an exhaustive configuration search that will not
-repeat: the knobs are now measured and the remaining ones are documented above as
-not worth their GPU-hours. Fine-tuning on this small in-domain dataset still buys
-a large, unambiguous margin over the best general-purpose zero-shot detector
+What has *not* changed is the conclusion, even as the gap keeps closing. 1.5× is
+still decisive, it is still the gap between "usable for bootstrapping labels"
+and "usable in production", and closing it this far took an exhaustive
+configuration search on the original six plus two additional model
+evaluations: the knobs on those six are now measured and documented above as
+not worth further GPU-hours, and LLMDet-large's and Qwen3-VL-8B's own tuning is
+summarised below. Fine-tuning on this small in-domain dataset still buys a
+real, if now smaller, margin over the best general-purpose zero-shot detector
 available off the shelf.
 
-The honest revision is that the margin is smaller than this report used to claim,
-and that a chunk of what looked like a capability gap was configuration nobody
-had examined.
+The trend across every revision of this section points the same way: the
+margin was smaller than this report originally claimed, and most of what has
+closed it since is fairer configuration and better model choices, not a
+fundamental limit on zero-shot detection.
+
+### Two more rows: LLMDet-large and Qwen3-VL-8B
+
+Both added 2026-08-19, through the same equal-effort search and the same
+scoring path as every row above — a new row does not get a different process,
+it gets the same one run again.
+
+**LLMDet-large** (`iSEE-Laboratory/llmdet_large`, Apache-2.0) is
+architecturally in the Grounding-DINO family — the closest existing row to
+mirror — and needed `transformers>=4.55.0`, newer than the `<4.52.0` pin the
+other six rows share for reproduction-gate stability. It runs in its own
+isolated pixi environment rather than bumping that shared pin; a sibling row
+(Qwen3-VL-8B) hit the identical version conflict independently and made the
+same choice. The equal-effort search picked `c5_bare_canonical` (bare class
+names) at val 0.337, and 2×2 tiling added +0.022. Two follow-up experiments
+after publication — re-sweeping NMS under tiling, and a disclosed,
+non-equal-effort sentence-style prompt exploration — both came back negative:
+NMS was already flat across a wide range (0.2–0.7 span 0.0028, inside noise),
+and three of four sentence-style candidates collapsed to exactly 0.000 because
+LLMDet's phrase-grounding head cannot resolve a multi-clause sentence into a
+single span. `classes` and the published test number were unchanged by either.
+Full record, including every candidate tried: the `llmdet` row's comments in
+`vlm_zeroshot.yaml`.
+
+**Qwen3-VL-8B** (`Qwen/Qwen3-VL-8B-Instruct`) has a genuine native JSON
+grounding mode — `{"bbox_2d": [...], "label": "..."}`, confirmed from the
+official cookbook — which is what makes it a detector-shaped row rather than a
+Gemini-shaped one: the prompt is built mechanically from `classes` and goes
+through the same equal-effort search (winner: `c3_small_object`, val 0.186).
+Its published number changed dramatically after one config fix: the image
+processor's default resolution bounds were not silently downscaling this
+dataset's 1920×1080 frames, but forcing genuine *upscaling* beyond native
+resolution — doubling the vision encoder's patch count — collapsed a flood of
+degenerate `number` detections (40–60 per image, of which ~1 was real) into a
+handful of correctly-placed ones. Measured on a val subsample: **0.194 →
+0.262, +0.0685**. Test-split result before the fix: 0.188 (tied for last, with
+YOLO-World). After: **0.318**. A disclosed prompt-constraint experiment
+targeting a separate crowd-mislabeling weakness (the model boxes bench and
+spectator regions as `player`) found no improvement and was not adopted; the
+mechanical prompt stands. Tiling was tried and hurt (-0.078 val), traced to
+that same crowd-mislabeling weakness being compounded by multiple overlapping
+crops. Full record: the `qwen3_vl` row's comments in
+`vlm_zeroshot.yaml`.
+
+Neither row is part of the six-model fusion explored later in this report —
+see [Can the six be combined?](#can-the-six-be-combined) for scope and the
+plan for extending it.
 
 ## Per-class failure analysis: where zero-shot breaks
 
@@ -433,41 +492,48 @@ the class they already know from web-scale pre-training (`player`, essentially
 COCO's `person`) and collapse on the small, domain-specific classes.**
 
 - **The `rim` collapse, and it is not a prompting problem.** `rim` is the class
-  every model fails hardest on: four of six score **exactly 0.000**, and the
+  every model fails hardest on: four of eight score **exactly 0.000**, and the
   best (Gemini) manages 0.036. A rim is small, thin, often partially occluded,
-  and not a salient "object" in a general model's prior. What is new is that
-  this has now been *tested* rather than assumed: across five open-weights
-  models and six vocabularies — thirty measurements — `rim` never once cleared
-  0.04, whether prompted as "basketball hoop", "basketball hoop and backboard",
-  "rim", or "hoop". **This is the single clearest domain gap in the comparison,
-  and vocabulary cannot close it.**
+  and not a salient "object" in a general model's prior. This has now been
+  *tested* across seven open-weights models and six vocabularies each —
+  forty-two measurements — and `rim` never once cleared 0.04, whether prompted
+  as "basketball hoop", "basketball hoop and backboard", "rim", or "hoop".
+  LLMDet-large and Qwen3-VL-8B, each searched independently after this finding
+  was already established, changed nothing about it. **This is the single
+  clearest domain gap in the comparison, and vocabulary cannot close it.**
 
-- **`referee` is where the models actually differ.** It ranges from Gemini's
-  0.717 down to YOLO-World's **0.000** — the widest spread of any class. A
-  referee is visually a `player` under any of these vocabularies (a person on a
-  court), so separating the officiating role is a genuine semantic
-  discrimination rather than a detection problem. Gemini's lead here is the
-  single largest contributor to its overall win, and it is also the model with
-  the hand-tuned prompt — worth holding in mind. Describing the clothing
-  explicitly was tried and made things *worse*, not better (see above).
-  YOLO-World's 0.000 has a different and more specific cause — see
-  [Does the COCO `person` alias manufacture false positives?](#does-the-coco-person-alias-manufacture-false-positives)
-  below.
+- **`referee` is where the models actually differ.** It ranges from
+  Qwen3-VL-8B's 0.727 — Gemini close behind at 0.717, the two are within a
+  point of each other and neither should be read as a clear "winner" here —
+  down to YOLO-World's **0.000**, the widest spread of any class. A referee is
+  visually a `player` under any of these vocabularies (a person on a court), so
+  separating the officiating role is a genuine semantic discrimination rather
+  than a detection problem. LLMDet-large (0.673) is close behind both; Gemini's
+  strength here — despite its hand-tuned-prompt advantage — is no longer unique
+  to it. Describing the clothing explicitly was tried and made things *worse*,
+  not better (see above). YOLO-World's 0.000 has a different and more specific
+  cause — see [Does the COCO `person` alias manufacture false
+  positives?](#does-the-coco-person-alias-manufacture-false-positives) below.
 
-- **`player` carries the score.** Every model except Florence-2 scores 0.83–0.92
-  on `player` — the one class that overlaps a general detector's prior, and
-  almost entirely responsible for the non-trivial overall mAP the leaders post.
-  Strip `player` out and the zero-shot ceiling would be far lower still. Note how
-  little separates the top open-weights models on it: OWLv2 (0.848) and
-  Grounding-DINO (0.851) are within noise of each other on `player`, and the
-  0.012 gap between their overall scores is decided almost entirely by the other
-  four classes — chiefly `number`, where Grounding-DINO manages 0.009 against
-  OWLv2's 0.337.
+- **`player` carries the score.** Every model but Florence-2 scores 0.80–0.93 on
+  `player` — the one class that overlaps a general detector's prior, and almost
+  entirely responsible for the non-trivial overall mAP the leaders post. Strip
+  `player` out and the zero-shot ceiling would be far lower still. Note how
+  little separates the top models on it: Qwen3-VL-8B (0.934), Gemini (0.923)
+  and OWLv2 (0.901) are within three points of each other, and none of them is
+  the overall leader — LLMDet-large's 0.880 on `player` is only fourth-best,
+  and it wins the table on the strength of the other four classes instead,
+  chiefly `number` (0.571, the best of any model here).
 
-- **Florence-2 is the one genuinely weak detector here**, at 0.335 on `player`
-  where every other model clears 0.82. Its failure is localisation, not
-  vocabulary: it was given the same six candidates as everyone else and its best
-  was still less than half the field's `player` AP.
+- **Florence-2 is the weakest detector here on `player`**, at 0.749 against a
+  field that otherwise clears 0.80. This bullet previously quoted 0.335 — stale
+  from before the 2026-08-04 ablation's checkpoint swap and tiling fix moved
+  Florence-2's overall score by +0.109 (see the ablation table above); the
+  number was never carried forward into this bullet when the table above it
+  was updated. Corrected here. Florence-2's failure is still localisation, not
+  vocabulary — it received the same six prompt candidates as everyone else and
+  is still last on the one class every other model treats as easy — just a
+  smaller gap than this report previously claimed.
 
 ### Does the COCO `person` alias manufacture false positives?
 
@@ -566,17 +632,17 @@ two classes it can both express.
 
 ### Methods this comparison does not cover
 
-Surveyed 2026-07-30. The strongest open-vocabulary detectors available now are
-**API-only**, which puts them in Gemini's category rather than the open-weights
-one: **DINO-X Pro** (59.8 AP LVIS-minival) and **Grounding DINO 1.5/1.6 Pro**
-(55.7 AP) both substantially exceed the `grounding-dino-base` checkpoint tested
-here. Using them would cost money per run and make the row non-reproducible
-without a key.
+Surveyed 2026-07-30, updated as models were added to this roster. The
+strongest open-vocabulary detectors available now are **API-only**, which puts
+them in Gemini's category rather than the open-weights one: **DINO-X Pro**
+(59.8 AP LVIS-minival) and **Grounding DINO 1.5/1.6 Pro** (55.7 AP) both
+substantially exceed the `grounding-dino-base` checkpoint tested here. Using
+them would cost money per run and make the row non-reproducible without a key.
 
-The more interesting omission is open-weights: **YOLO-World** (~35.4 AP
-zero-shot LVIS at real-time speed) is directly comparable to this roster and
-absent from it. It is the gap worth closing — fast, open-vocabulary, and
-released with weights.
+Three open-weights gaps this section used to flag are now closed: **YOLO-World**
+(added 2026-08-01), **LLMDet-large** and **Qwen3-VL-8B** (both 2026-08-19) are
+rows in the table above rather than omissions from it. What remains
+open-weights and absent is **YOLOE** — see the licence table below for why.
 
 **Licence, verified against the upstream `LICENSE` files rather than assumed:**
 
@@ -603,7 +669,20 @@ small, domain-specific object it was never really trained to find (`rim`).
 Fine-tuning closes exactly those gaps, which is why the fine-tuned detectors
 clear the zero-shot ceiling by such a wide margin.
 
+LLMDet-large is the one partial exception to "degrades on domain-specific
+semantics": at 0.571 on `number`, more than double every other model's best
+(OWLv2's 0.505), it is the only row here that comes close to solving a class
+this pattern predicts should be hard. `rim` is not that exception — LLMDet
+manages 0.001, in line with everything else. One class breaking the pattern
+does not retire it; it is a reason to keep measuring newer models rather than
+a reason to stop.
+
 ## Can the six be combined?
+
+*Scope note, added 2026-08-21: this section still covers the original six
+zero-shot rows only. LLMDet-large and Qwen3-VL-8B are not yet part of the
+fusion exploration below — extending it to all eight rows is a planned
+follow-up, not done here.*
 
 Every number above scores one model running one forward pass. This section asks
 a different question — what happens if you run all six and merge their output —
