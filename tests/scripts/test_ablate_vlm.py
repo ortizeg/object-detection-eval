@@ -168,6 +168,7 @@ def test_only_the_checkpoint_re_search_pins_a_second_field(manifest: Any) -> Non
         "nms_on_tiles",
         "nms_on_combined",
         "tiles",
+        "referee_word",
     }
 
 

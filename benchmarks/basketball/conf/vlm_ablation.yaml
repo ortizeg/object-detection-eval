@@ -476,6 +476,42 @@ elements:
       box_threshold: 0.001
     values: [0.6, 0.7, 0.8, 0.9]
 
+  # ELEMENT 11 -- TARGETED FOLLOW-UP (2026-08-18): the referee-word
+  # investigation, added well after the sweep above settled the published
+  # config. NOT part of the equal-effort six-candidate search
+  # (vlm_prompt_search.yaml) or ELEMENT 8's per-class-vocabulary ablation --
+  # this is a disclosed, non-equal-effort, single-class follow-up, triggered by
+  # a specific anomaly rather than run as part of any fair-comparison process.
+  #
+  # Pulling per-class AP50 across the six committed rows (merged5), YOLO-World
+  # is the ONLY model with a complete `referee` collapse (0.000) -- every other
+  # model, phrase-grounding or generative, scores 0.37-0.72 on the identical
+  # bare word "referee". That rules out "referee is a bad word" as the
+  # explanation; a total zero on this model alone is suspicious of a
+  # YOLO-World/CLIP-encoder blind spot rather than a genuine absence of
+  # referees in these images.
+  #
+  # ELEMENT 8's note already recorded that "referee in a striped shirt" (inside
+  # the c2/c4 full-vocabulary candidates) ALSO scored 0.000 for this model, so
+  # that phrase is not retried here -- every candidate below is a word/phrase
+  # the six-candidate search never tried for this model.
+  #
+  # `fixed` pins the CURRENT PUBLISHED config (the `combined` + `nms_on_combined`
+  # winners), not the top-of-file baseline, so only the referee word varies.
+  - name: referee_word
+    knob: classes
+    applies_to: [yolo_world]
+    fixed:
+      box_threshold: 0.001
+      nms_iou_threshold: 0.7
+      imgsz: 1280
+    values:
+      - [person, basketball, official, basketball hoop, jersey number on a uniform]
+      - [person, basketball, umpire, basketball hoop, jersey number on a uniform]
+      - [person, basketball, man in a striped shirt, basketball hoop, jersey number on a uniform]
+      - [person, basketball, basketball official, basketball hoop, jersey number on a uniform]
+      - [person, basketball, black and white striped shirt, basketball hoop, jersey number on a uniform]
+
   # ROUND 0 -- the noise floor, measured rather than inherited.
   #
   # `sample` changes nothing about the configuration and everything about the

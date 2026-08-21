@@ -50,3 +50,14 @@ aliases:
   orange basketball: ball
   basketball hoop and backboard: rim
   jersey number on a uniform: number
+
+  # --- YOLO-World referee-word investigation (260818-e01, targeted, NOT part
+  # of the equal-effort search above) -- see vlm_ablation.yaml's `referee_word`
+  # element. YOLO-World is the only committed row with a complete `referee`
+  # AP50 collapse (0.000); these candidate phrases probe whether that is a
+  # vocabulary fix or a deeper CLIP-encoder blind spot.
+  official: referee
+  umpire: referee
+  man in a striped shirt: referee
+  basketball official: referee
+  black and white striped shirt: referee

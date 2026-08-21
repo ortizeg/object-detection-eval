@@ -670,13 +670,33 @@ def ablation_headline_table(
 
     "Changes kept" is derived from the winning arm's config rather than stored,
     so it cannot describe a configuration the log does not contain.
+
+    The candidate pool for "what got adopted" is restricted to arms whose
+    config actually matches ``adopted`` (mirroring :func:`ablation_summary_table`'s
+    kept/reverted logic) rather than the single highest-scoring arm the log
+    contains. A disclosed-but-not-adopted arm can outscore what shipped — e.g.
+    a targeted follow-up that improves an unrelated class while leaving the
+    class it was investigating unchanged — and reporting that arm here would
+    claim a change was kept when it explicitly was not.
     """
     baselines = {a.model: a for a in log.arms if a.element == "baseline"}
-    best: dict[str, Any] = {}
+    # Seed every model at its own baseline: a model that adopted nothing from
+    # the sweep must still get a row, and falling back to the baseline is
+    # exactly what "nothing changed" means.
+    best: dict[str, Any] = dict(baselines)
     for arm in log.arms:
         if arm.element == "baseline":
             continue
-        if arm.model not in best or arm.map_50_95 > best[arm.model].map_50_95:
+        published = adopted.get(arm.model)
+        if published is None:
+            continue
+        # Only compare keys the ablation schema actually tracks. `adopted` can
+        # carry manifest fields with no independent Arm knob (Florence-2's
+        # `caption` is derived from `classes`, not swept on its own) -- a
+        # missing key must not read as a mismatch.
+        if any(key in arm.config and arm.config[key] != value for key, value in published.items()):
+            continue
+        if arm.map_50_95 > best[arm.model].map_50_95:
             best[arm.model] = arm
 
     header = ["Model", "Published", "Best on val", "Δ", "Changes kept"]

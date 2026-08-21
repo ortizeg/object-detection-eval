@@ -20,6 +20,7 @@ import yaml
 from object_detection_eval.report import (
     ABLATION_NOISE_FLOOR,
     ReportLoadError,
+    ablation_headline_table,
     ablation_summary_table,
     load_ablation_log,
     load_zeroshot_config,
@@ -227,3 +228,124 @@ def test_baseline_arms_do_not_get_their_own_row(tmp_path: Path) -> None:
     table = ablation_summary_table(log, {"owlv2": {"nms_iou_threshold": 0.9}})
     assert "baseline" not in table
     assert len([line for line in table.splitlines() if line.startswith("| owlv2")]) == 1
+
+
+# ---------------------------------------------------------------------------
+# The headline table -- same "describes what shipped" discipline as the
+# per-element table above, but for the one-row-per-model summary.
+# ---------------------------------------------------------------------------
+
+
+def test_headline_reports_the_published_arm_not_the_best_ever_logged(tmp_path: Path) -> None:
+    """A disclosed-but-not-adopted arm must not read as the outcome.
+
+    A targeted follow-up can log an arm that outscores what actually shipped
+    (e.g. it improves a class unrelated to the one it was investigating, and
+    that improvement is disclosed but not adopted). The headline table's job is
+    to report what the manifest actually runs, not the single highest-scoring
+    arm the log happens to contain -- otherwise it would attribute a change
+    that was explicitly not kept to the model, exactly the failure mode
+    `ablation_summary_table` already guards against.
+    """
+    log = load_ablation_log(
+        _write_log(
+            tmp_path / "valid_arms.json",
+            [
+                _arm(
+                    "yolo_world__baseline",
+                    "yolo_world",
+                    "baseline",
+                    0.132,
+                    {"nms_iou_threshold": 0.5, "classes": ["referee"]},
+                ),
+                _arm(
+                    "yolo_world__published",
+                    "yolo_world",
+                    "referee_word",
+                    0.177,
+                    {"nms_iou_threshold": 0.7, "classes": ["referee"]},
+                    baseline="yolo_world__baseline",
+                    delta=0.045,
+                ),
+                _arm(
+                    "yolo_world__not_adopted",
+                    "yolo_world",
+                    "referee_word",
+                    0.185,
+                    {"nms_iou_threshold": 0.7, "classes": ["official"]},
+                    baseline="yolo_world__baseline",
+                    delta=0.053,
+                ),
+            ],
+        )
+    )
+    table = ablation_headline_table(
+        log, {"yolo_world": {"nms_iou_threshold": 0.7, "classes": ["referee"]}}
+    )
+    assert "0.177" in table
+    assert "0.185" not in table
+
+
+def test_headline_says_none_adopted_when_nothing_published_beats_baseline(
+    tmp_path: Path,
+) -> None:
+    """A model can log a higher-scoring arm and still have adopted nothing.
+
+    Without restricting the candidate pool to arms matching the published
+    config, this case would report the unadopted winner as if it were kept.
+    """
+    log = load_ablation_log(
+        _write_log(
+            tmp_path / "valid_arms.json",
+            [
+                _arm("gemini__baseline", "gemini", "baseline", 0.258, {"nms_iou_threshold": None}),
+                _arm(
+                    "gemini__not_adopted",
+                    "gemini",
+                    "tiles",
+                    0.290,
+                    {"nms_iou_threshold": 0.5},
+                    baseline="gemini__baseline",
+                    delta=0.032,
+                ),
+            ],
+        )
+    )
+    table = ablation_headline_table(log, {"gemini": {"nms_iou_threshold": None}})
+    assert "none — baseline beat every arm tried" in table
+    assert "0.290" not in table
+
+
+def test_headline_ignores_published_fields_the_ablation_schema_does_not_track(
+    tmp_path: Path,
+) -> None:
+    """A manifest-only field (e.g. Florence-2's derived `caption`) must not
+    block a match. It has no independent Arm knob, so requiring it to equal
+    the manifest value would make every arm look unpublished."""
+    log = load_ablation_log(
+        _write_log(
+            tmp_path / "valid_arms.json",
+            [
+                _arm("florence2__baseline", "florence2", "baseline", 0.125, {"tiles": None}),
+                _arm(
+                    "florence2__published",
+                    "florence2",
+                    "combined",
+                    0.234,
+                    {"tiles": [2, 2]},
+                    baseline="florence2__baseline",
+                    delta=0.109,
+                ),
+            ],
+        )
+    )
+    published = {
+        "florence2": {
+            "tiles": [2, 2],
+            # Not a real Arm field -- derived from `classes` at run time.
+            "caption": "player. ball. referee. rim. number.",
+        }
+    }
+    table = ablation_headline_table(log, published)
+    assert "0.234" in table
+    assert "none — baseline beat every arm tried" not in table
