@@ -277,6 +277,29 @@ equalize only the shared protocol.** What the audit found:
   simply did not transfer to the 465-image set (heavy mosaic/mixup aug tuned for
   large data, plus a pre-distill checkpoint — the official distilled weights'
   bucket is dead). Reported honestly at its matched-640 number.
+- **Merged5 post-remap duplicate boxes — real, fixed, and NOT the reorder
+  explanation below.** `remap_detections` only relabels; each model's
+  per-class NMS runs in its own *pre-merge* (raw10) label space, so two boxes
+  on one physical object emitted under different raw10 categories that
+  collapse into the same merged5 class (e.g. `player-jump-shot` ->
+  `player`) can both survive as a spurious same-class duplicate after the
+  merge. RF-DETR's decode makes this easiest to trigger (top-k multi-label
+  selection, no NMS of its own) and DEIM's the second-easiest — both
+  DETR-style. The harness now runs a conservative post-remap per-eval-class
+  NMS (`dedupe_merged_class_detections`, IoU > 0.9 — a *low* threshold
+  measurably regresses every model here, because distinct-but-adjacent
+  players on a crowded court legitimately overlap past IoU 0.5) to close the
+  gap. Measured two ways — a controlled before/after on the exact stored
+  merged5 predictions, and a same-machine end2end A/B — the isolated effect
+  is **≤0.0008 pt mAP@50:95 per model, in both directions** (RF-DETR-M
+  +0.0002, DEIM-M −0.0003, RT-DETRv2-M +0.0008 the largest move): an order of
+  magnitude below the bootstrap's own standard error (~0.006-0.009) and
+  inside every existing reproduction-gate tolerance, so the committed
+  accuracy/bootstrap files are unchanged. No rank changes, no CI-crossing
+  changes. **This rules out duplicate-box inflation as an explanation for
+  the 5-class/10-class reorder** in the appendix below — that reorder runs
+  on multi-point per-class gaps, two to three orders of magnitude larger
+  than what this bug can move.
 
 **Not done, by design:** no per-model LR/aug sweeps. Tuning effort itself is an
 unfairness — it favors the models the authors understand best — so
@@ -288,7 +311,9 @@ For completeness, the fine-grained 10-class breakdown (the raw annotation
 taxonomy before the 5-class merge). The story flips relative to the coarse task:
 the **DETR family (DEIM, RF-DETR) leads the fine-grained 10-class task**, while
 YOLO26m's ball/number recall is what carries it on the coarse 5-class task.
-Emitted from `results/accuracy/reproduction_640_raw10.json`:
+(A merged5 duplicate-box artifact was investigated as an alternative
+explanation for this reorder and ruled out quantitatively — see the Fairness
+audit above.) Emitted from `results/accuracy/reproduction_640_raw10.json`:
 
 <!-- TABLE:per_class_10c START -->
 | Model | ball | ball-in-basket | number | player | player-in-possession | player-jump-shot | player-layup-dunk | player-shot-block | referee | rim |

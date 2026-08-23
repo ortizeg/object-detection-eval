@@ -11,9 +11,12 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import numpy as np
 import pytest
+import supervision as sv
 
 from object_detection_eval.data.taxonomy import (
+    dedupe_merged_class_detections,
     identity_taxonomy_from_coco,
     remap_detections,
     resolve_taxonomy,
@@ -196,3 +199,79 @@ def test_gemini_class_remap() -> None:
     remapped = remap_detections(dets, gemini_label_map, _NAME_TO_EVAL_ID)
     assert len(remapped) == 1
     assert remapped[0].class_id == 2  # referee -> eval ID 2
+
+
+# --- dedupe_merged_class_detections ------------------------------------------
+
+
+def _sv_dets(
+    boxes: list[tuple[float, float, float, float]], class_ids: list[int], confidences: list[float]
+) -> sv.Detections:
+    return sv.Detections(
+        xyxy=np.array(boxes, dtype=np.float32),
+        class_id=np.array(class_ids, dtype=int),
+        confidence=np.array(confidences, dtype=np.float32),
+    )
+
+
+def test_dedupe_suppresses_near_identical_same_class_box() -> None:
+    """The merge-artifact pattern: two source categories, one physical box."""
+    # e.g. raw "player" + "player-jump-shot" on the same athlete, both
+    # remapped to eval class 0 ("player"), boxes nearly coincident.
+    dets = _sv_dets(
+        boxes=[[100, 100, 200, 300], [101, 101, 199, 299]],
+        class_ids=[0, 0],
+        confidences=[0.9, 0.6],
+    )
+    kept = dedupe_merged_class_detections(dets)
+    assert len(kept) == 1
+    assert kept.confidence[0] == pytest.approx(0.9)  # higher-confidence survivor kept
+
+
+def test_dedupe_keeps_distinct_adjacent_same_class_detections() -> None:
+    """Two real, merely-adjacent objects of the same eval class must both survive.
+
+    On a crowded court, two distinct players standing close together can
+    overlap well past IoU 0.5 -- the default 0.9 threshold is conservative
+    specifically so this case is not collateral damage (see the function's
+    docstring for the measured sweep that picked 0.9).
+    """
+    dets = _sv_dets(
+        boxes=[[100, 100, 200, 300], [150, 100, 250, 300]],  # IoU ~0.33
+        class_ids=[0, 0],
+        confidences=[0.9, 0.8],
+    )
+    kept = dedupe_merged_class_detections(dets)
+    assert len(kept) == 2
+
+
+def test_dedupe_is_class_aware_not_class_agnostic() -> None:
+    """Overlapping boxes of DIFFERENT eval classes are never suppressed.
+
+    A literal class-agnostic pass (ignoring class_id) measurably regresses
+    every model on this dataset by discarding real cross-class neighbours
+    (e.g. a player box overlapping a referee); only same-eval-class
+    duplicates are the merge artifact this function targets.
+    """
+    dets = _sv_dets(
+        boxes=[[100, 100, 200, 300], [100, 100, 200, 300]],  # identical box
+        class_ids=[0, 2],  # player, referee
+        confidences=[0.9, 0.8],
+    )
+    kept = dedupe_merged_class_detections(dets)
+    assert len(kept) == 2
+
+
+def test_dedupe_empty_input_returns_empty() -> None:
+    assert len(dedupe_merged_class_detections(sv.Detections.empty())) == 0
+
+
+def test_dedupe_respects_custom_iou_threshold() -> None:
+    """A caller-supplied threshold overrides the conservative 0.9 default."""
+    dets = _sv_dets(
+        boxes=[[100, 100, 200, 300], [150, 100, 250, 300]],  # IoU ~0.33
+        class_ids=[0, 0],
+        confidences=[0.9, 0.8],
+    )
+    kept = dedupe_merged_class_detections(dets, iou_threshold=0.3)
+    assert len(kept) == 1

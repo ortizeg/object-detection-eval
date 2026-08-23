@@ -8,7 +8,11 @@ and the 7 ONNX detectors behind `BaseInferencer`.
 from __future__ import annotations
 
 from object_detection_eval.data.coco_gt import load_coco_gt
-from object_detection_eval.data.taxonomy import remap_detections, resolve_taxonomy
+from object_detection_eval.data.taxonomy import (
+    dedupe_merged_class_detections,
+    remap_detections,
+    resolve_taxonomy,
+)
 from object_detection_eval.inference.base import BaseInferencer
 from object_detection_eval.inference.detectors import (
     DamoDetector,
@@ -40,6 +44,7 @@ __all__ = [
     "compute_metrics",
     "compute_pr_curve",
     "compute_prf1_at_threshold",
+    "dedupe_merged_class_detections",
     "find_best_threshold",
     "load_coco_gt",
     "remap_detections",
