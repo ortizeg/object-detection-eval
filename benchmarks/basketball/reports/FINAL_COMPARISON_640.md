@@ -74,10 +74,17 @@ metric). Emitted from `results/accuracy/reproduction_640_merged5.json`:
 <!-- TABLE:primary_7model END -->
 
 YOLO26m posts the top point estimate, DEIM-M and YOLOX-M follow, and RT-DETRv2-M
-(a ResNet-34-vd backbone) trails — a *real* backbone effect, not a training
-artifact (the fairness audit below confirms it reads faithfully). But point
-estimates alone over-state how separated these models are; the confidence
-intervals tell the honest story.
+trails. RT-DETRv2-M is the only model here on a plain ImageNet ResNet-34-vd
+backbone — every other model uses either a NAS-searched backbone (DAMO-YOLO,
+the CSPNeXt/CSPDarknet lineage in YOLOX and RTMDet) or a self-supervised
+foundation model (RF-DETR's DINOv2 ViT) — which is a plausible story for the
+gap. But these seven runs vary backbone, neck, head, label assignment,
+augmentation and epoch count simultaneously, so no single factor is isolated.
+The fairness audit below rules out a training-recipe bug as the cause; it does
+not run a backbone-swap ablation, so "backbone effect" is this report's
+leading hypothesis, not a demonstrated one. Point estimates alone also
+over-state how separated these models are; the confidence intervals tell the
+honest story.
 
 ## Confidence intervals and pairwise significance
 
@@ -270,8 +277,13 @@ equalize only the shared protocol.** What the audit found:
   vendored loader that *drops* pos-emb on mismatch was deliberately avoided.
 - **RT-DETRv2-M had the same 2000-iter warmup trap as DEIM — caught & fixed.**
   Shortened to 50 iters; harness/val then reads within 0.06 pt of native,
-  confirming faithful reading. Its low 0.581 is a real backbone effect
-  (ResNet-34-vd), not a training artifact.
+  confirming faithful reading. Its low 0.581 is *not* a training artifact — the
+  warmup bug is ruled out. It is the only model here on a plain ResNet-34-vd
+  backbone (RT-DETRv2's S/M/L/X family runs R18-vd/R34-vd/R50-vd/R101-vd, so
+  R34-vd is second-lightest, not the lightest), which is a plausible
+  explanation for the gap, but no backbone-swap ablation was run to separate
+  it from the neck/head/assignment/augmentation/epoch differences that also
+  vary across the seven models compared here.
 - **DAMO-YOLO-M validated.** New harness inferencer (RGB square-640, raw 0-255,
   per-class NMS); identity/val reads within ~1.2 pt of native. Its COCO strength
   simply did not transfer to the 465-image set (heavy mosaic/mixup aug tuned for
