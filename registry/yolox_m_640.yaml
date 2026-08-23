@@ -5,7 +5,7 @@ architecture: yolox-m
 description: YOLOX-M anchor-free detector fine-tuned on the basketball dataset at a
   640x640 input resolution. This is the checkpoint every published YOLOX-M number in
   the final @640 comparison is produced from, and the fastest model in that roster
-  on a dedicated T4 (5.70 ms fp16 to-boxes), while carrying a permissive Apache-2.0
+  on a dedicated T4 (5.68 ms fp16 to-boxes), while carrying a permissive Apache-2.0
   licence.
 license: Apache-2.0
 training_dataset: basketball-player-detection-3

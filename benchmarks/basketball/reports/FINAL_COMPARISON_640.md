@@ -23,7 +23,7 @@ do**, and they point in opposite directions:
 
 | | mAP@50:95 | T4 fp16 to-boxes | Licence |
 |---|---|---|---|
-| **YOLOX-M** | 0.672 | **5.70 ms** (fastest measured) | **Apache-2.0** |
+| **YOLOX-M** | 0.672 | **5.68 ms** (fastest measured) | **Apache-2.0** |
 | **YOLO26m** | 0.716 | 5.85 ms | **AGPL-3.0-only** |
 | **DEIM-M** | 0.686 | 6.61 ms | **Apache-2.0** |
 
@@ -330,7 +330,7 @@ This supersedes the earlier shared-instance run, which read every model 17-85% s
 | --- | --- | --- | --- |
 | YOLO26m | 5.85 | 6.00 | no |
 | DEIM-M | 6.61 | 7.16 | no |
-| YOLOX-M | 5.70 | 5.85 | yes |
+| YOLOX-M | 5.68 | 5.83 | yes |
 | RF-DETR-M | 7.71 | 7.91 | no |
 | RTMDet-M | 8.19 | 8.54 | yes |
 | DAMO-YOLO-M | 6.70 | 6.83 | yes |
@@ -413,8 +413,8 @@ test set's 3-clip structure is respected. The ranking you see is real as a point
 estimate and unsupported as a claim.
 
 **2. Speed and licence are what actually differentiate them.** YOLOX-M is the
-fastest model measured (5.70 ms fp16 to-boxes on a dedicated T4) *and*
-Apache-2.0. YOLO26m is 0.15 ms slower and AGPL-3.0-only. Nothing else in the
+fastest model measured (5.68 ms fp16 to-boxes on a dedicated T4) *and*
+Apache-2.0. YOLO26m is 0.17 ms slower and AGPL-3.0-only. Nothing else in the
 roster is on the accuracy/latency frontier.
 
 **3. Why the licence is not a footnote.** AGPL-3.0-only means commercial serving
