@@ -2,11 +2,19 @@
 
 Re-scores the 7 medium detectors @640 through the refactored harness
 (``resolve_taxonomy`` -> [``ONNXInferencer`` subclass -> ``remap_detections``
--> ``detections_to_sv``] or ``load_predictions`` -> ``compute_metrics``) and
-asserts the result against ``EVAL_REPORT_FINAL.md`` §2's published 5-class
-test table, both in absolute value (within ``--tolerance``) and in exact rank
-order. This is the HARD GATE: no downstream phase begins until this script
-passes.
+-> ``detections_to_sv``] or ``load_predictions`` -> ``dedupe_merged_class_
+detections`` (merged5 only) -> ``compute_metrics``) and asserts the result
+against ``EVAL_REPORT_FINAL.md`` §2's published 5-class test table, both in
+absolute value (within ``--tolerance``) and in exact rank order. This is the
+HARD GATE: no downstream phase begins until this script passes.
+
+The merged5 taxonomy collapses several raw source categories into one eval
+class (e.g. ``player-jump-shot`` -> ``player``); a model's per-class NMS ran
+in its own pre-merge label space, so two boxes on one physical object under
+different source categories can both survive and land in the same eval class
+as a spurious duplicate. ``dedupe_merged_class_detections`` closes that gap
+with a conservative post-remap NMS pass, applied identically in both modes
+below and skipped entirely for ``raw10``/``identity`` (see its docstring).
 
 Two modes over the SAME ``compute_metrics`` path:
 
@@ -49,7 +57,11 @@ from pydantic import BaseModel, Field
 
 from object_detection_eval.data.coco_gt import load_coco_gt
 from object_detection_eval.data.image import ImageLoader
-from object_detection_eval.data.taxonomy import remap_detections, resolve_taxonomy
+from object_detection_eval.data.taxonomy import (
+    dedupe_merged_class_detections,
+    remap_detections,
+    resolve_taxonomy,
+)
 from object_detection_eval.inference.detectors import (
     DamoDetector,
     DeimDetector,
@@ -248,6 +260,7 @@ def _score_end2end(
     args: argparse.Namespace,
     gt_map: dict[str, sv.Detections],
     name_to_id: dict[str, int],
+    dedupe_merged_classes: bool,
 ) -> dict[str, sv.Detections]:
     root = _resolve_root(entry.root, args.source_repo, args.yolox_root)
     onnx_path = root / entry.onnx
@@ -272,18 +285,26 @@ def _score_end2end(
         width, height = loader.width, loader.height
         detections = detector.predict(image, image_width=width, image_height=height)
         remapped = remap_detections(detections, label_map, name_to_id)
-        pred_map[filename] = detections_to_sv(remapped, width, height)
+        sv_dets = detections_to_sv(remapped, width, height)
+        if dedupe_merged_classes:
+            sv_dets = dedupe_merged_class_detections(sv_dets)
+        pred_map[filename] = sv_dets
 
     logger.info(f"{entry.name}: end2end inference over {len(pred_map)} images done")
     return pred_map
 
 
 def _score_from_predictions(
-    entry: ManifestEntry, args: argparse.Namespace
+    entry: ManifestEntry, args: argparse.Namespace, dedupe_merged_classes: bool
 ) -> dict[str, sv.Detections]:
     pred_root = _resolve_root(entry.resolved_predictions_root, args.source_repo, args.yolox_root)
     pred_path = pred_root / entry.predictions
-    return load_predictions(pred_path)
+    pred_map = load_predictions(pred_path)
+    if dedupe_merged_classes:
+        pred_map = {
+            filename: dedupe_merged_class_detections(dets) for filename, dets in pred_map.items()
+        }
+    return pred_map
 
 
 def _print_table_and_verdict(
@@ -379,6 +400,11 @@ def main() -> None:
     if args.mode == "end2end":
         _assert_images_exist(args.data_root, list(gt_map.keys()))
 
+    # Only "merged5" collapses several raw source categories into one eval
+    # class (see benchmarks/basketball/conf/taxonomy/merged5.yaml's `merge`
+    # block); "raw10"/"identity" have no pre/post-merge collision to dedupe.
+    dedupe_merged_classes = args.taxonomy == "merged5"
+
     effective_tolerance = (
         _STRICT_FROM_PREDICTIONS_TOLERANCE
         if (args.mode == "from-predictions" and args.strict)
@@ -393,9 +419,9 @@ def main() -> None:
     for entry in manifest.models:
         logger.info(f"Scoring {entry.name} ({entry.detector}) via {args.mode} mode")
         pred_map = (
-            _score_end2end(entry, args, gt_map, name_to_id)
+            _score_end2end(entry, args, gt_map, name_to_id, dedupe_merged_classes)
             if args.mode == "end2end"
-            else _score_from_predictions(entry, args)
+            else _score_from_predictions(entry, args, dedupe_merged_classes)
         )
         metrics = compute_metrics(gt_map, pred_map, id_to_name)
         metrics_by_name[entry.name] = metrics
