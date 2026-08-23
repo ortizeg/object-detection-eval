@@ -37,8 +37,8 @@
     {
       "name": "YOLOX-M",
       "engine_scope": "to_boxes",
-      "median_ms": 5.6958,
-      "p99_ms": 5.85193,
+      "median_ms": 5.68115,
+      "p99_ms": 5.82678,
       "nms_graft": true,
       "trt_version": "10.3.0",
       "build_status": "ok"
