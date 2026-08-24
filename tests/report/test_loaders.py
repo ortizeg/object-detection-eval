@@ -73,13 +73,16 @@ def test_cpu_latency_loader_validates_fixture() -> None:
     assert yolox.nms_graft is True
     assert yolox.median_ms == 100.0
     assert yolox.provider == "CPUExecutionProvider"
+    assert result.environment.cpu_model == "Apple M4 Pro"
+    assert result.environment.onnxruntime_version == "1.23.2"
 
 
-def test_cpu_latency_loader_rejects_reproducibility_block(tmp_path: Path) -> None:
-    # The CPU shape is plain measured numbers: a reproducibility block (which
-    # the honest-labelled TRT LatencyResult REQUIRES) must be rejected here.
+def test_cpu_latency_loader_requires_environment_block(tmp_path: Path) -> None:
+    # LAT-05 honesty fix: the CPU shape now REQUIRES an environment block (CPU
+    # model, core count, thread setting, ORT version) so the report's
+    # provenance caveat is backed by the data, not just hand-typed prose.
     data = json.loads(_CPU_LATENCY_025.read_text())
-    data["reproducibility"] = {"status": "manually_measured"}
+    del data["environment"]
     bad = tmp_path / "bad.json"
     bad.write_text(json.dumps(data))
     with pytest.raises(ReportLoadError):

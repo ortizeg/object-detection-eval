@@ -232,8 +232,17 @@ def cpu_latency_section(conf025: CpuLatencyResult, conf001: CpuLatencyResult) ->
 
     Raises:
         ValueError: a model timed at conf=0.25 is absent from the conf=0.01 run
-            (the two files must cover the same fleet to join).
+            (the two files must cover the same fleet to join), or the two runs'
+            ``environment`` blocks disagree (they must share one host/run).
     """
+    env025, env001 = conf025.environment, conf001.environment
+    if env025 != env001:
+        msg = (
+            "conf=0.25 and conf=0.01 CPU runs report different environments "
+            f"({env025!r} vs {env001!r}); re-run both on the same host"
+        )
+        raise ValueError(msg)
+
     by_name_001 = {m.name: m for m in conf001.models}
     rows: list[list[str]] = []
     for entry in sorted(conf025.models, key=lambda m: m.median_ms):
@@ -258,7 +267,14 @@ def cpu_latency_section(conf025: CpuLatencyResult, conf001: CpuLatencyResult) ->
         "Δ (NMS blow-up)",
         "head",
     ]
-    return _table(header, rows)
+    provenance = (
+        f"_measured {env025.measured_date} on {env025.cpu_model} "
+        f"({env025.logical_cores} logical cores, {env025.os}), "
+        f"onnxruntime {env025.onnxruntime_version}, "
+        f"intra_op_num_threads={env025.intra_op_num_threads}, "
+        f"providers={env025.providers_requested}_"
+    )
+    return "\n\n".join([provenance, _table(header, rows)])
 
 
 # --------------------------------------------------------------------------- #
