@@ -1,64 +1,75 @@
 {
+  "environment": {
+    "measured_date": "2026-08-24",
+    "cpu_model": "Intel(R) Xeon(R) CPU @ 2.80GHz",
+    "logical_cores": 8,
+    "os": "Linux 6.1.0-52-cloud-amd64 (x86_64)",
+    "onnxruntime_version": "1.29.0",
+    "intra_op_num_threads": "default (ORT auto-selected; not overridden)",
+    "providers_requested": [
+      "CPUExecutionProvider"
+    ]
+  },
   "models": [
     {
       "name": "YOLO26m",
-      "median_ms": 118.77456249203533,
-      "p90_ms": 122.95712495688349,
-      "fps": 8.419311164097591,
+      "median_ms": 188.11417200049618,
+      "p90_ms": 331.76115729984303,
+      "fps": 5.315920588893017,
       "provider": "CPUExecutionProvider",
       "nms_graft": false,
       "suspect": false
     },
     {
       "name": "DEIM-M",
-      "median_ms": 115.83431251347065,
-      "p90_ms": 119.52320800628513,
-      "fps": 8.63302054720364,
+      "median_ms": 227.17754500081355,
+      "p90_ms": 368.46987010012526,
+      "fps": 4.401843500846084,
       "provider": "CPUExecutionProvider",
       "nms_graft": false,
       "suspect": false
     },
     {
       "name": "YOLOX-M",
-      "median_ms": 126.74452108331025,
-      "p90_ms": 130.5937705328688,
-      "fps": 7.889887400676606,
+      "median_ms": 185.48972999906255,
+      "p90_ms": 338.20309339917003,
+      "fps": 5.391134053648436,
       "provider": "CPUExecutionProvider",
       "nms_graft": true,
       "suspect": false
     },
     {
       "name": "RF-DETR-M",
-      "median_ms": 180.54370838217437,
-      "p90_ms": 184.73666650243104,
-      "fps": 5.538824969093928,
+      "median_ms": 379.776800999025,
+      "p90_ms": 550.5847017999258,
+      "fps": 2.633125555245717,
       "provider": "CPUExecutionProvider",
       "nms_graft": false,
       "suspect": false
     },
     {
       "name": "RTMDet-M",
-      "median_ms": 142.98683288507164,
-      "p90_ms": 148.5719585325569,
-      "fps": 6.993650952488533,
+      "median_ms": 212.84495550025895,
+      "p90_ms": 378.7862662000407,
+      "fps": 4.698255580686212,
       "provider": "CPUExecutionProvider",
       "nms_graft": true,
       "suspect": false
     },
     {
       "name": "DAMO-YOLO-M",
-      "median_ms": 155.67954198922962,
-      "p90_ms": 169.9480835814029,
-      "fps": 6.4234515802287175,
+      "median_ms": 300.602761499249,
+      "p90_ms": 333.9045511007498,
+      "fps": 3.3266494127084,
       "provider": "CPUExecutionProvider",
       "nms_graft": true,
       "suspect": false
     },
     {
       "name": "RT-DETRv2-M",
-      "median_ms": 163.16197847481817,
-      "p90_ms": 169.8321874719113,
-      "fps": 6.128878856138266,
+      "median_ms": 262.08990449958947,
+      "p90_ms": 459.6112302991969,
+      "fps": 3.8154846212383062,
       "provider": "CPUExecutionProvider",
       "nms_graft": false,
       "suspect": false

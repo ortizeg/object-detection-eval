@@ -400,46 +400,56 @@ of the artifact, not of either machine.
 
 ### CPU / edge latency (LAT-05)
 
-> **⚠️ Provenance caveat.** Unlike the GPU table above, these CPU numbers were
-> **not** re-measured on a dedicated instance. They predate the 2026-07-30
-> correction and come from the same era as the GPU numbers that turned out to be
-> contention artifacts, so their *absolute* values should be treated as
-> unvalidated. The **relative** story below is more robust than the milliseconds:
-> the NMS blow-up it reports is a +46.9 ms effect concentrated in one model,
-> which contention alone is unlikely to manufacture. Read the Δ column, not the
-> absolute latencies.
+**Provenance.** Re-measured 2026-08-24 on a short-lived, single-tenant-billed
+GCP `n2-standard-8` CPU-only VM (`us-central1-a`) — not this repo's dev
+machine, to rule out a shared-laptop confound. A same-config stability check
+(rerunning the identical conf=0.25 sweep back to back) caught one contaminated
+run: the first conf=0.01 attempt read almost every model 85-96% slower than an
+immediate rerun, including the architecturally NMS-free/DETR-decode models
+that have no reason to slow down at a lower confidence threshold — the kind of
+transient noisy-neighbour artifact the GPU section above already documents
+once. That run was discarded; the table below is from the reproducible rerun,
+confirmed by a third pass. Exact CPU model, core count, OS, and ONNX Runtime
+version travel with the data in `environment` (`cpu_e2e_conf025.json` /
+`cpu_e2e_conf001.json`), not just this prose.
 
 On a T4 the on-GPU NMS is nearly free (Phase 6), so dense-head and NMS-free
 models rank together. On **CPU** — the edge/no-accelerator regime — a dense head
 runs its NMS in Python/numpy, and that cost scales with how many candidate boxes
 survive the confidence threshold into the sort/IoU loop. The effect is
 **strongly model-dependent, not a uniform dense-head penalty**: **DAMO-YOLO-M**
-reproduces the source repo's blow-up almost exactly (108.7 ms @ conf=0.25 →
-155.7 ms @ conf=0.01, **+46.9 ms**) because its head floods NMS with low-score
-boxes at the low threshold, whereas **YOLOX-M (+2.6 ms)** and **RTMDet-M
-(+1.9 ms)** emit far fewer survivors here and pay only a modest Python-NMS cost.
-The NMS-free **YOLO26m (+1.1 ms)** and the three in-graph-decode DETRs
-(RF-DETR-M, DEIM-M, RT-DETRv2-M) never run a separable NMS, so they are flat
-across the sweep by construction. So the NMS-free / edge advantage is real but
-concentrated in the models whose heads flood NMS at low thresholds (here,
-DAMO-YOLO) — it is not a blanket win for NMS-free architectures. Note the
-absolute CPU end-to-end latencies (~110–180 ms) are ~20–40× the native
-TensorRT-fp16 GPU numbers above, the expected gap for a no-accelerator baseline.
+is the one clear outlier (168.7 ms @ conf=0.25 → 300.6 ms @ conf=0.01,
+**+131.9 ms**) because its head floods NMS with low-score boxes at the low
+threshold. Every other model — dense-head or not — lands within a **single-digit
+millisecond delta (≤8.1 ms)**, indistinguishable from run-to-run noise at this
+scale: the other two dense heads (**YOLOX-M +1.1 ms**, **RTMDet-M +7.7 ms**) pay
+only a modest Python-NMS cost, and the NMS-free **YOLO26m (+2.6 ms)** and the
+three in-graph-decode DETRs (RF-DETR-M +8.1 ms, DEIM-M +5.6 ms, RT-DETRv2-M
++2.4 ms) never run a separable NMS, so they are flat across the sweep by
+construction. So the NMS-free / edge advantage is real but concentrated in the
+one model whose head floods NMS at low thresholds (here, DAMO-YOLO) — it is not
+a blanket win for NMS-free architectures. Note the absolute CPU end-to-end
+latencies (~170-380 ms) are roughly 25-50× the native TensorRT-fp16 GPU numbers
+above, the expected gap for a no-accelerator baseline — the multiple is wider
+than the earlier unvalidated numbers implied, consistent with this being
+weaker x86 cloud CPU hardware, not the same machine the GPU comparison ran on.
 The table times the identical fleet on CPU at the deployment-realistic conf=0.25
 and the accuracy-gate conf=0.01; **Δ (NMS blow-up)** is the CPU cost each head
 pays for dropping the threshold. Emitted from
 `results/latency/cpu_e2e_conf025.json` and `cpu_e2e_conf001.json`:
 
 <!-- TABLE:cpu_latency START -->
+_measured 2026-08-24 on Intel(R) Xeon(R) CPU @ 2.80GHz (8 logical cores, Linux 6.1.0-52-cloud-amd64 (x86_64)), onnxruntime 1.29.0, intra_op_num_threads=default (ORT auto-selected; not overridden), providers=['CPUExecutionProvider']_
+
 | Model | CPU e2e @conf0.25 (ms) | CPU e2e @conf0.01 (ms) | Δ (NMS blow-up) | head |
 | --- | --- | --- | --- | --- |
-| DAMO-YOLO-M | 108.7 | 155.7 | +46.9 | dense + Python NMS |
-| DEIM-M | 113.1 | 115.8 | +2.7 | DETR decode |
-| YOLO26m | 117.7 | 118.8 | +1.1 | NMS-free |
-| YOLOX-M | 124.1 | 126.7 | +2.6 | dense + Python NMS |
-| RTMDet-M | 141.1 | 143.0 | +1.9 | dense + Python NMS |
-| RT-DETRv2-M | 163.4 | 163.2 | -0.2 | DETR decode |
-| RF-DETR-M | 175.7 | 180.5 | +4.9 | DETR decode |
+| DAMO-YOLO-M | 168.7 | 300.6 | +131.9 | dense + Python NMS |
+| YOLOX-M | 184.3 | 185.5 | +1.1 | dense + Python NMS |
+| YOLO26m | 185.5 | 188.1 | +2.6 | NMS-free |
+| RTMDet-M | 205.1 | 212.8 | +7.7 | dense + Python NMS |
+| DEIM-M | 221.5 | 227.2 | +5.6 | DETR decode |
+| RT-DETRv2-M | 259.7 | 262.1 | +2.4 | DETR decode |
+| RF-DETR-M | 371.7 | 379.8 | +8.1 | DETR decode |
 <!-- TABLE:cpu_latency END -->
 
 ## Takeaways
