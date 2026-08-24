@@ -125,7 +125,7 @@ PER_MODEL_CONFIGS: dict[str, GraftConfig] = {
     "yolox": GraftConfig(
         model="yolox",
         iou_threshold=0.45,  # YOLOXPostProcessor.nms_iou_threshold default
-        score_threshold=0.25,  # YOLOXPostProcessor confidence_threshold default
+        score_threshold=0.01,  # matches damo/rtmdet threshold for a fair to-boxes comparison
         box_coding=1,  # fused head emits center-size cxcywh -> feed as center-size
         score_activation=False,  # scores = obj_conf * class_conf, already activated
         fused_split=True,  # single fused [1,N,5+C] output -> slice + obj*cls first

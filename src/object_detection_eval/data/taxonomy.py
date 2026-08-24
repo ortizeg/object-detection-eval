@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import supervision as sv
 from loguru import logger
 
 from object_detection_eval.schemas.detection import Detection
@@ -130,3 +131,40 @@ def remap_detections(
             )
         )
     return remapped
+
+
+def dedupe_merged_class_detections(
+    detections: sv.Detections,
+    iou_threshold: float = 0.9,
+) -> sv.Detections:
+    """Suppress same-eval-class duplicates a taxonomy merge exposes.
+
+    ``remap_detections`` only relabels; it never re-runs NMS. A model's own
+    per-class NMS runs in its *pre-merge* label space, so when a taxonomy
+    merges several source categories into one eval class (``merged5``:
+    e.g. ``player-jump-shot`` -> ``player``), two boxes on the same physical
+    object emitted under different source categories both survive their
+    model's NMS untouched by each other -- then land in the same eval class
+    after remapping, where one is a spurious same-class false positive.
+
+    Call this once per image, after remapping to an eval taxonomy that
+    merges classes. Harmless no-op for taxonomies that do not merge (e.g.
+    ``raw10``, ``identity``): those have no pre/post-merge collision to
+    create a duplicate.
+
+    ``iou_threshold`` defaults to a conservative 0.9 rather than a typical
+    NMS value like 0.5: on this crowded-court dataset, distinct-but-adjacent
+    real detections of the *same* eval class (e.g. two players standing
+    close together) routinely overlap at IoU 0.5-0.9, and suppressing those
+    trades a false positive for a false negative -- net negative on every
+    model measured. Only near-total overlap (>0.9) reliably isolates the
+    merge-artifact pattern (same box, two source labels) without discarding
+    genuine detections; swept 0.5-0.99 against the stored merged5 test
+    predictions, mAP@50:95 only stops regressing at/above 0.9.
+
+    Args:
+        detections: One image's detections, already in eval-class-id space.
+        iou_threshold: Suppress a same-eval-class box overlapping a
+            higher-confidence one by more than this.
+    """
+    return detections.with_nms(threshold=iou_threshold, class_agnostic=False)

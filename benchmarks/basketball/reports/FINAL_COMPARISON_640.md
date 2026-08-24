@@ -23,7 +23,7 @@ do**, and they point in opposite directions:
 
 | | mAP@50:95 | T4 fp16 to-boxes | Licence |
 |---|---|---|---|
-| **YOLOX-M** | 0.672 | **5.70 ms** (fastest measured) | **Apache-2.0** |
+| **YOLOX-M** | 0.672 | **5.68 ms** (fastest measured) | **Apache-2.0** |
 | **YOLO26m** | 0.716 | 5.85 ms | **AGPL-3.0-only** |
 | **DEIM-M** | 0.686 | 6.61 ms | **Apache-2.0** |
 
@@ -74,10 +74,17 @@ metric). Emitted from `results/accuracy/reproduction_640_merged5.json`:
 <!-- TABLE:primary_7model END -->
 
 YOLO26m posts the top point estimate, DEIM-M and YOLOX-M follow, and RT-DETRv2-M
-(a ResNet-34-vd backbone) trails — a *real* backbone effect, not a training
-artifact (the fairness audit below confirms it reads faithfully). But point
-estimates alone over-state how separated these models are; the confidence
-intervals tell the honest story.
+trails. RT-DETRv2-M is the only model here on a plain ImageNet ResNet-34-vd
+backbone — every other model uses either a NAS-searched backbone (DAMO-YOLO,
+the CSPNeXt/CSPDarknet lineage in YOLOX and RTMDet) or a self-supervised
+foundation model (RF-DETR's DINOv2 ViT) — which is a plausible story for the
+gap. But these seven runs vary backbone, neck, head, label assignment,
+augmentation and epoch count simultaneously, so no single factor is isolated.
+The fairness audit below rules out a training-recipe bug as the cause; it does
+not run a backbone-swap ablation, so "backbone effect" is this report's
+leading hypothesis, not a demonstrated one. Point estimates alone also
+over-state how separated these models are; the confidence intervals tell the
+honest story.
 
 ## Confidence intervals and pairwise significance
 
@@ -270,13 +277,41 @@ equalize only the shared protocol.** What the audit found:
   vendored loader that *drops* pos-emb on mismatch was deliberately avoided.
 - **RT-DETRv2-M had the same 2000-iter warmup trap as DEIM — caught & fixed.**
   Shortened to 50 iters; harness/val then reads within 0.06 pt of native,
-  confirming faithful reading. Its low 0.581 is a real backbone effect
-  (ResNet-34-vd), not a training artifact.
+  confirming faithful reading. Its low 0.581 is *not* a training artifact — the
+  warmup bug is ruled out. It is the only model here on a plain ResNet-34-vd
+  backbone (RT-DETRv2's S/M/L/X family runs R18-vd/R34-vd/R50-vd/R101-vd, so
+  R34-vd is second-lightest, not the lightest), which is a plausible
+  explanation for the gap, but no backbone-swap ablation was run to separate
+  it from the neck/head/assignment/augmentation/epoch differences that also
+  vary across the seven models compared here.
 - **DAMO-YOLO-M validated.** New harness inferencer (RGB square-640, raw 0-255,
   per-class NMS); identity/val reads within ~1.2 pt of native. Its COCO strength
   simply did not transfer to the 465-image set (heavy mosaic/mixup aug tuned for
   large data, plus a pre-distill checkpoint — the official distilled weights'
   bucket is dead). Reported honestly at its matched-640 number.
+- **Merged5 post-remap duplicate boxes — real, fixed, and NOT the reorder
+  explanation below.** `remap_detections` only relabels; each model's
+  per-class NMS runs in its own *pre-merge* (raw10) label space, so two boxes
+  on one physical object emitted under different raw10 categories that
+  collapse into the same merged5 class (e.g. `player-jump-shot` ->
+  `player`) can both survive as a spurious same-class duplicate after the
+  merge. RF-DETR's decode makes this easiest to trigger (top-k multi-label
+  selection, no NMS of its own) and DEIM's the second-easiest — both
+  DETR-style. The harness now runs a conservative post-remap per-eval-class
+  NMS (`dedupe_merged_class_detections`, IoU > 0.9 — a *low* threshold
+  measurably regresses every model here, because distinct-but-adjacent
+  players on a crowded court legitimately overlap past IoU 0.5) to close the
+  gap. Measured two ways — a controlled before/after on the exact stored
+  merged5 predictions, and a same-machine end2end A/B — the isolated effect
+  is **≤0.0008 pt mAP@50:95 per model, in both directions** (RF-DETR-M
+  +0.0002, DEIM-M −0.0003, RT-DETRv2-M +0.0008 the largest move): an order of
+  magnitude below the bootstrap's own standard error (~0.006-0.009) and
+  inside every existing reproduction-gate tolerance, so the committed
+  accuracy/bootstrap files are unchanged. No rank changes, no CI-crossing
+  changes. **This rules out duplicate-box inflation as an explanation for
+  the 5-class/10-class reorder** in the appendix below — that reorder runs
+  on multi-point per-class gaps, two to three orders of magnitude larger
+  than what this bug can move.
 
 **Not done, by design:** no per-model LR/aug sweeps. Tuning effort itself is an
 unfairness — it favors the models the authors understand best — so
@@ -288,7 +323,9 @@ For completeness, the fine-grained 10-class breakdown (the raw annotation
 taxonomy before the 5-class merge). The story flips relative to the coarse task:
 the **DETR family (DEIM, RF-DETR) leads the fine-grained 10-class task**, while
 YOLO26m's ball/number recall is what carries it on the coarse 5-class task.
-Emitted from `results/accuracy/reproduction_640_raw10.json`:
+(A merged5 duplicate-box artifact was investigated as an alternative
+explanation for this reorder and ruled out quantitatively — see the Fairness
+audit above.) Emitted from `results/accuracy/reproduction_640_raw10.json`:
 
 <!-- TABLE:per_class_10c START -->
 | Model | ball | ball-in-basket | number | player | player-in-possession | player-jump-shot | player-layup-dunk | player-shot-block | referee | rim |
@@ -330,7 +367,7 @@ This supersedes the earlier shared-instance run, which read every model 17-85% s
 | --- | --- | --- | --- |
 | YOLO26m | 5.85 | 6.00 | no |
 | DEIM-M | 6.61 | 7.16 | no |
-| YOLOX-M | 5.70 | 5.85 | yes |
+| YOLOX-M | 5.68 | 5.83 | yes |
 | RF-DETR-M | 7.71 | 7.91 | no |
 | RTMDet-M | 8.19 | 8.54 | yes |
 | DAMO-YOLO-M | 6.70 | 6.83 | yes |
@@ -423,8 +460,8 @@ test set's 3-clip structure is respected. The ranking you see is real as a point
 estimate and unsupported as a claim.
 
 **2. Speed and licence are what actually differentiate them.** YOLOX-M is the
-fastest model measured (5.70 ms fp16 to-boxes on a dedicated T4) *and*
-Apache-2.0. YOLO26m is 0.15 ms slower and AGPL-3.0-only. Nothing else in the
+fastest model measured (5.68 ms fp16 to-boxes on a dedicated T4) *and*
+Apache-2.0. YOLO26m is 0.17 ms slower and AGPL-3.0-only. Nothing else in the
 roster is on the accuracy/latency frontier.
 
 **3. Why the licence is not a footnote.** AGPL-3.0-only means commercial serving
