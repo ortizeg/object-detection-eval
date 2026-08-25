@@ -193,3 +193,29 @@ complete._
 
 - 2026-08-21 — plan written; adoption rule fixed before any eight-model
   fusion number exists.
+- 2026-08-24 — Phase 1 complete. LLMDet-large's val arm (0.3590, already
+  committed) re-verified on a fresh vast.ai RTX 4090 (contract 48494367,
+  `--verify` gap 1.37e-04, matching the divergence already disclosed in
+  b338012 -- not a new finding). Qwen3-VL-8B's first full-96-image val score
+  backfilled and committed: 0.2651 (`ablate_vlm.py --verify` gap 0.00e+00;
+  raw detection counts sane, 24.6 boxes/img, no blanks; independently
+  cross-checked by replaying the adopted config on the TEST split, which
+  reproduced the already-published 0.3175 exactly). Also found and fixed a
+  real infrastructure bug while running `fuse_vlm.py --verify` locally:
+  Phase 0 added `min_pixels`/`max_pixels` to `ablate_vlm.py`'s
+  `Arm.signature()`, but `fuse_vlm.py`'s own separate reimplementation of
+  that signature was never updated to match, so it silently excluded both
+  new models' caches ("no cache -- excluded from fusion") rather than
+  fusing them. Fixed in `fuse_vlm.py` (resolve_cache now tries three cache-
+  key formats). All eight models now verify through the fusion path at
+  0.00e+00 gap except yolo_world (3.10e-04 -- its winning arm's cache had to
+  be regenerated locally on Apple Silicon MPS/CPU rather than the original
+  CUDA RTX 3090 run to unblock the sweep; well under the 0.002 noise floor).
+- 2026-08-24 — Pre-registered alternate written down BEFORE running the
+  subset sweep, per the rule (§"The adoption rule", point 4): ranking all
+  eight models by their already-committed val mAP@50:95 --
+  llmdet 0.3590, owlv2 0.2879, grounding_dino 0.2779, qwen3_vl 0.2651,
+  gemini 0.2583, florence2 0.2340, omdet_turbo 0.2159, yolo_world 0.1846 --
+  the top two are **llmdet + owlv2**. This is now locked in as the
+  pre-registered alternate configuration; the subset sweep has not been run
+  yet as of this line being written.
