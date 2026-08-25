@@ -5,8 +5,10 @@
     "florence2": "published test dump",
     "gemini": "published test dump",
     "grounding_dino": "published test dump",
+    "llmdet": "published test dump",
     "omdet_turbo": "published test dump",
     "owlv2": "published test dump",
+    "qwen3_vl": "published test dump",
     "yolo_world": "published test dump"
   },
   "rows": [
@@ -104,6 +106,42 @@
     },
     {
       "models": [
+        "llmdet"
+      ],
+      "n_models": 1,
+      "method": "nms",
+      "iou": 1.0,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.3883121609687805,
+      "mAP_50": 0.5061895251274109,
+      "per_class_ap50": {
+        "player": 0.8796826601028442,
+        "ball": 0.4065794348716736,
+        "referee": 0.6731314659118652,
+        "rim": 0.0009900990407913923,
+        "number": 0.5705640912055969
+      },
+      "boxes_per_image": 32.9468085106383,
+      "best_f1": {
+        "threshold": 0.38,
+        "precision": 0.6797020484171322,
+        "recall": 0.7373737373737373,
+        "f1": 0.7073643410852714
+      },
+      "recall_at_p90": {
+        "threshold": 0.68,
+        "recall": 0.34444444444444444,
+        "precision": 0.917900403768506
+      },
+      "recall_at_p95": {
+        "threshold": 0.72,
+        "recall": 0.2641414141414141,
+        "precision": 0.9631675874769797
+      }
+    },
+    {
+      "models": [
         "omdet_turbo"
       ],
       "n_models": 1,
@@ -176,6 +214,34 @@
     },
     {
       "models": [
+        "qwen3_vl"
+      ],
+      "n_models": 1,
+      "method": "nms",
+      "iou": 1.0,
+      "normalize": false,
+      "min_models": null,
+      "mAP_50_95": 0.31751686334609985,
+      "mAP_50": 0.452224463224411,
+      "per_class_ap50": {
+        "player": 0.933837890625,
+        "ball": 0.3340285122394562,
+        "referee": 0.7269189953804016,
+        "rim": 0.0,
+        "number": 0.2663368582725525
+      },
+      "boxes_per_image": 25.73404255319149,
+      "best_f1": {
+        "threshold": 0.0,
+        "precision": 0.6176105828854899,
+        "recall": 0.7545454545454545,
+        "f1": 0.6792452830188678
+      },
+      "recall_at_p90": null,
+      "recall_at_p95": null
+    },
+    {
+      "models": [
         "yolo_world"
       ],
       "n_models": 1,
@@ -207,40 +273,42 @@
         "florence2",
         "gemini",
         "grounding_dino",
+        "llmdet",
         "omdet_turbo",
         "owlv2",
+        "qwen3_vl",
         "yolo_world"
       ],
-      "n_models": 6,
+      "n_models": 8,
       "method": "wbf",
       "iou": 0.55,
       "normalize": false,
       "min_models": null,
-      "mAP_50_95": 0.4060514569282532,
-      "mAP_50": 0.5666868686676025,
+      "mAP_50_95": 0.43735647201538086,
+      "mAP_50": 0.5988664627075195,
       "per_class_ap50": {
-        "player": 0.9573129415512085,
-        "ball": 0.5791606307029724,
-        "referee": 0.8311233520507812,
-        "rim": 0.030468355864286423,
-        "number": 0.43536892533302307
+        "player": 0.9654195308685303,
+        "ball": 0.5737248063087463,
+        "referee": 0.8586710095405579,
+        "rim": 0.016459479928016663,
+        "number": 0.5800574421882629
       },
-      "boxes_per_image": 1518.7553191489362,
+      "boxes_per_image": 1523.223404255319,
       "best_f1": {
-        "threshold": 0.3,
-        "precision": 0.9262422360248447,
-        "recall": 0.6025252525252526,
-        "f1": 0.7301101591187271
+        "threshold": 0.24,
+        "precision": 0.8412887828162291,
+        "recall": 0.7121212121212122,
+        "f1": 0.7713347921225383
       },
       "recall_at_p90": {
-        "threshold": 0.28,
-        "recall": 0.6080808080808081,
-        "precision": 0.9025487256371814
+        "threshold": 0.3,
+        "recall": 0.6535353535353535,
+        "precision": 0.902370990237099
       },
       "recall_at_p95": {
-        "threshold": 0.38,
-        "recall": 0.545959595959596,
-        "precision": 0.9591836734693877
+        "threshold": 0.4,
+        "recall": 0.5823232323232324,
+        "precision": 0.9600333055786844
       }
     }
   ]
