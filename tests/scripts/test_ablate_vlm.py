@@ -326,6 +326,8 @@ def test_forward_pass_knobs_do_change_the_signature(sut: types.ModuleType) -> No
         ("imgsz", 1280),
         ("tiles", [2, 2]),
         ("max_det", 1000),
+        ("min_pixels", 4_096_000),
+        ("max_pixels", 8_192_000),
     ]:
         assert _arm(sut, id=field, **{field: value}).signature() != base.signature(), field
 

@@ -34,6 +34,12 @@ signature so Gemini's arms could differ by prompt. That silently re-keyed every
 cache written before it, so the five open-weights caches on disk sit under the
 old name and today's ``ablate_vlm.py`` would miss all of them and re-run
 forward passes it already paid for. :func:`resolve_cache` tries both formats.
+The eight-model round's Phase 0 (``829dfbc``) appended ``minpx``/``maxpx`` to
+``Arm.signature()`` for Qwen3-VL's resolution config -- this module's own
+:func:`signature` is a separate reimplementation of that same format (fusion
+has no ``Arm`` to call), and it silently fell out of sync until this round
+fixed it: every arm built after Phase 0 (llmdet's and qwen3_vl's val caches)
+was unresolvable, logged as "no cache -- excluded" rather than an error.
 """
 
 from __future__ import annotations
@@ -115,10 +121,13 @@ _TEST_DUMP_DIR = Path("benchmarks/basketball/results/vlm")
 # ---------------------------------------------------------------------------
 
 
-def signature(cfg: dict[str, Any], model: str, *, legacy: bool) -> str:
+def signature(cfg: dict[str, Any], model: str, *, legacy: bool, with_minpx: bool = True) -> str:
     """Forward-pass key for an adopted config.
 
     ``legacy`` reproduces the pre-#19 format; see the module docstring.
+    ``with_minpx`` reproduces the pre-Phase-0 (eight-model round) format, from
+    before ``minpx``/``maxpx`` joined ``Arm.signature()``; see the module
+    docstring's Phase 0 note.
     """
     parts = [
         cfg["inferencer"],
@@ -131,6 +140,8 @@ def signature(cfg: dict[str, Any], model: str, *, legacy: bool) -> str:
         f"tiles{cfg.get('tiles')}@{cfg.get('tile_overlap')}",
         f"maxdet{cfg.get('max_det')}",
     ]
+    if with_minpx:
+        parts += [f"minpx{cfg.get('min_pixels')}", f"maxpx{cfg.get('max_pixels')}"]
     if not legacy:
         digest = hashlib.sha256((cfg.get("prompt_template") or "-").encode()).hexdigest()[:8]
         parts += [f"prompt{digest}", f"sample{cfg.get('sample')}"]
@@ -149,11 +160,18 @@ def cache_path(cache_dir: Path, split: str, sig: str) -> Path:
 def resolve_cache(
     cache_dir: Path, split: str, model: str, cfg: dict[str, Any]
 ) -> dict[str, list[list[float]]] | None:
-    for legacy in (False, True):
-        path = cache_path(cache_dir, split, signature(cfg, model, legacy=legacy))
+    # Newest format first: (with_minpx, legacy). ``with_minpx=True, legacy=True``
+    # is skipped -- Phase 0 postdates PR #19, so no cache was ever written under
+    # that combination.
+    for with_minpx, legacy in ((True, False), (False, False), (False, True)):
+        path = cache_path(
+            cache_dir, split, signature(cfg, model, legacy=legacy, with_minpx=with_minpx)
+        )
         if path.exists():
             if legacy:
                 logger.debug(f"{model}: cache hit under the pre-#19 key")
+            elif not with_minpx:
+                logger.debug(f"{model}: cache hit under the pre-Phase-0 key")
             with open(path) as f:
                 blob: dict[str, list[list[float]]] = json.load(f)
             return blob

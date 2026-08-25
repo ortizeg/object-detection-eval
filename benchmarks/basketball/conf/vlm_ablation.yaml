@@ -119,6 +119,43 @@ models:
       prompt_template: |
         Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - At most 10 players, 3 referees, 1 rim, and 1 ball per image. - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - "player" for any basketball player on the court - "referee" for game officials - "ball" for the basketball (only when NOT going through the rim) - "rim" for the basketball hoop rim - "number" for visible jersey numbers (tight box around the digits only)
 
+  # LLMDet-large and Qwen3-VL-8B, added 2026-08-21 for the eight-model fusion
+  # round (nimbalyst-local/plans/vlm-fusion-eight-models.md). Baseline-only:
+  # both models' tuning is already done and published in vlm_zeroshot.yaml, so
+  # this file exists to give fuse_vlm.py a val-split raw-detection cache for
+  # each, NOT to re-sweep them. Deliberately zero new `elements:` reference
+  # either name below.
+  - name: llmdet
+    config:
+      inferencer: llmdet
+      model_name: iSEE-Laboratory/llmdet_large
+      classes: [player, ball, referee, rim, number]
+      box_threshold: 0.01
+      text_threshold: 0.25
+      nms_iou_threshold: 0.5
+      tiles: [2, 2]
+
+  # min_pixels/max_pixels MUST be stated explicitly here, not left at Arm's
+  # `None` default: Qwen3VLInferencer's own constructor default is the 2x
+  # upscale (_DEFAULT_MIN_PIXELS/_DEFAULT_MAX_PIXELS in qwen3_vl.py), but
+  # ablate_vlm.py's build_inferencer always passes arm.min_pixels/max_pixels
+  # through explicitly -- an unset arm field would pass `None` and silently
+  # select the checkpoint's own (pre-fix, un-upscaled) bounds instead of
+  # inheriting the inferencer's default. Values match vlm_zeroshot.yaml's
+  # qwen3_vl row, which relies on Qwen3VLInferencer's constructor default
+  # rather than stating them (run_vlm_benchmark.py's `_qwen3_vl_factory` does
+  # not pass them either) -- stated here because this file's arms must be
+  # fully self-describing to be replayed from cache.
+  - name: qwen3_vl
+    config:
+      inferencer: qwen3_vl
+      model_name: Qwen/Qwen3-VL-8B-Instruct
+      classes:
+        [basketball player, orange basketball, referee,
+         basketball hoop and backboard, jersey number on a uniform]
+      min_pixels: 4096000
+      max_pixels: 8192000
+
 # ---------------------------------------------------------------------------
 # Elements. One knob each; arms are generated as baseline-plus-one-change.
 # ---------------------------------------------------------------------------
@@ -162,8 +199,15 @@ elements:
   # threshold settings. If element 1 or 2 moves, that choice was made under a
   # configuration that no longer exists, so it is re-confirmed rather than
   # inherited.
+  # applies_to stated explicitly (2026-08-21, eight-model fusion round): an
+  # empty list means "every model in `models:`", which would silently pull
+  # llmdet/qwen3_vl into this sweep the moment they were added below -- their
+  # tuning is already published and this round adds zero new elements
+  # referencing either. Scoped to the six models this element was written for;
+  # unchanged behaviour for all of them.
   - name: singleton_top_k
     knob: singleton_top_k
+    applies_to: [owlv2, omdet_turbo, grounding_dino, florence2, yolo_world, gemini]
     values: [1, 2, 5, 10, 1000]
 
   # ELEMENT 4 -- checkpoint variants. Every model here runs exactly one
