@@ -2,15 +2,15 @@
 planStatus:
   planId: plan-vlm-fusion-eight-models
   title: Extending the zero-shot fusion to eight models — LLMDet-large and Qwen3-VL-8B join the ensemble
-  status: not-started
+  status: in-review
   planType: research
   priority: medium
   owner: ortizeg
   stakeholders: []
   tags: [vlm, evaluation, ensembling, wbf, auto-labeling, llmdet, qwen3-vl]
   created: "2026-08-21"
-  updated: "2026-08-21"
-  progress: 0
+  updated: "2026-08-24"
+  progress: 100
 ---
 
 # Extending the zero-shot fusion to eight models
@@ -186,8 +186,49 @@ auto-labeling question.
 
 ## Outcome
 
-_Not yet run — fill in once the backfill, sweep, and rule application are
-complete._
+**Run to completion, adoption rule applied exactly as pre-registered.**
+
+- **Headline (all eight, zero selection freedom): val 0.4366, test 0.4374**
+  (supersedes the six-model round's test 0.4061). Clears the 0.002 noise
+  floor comfortably in both directions the rule checks: val headline vs.
+  the six-model round's test number (+0.0306, 15x the floor, which is what
+  licensed spending the test look), and val-to-test transfer for the new
+  number itself (gap 0.0008, tighter than the six-model round's 0.0024).
+- **Pre-registered alternate (LLMDet-large + OWLv2, top two by
+  already-published val mAP, locked in before the sweep ran): val 0.3807.**
+  Loses to the headline by 12.8% relative — worse than the headline, better
+  than nothing, and (as pre-registration is for) chosen before the outcome
+  was visible.
+- **Full 255-subset sweep: reported as exploration, its argmax (0.438 at
+  size 7) explicitly not adopted**, per the rule. The eight-model headline
+  (0.437) is inside noise of that argmax.
+- **The round's central open question — does LLMDet's single-model
+  dominance change which mechanism drives the fusion gain — has a clean
+  answer: no.** Pooling itself flips from flat (+0.0025, six models, no
+  model dominated) to actively harmful (-0.0879, eight models, LLMDet 0.071
+  clear of the field), exactly the failure mode hazard #5 worried about.
+  But the agreement-re-scoring mechanism's *share* of the pool-to-WBF gain
+  is unchanged: 79.3% here vs. ~80% for six models. Agreement re-scoring is
+  correcting for the same problem pooling now actively creates, at
+  essentially the same rate it always did.
+- **Two things the pre-registered rule didn't ask about, found along the
+  way, disclosed rather than smoothed over:** (1) a real infrastructure bug
+  in `fuse_vlm.py`'s cache-key signature, silently excluding both new
+  models from every fusion computation until fixed (see the Log); (2) the
+  per-class routing oracle needed four models this round, not two, because
+  LLMDet's dominance and Qwen3-VL's `referee` strength each won a class
+  outright.
+- **Nothing about `rim` changed.** Every model, old or new, sits at
+  0.000–0.012. A fifth of the taxonomy remains untouched regardless of how
+  many zero-shot models get fused into it.
+
+The hypothesis this plan set out to test honestly — "does extending the
+fusion pool from six to eight models help, hurt, or complicate the original
+finding" — resolved as: **it helps** (both the headline and the mechanism
+split held up, the absolute numbers improved on both splits), **but not for
+the reason a naive extrapolation would guess** (pooling itself got worse,
+not better, as the field got stronger; the gain came entirely from the
+re-ranking and averaging steps working harder to compensate).
 
 ## Log
 
@@ -219,3 +260,31 @@ complete._
   the top two are **llmdet + owlv2**. This is now locked in as the
   pre-registered alternate configuration; the subset sweep has not been run
   yet as of this line being written.
+- 2026-08-24 — Phase 2 complete: the eight-model val sweep (`fuse_vlm.py`,
+  headline + pre-registered alternate + the full 255-subset curve, 343 rows,
+  matching C(8,2)+...+C(8,8)+8 exactly) committed. Headline WBF 0.4366,
+  alternate WBF 0.3807, mechanism decomposition and 255-subset exploration
+  as summarised in Outcome above.
+- 2026-08-24 — Phase 3 complete: headline cleared the noise floor over the
+  six-model round's test number, so the pre-committed all-eight
+  configuration was scored on test exactly once via `fuse_vlm.py --final
+  --force` (force used deliberately -- this supersedes the six-model
+  round's own single test score with this round's own single test score,
+  not a second look at the same configuration). Result: 0.4374.
+- 2026-08-24 — Phase 4 complete: `VLM_VS_FINETUNED.md`'s fusion section
+  retitled "Can the eight be combined?", PR #24's forward-pointing scope
+  note removed, every hand-written paragraph rewritten against the real
+  eight-model numbers (not a mechanical six->eight substitution -- several
+  findings changed in kind, not just magnitude; see Outcome). Surfaced and
+  fixed two additional defects along the way: `tables.py`'s
+  `_FUSION_STEPS` hardcoded "Pool all six" as a literal string rather than
+  deriving it from the row count (now a template); and
+  `test_fusion_table.py`'s per-model cross-check had a latent key-matching
+  bug ("LLMDet-large" vs "llmdet") invisible until LLMDet became a
+  single-model row in the fused test log for the first time. `--check`
+  (drift gate) and `pixi run docs-build` both clean.
+- 2026-08-24 — Wrap-up: full suite green (`pytest` 551 passed / 10 skipped,
+  `lint`, `format-check`, `typecheck` all clean). GPU work used one vast.ai
+  RTX 4090 (contract 48494367, terminated after Phase 1 -- Phases 2-4 are
+  CPU-only, replaying committed caches and dumps). Branch pushed and PR
+  opened for human review; not merged.
