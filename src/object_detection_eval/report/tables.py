@@ -778,7 +778,7 @@ def _describe_change(key: str, value: Any) -> str:
 #: and changes exactly one thing, so the deltas are additive by construction
 #: rather than by hope. This project has been bitten by assuming otherwise.
 _FUSION_STEPS = (
-    ("nms", "Pool all six, suppress duplicates", "more candidate boxes"),
+    ("nms", "Pool all {n}, suppress duplicates", "more candidate boxes"),
     ("agree", "+ re-score by how many models agreed", "ranking"),
     ("wbf", "+ average the agreeing boxes (WBF)", "localisation"),
 )
@@ -820,10 +820,10 @@ def _fusion_best_single(log: Any) -> Any:
 def fusion_headline_table(log: Any) -> str:
     """Attribute the ensemble's gain to the mechanism that produced it.
 
-    "Ensembling helps" is not a finding — pooling six models' boxes raises
+    "Ensembling helps" is not a finding — pooling the models' boxes raises
     recall on its own, and that has nothing to do with fusion. Each row adds one
-    mechanism to the row above it, so the reader can see that pooling is worth
-    almost nothing and the fusion arithmetic is worth almost everything.
+    mechanism to the row above it, so the reader can see how much pooling alone
+    is worth against the fusion arithmetic on top of it.
     """
     base = _fusion_best_single(log)
     n = max(r.n_models for r in log.rows)
@@ -847,7 +847,7 @@ def fusion_headline_table(log: Any) -> str:
         best = method == _FUSION_STEPS[-1][0]
         rows.append(
             [
-                label,
+                label.format(n=n),
                 f"**{_fmt3(row.map_50_95)}**" if best else _fmt3(row.map_50_95),
                 _fmt_delta(delta),
                 _fmt3(row.map_50),

@@ -314,9 +314,8 @@ def test_committed_test_log_matches_the_published_per_model_numbers() -> None:
     The two files are NOT expected to cover the same model SET, only to agree
     on whichever models they share: `vlm_metrics_merged5.json` holds every
     published VLM row, while this log holds only the models `adopted_arms`
-    names as fused (six, as of LLMDet-large's and Qwen3-VL's additions --
-    neither is yet part of fusion, a documented follow-up, so they appear in
-    the former but not the latter).
+    names as fused (all eight, as of the eight-model fusion round -- every
+    published VLM row is now also a fusion candidate).
     """
     published = load_vlm_metrics(
         _REPO_ROOT / "benchmarks" / "basketball" / "results" / "vlm" / "vlm_metrics_merged5.json"
@@ -324,25 +323,32 @@ def test_committed_test_log_matches_the_published_per_model_numbers() -> None:
 
     # The two files key models differently -- display names ("Grounding-DINO")
     # against manifest names ("grounding_dino") -- so match on alphanumerics.
+    # A plain equality check is not quite enough: "LLMDet-large"'s display name
+    # carries a size suffix ("-large") its manifest identifier ("llmdet") does
+    # not, so the manifest key is only a PREFIX of the display key there.
+    # Falling back to prefix containment (checked both directions so neither
+    # side has to be the longer one) covers that case without a hardcoded
+    # alias table.
     def key(name: str) -> str:
         return "".join(c for c in name.lower() if c.isalnum())
 
     by_key = {key(k): v for k, v in published.items()}
 
-    # LLMDet-large and Qwen3-VL were both added after the fusion/ensembling
-    # sweep (test_fusion.json) was run and have never gone through that
-    # separate exercise -- they are not missing by mistake, they postdate the
-    # file. Everything that WAS a candidate in the fusion sweep must still
-    # match exactly, which is what `adopted_arms` names -- checking against it
-    # directly (rather than a hardcoded exclude-list of published-but-unfused
-    # models) means this assertion does not need updating every time another
-    # model is published ahead of its own fusion follow-up.
+    def lookup(manifest_name: str) -> Any:
+        k = key(manifest_name)
+        if k in by_key:
+            return by_key[k]
+        for other_key, entry in by_key.items():
+            if k.startswith(other_key) or other_key.startswith(k):
+                return entry
+        return None
+
     log = load_fusion_test_log(_COMMITTED_TEST)
     checked = 0
     for row in log.rows:
         if row.n_models != 1:
             continue
-        entry = by_key.get(key(row.models[0]))
+        entry = lookup(row.models[0])
         assert entry is not None, f"no published metrics for {row.models[0]}"
         assert row.map_50_95 == pytest.approx(entry["mAP_50_95"], abs=1e-6)
         checked += 1
