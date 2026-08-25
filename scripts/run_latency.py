@@ -31,12 +31,17 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import platform
 import statistics
+import subprocess
 import time
 from collections.abc import Callable
+from datetime import date
 from pathlib import Path
 from typing import Any
 
+import onnxruntime as ort
 import yaml
 from loguru import logger
 from pydantic import BaseModel, Field
@@ -184,6 +189,51 @@ def within_band(value: float, low: float, high: float) -> bool:
     check (ONGPU_NMS_DELTA_BAND_MS) at Plan 06-03's checkpoint.
     """
     return low <= value <= high
+
+
+def _cpu_model_name() -> str:
+    """Best-effort human-readable CPU model string.
+
+    ``platform.processor()`` returns a near-useless value on both of this
+    project's dev/host platforms (empty or ``'arm'`` on macOS, often empty on
+    Linux), so shell out to the platform-specific source first and fall back
+    to ``platform`` only if that fails.
+    """
+    system = platform.system()
+    try:
+        if system == "Darwin":
+            return subprocess.check_output(
+                ["/usr/sbin/sysctl", "-n", "machdep.cpu.brand_string"], text=True
+            ).strip()
+        if system == "Linux":
+            with open("/proc/cpuinfo") as f:
+                for line in f:
+                    if line.lower().startswith("model name"):
+                        return line.split(":", 1)[1].strip()
+    except (OSError, subprocess.SubprocessError):
+        pass
+    return platform.processor() or platform.machine() or "unknown"
+
+
+def collect_environment(providers: list[str]) -> dict[str, Any]:
+    """Capture the CPU/runtime provenance a latency run was measured under.
+
+    A code review flagged that the LAT-05 CPU results carried no CPU model,
+    core count, thread setting, or ORT version, leaving the report's
+    provenance caveat unbacked by the data itself. No ``SessionOptions`` sets
+    ``intra_op_num_threads`` anywhere in this codebase (``ONNXInferencer``
+    constructs its session with defaults), so the honest value is ORT's
+    auto-selected default, not a number this process chose.
+    """
+    return {
+        "measured_date": date.today().isoformat(),
+        "cpu_model": _cpu_model_name(),
+        "logical_cores": os.cpu_count(),
+        "os": f"{platform.system()} {platform.release()} ({platform.machine()})",
+        "onnxruntime_version": ort.__version__,
+        "intra_op_num_threads": "default (ORT auto-selected; not overridden)",
+        "providers_requested": providers,
+    }
 
 
 def build_record(
@@ -358,11 +408,11 @@ def _print_table(records: list[dict[str, Any]]) -> None:
     logger.info("=" * len(header))
 
 
-def _write_results(out: Path, records: list[dict[str, Any]]) -> None:
+def _write_results(out: Path, records: list[dict[str, Any]], environment: dict[str, Any]) -> None:
     """Write the small numeric results JSON (committed; fits the 2 MB hook)."""
     out.parent.mkdir(parents=True, exist_ok=True)
     with open(out, "w") as f:
-        json.dump({"models": records}, f, indent=2)
+        json.dump({"environment": environment, "models": records}, f, indent=2)
     logger.info(f"Wrote {len(records)} latency records to {out}")
 
 
@@ -436,7 +486,7 @@ def main() -> None:
 
     _flag_suspects(records)
     _print_table(records)
-    _write_results(args.out, records)
+    _write_results(args.out, records, collect_environment(args.providers))
 
 
 if __name__ == "__main__":

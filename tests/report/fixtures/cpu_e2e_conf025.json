@@ -1,4 +1,13 @@
 {
+  "environment": {
+    "measured_date": "2026-08-23",
+    "cpu_model": "Apple M4 Pro",
+    "logical_cores": 14,
+    "os": "Darwin 25.5.0 (arm64)",
+    "onnxruntime_version": "1.23.2",
+    "intra_op_num_threads": "default (ORT auto-selected; not overridden)",
+    "providers_requested": ["CPUExecutionProvider"]
+  },
   "models": [
     {
       "name": "YOLO26m",

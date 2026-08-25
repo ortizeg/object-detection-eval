@@ -52,7 +52,10 @@ from loguru import logger
 from pydantic import BaseModel
 
 from object_detection_eval.data.coco_gt import load_coco_gt
-from object_detection_eval.data.taxonomy import resolve_taxonomy
+from object_detection_eval.data.taxonomy import (
+    dedupe_merged_class_detections,
+    resolve_taxonomy,
+)
 from object_detection_eval.metrics.bootstrap import build_report, load_predictions, run_bootstrap
 
 _DEFAULT_SOURCE_REPO = Path("/Users/ortizeg/1Projects/⛹️‍♂️ Next Play/code/object-detection-training")
@@ -230,11 +233,24 @@ def _run_check_a(
     including the RTMDet-M vs DAMO-YOLO-M tie; 5 of 6 adjacent pairs
     significant). The joint-best headline tie is a SEPARATE Check B (@800
     YOLOX-M vs @640 YOLO26m) and is not part of this report.
+
+    The manifest's ``predictions`` are always merged5-space, so every model
+    here goes through :func:`~object_detection_eval.data.taxonomy.
+    dedupe_merged_class_detections` -- same fix, same reason, as
+    ``run_benchmark.py``'s merged5 path (a model's per-class NMS ran
+    pre-merge, so same-eval-class duplicates can survive the merge
+    untouched). The external anchor predates the fix; at the default 0.01
+    tolerance the measured shift (<=0.002 mAP@50:95 per model) still
+    reproduces it.
     """
     pred_maps: dict[str, dict[str, sv.Detections]] = {}
     for entry in manifest.models:
         pred_path = _manifest_predictions_path(entry, source_repo)
-        pred_maps[entry.name] = load_predictions(pred_path)
+        raw_pred_map = load_predictions(pred_path)
+        pred_maps[entry.name] = {
+            filename: dedupe_merged_class_detections(dets)
+            for filename, dets in raw_pred_map.items()
+        }
 
     logger.info(f"Check A: bootstrapping {len(pred_maps)} models (n_boot={n_boot}, seed={seed})")
     boot = run_bootstrap(gt_map, pred_maps, n_boot, seed)

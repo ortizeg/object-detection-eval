@@ -269,6 +269,28 @@ def test_cpu_latency_section_raises_on_missing_model() -> None:
         cpu_latency_section(conf025, partial)
 
 
+def test_cpu_latency_section_carries_environment_provenance() -> None:
+    # LAT-05 honesty fix: the CPU model/core count/ORT version travel with the
+    # table, so the report's provenance caveat is no longer hand-typed prose
+    # unbacked by data.
+    conf025 = load_cpu_latency_results(_CPU_LATENCY_025)
+    conf001 = load_cpu_latency_results(_CPU_LATENCY_001)
+    table = cpu_latency_section(conf025, conf001)
+    assert "Apple M4 Pro" in table
+    assert "onnxruntime 1.23.2" in table
+    assert "14 logical cores" in table
+
+
+def test_cpu_latency_section_raises_on_mismatched_environment() -> None:
+    conf025 = load_cpu_latency_results(_CPU_LATENCY_025)
+    conf001 = load_cpu_latency_results(_CPU_LATENCY_001)
+    mismatched = conf001.model_copy(
+        update={"environment": conf001.environment.model_copy(update={"cpu_model": "Intel Xeon"})}
+    )
+    with pytest.raises(ValueError, match="different environments"):
+        cpu_latency_section(conf025, mismatched)
+
+
 # --------------------------------------------------------------------------- #
 # VLM tables: per-class AP keyed by class name, read from the committed file
 # --------------------------------------------------------------------------- #

@@ -222,16 +222,39 @@ class CpuLatencyModelEntry(BaseModel):
     suspect: bool = False
 
 
-class CpuLatencyResult(BaseModel):
-    """The bare ``{"models": [...]}`` CPU-latency payload (NO reproducibility block).
+class CpuLatencyEnvironment(BaseModel):
+    """Machine/runtime provenance for a CPU-latency run (LAT-05 honesty fix).
 
-    Distinct from ``LatencyResult``, whose schema REQUIRES a ``reproducibility``
-    record: the CPU files are plain measured numbers with no honest-label
-    provenance, so reusing ``LatencyResult`` would reject them (missing key).
+    A code review flagged that ``cpu_e2e_*.json`` carried no CPU model, core
+    count, thread setting, or ORT version, so the report's provenance caveat
+    had nothing in the data to back it. ``run_latency.py`` now writes this
+    block on every run so the numbers are self-describing without the reader
+    having to trust hand-typed report prose.
     """
 
     model_config = _STRICT
 
+    measured_date: str
+    cpu_model: str
+    logical_cores: int
+    os: str
+    onnxruntime_version: str
+    intra_op_num_threads: str
+    providers_requested: list[str]
+
+
+class CpuLatencyResult(BaseModel):
+    """The ``{"environment": ..., "models": [...]}`` CPU-latency payload.
+
+    Distinct from ``LatencyResult``, whose ``reproducibility`` record attests a
+    *dedicated-instance* measurement: CPU runs have no such honest-label to
+    give, but they DO have a characterizable machine, which ``environment``
+    records instead.
+    """
+
+    model_config = _STRICT
+
+    environment: CpuLatencyEnvironment
     models: list[CpuLatencyModelEntry]
 
 
@@ -239,8 +262,7 @@ def load_cpu_latency_results(path: Path | str) -> CpuLatencyResult:
     """Load and validate a CPU end-to-end latency results JSON (LAT-05).
 
     Raises:
-        ReportLoadError: the file has an unexpected/missing key or wrong type
-            (e.g. a ``reproducibility`` block, which this shape forbids).
+        ReportLoadError: the file has an unexpected/missing/wrongly-typed key.
     """
     try:
         return CpuLatencyResult.model_validate(_read_json(path))
