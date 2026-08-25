@@ -271,10 +271,19 @@ equalize only the shared protocol.** What the audit found:
   0.628, statistically indistinguishable within the CI). The recipe-default run
   is reported — no cherry-picking, since 1000-iter warmup is RTMDet's own
   published default and scores marginally higher on test.
-- **RF-DETR @640 is not handicapped by off-native resolution.** It was trained
-  through the `rfdetr` library, which interpolates the DINOv2 position embeddings
-  to the 640 grid and finetunes — the intended, resolution-adaptive path. The
-  vendored loader that *drops* pos-emb on mismatch was deliberately avoided.
+- **RF-DETR @640 is not handicapped by off-native resolution — methodology
+  claim, not an empirical one.** It was trained through the `rfdetr` library,
+  which interpolates the DINOv2 position embeddings to the 640 grid and
+  finetunes — the intended, resolution-adaptive path. The vendored loader that
+  *drops* pos-emb on mismatch was deliberately avoided. But DINOv2 is patch-14
+  with documented native resolutions in multiples of 56, so 640 itself sits
+  off-grid; we never retrained at a native resolution (560 or 672) to confirm
+  the interpolation costs nothing. Of every model in this comparison, RF-DETR
+  is the one carrying an untested handicap. Given 94 test images, a 560/672
+  ablation would likely land within the same overlapping-CI noise as the
+  YOLOX-M/YOLO26m tie above — real GPU-hours for a probably-inconclusive
+  answer — so it's flagged here as a known gap rather than run before
+  publishing.
 - **RT-DETRv2-M had the same 2000-iter warmup trap as DEIM — caught & fixed.**
   Shortened to 50 iters; harness/val then reads within 0.06 pt of native,
   confirming faithful reading. Its low 0.581 is *not* a training artifact — the
