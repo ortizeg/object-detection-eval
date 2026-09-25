@@ -27,8 +27,10 @@ from object_detection_eval.inference.vlm.astra import (
     AstraDetection,
     AstraInferencer,
     AstraResponse,
+    FewShotExample,
+    render_example_image,
 )
-from object_detection_eval.schemas.detection import Detection
+from object_detection_eval.schemas.detection import BoundingBox, Detection
 
 pytestmark = [pytest.mark.vlm, pytest.mark.external]
 
@@ -312,6 +314,56 @@ class TestAstraInferencerPredict:
 
         assert len(dets) == 1
         assert _parse(mock_client).call_count == 2
+
+
+class TestFewShot:
+    """Few-shot box-prompting rendering + request assembly (reported separately)."""
+
+    def _example(self):
+        img = np.zeros((100, 100, 3), dtype=np.uint8)
+        det = Detection(bbox=BoundingBox(x=0.1, y=0.1, w=0.2, h=0.3), confidence=1.0, class_id=0)
+        return img, det
+
+    def test_render_example_image_shape_and_no_mutation(self) -> None:
+        img, det = self._example()
+        original = img.copy()
+        rendered = render_example_image(img, [det], ["player", "ball"])
+        assert rendered.shape == img.shape
+        # Input must not be mutated (function draws on a copy)...
+        assert np.array_equal(img, original)
+        # ...and the rendered image must actually differ (a box was drawn).
+        assert not np.array_equal(rendered, original)
+
+    def test_zero_shot_has_no_example_blocks(
+        self, _mock_openai, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setenv("OPENAI_KEY", "dummy-key")
+        inferencer = AstraInferencer(classes=["player"])
+        assert inferencer._example_blocks == []
+
+    def test_few_shot_prepends_preamble_and_example_images(
+        self, _mock_openai, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setenv("OPENAI_KEY", "dummy-key")
+        _, mock_client = _mock_openai
+        _parse(mock_client).return_value = _completion(parsed=AstraResponse(detections=[]))
+
+        img, det = self._example()
+        inferencer = AstraInferencer(
+            classes=["player", "ball", "referee", "rim", "number"],
+            few_shot_examples=[FewShotExample(image=img, detections=[det])],
+        )
+        inferencer.predict(np.zeros((50, 50, 3), dtype=np.uint8))
+
+        content = _parse(mock_client).call_args.kwargs["messages"][0]["content"]
+        # preamble text + 1 example image + prompt text + target image = 4 blocks.
+        assert len(content) == 4
+        assert content[0]["type"] == "text"  # preamble
+        assert content[1]["type"] == "image_url"  # rendered example
+        assert content[2]["type"] == "text"  # instruction
+        assert content[3]["type"] == "image_url"  # target
+        # The preamble names the target-vs-example distinction.
+        assert "EXAMPLE" in content[0]["text"].upper()
 
 
 class TestResolveLabel:

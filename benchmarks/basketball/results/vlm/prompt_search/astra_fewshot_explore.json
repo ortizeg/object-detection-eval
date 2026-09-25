@@ -1,0 +1,71 @@
+{
+  "model": "gpt-6-astra",
+  "mode": "few-shot (NOT zero-shot -- reported separately)",
+  "split": "valid",
+  "efforts_explored": [
+    "low"
+  ],
+  "note": "Few-shot box prompting: labelled TRAIN-frame examples prepended to each val request. Selected on val; winner run once on test (astra_fewshot_fs_2shot_test.json).",
+  "published": {
+    "candidate": "fs_2shot"
+  },
+  "best": {
+    "candidate": "fs_2shot",
+    "val_mAP_50_95": 0.5008923411369324,
+    "val_mAP_50": 0.8626450300216675
+  },
+  "results": [
+    {
+      "candidate": "fs_2shot",
+      "effort": "low",
+      "n_examples": 2,
+      "example_ids": [
+        "magic",
+        "knicks"
+      ],
+      "mAP_50_95": 0.5008923411369324,
+      "mAP_50": 0.8626450300216675,
+      "per_class_ap50": {
+        "player": 0.9795502424240112,
+        "ball": 0.7415106296539307,
+        "referee": 0.9694740176200867,
+        "rim": 0.6956853866577148,
+        "number": 0.9270049929618835
+      }
+    },
+    {
+      "candidate": "fs_1shot_knicks",
+      "effort": "low",
+      "n_examples": 1,
+      "example_ids": [
+        "knicks"
+      ],
+      "mAP_50_95": 0.4995572566986084,
+      "mAP_50": 0.8514151573181152,
+      "per_class_ap50": {
+        "player": 0.9797069430351257,
+        "ball": 0.6933998465538025,
+        "referee": 0.9702619314193726,
+        "rim": 0.6888082027435303,
+        "number": 0.9248988032341003
+      }
+    },
+    {
+      "candidate": "fs_1shot_magic",
+      "effort": "low",
+      "n_examples": 1,
+      "example_ids": [
+        "magic"
+      ],
+      "mAP_50_95": 0.49648839235305786,
+      "mAP_50": 0.8279892206192017,
+      "per_class_ap50": {
+        "player": 0.9790254831314087,
+        "ball": 0.7204923629760742,
+        "referee": 0.9382798671722412,
+        "rim": 0.5751948952674866,
+        "number": 0.9269536137580872
+      }
+    }
+  ]
+}

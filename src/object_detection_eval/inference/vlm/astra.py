@@ -40,7 +40,9 @@ import base64
 import io
 import os
 import time
+from dataclasses import dataclass
 
+import cv2
 import numpy as np
 import numpy.typing as npt
 from loguru import logger
@@ -50,6 +52,86 @@ from pydantic import BaseModel, Field
 
 from object_detection_eval.inference.base import BaseInferencer
 from object_detection_eval.schemas.detection import BoundingBox, Detection
+
+#: Per-class BGR colours for rendering few-shot example boxes. Distinct, saturated
+#: hues so the model can tell classes apart visually; the label text is drawn too,
+#: so colour is a redundant cue rather than the only one.
+_CLASS_COLORS: dict[str, tuple[int, int, int]] = {
+    "player": (0, 255, 0),  # green
+    "ball": (0, 165, 255),  # orange
+    "referee": (255, 0, 0),  # blue
+    "rim": (0, 0, 255),  # red
+    "number": (255, 0, 255),  # magenta
+}
+_DEFAULT_COLOR: tuple[int, int, int] = (0, 255, 255)  # yellow fallback
+
+#: Human colour words for the few-shot legend text, keyed by class name (kept in
+#: sync with _CLASS_COLORS above).
+_CLASS_COLOR_WORDS: dict[str, str] = {
+    "player": "green",
+    "ball": "orange",
+    "referee": "blue",
+    "rim": "red",
+    "number": "magenta",
+}
+
+
+def _color_word(class_name: str) -> str:
+    """Human colour word for a class's few-shot box colour (for the legend)."""
+    return _CLASS_COLOR_WORDS.get(class_name, "yellow")
+
+
+@dataclass(frozen=True)
+class FewShotExample:
+    """One in-context example: a BGR image and its ground-truth detections.
+
+    Used ONLY by the (separately-reported) few-shot mode. The detections are
+    drawn onto a copy of the image as coloured, labelled boxes and passed to the
+    model as a visual example before the target image -- the "box prompting"
+    technique from OpenAI/Roboflow's Astra evals, adapted to multi-class by
+    showing a fully-annotated frame rather than green/red positive/negative
+    boxes for a single concept.
+    """
+
+    image: npt.NDArray[np.uint8]
+    detections: list[Detection]
+
+
+def render_example_image(
+    image: npt.NDArray[np.uint8],
+    detections: list[Detection],
+    class_names: list[str],
+) -> npt.NDArray[np.uint8]:
+    """Draw labelled, per-class-coloured GT boxes onto a copy of ``image``.
+
+    Pure function (no API, no state) so the rendering is unit-testable. Boxes are
+    ``Detection`` in normalised top-left xywh; ``class_names`` maps class_id ->
+    name (and hence colour). Returns a new BGR array; the input is not mutated.
+    """
+    canvas = image.copy()
+    h, w = canvas.shape[:2]
+    for det in detections:
+        name = class_names[det.class_id] if 0 <= det.class_id < len(class_names) else "?"
+        color = _CLASS_COLORS.get(name, _DEFAULT_COLOR)
+        x1 = round(det.bbox.x * w)
+        y1 = round(det.bbox.y * h)
+        x2 = round((det.bbox.x + det.bbox.w) * w)
+        y2 = round((det.bbox.y + det.bbox.h) * h)
+        cv2.rectangle(canvas, (x1, y1), (x2, y2), color, 2)
+        (tw, th), _ = cv2.getTextSize(name, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
+        ly = max(0, y1 - th - 4)
+        cv2.rectangle(canvas, (x1, ly), (x1 + tw + 4, ly + th + 4), color, -1)
+        cv2.putText(
+            canvas,
+            name,
+            (x1 + 2, ly + th + 1),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.5,
+            (0, 0, 0),
+            1,
+            cv2.LINE_AA,
+        )
+    return canvas
 
 
 class AstraBBox(BaseModel):
@@ -128,10 +210,12 @@ class AstraInferencer(BaseInferencer):
         classes: list[str] | None = None,
         prompt_template: str | None = None,
         reasoning_effort: str | None = "low",
+        few_shot_examples: list[FewShotExample] | None = None,
     ) -> None:
         self.model_name = model_name
         self.classes = classes or []
         self.reasoning_effort = reasoning_effort
+        self.few_shot_examples = few_shot_examples or []
 
         # Normalised lookup: lower-cased class name -> class index.
         self._name_to_id: dict[str, int] = {
@@ -167,6 +251,39 @@ class AstraInferencer(BaseInferencer):
             "names, and a confidence in [0, 1]."
         )
 
+        # Few-shot mode: render each example's GT boxes ONCE at construction and
+        # cache the content blocks (a preamble + the annotated example images),
+        # since they are identical for every target image. Empty for zero-shot.
+        self._example_blocks: list[dict[str, object]] = self._build_example_blocks()
+
+    def _build_example_blocks(self) -> list[dict[str, object]]:
+        """Render the few-shot examples into cached chat content blocks.
+
+        Returns ``[]`` in zero-shot mode. Otherwise: one text preamble (naming
+        the per-class colour legend and stressing the examples are from OTHER
+        frames) followed by one annotated image per example. Rendered ONCE here
+        because the examples are identical across every target image.
+        """
+        if not self.few_shot_examples:
+            return []
+
+        legend = ", ".join(
+            f"{name} = {_color_word(name)}" for name in self.classes if name in _CLASS_COLORS
+        )
+        preamble = (
+            f"The next {len(self.few_shot_examples)} image(s) are LABELLED EXAMPLES "
+            "from OTHER basketball frames (not the image you must annotate). Each "
+            "shows the correct bounding boxes drawn and coloured by class "
+            f"({legend}). Study how each object type looks and is boxed, then apply "
+            "the SAME labels to the FINAL image below. Do NOT copy the example "
+            "coordinates -- detect the objects in the final image itself."
+        )
+        blocks: list[dict[str, object]] = [{"type": "text", "text": preamble}]
+        for ex in self.few_shot_examples:
+            rendered = render_example_image(ex.image, ex.detections, self.classes)
+            blocks.append({"type": "image_url", "image_url": {"url": self._encode_image(rendered)}})
+        return blocks
+
     # ------------------------------------------------------------------
     # Public API
     # ------------------------------------------------------------------
@@ -197,6 +314,9 @@ class AstraInferencer(BaseInferencer):
                         {
                             "role": "user",
                             "content": [
+                                # Few-shot example blocks (empty in zero-shot mode)
+                                # come FIRST, then the instruction and the target.
+                                *self._example_blocks,
                                 {"type": "text", "text": self._prompt},
                                 {"type": "image_url", "image_url": {"url": data_url}},
                             ],

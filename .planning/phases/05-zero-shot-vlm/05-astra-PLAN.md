@@ -19,11 +19,49 @@ canonical labels) at `reasoning_effort: low`.
 - Committed dump: results/vlm/astra.json. Exploration: results/vlm/prompt_search/
   astra_explore.json. All runs: 0 retry-exhaustions, 0 rate-limit failures.
 
-FOLLOW-UP (not done here, needs editorial judgment): fold Astra into
+## EXTRAS (2026-09-25) — few-shot + crop-refine
+
+Both explored on val, run once on test. All runs: 0 retry-exhaustions.
+
+### Few-shot box prompting (REPORTED SEPARATELY — not zero-shot)
+
+Labelled TRAIN-frame examples (coloured, per-class boxes) prepended to each
+request — the OpenAI/Roboflow "box prompting" lever, adapted to multi-class by
+showing a fully-annotated example frame. Examples from TRAIN only; selected on
+val, run once on test.
+
+- Val: fs_2shot 0.5009 > fs_1shot_knicks 0.4996 > fs_1shot_magic 0.4965 (baseline
+  0.4850). Two examples win.
+- **TEST fs_2shot: mAP@50:95 = 0.5235, mAP@50 = 0.8462** (baseline 0.5010, **+0.0225**).
+  Per-class AP50: player 0.979, ball 0.772, referee 0.990, rim 0.572, number 0.918.
+- Modest lift, as expected — the zero-shot text prompt was already strong, so no
+  Roboflow-style 21→90 hard-case jump. NOT comparable to the zero-shot rows;
+  reported on its own. Code: astra.py few-shot mode + scripts/explore_astra_fewshot.py
+  (val) + scripts/run_astra_fewshot.py (final). Results:
+  results/vlm/astra_fewshot_fs_2shot_test.json, prompt_search/astra_fewshot_explore.json.
+
+### Two-pass crop-refine for ball/rim (ZERO-SHOT pipeline variant)
+
+Pass 1 = published config; pass 2 = focused single-class re-detection on a zoomed
+crop around each ball/rim box, mapped back. No labelled examples → still
+zero-shot (a disclosed pipeline variant, like tiling for the open-weights rows).
+
+- Val: 0.5397 (baseline 0.4850, +0.0547), rim AP50 0.62→0.84.
+- **TEST: mAP@50:95 = 0.5878, mAP@50 = 0.8895** (baseline 0.5010, **+0.0877**).
+  Per-class AP50: player 0.980, ball 0.688, referee 0.980, rim **0.952**, number 0.848.
+- The big winner, almost entirely from **rim localisation** (0.521→0.952): a whole
+  1080p frame gives the model too few pixels on a rim, so zooming tightens the box
+  at high IoU. Ball dipped slightly (0.776→0.688). Code:
+  inference/vlm/astra_crop_refine.py + scripts/run_astra_crop_refine.py. Results:
+  results/vlm/astra_crop_refine_{valid,test}.json.
+
+FINAL test mAP@50:95: zero-shot 0.5010 < few-shot 0.5235 < crop-refine 0.5878.
+
+FOLLOW-UP (not done, needs editorial judgment): fold Astra into
 site_src/reports/VLM_VS_FINETUNED.md (add to write_vlm_metrics.py `_VLM_FILES`,
-regenerate the vlm_summary / vlm_per_class injected tables, and rewrite the
-"zero-shot ceiling" narrative — a billed API now leads at 0.501). Also open:
-the crop-refine / few-shot extras discussion.
+regenerate the injected tables, rewrite the "zero-shot ceiling" narrative — a
+billed API now leads at 0.501, and a zero-shot crop-refine pipeline reaches
+0.588). Consider whether crop-refine warrants its own committed row.
 
 ## Status log
 

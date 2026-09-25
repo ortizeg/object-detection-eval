@@ -1,0 +1,55 @@
+# astra_fewshot_explore.yaml -- FEW-SHOT box-prompting exploration for GPT-6
+# Astra. Consumed by scripts/explore_astra_fewshot.py.
+#
+# REPORTED SEPARATELY, NOT a zero-shot row. Feeding Astra labelled example frames
+# makes it few-shot / in-context, so its number is NOT comparable to the zero-shot
+# rows in vlm_zeroshot.yaml and must never be added to that table. This measures
+# the ADDED value of in-context examples on top of the best zero-shot config.
+#
+# Example frames are from the TRAIN split (drawing example boxes from val/test
+# would be leakage). Selection runs on val; the winner is later run once on test
+# with the SAME train examples. The script refuses --split test.
+
+split: valid
+model_name: gpt-6-astra
+classes: [player, ball, referee, rim, number]
+efforts: [low]
+
+# Base prompt = the winning zero-shot prompt (c_gemini_style), so few-shot is
+# measured as examples ON TOP of the best zero-shot instruction.
+prompt_template: >
+  Detect all basketball players, referees, the rim, the basketball, and
+  visible jersey numbers in this basketball game image.
+  Constraints:
+  - At most 10 players, 3 referees, 1 rim, and 1 ball per image.
+  - Each person gets exactly ONE bounding box with the most specific label.
+  Use EXACTLY these labels:
+  - "player" for any basketball player on the court
+  - "referee" for game officials
+  - "ball" for the basketball (only when NOT going through the rim)
+  - "rim" for the basketball hoop rim
+  - "number" for visible jersey numbers (tight box around the digits only)
+  Return each box as (x_min, y_min, x_max, y_max) integers in a 0-1000
+  normalised coordinate system and a confidence in [0, 1].
+
+# Train example frames, chosen for full 5-class coverage (incl. the collapse-prone
+# ball + rim) and cross-game diversity (one Magic game, one Knicks game).
+examples:
+  magic: boston-celtics-orlando-magic-game-4-q1-08_18-08_14-0108_png.rf.74ef4a5f053fbda8c7aa36cb05507ec9.jpg
+  knicks: boston-celtics-new-york-knicks-game-4-q2-07_01-06_53-0172_png.rf.6b3a878e68e139d463bcd19baf597ff3.jpg
+
+candidates:
+  # One example (Magic frame). Cheapest few-shot; tests whether a single
+  # in-context frame already moves the weak classes (ball/rim/number).
+  - id: fs_1shot_magic
+    example_ids: [magic]
+
+  # One example (Knicks frame). Same budget, different frame -- guards against a
+  # result that is really "this one lucky example" rather than "examples help".
+  - id: fs_1shot_knicks
+    example_ids: [knicks]
+
+  # Two examples (both frames). More coverage/diversity vs a longer, costlier
+  # prompt -- does a second example add or does it dilute?
+  - id: fs_2shot
+    example_ids: [magic, knicks]
