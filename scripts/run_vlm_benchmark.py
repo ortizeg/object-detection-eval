@@ -98,6 +98,10 @@ class ManifestEntry(BaseModel, frozen=True):
     task: str | None = None
     caption: str | None = None
     prompt_template: str | None = None
+    #: Astra (billed API) only: reasoning effort the row published at
+    #: (low/medium/high/xhigh/max). None omits the parameter. Higher = better
+    #: localisation, steeply higher per-image cost.
+    reasoning_effort: str | None = None
     expected_map5095: float | None = Field(default=None, ge=0.0, le=1.0)
 
 
@@ -220,6 +224,17 @@ def _gemini_factory(entry: ManifestEntry) -> BaseInferencer:
     )
 
 
+def _astra_factory(entry: ManifestEntry) -> BaseInferencer:
+    from object_detection_eval.inference.vlm.astra import AstraInferencer
+
+    return AstraInferencer(
+        model_name=entry.model_name,
+        classes=entry.classes,
+        prompt_template=entry.prompt_template,
+        reasoning_effort=entry.reasoning_effort if entry.reasoning_effort is not None else "low",
+    )
+
+
 def _qwen3_vl_factory(entry: ManifestEntry) -> BaseInferencer:
     from object_detection_eval.inference.vlm.qwen3_vl import Qwen3VLInferencer
 
@@ -232,6 +247,7 @@ def _qwen3_vl_factory(entry: ManifestEntry) -> BaseInferencer:
 
 _INFERENCER_FACTORIES: dict[str, Callable[[ManifestEntry], BaseInferencer]] = {
     "gemini": _gemini_factory,
+    "astra": _astra_factory,
     "owlv2": _owlv2_factory,
     "omdet_turbo": _omdet_turbo_factory,
     "grounding_dino": _grounding_dino_factory,

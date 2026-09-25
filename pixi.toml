@@ -69,6 +69,10 @@ einops = "*"
 peft = "*"
 num2words = "*"
 google-genai = ">=1.63.0, <2"
+# GPT-6 Astra (OpenAI). Pure API call, no torch — also available torch-free via
+# the standalone `astra`/`vlm-astra` feature below; listed here so the full vlm
+# env can run every API row (Gemini + Astra) too.
+openai = ">=1.55.0"
 # YOLO-World. AGPL-3.0, optional-extra-only — see pyproject's [vlm] note.
 ultralytics = ">=8.3, <9"
 # YOLO-World's prompt-then-detect encodes the class vocabulary with CLIP.
@@ -77,6 +81,15 @@ ultralytics = ">=8.3, <9"
 # mutates a pixi-locked environment and is not reproducible. Declaring the
 # PyPI packaging (MIT) here keeps the env solved and locked.
 clip-anytorch = "*"
+
+# GPT-6 Astra (OpenAI) zero-shot inferencer. TORCH-FREE: unlike every other VLM
+# feature here it has no [feature.astra.dependencies] block pulling pytorch — a
+# billed API call needs neither torch nor a GPU. Only `openai` on top of the
+# core deps, which already carry the whole scoring path. This is the small
+# environment the remote API runner uses. Composed as `vlm-astra` in
+# [environments] below. Mirrors pyproject.toml's `astra` extra.
+[feature.astra.pypi-dependencies]
+openai = ">=1.55.0"
 
 # Qwen3-VL-8B zero-shot inferencer. A SEPARATE feature from [feature.vlm],
 # not an addition to it: Qwen3-VL requires transformers>=4.57.0, and
@@ -264,6 +277,8 @@ vlm = ["dev", "vlm"]
 # than the other six zero-shot rows are pinned to. See [feature.qwen3vl]'s
 # comment above.
 vlm-qwen3vl = ["dev", "qwen3vl"]
+# GPT-6 Astra (OpenAI). Torch-free API runner — see [feature.astra].
+vlm-astra = ["dev", "astra"]
 # LLMDet-large only, isolated from `vlm` (see [feature.llmdet] for why).
 llmdet = ["dev", "llmdet"]
 # Cross-platform: core (CPU onnxruntime) + dev + the graph-surgery tooling.
