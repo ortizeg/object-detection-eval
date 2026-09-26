@@ -1054,14 +1054,21 @@ to the lowest-ranked row (RT-DETRv2-M, 0.581) from the six-model round's
 > **0.588**, +0.151 over the fusion and fractionally past RT-DETRv2-M (0.581),
 > so the "closest zero-shot has come" and "rim is effectively zero across all
 > eight" claims above both belong to the pre-Astra roster: Astra takes `rim` to
-> 0.52 alone and 0.95 with crop-refine. Two honest caveats keep this from being a
-> clean knockout. First, Astra is a billed API — but so is Gemini, which is
-> *already inside* this fusion, so the ensemble was never key-free either.
-> Second, the fusion's one surviving edge is the metric this section cares most
-> about: **recall at 95% precision (0.582)**, a labeling-quality operating point.
-> Astra's precision/recall curve was not measured, so whether a single model also
-> dominates that axis is open — the mAP question is settled, the auto-labeling
-> one is not.
+> 0.52 alone and 0.95 with crop-refine. One caveat keeps this from being a
+> completely clean knockout: Astra is a billed API — but so is Gemini, which is
+> *already inside* this fusion, so the ensemble was never key-free either. The
+> fusion's other apparent edge — **recall at 95% precision**, the labeling-quality
+> operating point this section cares most about — turned out not to be one.
+> Measured the same way (a confidence sweep on the committed `astra.json`, which
+> reproduces every per-model number in the fusion tables exactly), a single Astra
+> call reaches **0.908** against the ensemble's **0.582**, and the few-shot
+> variant **0.951**. Astra emits a real, varied confidence, so it *has* an
+> operating point — and it dominates there too. One wrinkle worth stating:
+> crop-refine, which wins on mAP, slightly *lowers* recall@95 (0.908 → 0.882),
+> because its extra ball/rim crop boxes add a few low-confidence detections that
+> cost precision — so the right Astra config is objective-dependent (crop-refine
+> for mAP, base or few-shot for labeling). The auto-labeling question is now
+> settled too, in Astra's favour.
 
 The per-model rows above come from the same dumps the test table earlier in this
 report renders, through the same scorer, so the two cannot disagree without one
