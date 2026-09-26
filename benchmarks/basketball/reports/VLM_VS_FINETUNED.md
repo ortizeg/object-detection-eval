@@ -1044,10 +1044,24 @@ essentially unchanged.
 Against the fine-tuned detectors in
 [FINAL_COMPARISON_640.md](FINAL_COMPARISON_640.md), the ensemble narrows the gap
 to the lowest-ranked row (RT-DETRv2-M, 0.581) from the six-model round's
-**1.43×** to **1.33×**. That is the closest zero-shot has come in this
-project, and it still is not close: it costs eight forward passes to get
-there, and `rim` is still effectively zero (0.001-0.012 across all eight
-models).
+**1.43×** to **1.33×**. That was the closest zero-shot had come in this project
+*when this section was written*, and it cost eight forward passes to get there.
+
+> **Superseded 2026-09-25 by a single model.** GPT-6 Astra alone scores **0.501**
+> on this same test split — **+0.064 over the entire eight-model fusion's
+> 0.437**, in *one* forward pass rather than eight, and without the ensemble's
+> ~1,500-box speculative tail. Its zero-shot crop-refine variant reaches
+> **0.588**, +0.151 over the fusion and fractionally past RT-DETRv2-M (0.581),
+> so the "closest zero-shot has come" and "rim is effectively zero across all
+> eight" claims above both belong to the pre-Astra roster: Astra takes `rim` to
+> 0.52 alone and 0.95 with crop-refine. Two honest caveats keep this from being a
+> clean knockout. First, Astra is a billed API — but so is Gemini, which is
+> *already inside* this fusion, so the ensemble was never key-free either.
+> Second, the fusion's one surviving edge is the metric this section cares most
+> about: **recall at 95% precision (0.582)**, a labeling-quality operating point.
+> Astra's precision/recall curve was not measured, so whether a single model also
+> dominates that axis is open — the mAP question is settled, the auto-labeling
+> one is not.
 
 The per-model rows above come from the same dumps the test table earlier in this
 report renders, through the same scorer, so the two cannot disagree without one
