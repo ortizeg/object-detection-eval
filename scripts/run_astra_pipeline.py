@@ -63,6 +63,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--conf-threshold", type=float, default=0.9)
     parser.add_argument("--self-prompt", action="store_true")
     parser.add_argument("--crop-refine", action="store_true")
+    parser.add_argument(
+        "--number-crop",
+        action="store_true",
+        help="Per-player zoom to re-detect jersey numbers (targets the `number` class).",
+    )
     parser.add_argument("--max-images", type=int, default=None)
     return parser.parse_args()
 
@@ -89,6 +94,11 @@ def main() -> None:
             base=inferencer, classes=_CLASSES, refine_classes={"ball", "rim"}, pad=args.pad
         )
         stages.append("cropfine")
+    if args.number_crop:
+        from object_detection_eval.inference.vlm.astra_number_crop import AstraNumberCropInferencer
+
+        inferencer = AstraNumberCropInferencer(base=inferencer, classes=_CLASSES)
+        stages.append("numcrop")
 
     split_dir = args.data_root / args.split
     gt_map = load_coco_gt(split_dir / "_annotations.coco.json", name_to_id)
