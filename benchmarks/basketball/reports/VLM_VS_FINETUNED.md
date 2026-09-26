@@ -470,8 +470,22 @@ NMS was already flat across a wide range (0.2–0.7 span 0.0028, inside noise),
 and three of four sentence-style candidates collapsed to exactly 0.000 because
 LLMDet's phrase-grounding head cannot resolve a multi-clause sentence into a
 single span. `classes` and the published test number were unchanged by either.
-Full record, including every candidate tried: the `llmdet` row's comments in
-`vlm_zeroshot.yaml`.
+
+A third follow-up (2026-09-26, prompted by the resolution win on Qwen3-VL): the
+same **image-resolution lever** was swept on LLMDet, untiled, over shortest-edge
+800/1000/1200/1333 on val (`explore_llmdet_resolution.py`,
+`results/vlm/prompt_search/llmdet_resolution.json`). It did **not** transfer. The
+curve is non-monotonic with a tiny peak at 1000 (0.343, +0.006 over the 800
+default, all of it `ball`) and *degrades* above that — the opposite of Qwen3-VL's
+monotonic gain — and the best untiled+resolution point (0.343) is still below
+LLMDet's own published *tiled* config (0.359 val). Most tellingly, **`rim` stayed
+exactly 0.000 at every resolution**: LLMDet's rim failure is a phrase-grounding
+label collision, not pixel-starvation, so more pixels cannot fix it. Resolution
+helps a generative VLM's encoder (more tokens per small object) but not a
+grounding-DINO detector's fixed feature pyramid. Negative result, recorded; the
+published tiled config stands. (Real 2× upscale — Qwen3-VL's regime — OOMs
+LLMDet-large on a 24 GB GPU even under bf16 autocast, so the sweep tops out at
+1333.) Full record: the `llmdet` row's comments in `vlm_zeroshot.yaml`.
 
 **Qwen3-VL-8B** (`Qwen/Qwen3-VL-8B-Instruct`) has a genuine native JSON
 grounding mode — `{"bbox_2d": [...], "label": "..."}`, confirmed from the
