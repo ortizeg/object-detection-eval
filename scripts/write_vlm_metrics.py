@@ -39,6 +39,7 @@ _DEFAULT_TAXONOMY_DIR = _REPO_ROOT / "benchmarks" / "basketball" / "conf" / "tax
 #: Keys are the display labels used as row keys in the committed metrics file
 #: (and therefore in the rendered report tables).
 _VLM_FILES: dict[str, str] = {
+    "GPT-6 Astra": "astra.json",
     "Gemini": "gemini.json",
     "OWLv2": "owlv2.json",
     "Grounding-DINO": "grounding_dino.json",
