@@ -91,11 +91,18 @@ treatment**:
 - Self-prompt: included it as a recall class, but **hurt** it (over-enumeration).
 - Crop-refine: **excluded** it (built for single-instance ball/rim).
 
-**Untried idea worth flagging:** a *per-player number crop* — crop each detected
-player box and re-detect the jersey number inside it. Within one player's crop the
-number is effectively single-instance, which is exactly the regime crop-refine
-handles well (it took rim 0.52 → 0.95). This is the most promising unexplored lever
-for `number`, and is not yet implemented.
+**Per-player number crop — TRIED (2026-09-26), POSITIVE, zero-shot.** Crop each
+detected player box and re-detect the jersey number inside it (within one
+player's crop the number is effectively single-instance — the regime crop-refine
+handles well). Result: **`number` AP50 0.861 → 0.900 on test** (val 0.88 → 0.921),
+**zero-shot**, nearly matching the few-shot variant's 0.918 without any labelled
+data. Overall test mAP@50:95 0.501 → 0.509 (number is 1/5 classes, so the overall
+move is small). `AstraNumberCropInferencer` + `run_astra_pipeline.py --number-crop`;
+results `results/vlm/astra_base_numcrop_{valid,test}.json`. This confirms the
+pattern: **both small classes respond to zooming** — rim via crop-refine
+(0.52→0.95), number via per-player crop (0.86→0.90) — while the near-ceiling
+classes (player/referee) do not benefit from extra prompting (the self-prompt
+negative above).
 
 ## Cross-model note
 

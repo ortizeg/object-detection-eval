@@ -426,6 +426,21 @@ rim gain. A separate *few-shot* variant (labelled train-frame examples prepended
 to each request — no longer zero-shot, so reported apart) reaches 0.524. Both are
 detailed in the Astra plan of record and `results/vlm/astra_*.json`.
 
+The same crop-and-re-detect idea also lifts the other small class, **`number`**,
+once the crop is chosen right. A jersey number is tiny and multi-instance, so
+crop-refine (built for the one-per-frame ball/rim) skips it — but there is at most
+one number *per player*, so cropping to each detected player box and re-detecting
+the number inside that zoom makes it effectively single-instance in-crop. This
+*per-player number crop* takes **`number` AP50 from 0.861 to 0.900 on test,
+zero-shot** — nearly matching the few-shot variant's 0.918 (which needs labelled
+examples) without any. (An earlier idea, a self-prompt recall pass feeding pass-1's
+confident player/referee/number boxes back as positive examples, went the other
+way: it *lowered* the score, 0.456 val alone, because Astra is already near
+ceiling on those classes and prompting for "more" adds bench/crowd false
+positives — the same over-enumeration Qwen3-VL shows.) Net: the small-object
+classes both respond to zooming (`rim` 0.52→0.95 via crop-refine, `number`
+0.86→0.90 via per-player crop); the near-ceiling classes do not want extra prompting.
+
 One further idea was tried and **did not work, recorded here because the negative
 is informative**: a *self-prompt recall pass* — draw pass 1's confident
 player/referee/number boxes back onto the frame and ask a second pass to keep
