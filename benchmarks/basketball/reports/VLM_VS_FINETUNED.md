@@ -426,6 +426,21 @@ rim gain. A separate *few-shot* variant (labelled train-frame examples prepended
 to each request — no longer zero-shot, so reported apart) reaches 0.524. Both are
 detailed in the Astra plan of record and `results/vlm/astra_*.json`.
 
+One further idea was tried and **did not work, recorded here because the negative
+is informative**: a *self-prompt recall pass* — draw pass 1's confident
+player/referee/number boxes back onto the frame and ask a second pass to keep
+those and add any it missed (the positive-box-prompting trick, aimed intra-image
+at the multi-instance classes, the recall analogue of crop-refine's
+single-instance localisation). It lowered the score, alone (0.456 val vs base
+0.485) and stacked on crop-refine (0.517 val vs 0.540). The mechanism is the
+reason it can't help *this* model: Astra already sits at ~0.98 on player and
+referee, so there is almost nothing to recover, and prompting for "more" mostly
+elicits false positives on the bench and crowd — the same over-enumeration Qwen3-VL
+shows when shown examples. `player` and `number` AP50 both fell in exactly the
+runs the recall pass touched them. The technique is sound for a *low-recall*
+multi-instance detector; Astra is the wrong patient. Results:
+`results/vlm/astra_base_selfprompt*_valid.json`.
+
 > A revision of this paragraph dated 2026-08-05 named DAMO-YOLO-M's 0.619 as the
 > lowest-ranked fine-tuned detector and computed 1.97× from it. That was the
 > *second*-lowest row; RT-DETRv2-M sits below it at 0.581. Corrected then, and
