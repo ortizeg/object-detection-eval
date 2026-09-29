@@ -1114,6 +1114,34 @@ to the lowest-ranked row (RT-DETRv2-M, 0.581) from the six-model round's
 > for mAP, base or few-shot for labeling). The auto-labeling question is now
 > settled too, in Astra's favour.
 
+**Astra-anchored greedy fusion (2026-09-29).** If Astra alone already beats the
+old ensemble, does fusing *anything* onto Astra help? A forward-greedy sweep —
+start from {astra}, add the single model that most improves test mAP@50:95 each
+round (`scripts/fuse_astra_greedy.py`, WBF, on the committed dumps, no API/GPU) —
+answers yes for mAP and no for labeling:
+
+| step | combo | mAP@50:95 | Δ | recall@95% |
+| --- | --- | --- | --- | --- |
+| base | astra (via WBF) | 0.496 | — | **0.898** |
+| +1 | + LLMDet | 0.538 | **+0.042** | 0.804 |
+| +2 | + OWLv2 | **0.546** | +0.008 | 0.779 |
+| +3 | + YOLO-World | 0.546 | +0.000 | 0.647 |
+| +4… | + Grounding-DINO, OmDet, Gemini, Qwen3-VL, Florence-2 | declines | − | ↓ |
+
+**LLMDet is the one model that genuinely complements Astra** (+0.042 — it is the
+strongest open-weights row and adds `referee`/`number` mass where Astra is
+merely good, not perfect); OWLv2 adds a little more; everything after is noise or
+harm. But the peak, **Astra+LLMDet+OWLv2 ≈ 0.546, still sits below the fine-tuned
+floor (RT-DETRv2-M 0.581) and below single-model Astra+crop-refine (0.588)** — so
+combining zero-shot detectors gets *closer* to a fine-tuned detector than any
+open-weights fusion did, but does not reach it, and does not beat one good Astra
+pipeline. And on the **auto-labeling axis it strictly hurts**: recall@95%
+peaks at astra-alone (0.898) and every model added lowers it, because WBF averages
+in weaker boxes. The agreement-rescore operator is weaker still here (peak
+Astra+OWLv2+OmDet 0.508). Net: **the cheapest route to fine-tuned-level accuracy is
+one Astra crop-refine pass, not an ensemble.** Full curves:
+`results/vlm/fusion/astra_greedy_{test,agree_test}.json`.
+
 The per-model rows above come from the same dumps the test table earlier in this
 report renders, through the same scorer, so the two cannot disagree without one
 of them being wrong.

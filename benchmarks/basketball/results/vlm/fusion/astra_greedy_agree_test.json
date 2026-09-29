@@ -1,0 +1,389 @@
+{
+  "method": "agree",
+  "iou": 0.5,
+  "greedy_path": [
+    {
+      "added": "astra",
+      "combo": [
+        "astra"
+      ],
+      "mAP_50_95": 0.497588574886322,
+      "mAP_50": 0.8193998336791992,
+      "recall_at_p95": 0.898
+    },
+    {
+      "added": "owlv2",
+      "combo": [
+        "astra",
+        "owlv2"
+      ],
+      "mAP_50_95": 0.5061677694320679,
+      "mAP_50": 0.8380628228187561,
+      "recall_at_p95": 0.813
+    },
+    {
+      "added": "omdet_turbo",
+      "combo": [
+        "astra",
+        "owlv2",
+        "omdet_turbo"
+      ],
+      "mAP_50_95": 0.5076252222061157,
+      "mAP_50": 0.8329035639762878,
+      "recall_at_p95": 0.835
+    },
+    {
+      "added": "yolo_world",
+      "combo": [
+        "astra",
+        "owlv2",
+        "omdet_turbo",
+        "yolo_world"
+      ],
+      "mAP_50_95": 0.5075596570968628,
+      "mAP_50": 0.8293713331222534,
+      "recall_at_p95": 0.505
+    },
+    {
+      "added": "grounding_dino",
+      "combo": [
+        "astra",
+        "owlv2",
+        "omdet_turbo",
+        "yolo_world",
+        "grounding_dino"
+      ],
+      "mAP_50_95": 0.5028722286224365,
+      "mAP_50": 0.8214076161384583,
+      "recall_at_p95": 0.547
+    },
+    {
+      "added": "llmdet",
+      "combo": [
+        "astra",
+        "owlv2",
+        "omdet_turbo",
+        "yolo_world",
+        "grounding_dino",
+        "llmdet"
+      ],
+      "mAP_50_95": 0.49672216176986694,
+      "mAP_50": 0.8069407939910889,
+      "recall_at_p95": 0.603
+    },
+    {
+      "added": "florence2",
+      "combo": [
+        "astra",
+        "owlv2",
+        "omdet_turbo",
+        "yolo_world",
+        "grounding_dino",
+        "llmdet",
+        "florence2"
+      ],
+      "mAP_50_95": 0.4515213966369629,
+      "mAP_50": 0.7489634156227112,
+      "recall_at_p95": 0.596
+    },
+    {
+      "added": "gemini",
+      "combo": [
+        "astra",
+        "owlv2",
+        "omdet_turbo",
+        "yolo_world",
+        "grounding_dino",
+        "llmdet",
+        "florence2",
+        "gemini"
+      ],
+      "mAP_50_95": 0.4336875379085541,
+      "mAP_50": 0.7133414149284363,
+      "recall_at_p95": 0.631
+    },
+    {
+      "added": "qwen3_vl",
+      "combo": [
+        "astra",
+        "owlv2",
+        "omdet_turbo",
+        "yolo_world",
+        "grounding_dino",
+        "llmdet",
+        "florence2",
+        "gemini",
+        "qwen3_vl"
+      ],
+      "mAP_50_95": 0.4275343418121338,
+      "mAP_50": 0.6979432702064514,
+      "recall_at_p95": 0.659
+    }
+  ],
+  "rounds": [
+    {
+      "from": [
+        "astra"
+      ],
+      "trials": [
+        {
+          "add": "owlv2",
+          "mAP_50_95": 0.5062,
+          "recall_at_p95": 0.813
+        },
+        {
+          "add": "llmdet",
+          "mAP_50_95": 0.5029,
+          "recall_at_p95": 0.803
+        },
+        {
+          "add": "yolo_world",
+          "mAP_50_95": 0.5025,
+          "recall_at_p95": 0.847
+        },
+        {
+          "add": "omdet_turbo",
+          "mAP_50_95": 0.5004,
+          "recall_at_p95": 0.836
+        },
+        {
+          "add": "grounding_dino",
+          "mAP_50_95": 0.4985,
+          "recall_at_p95": 0.867
+        },
+        {
+          "add": "qwen3_vl",
+          "mAP_50_95": 0.4344,
+          "recall_at_p95": 0.732
+        },
+        {
+          "add": "florence2",
+          "mAP_50_95": 0.4306,
+          "recall_at_p95": 0.577
+        },
+        {
+          "add": "gemini",
+          "mAP_50_95": 0.3783,
+          "recall_at_p95": 0.643
+        }
+      ]
+    },
+    {
+      "from": [
+        "astra",
+        "owlv2"
+      ],
+      "trials": [
+        {
+          "add": "omdet_turbo",
+          "mAP_50_95": 0.5076,
+          "recall_at_p95": 0.835
+        },
+        {
+          "add": "yolo_world",
+          "mAP_50_95": 0.5071,
+          "recall_at_p95": 0.575
+        },
+        {
+          "add": "llmdet",
+          "mAP_50_95": 0.5061,
+          "recall_at_p95": 0.779
+        },
+        {
+          "add": "grounding_dino",
+          "mAP_50_95": 0.504,
+          "recall_at_p95": 0.784
+        },
+        {
+          "add": "florence2",
+          "mAP_50_95": 0.4583,
+          "recall_at_p95": 0.594
+        },
+        {
+          "add": "qwen3_vl",
+          "mAP_50_95": 0.4492,
+          "recall_at_p95": 0.725
+        },
+        {
+          "add": "gemini",
+          "mAP_50_95": 0.3981,
+          "recall_at_p95": 0.657
+        }
+      ]
+    },
+    {
+      "from": [
+        "astra",
+        "owlv2",
+        "omdet_turbo"
+      ],
+      "trials": [
+        {
+          "add": "yolo_world",
+          "mAP_50_95": 0.5076,
+          "recall_at_p95": 0.505
+        },
+        {
+          "add": "grounding_dino",
+          "mAP_50_95": 0.5036,
+          "recall_at_p95": 0.746
+        },
+        {
+          "add": "llmdet",
+          "mAP_50_95": 0.5036,
+          "recall_at_p95": 0.741
+        },
+        {
+          "add": "florence2",
+          "mAP_50_95": 0.4565,
+          "recall_at_p95": 0.591
+        },
+        {
+          "add": "qwen3_vl",
+          "mAP_50_95": 0.4479,
+          "recall_at_p95": 0.712
+        },
+        {
+          "add": "gemini",
+          "mAP_50_95": 0.4023,
+          "recall_at_p95": 0.659
+        }
+      ]
+    },
+    {
+      "from": [
+        "astra",
+        "owlv2",
+        "omdet_turbo",
+        "yolo_world"
+      ],
+      "trials": [
+        {
+          "add": "grounding_dino",
+          "mAP_50_95": 0.5029,
+          "recall_at_p95": 0.547
+        },
+        {
+          "add": "llmdet",
+          "mAP_50_95": 0.5019,
+          "recall_at_p95": 0.621
+        },
+        {
+          "add": "florence2",
+          "mAP_50_95": 0.4578,
+          "recall_at_p95": 0.618
+        },
+        {
+          "add": "qwen3_vl",
+          "mAP_50_95": 0.4492,
+          "recall_at_p95": 0.704
+        },
+        {
+          "add": "gemini",
+          "mAP_50_95": 0.4022,
+          "recall_at_p95": 0.654
+        }
+      ]
+    },
+    {
+      "from": [
+        "astra",
+        "owlv2",
+        "omdet_turbo",
+        "yolo_world",
+        "grounding_dino"
+      ],
+      "trials": [
+        {
+          "add": "llmdet",
+          "mAP_50_95": 0.4967,
+          "recall_at_p95": 0.603
+        },
+        {
+          "add": "florence2",
+          "mAP_50_95": 0.4542,
+          "recall_at_p95": 0.585
+        },
+        {
+          "add": "qwen3_vl",
+          "mAP_50_95": 0.4438,
+          "recall_at_p95": 0.705
+        },
+        {
+          "add": "gemini",
+          "mAP_50_95": 0.3987,
+          "recall_at_p95": 0.659
+        }
+      ]
+    },
+    {
+      "from": [
+        "astra",
+        "owlv2",
+        "omdet_turbo",
+        "yolo_world",
+        "grounding_dino",
+        "llmdet"
+      ],
+      "trials": [
+        {
+          "add": "florence2",
+          "mAP_50_95": 0.4515,
+          "recall_at_p95": 0.596
+        },
+        {
+          "add": "qwen3_vl",
+          "mAP_50_95": 0.4438,
+          "recall_at_p95": 0.699
+        },
+        {
+          "add": "gemini",
+          "mAP_50_95": 0.3989,
+          "recall_at_p95": 0.647
+        }
+      ]
+    },
+    {
+      "from": [
+        "astra",
+        "owlv2",
+        "omdet_turbo",
+        "yolo_world",
+        "grounding_dino",
+        "llmdet",
+        "florence2"
+      ],
+      "trials": [
+        {
+          "add": "gemini",
+          "mAP_50_95": 0.4337,
+          "recall_at_p95": 0.631
+        },
+        {
+          "add": "qwen3_vl",
+          "mAP_50_95": 0.4335,
+          "recall_at_p95": 0.649
+        }
+      ]
+    },
+    {
+      "from": [
+        "astra",
+        "owlv2",
+        "omdet_turbo",
+        "yolo_world",
+        "grounding_dino",
+        "llmdet",
+        "florence2",
+        "gemini"
+      ],
+      "trials": [
+        {
+          "add": "qwen3_vl",
+          "mAP_50_95": 0.4275,
+          "recall_at_p95": 0.659
+        }
+      ]
+    }
+  ]
+}

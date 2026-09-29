@@ -110,6 +110,21 @@ The resolution lever that helped Qwen3-VL was also tried on **LLMDet** (not Astr
 negative — rim stayed 0.000 at every resolution and it never beat LLMDet's tiled
 config. See the report's LLMDet paragraph and `results/vlm/prompt_search/llmdet_resolution.json`.
 
+## Astra-anchored greedy fusion (2026-09-29)
+
+Forward-greedy sweep from {astra}, adding the best model each round (WBF, committed
+dumps, no API/GPU; `scripts/fuse_astra_greedy.py`, `results/vlm/fusion/astra_greedy_*.json`):
+
+- **Astra + LLMDet is the one real gain: 0.496 → 0.538 test mAP (+0.042)** — LLMDet
+  complements Astra on referee/number. + OWLv2 → 0.546 (peak); everything after
+  declines.
+- **Peak 0.546 < fine-tuned floor 0.581 < Astra+crop-refine 0.588.** Fusion gets
+  closer to a fine-tuned detector than any prior ensemble but doesn't reach it, and
+  a single Astra crop-refine pass still wins.
+- **Auto-labeling recall@95% is HURT by fusion** — astra-alone 0.898 is the peak;
+  each added model lowers it (WBF averages in weaker boxes). Agree operator weaker
+  (peak 0.508).
+
 ## Bottom line
 
 - **Publish crop-refine (0.588) for mAP, base (0.501) or few-shot (0.951 recall) for
