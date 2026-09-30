@@ -1,0 +1,123 @@
+# astra_prompt_explore.yaml -- bespoke, DISCLOSED prompt/effort exploration for
+# the GPT-6 Astra (OpenAI) row. Consumed by scripts/explore_astra_prompts.py.
+#
+# THIS IS NOT THE EQUAL-EFFORT SEARCH. The six open-weights detectors are scored
+# against one shared candidate list in vlm_prompt_search.yaml so none wins by
+# getting more tuning attention. Astra, like Gemini, is a billed API steered by a
+# free-text instruction rather than a class vocabulary, so it is excluded from
+# that process (vlm_prompt_search.yaml's header states this) and instead gets a
+# hand-tuned exploration -- the same posture Gemini's row and Qwen3-VL's
+# disclosed prompt experiments already set. These candidates are hand-written,
+# not drawn from the shared pool, and that is stated plainly here.
+#
+# SEARCH SPLIT: valid (96 images), NEVER test. Choosing a prompt on the split you
+# then publish reports the max over N draws as an unbiased number. The winner
+# runs ONCE on test, later, via run_vlm_benchmark.py.
+#
+# All candidate `classes` phrases resolve through merged5.yaml's `aliases` block
+# (person/basketball player -> player, orange basketball -> ball, basketball
+# hoop and backboard -> rim, jersey number on a uniform -> number, ...). The
+# script asserts this before spending a cent.
+
+split: valid
+model_name: gpt-6-astra
+
+# Confirmed with user 2026-09-25: low + medium only. Roboflow found high adds
+# ~1.5 mAP@50 for ~2x cost; xhigh/max are out of scope for this row. Run the
+# candidate search at low first (--efforts low), then an A/B on the winner
+# (--only <id> --efforts low medium).
+efforts:
+  - low
+  - medium
+
+candidates:
+  # Baseline: bare canonical names on the built-in mechanical prompt. The
+  # shortest prompt and the one a reader would try first -- included so "an
+  # elaborate prompt helps Astra" is a measured result, not an assumption.
+  - id: c_bare_canonical
+    classes: [player, ball, referee, rim, number]
+    prompt_template: null
+
+  # Domain vocabulary (the phrasing OWLv2/Grounding-DINO use), still on the
+  # built-in mechanical prompt. Isolates vocabulary from instruction style.
+  - id: c_domain
+    classes: [basketball player, basketball, referee, basketball hoop, jersey number]
+    prompt_template: null
+
+  # Small-object colour/structure cues -- the axis that measurably helped
+  # OWLv2, Grounding-DINO and Qwen3-VL on this dataset's collapse-prone `ball`
+  # and `rim`. Built-in mechanical prompt.
+  - id: c_small_object
+    classes:
+      - basketball player
+      - orange basketball
+      - referee
+      - basketball hoop and backboard
+      - jersey number on a uniform
+    prompt_template: null
+
+  # Gemini-style hand-tuned instruction: per-class definitions + count caps, the
+  # exact structure Gemini's committed row uses. Tests whether Astra benefits
+  # from the same hand-tuning that helped Gemini. Canonical labels.
+  - id: c_gemini_style
+    classes: [player, ball, referee, rim, number]
+    prompt_template: >
+      Detect all basketball players, referees, the rim, the basketball, and
+      visible jersey numbers in this basketball game image.
+      Constraints:
+      - At most 10 players, 3 referees, 1 rim, and 1 ball per image.
+      - Each person gets exactly ONE bounding box with the most specific label.
+      Use EXACTLY these labels:
+      - "player" for any basketball player on the court
+      - "referee" for game officials
+      - "ball" for the basketball (only when NOT going through the rim)
+      - "rim" for the basketball hoop rim
+      - "number" for visible jersey numbers (tight box around the digits only)
+      Return each box as (x_min, y_min, x_max, y_max) integers in a 0-1000
+      normalised coordinate system and a confidence in [0, 1].
+
+  # Astra-reasoning candidate: leans into a reasoning model's strengths --
+  # explicit exclusion (negative prompting) of the bench/spectator false-player
+  # failure mode Qwen3-VL hit, plus small-object guidance. Canonical labels.
+  - id: c_reasoning_exclusion
+    classes: [player, ball, referee, rim, number]
+    prompt_template: >
+      You are localising objects in a broadcast image of a basketball game.
+      Detect ONLY these objects, using EXACTLY these labels:
+      - "player": a player actively on the court in a team uniform. Do NOT box
+        coaches, substitutes on the bench, or spectators in the crowd.
+      - "referee": a game official, typically in a striped shirt.
+      - "ball": the orange basketball. It is small; look carefully near hands,
+        the rim, and mid-air.
+      - "rim": the hoop rim and backboard.
+      - "number": the jersey number on a player's uniform. Draw a tight box
+        around the digits only, not the whole jersey.
+      Think about which people are participants versus crowd before boxing them.
+      Return each detection as (x_min, y_min, x_max, y_max) integers in a 0-1000
+      normalised coordinate system, the label, and a confidence in [0, 1].
+
+  # Compose the two levers that helped most elsewhere: small-object vocabulary +
+  # the reasoning/exclusion instruction. Tests whether they add or the longer
+  # prompt dilutes the signal (the same compose-or-dilute question c4 asks in
+  # the open-weights search).
+  - id: c_small_object_reasoning
+    classes:
+      - basketball player
+      - orange basketball
+      - referee
+      - basketball hoop and backboard
+      - jersey number on a uniform
+    prompt_template: >
+      You are localising objects in a broadcast image of a basketball game.
+      Detect ONLY these objects, using EXACTLY these labels:
+      - "basketball player": a player actively on the court in a team uniform.
+        Do NOT box coaches, bench substitutes, or spectators in the crowd.
+      - "referee": a game official, typically in a striped shirt.
+      - "orange basketball": the small orange ball; look near hands, the rim,
+        and mid-air.
+      - "basketball hoop and backboard": the rim together with the backboard.
+      - "jersey number on a uniform": the digits on a player's jersey; draw a
+        tight box around the digits only.
+      Think about which people are participants versus crowd before boxing them.
+      Return each detection as (x_min, y_min, x_max, y_max) integers in a 0-1000
+      normalised coordinate system, the label, and a confidence in [0, 1].

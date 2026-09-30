@@ -51,6 +51,11 @@ vlm = [
     # a GPU re-run of the VLM gate to prove the other 4 models still load.
     "num2words",
     "google-genai>=1.63.0,<2",
+    # GPT-6 Astra (OpenAI) zero-shot row. Pure API call, no torch — see the
+    # standalone `astra` extra below for a torch-free install that runs this
+    # row alone. Listed here too so the full `vlm` env can run every API row
+    # (Gemini + Astra) alongside the open-weights ones.
+    "openai>=1.55.0",
     # YOLO-World (open-vocabulary, real-time). AGPL-3.0 — a copyleft runtime
     # dependency, confined to this OPTIONAL extra and never redistributed with
     # the Apache-2.0 package. The YOLO-World weights themselves are GPL-3.0
@@ -62,6 +67,17 @@ vlm = [
     # at runtime and mutates the environment. MIT.
     "clip-anytorch",
 ]
+# GPT-6 Astra (OpenAI) zero-shot inferencer, TORCH-FREE. Astra is a pure API
+# call (like Gemini), so unlike every other VLM extra it pulls neither torch nor
+# transformers — only `openai` on top of the core deps, which already carry the
+# whole scoring path (supervision, opencv, pydantic, ...). This is what the
+# remote API runner installs (`pip install -e .[astra]`): a small, GPU-free
+# environment that can both call Astra AND score its output. Mirrors pixi.toml's
+# `[feature.astra]` / `vlm-astra` environment.
+astra = [
+    "openai>=1.55.0",
+]
+
 # Qwen3-VL-8B zero-shot inferencer. SEPARATE from [vlm], not merged into it:
 # Qwen3-VL requires transformers>=4.57.0, while [vlm]'s pin (<4.52.0, see its
 # comment) is load-bearing for the six already-published zero-shot rows —
@@ -175,6 +191,9 @@ module = [
     "einops.*",
     "peft.*",
     "google.*",
+    # openai is [vlm]/[astra]-extra-only (the GPT-6 Astra API row), absent from
+    # the default torch-free typecheck env -- same posture as google.* above.
+    "openai.*",
     "tensorrt.*",
     "onnx_graphsurgeon.*",
     # torch/torchvision/PIL are [vlm]-extra-only and not installed in the

@@ -1,0 +1,168 @@
+{
+  "model": "gpt-6-astra",
+  "split": "valid",
+  "note": "Bespoke, DISCLOSED prompt/effort exploration (NOT the equal-effort search vlm_prompt_search.yaml). Billed-API row, same posture as Gemini. See vlm_zeroshot.yaml's astra row and .planning/phases/05-zero-shot-vlm/05-astra-PLAN.md.",
+  "efforts_explored": [
+    "low",
+    "medium"
+  ],
+  "published": {
+    "candidate": "c_gemini_style",
+    "effort": "low"
+  },
+  "best": {
+    "candidate": "c_gemini_style",
+    "effort": "low",
+    "val_mAP_50_95": 0.4849620461463928,
+    "val_mAP_50": 0.8246229887008667
+  },
+  "results": [
+    {
+      "candidate": "c_gemini_style",
+      "effort": "low",
+      "classes": [
+        "player",
+        "ball",
+        "referee",
+        "rim",
+        "number"
+      ],
+      "has_custom_prompt": true,
+      "mAP_50_95": 0.4849620461463928,
+      "mAP_50": 0.8246229887008667,
+      "per_class_ap50": {
+        "player": 0.9789279103279114,
+        "ball": 0.7331269979476929,
+        "referee": 0.9093013405799866,
+        "rim": 0.6239292025566101,
+        "number": 0.8778294920921326
+      }
+    },
+    {
+      "candidate": "c_gemini_style",
+      "effort": "medium",
+      "classes": [
+        "player",
+        "ball",
+        "referee",
+        "rim",
+        "number"
+      ],
+      "has_custom_prompt": true,
+      "mAP_50_95": 0.4843599796295166,
+      "mAP_50": 0.832465648651123,
+      "per_class_ap50": {
+        "player": 0.978617787361145,
+        "ball": 0.7174809575080872,
+        "referee": 0.9092445969581604,
+        "rim": 0.6411468982696533,
+        "number": 0.9158380627632141
+      }
+    },
+    {
+      "candidate": "c_bare_canonical",
+      "effort": "low",
+      "classes": [
+        "player",
+        "ball",
+        "referee",
+        "rim",
+        "number"
+      ],
+      "has_custom_prompt": false,
+      "mAP_50_95": 0.4616532325744629,
+      "mAP_50": 0.7835594415664673,
+      "per_class_ap50": {
+        "player": 0.9785939455032349,
+        "ball": 0.729385495185852,
+        "referee": 0.8901061415672302,
+        "rim": 0.5001561045646667,
+        "number": 0.819555401802063
+      }
+    },
+    {
+      "candidate": "c_reasoning_exclusion",
+      "effort": "low",
+      "classes": [
+        "player",
+        "ball",
+        "referee",
+        "rim",
+        "number"
+      ],
+      "has_custom_prompt": true,
+      "mAP_50_95": 0.4610018730163574,
+      "mAP_50": 0.6932013034820557,
+      "per_class_ap50": {
+        "player": 0.9679664373397827,
+        "ball": 0.6980029344558716,
+        "referee": 0.8709311485290527,
+        "rim": 0.0,
+        "number": 0.9291058778762817
+      }
+    },
+    {
+      "candidate": "c_small_object_reasoning",
+      "effort": "low",
+      "classes": [
+        "basketball player",
+        "orange basketball",
+        "referee",
+        "basketball hoop and backboard",
+        "jersey number on a uniform"
+      ],
+      "has_custom_prompt": true,
+      "mAP_50_95": 0.4585009515285492,
+      "mAP_50": 0.692907989025116,
+      "per_class_ap50": {
+        "player": 0.9680022597312927,
+        "ball": 0.6923207640647888,
+        "referee": 0.870808482170105,
+        "rim": 0.0,
+        "number": 0.9334083795547485
+      }
+    },
+    {
+      "candidate": "c_small_object",
+      "effort": "low",
+      "classes": [
+        "basketball player",
+        "orange basketball",
+        "referee",
+        "basketball hoop and backboard",
+        "jersey number on a uniform"
+      ],
+      "has_custom_prompt": false,
+      "mAP_50_95": 0.4475693106651306,
+      "mAP_50": 0.6965805292129517,
+      "per_class_ap50": {
+        "player": 0.9786531925201416,
+        "ball": 0.7144973278045654,
+        "referee": 0.8787313103675842,
+        "rim": 0.0,
+        "number": 0.9110207557678223
+      }
+    },
+    {
+      "candidate": "c_domain",
+      "effort": "low",
+      "classes": [
+        "basketball player",
+        "basketball",
+        "referee",
+        "basketball hoop",
+        "jersey number"
+      ],
+      "has_custom_prompt": false,
+      "mAP_50_95": 0.4421662390232086,
+      "mAP_50": 0.7022773623466492,
+      "per_class_ap50": {
+        "player": 0.979295015335083,
+        "ball": 0.7288313508033752,
+        "referee": 0.8801974654197693,
+        "rim": 0.0,
+        "number": 0.9230630993843079
+      }
+    }
+  ]
+}

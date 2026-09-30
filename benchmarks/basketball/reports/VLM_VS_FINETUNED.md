@@ -362,12 +362,13 @@ never emit, while the singleton cap *constrains* the zero-shot rows.
 
 ## The zero-shot ceiling
 
-Six zero-shot VLMs, scored on the merged-5 test split. The table is recomputed
+Nine zero-shot VLMs, scored on the merged-5 test split. The table is recomputed
 from the committed prediction dumps in `results/vlm/*.json` (never transcribed):
 
 <!-- TABLE:vlm_summary START -->
 | Model | mAP@50:95 | mAP@50 | mAP@75 |
 | --- | --- | --- | --- |
+| GPT-6 Astra | 0.501 | 0.823 | 0.507 |
 | Gemini | 0.250 | 0.430 | 0.252 |
 | OWLv2 | 0.315 | 0.476 | 0.367 |
 | Grounding-DINO | 0.293 | 0.352 | 0.318 |
@@ -382,24 +383,83 @@ This table has changed twice since the 2026-08-05 ablation, and both changes
 are worth stating plainly because earlier revisions of this report said
 otherwise.
 
-**LLMDet-large now leads, by the widest margin anywhere in this table.** Added
-2026-08-19 through the identical equal-effort search every open-weights row
-here goes through, it scores 0.388 — 0.073 clear of OWLv2's 0.315, the
-previous leader. Qwen3-VL-8B (0.318) passed OWLv2 too, on the strength of one
-fix: forcing 2x upscaling before inference took it from 0.188 (tied for last)
-to 0.318. Both rows' tuning is summarised in [Two more rows: LLMDet-large and
-Qwen3-VL-8B](#two-more-rows-llmdet-large-and-qwen3-vl-8b) below. Configuration
-and model choice, not prompting, moved this table again; every row here still
-goes through the same prompt-fairness process Gemini does not.
+**GPT-6 Astra now leads the whole table, and it is not close — but it is a
+billed API, not open weights.** Added 2026-09-25, it scores **0.501**, 0.113
+clear of the next row and more than double Gemini's 0.250. Like Gemini, and
+unlike every open-weights row, it is a hosted model steered by a free-text
+instruction rather than a class vocabulary, so it is *exempt from the
+equal-effort search* for the same two reasons Gemini is (a free-text prompt, and
+a per-image bill): its prompt was hand-tuned on the val split and that is
+disclosed, not hidden. It answers a different question than the open-weights
+rows — "how good is the best detector you can rent?", not "the best you can run"
+— so read it alongside them, not as one of them.
 
-**"Below half the worst fine-tuned detector" has now been retracted twice.** It
-was correct when the ceiling was Gemini's 0.250 (2.5×), then OWLv2's 0.315
-(1.85×), and is smaller again now: at 0.388 against the lowest-ranked
-fine-tuned detector's **0.581** (RT-DETRv2-M) the ratio is **1.50×** — see
-[FINAL_COMPARISON_640.md](FINAL_COMPARISON_640.md) for the fine-tuned figures
-rather than re-tabulating them here. Each retraction shrank the gap because a
-stronger zero-shot model entered the comparison, not because the fine-tuned
-figures moved.
+**Among open weights, LLMDet-large still leads at 0.388.** Added 2026-08-19
+through the identical equal-effort search every open-weights row goes through, it
+is 0.073 clear of OWLv2's 0.315, the previous open-weights leader. Qwen3-VL-8B
+(0.318) passed OWLv2 too, on the strength of one fix: forcing 2x upscaling before
+inference took it from 0.188 (tied for last) to 0.318. Both rows' tuning is
+summarised in [Two more rows: LLMDet-large and
+Qwen3-VL-8B](#two-more-rows-llmdet-large-and-qwen3-vl-8b) below.
+
+**"Below half the worst fine-tuned detector" now depends entirely on whether you
+count the paid API.** Against the lowest-ranked fine-tuned detector's **0.581**
+(RT-DETRv2-M — see [FINAL_COMPARISON_640.md](FINAL_COMPARISON_640.md)): the best
+*open-weights* zero-shot row, LLMDet-large at 0.388, is still **1.50×** behind,
+the same order-of-magnitude gap this report has narrated shrinking (Gemini 2.5×,
+OWLv2 1.85×). But the best zero-shot row you can *rent*, Astra at 0.501, is only
+**1.16×** behind — the gap to a fine-tuned detector has all but closed for the
+strongest off-the-shelf option, provided you are willing to pay per image for a
+proprietary model with no weights to run offline.
+
+**And one zero-shot configuration now edges it entirely.** A two-pass crop-refine
+pipeline — Astra's published config on the full frame, then a focused single-class
+re-detection on a zoomed crop around each ball/rim box (still zero-shot: no
+labelled examples, a disclosed pipeline variant in the spirit of tiling) — scores
+**0.588 on test**, fractionally *above* RT-DETRv2-M's 0.581. Almost the entire
+gain is rim localisation: cropping lifts rim AP50 from 0.52 to **0.95**, because a
+whole 1080p frame gives the model too few pixels to place a tight box on a small
+rim. It is the first zero-shot row in this report to reach a fine-tuned
+detector's accuracy — with the caveats that it is a billed API, it costs several
+model calls per image, and it trades a little ball accuracy (0.78 → 0.69) for the
+rim gain. A separate *few-shot* variant (labelled train-frame examples prepended
+to each request — no longer zero-shot, so reported apart) reaches 0.524. Both are
+detailed in the Astra plan of record and `results/vlm/astra_*.json`.
+
+The same crop-and-re-detect idea also lifts the other small class, **`number`**,
+once the crop is chosen right. A jersey number is tiny and multi-instance, so
+crop-refine (built for the one-per-frame ball/rim) skips it — but there is at most
+one number *per player*, so cropping to each detected player box and re-detecting
+the number inside that zoom makes it effectively single-instance in-crop. This
+*per-player number crop* takes **`number` AP50 from 0.861 to 0.900 on test,
+zero-shot** — nearly matching the few-shot variant's 0.918 (which needs labelled
+examples) without any. (An earlier idea, a self-prompt recall pass feeding pass-1's
+confident player/referee/number boxes back as positive examples, went the other
+way: it *lowered* the score, 0.456 val alone, because Astra is already near
+ceiling on those classes and prompting for "more" adds bench/crowd false
+positives — the same over-enumeration Qwen3-VL shows.) Net: the small-object
+classes both respond to zooming (`rim` 0.52→0.95 via crop-refine, `number`
+0.86→0.90 via per-player crop); the near-ceiling classes do not want extra prompting.
+Because the two zoom passes touch disjoint classes, stacking them is projected to
+**~0.594** test mAP@50:95 (rim 0.95 + number 0.90), edging crop-refine's 0.588 —
+an *estimate* spliced from the two committed dumps (crop-refine for every class
+except `number`, number-crop for `number`), not a full end-to-end run, which was
+judged not worth the extra ~12 API calls/image for a projected +0.006.
+
+One further idea was tried and **did not work, recorded here because the negative
+is informative**: a *self-prompt recall pass* — draw pass 1's confident
+player/referee/number boxes back onto the frame and ask a second pass to keep
+those and add any it missed (the positive-box-prompting trick, aimed intra-image
+at the multi-instance classes, the recall analogue of crop-refine's
+single-instance localisation). It lowered the score, alone (0.456 val vs base
+0.485) and stacked on crop-refine (0.517 val vs 0.540). The mechanism is the
+reason it can't help *this* model: Astra already sits at ~0.98 on player and
+referee, so there is almost nothing to recover, and prompting for "more" mostly
+elicits false positives on the bench and crowd — the same over-enumeration Qwen3-VL
+shows when shown examples. `player` and `number` AP50 both fell in exactly the
+runs the recall pass touched them. The technique is sound for a *low-recall*
+multi-instance detector; Astra is the wrong patient. Results:
+`results/vlm/astra_base_selfprompt*_valid.json`.
 
 > A revision of this paragraph dated 2026-08-05 named DAMO-YOLO-M's 0.619 as the
 > lowest-ranked fine-tuned detector and computed 1.97× from it. That was the
@@ -407,20 +467,23 @@ figures moved.
 > unchanged since — RT-DETRv2-M is still the reference for every ratio in this
 > report.
 
-What has *not* changed is the conclusion, even as the gap keeps closing. 1.5× is
-still decisive, it is still the gap between "usable for bootstrapping labels"
-and "usable in production", and closing it this far took an exhaustive
-configuration search on the original six plus two additional model
-evaluations: the knobs on those six are now measured and documented above as
-not worth further GPU-hours, and LLMDet-large's and Qwen3-VL-8B's own tuning is
-summarised below. Fine-tuning on this small in-domain dataset still buys a
-real, if now smaller, margin over the best general-purpose zero-shot detector
-available off the shelf.
+The conclusion now **splits on whether you can pay per image**, and that split
+is the honest headline. For a model with *weights you can run offline*,
+fine-tuning on this small in-domain dataset still buys a real margin: 1.5× over
+LLMDet-large, still the gap between "usable for bootstrapping labels" and "usable
+in production", and closing it even that far took an exhaustive configuration
+search on the original six plus two more model evaluations. But for the best
+detector you can *rent*, that margin is nearly gone (1.16×), and a zero-shot
+crop-refine pipeline on the same paid API actually reaches it. If the deployment
+constraint is "no offline weights, no per-image cost", the fine-tuned detector
+still wins clearly; if it is "best accuracy, willing to call an API", a
+general-purpose model now matches a detector fine-tuned on this exact dataset.
 
-The trend across every revision of this section points the same way: the
-margin was smaller than this report originally claimed, and most of what has
-closed it since is fairer configuration and better model choices, not a
-fundamental limit on zero-shot detection.
+The trend across every revision of this section points the same way: the margin
+was smaller than this report originally claimed, and most of what has closed it
+is fairer configuration and better models — now including a frontier API whose
+grounding is strong enough that fine-tuning's remaining advantage is a
+deployment-economics question, not a capability one.
 
 ### Two more rows: LLMDet-large and Qwen3-VL-8B
 
@@ -442,8 +505,22 @@ NMS was already flat across a wide range (0.2–0.7 span 0.0028, inside noise),
 and three of four sentence-style candidates collapsed to exactly 0.000 because
 LLMDet's phrase-grounding head cannot resolve a multi-clause sentence into a
 single span. `classes` and the published test number were unchanged by either.
-Full record, including every candidate tried: the `llmdet` row's comments in
-`vlm_zeroshot.yaml`.
+
+A third follow-up (2026-09-26, prompted by the resolution win on Qwen3-VL): the
+same **image-resolution lever** was swept on LLMDet, untiled, over shortest-edge
+800/1000/1200/1333 on val (`explore_llmdet_resolution.py`,
+`results/vlm/prompt_search/llmdet_resolution.json`). It did **not** transfer. The
+curve is non-monotonic with a tiny peak at 1000 (0.343, +0.006 over the 800
+default, all of it `ball`) and *degrades* above that — the opposite of Qwen3-VL's
+monotonic gain — and the best untiled+resolution point (0.343) is still below
+LLMDet's own published *tiled* config (0.359 val). Most tellingly, **`rim` stayed
+exactly 0.000 at every resolution**: LLMDet's rim failure is a phrase-grounding
+label collision, not pixel-starvation, so more pixels cannot fix it. Resolution
+helps a generative VLM's encoder (more tokens per small object) but not a
+grounding-DINO detector's fixed feature pyramid. Negative result, recorded; the
+published tiled config stands. (Real 2× upscale — Qwen3-VL's regime — OOMs
+LLMDet-large on a 24 GB GPU even under bf16 autocast, so the sweep tops out at
+1333.) Full record: the `llmdet` row's comments in `vlm_zeroshot.yaml`.
 
 **Qwen3-VL-8B** (`Qwen/Qwen3-VL-8B-Instruct`) has a genuine native JSON
 grounding mode — `{"bbox_2d": [...], "label": "..."}`, confirmed from the
@@ -478,6 +555,7 @@ makes the pattern unmistakable:
 <!-- TABLE:vlm_per_class START -->
 | Model | player | ball | referee | rim | number |
 | --- | --- | --- | --- | --- | --- |
+| GPT-6 Astra | 0.980 | 0.776 | 0.979 | 0.521 | 0.861 |
 | Gemini | 0.923 | 0.316 | 0.717 | 0.036 | 0.156 |
 | OWLv2 | 0.901 | 0.583 | 0.388 | 0.002 | 0.505 |
 | Grounding-DINO | 0.867 | 0.355 | 0.533 | 0.000 | 0.006 |
@@ -492,21 +570,28 @@ Read down the columns and one story emerges: **open-vocabulary VLMs recognise
 the class they already know from web-scale pre-training (`player`, essentially
 COCO's `person`) and collapse on the small, domain-specific classes.**
 
-- **The `rim` collapse, and it is not a prompting problem.** `rim` is the class
-  every model fails hardest on: four of eight score **exactly 0.000**, and the
-  best (Gemini) manages 0.036. A rim is small, thin, often partially occluded,
-  and not a salient "object" in a general model's prior. This has now been
+- **The `rim` collapse — a hard ceiling for the open-weights models and Gemini,
+  which GPT-6 Astra breaks.** Among the eight open-weights-and-Gemini rows, `rim`
+  is the class every one fails hardest on: four score **exactly 0.000** and the
+  best of them (Gemini) manages 0.036. A rim is small, thin, often partially
+  occluded, and not a salient "object" in a general model's prior. This was
   *tested* across seven open-weights models and six vocabularies each —
-  forty-two measurements — and `rim` never once cleared 0.04, whether prompted
-  as "basketball hoop", "basketball hoop and backboard", "rim", or "hoop".
-  LLMDet-large and Qwen3-VL-8B, each searched independently after this finding
-  was already established, changed nothing about it. **This is the single
-  clearest domain gap in the comparison, and vocabulary cannot close it.**
+  forty-two measurements — and `rim` never once cleared 0.04, whether prompted as
+  "basketball hoop", "basketball hoop and backboard", "rim", or "hoop"; vocabulary
+  cannot close it for those models. **GPT-6 Astra is the first to break it**,
+  scoring **0.521** — over 14× the previous best — and the two-pass crop-refine
+  pipeline, which simply zooms in and re-detects, takes rim to **0.95**. So the
+  rim collapse is a capability-and-resolution gap for the models that were
+  available when this report was first written, not an absolute limit of
+  zero-shot detection: a frontier model with enough grounding ability clears it,
+  and giving any model enough pixels on the rim nearly solves it.
 
-- **`referee` is where the models actually differ.** It ranges from
-  Qwen3-VL-8B's 0.727 — Gemini close behind at 0.717, the two are within a
-  point of each other and neither should be read as a clear "winner" here —
-  down to YOLO-World's **0.000**, the widest spread of any class. A referee is
+- **`referee` is where the models actually differ.** It ranges from GPT-6
+  Astra's **0.979** — with Qwen3-VL-8B (0.727) and Gemini (0.717) within a point
+  of each other well behind, and neither of those should be read as a clear
+  "winner" over the other — down to YOLO-World's **0.000**, the widest spread of
+  any class. Astra separates the officiating role almost perfectly; the rest do
+  not. A referee is
   visually a `player` under any of these vocabularies (a person on a court), so
   separating the officiating role is a genuine semantic discrimination rather
   than a detection problem. LLMDet-large (0.673) is close behind both; Gemini's
@@ -516,15 +601,16 @@ COCO's `person`) and collapse on the small, domain-specific classes.**
   cause — see [Does the COCO `person` alias manufacture false
   positives?](#does-the-coco-person-alias-manufacture-false-positives) below.
 
-- **`player` carries the score.** Every model but Florence-2 scores 0.80–0.93 on
+- **`player` carries the score.** Every model but Florence-2 scores 0.80–0.98 on
   `player` — the one class that overlaps a general detector's prior, and almost
   entirely responsible for the non-trivial overall mAP the leaders post. Strip
-  `player` out and the zero-shot ceiling would be far lower still. Note how
-  little separates the top models on it: Qwen3-VL-8B (0.934), Gemini (0.923)
-  and OWLv2 (0.901) are within three points of each other, and none of them is
-  the overall leader — LLMDet-large's 0.880 on `player` is only fourth-best,
-  and it wins the table on the strength of the other four classes instead,
-  chiefly `number` (0.571, the best of any model here).
+  `player` out and the zero-shot ceiling would be far lower still. GPT-6 Astra
+  tops it at **0.980** and leads the table overall; among the rest, how little
+  separates them is the story — Qwen3-VL-8B (0.934), Gemini (0.923) and OWLv2
+  (0.901) are within three points of each other, and none of *those* is its
+  group's overall leader: LLMDet-large's 0.880 on `player` is only fifth-best,
+  and it wins the open-weights ranking on the strength of the other four classes
+  instead, chiefly `number` (0.571, the best of any model here except Astra).
 
 - **Florence-2 is the weakest detector here on `player`**, at 0.749 against a
   field that otherwise clears 0.80. This bullet previously quoted 0.335 — stale
@@ -635,10 +721,14 @@ two classes it can both express.
 
 Surveyed 2026-07-30, updated as models were added to this roster. The
 strongest open-vocabulary detectors available now are **API-only**, which puts
-them in Gemini's category rather than the open-weights one: **DINO-X Pro**
-(59.8 AP LVIS-minival) and **Grounding DINO 1.5/1.6 Pro** (55.7 AP) both
-substantially exceed the `grounding-dino-base` checkpoint tested here. Using
-them would cost money per run and make the row non-reproducible without a key.
+them in Gemini's category rather than the open-weights one. **GPT-6 Astra**
+(added 2026-09-25) makes that concrete: it is now a row in the table above, in
+that same billed-API category, and it leads the whole comparison — the cost is a
+per-image bill and a hand-tuned prompt disclosed on the row. Others in this class
+remain uncovered: **DINO-X Pro** (59.8 AP LVIS-minival) and **Grounding DINO
+1.5/1.6 Pro** (55.7 AP) both substantially exceed the `grounding-dino-base`
+checkpoint tested here. Using any of them costs money per run and makes the row
+non-reproducible without a key.
 
 Three open-weights gaps this section used to flag are now closed: **YOLO-World**
 (added 2026-08-01), **LLMDet-large** and **Qwen3-VL-8B** (both 2026-08-19) are
@@ -667,8 +757,14 @@ how open-vocabulary pre-training generalises to a domain: it transfers the
 classes it already knows (`player`), degrades on the ones that need fine spatial
 resolution or in-domain semantics (`ball`, `referee`), and collapses on the
 small, domain-specific object it was never really trained to find (`rim`).
-Fine-tuning closes exactly those gaps, which is why the fine-tuned detectors
-clear the zero-shot ceiling by such a wide margin.
+Fine-tuning closes exactly those gaps, which is why the *open-weights* zero-shot
+detectors sit well below the fine-tuned ceiling. The GPT-6 Astra rows are the
+exception that sharpens the rule: a frontier API closes most of the gap
+(0.501 vs the weakest fine-tuned 0.581), and simply zooming in to re-detect the
+rim — the class the pattern above says should be hopeless — closes the rest
+(crop-refine 0.588). What is left is not a capability ceiling on zero-shot
+detection but a deployment trade: offline weights and zero per-image cost on one
+side, a per-image API bill and the best available accuracy on the other.
 
 LLMDet-large is the one partial exception to "degrades on domain-specific
 semantics": at 0.571 on `number`, more than double every other model's best
@@ -688,7 +784,11 @@ enough to re-run the whole exercise rather than mechanically swap "six" for
 dominated. The adoption rule below was fixed in
 `nimbalyst-local/plans/vlm-fusion-eight-models.md` before any eight-model
 fusion number existed. Where a finding carried over unchanged from the
-six-model round, that is stated explicitly; where it didn't, that is too.*
+six-model round, that is stated explicitly; where it didn't, that is too.
+GPT-6 Astra (added 2026-09-25) postdates this fusion work and is **not** part of
+it — every "eight" in this section is the eight open-weights-and-Gemini rows.
+Fusing a model that already scores 0.501 alone, and whose licence and per-image
+cost differ from the rest, is a separate question left for future work.*
 
 Every number above scores one model running one forward pass. This section asks
 a different question — what happens if you run all eight and merge their
@@ -993,10 +1093,59 @@ essentially unchanged.
 Against the fine-tuned detectors in
 [FINAL_COMPARISON_640.md](FINAL_COMPARISON_640.md), the ensemble narrows the gap
 to the lowest-ranked row (RT-DETRv2-M, 0.581) from the six-model round's
-**1.43×** to **1.33×**. That is the closest zero-shot has come in this
-project, and it still is not close: it costs eight forward passes to get
-there, and `rim` is still effectively zero (0.001-0.012 across all eight
-models).
+**1.43×** to **1.33×**. That was the closest zero-shot had come in this project
+*when this section was written*, and it cost eight forward passes to get there.
+
+> **Superseded 2026-09-25 by a single model.** GPT-6 Astra alone scores **0.501**
+> on this same test split — **+0.064 over the entire eight-model fusion's
+> 0.437**, in *one* forward pass rather than eight, and without the ensemble's
+> ~1,500-box speculative tail. Its zero-shot crop-refine variant reaches
+> **0.588**, +0.151 over the fusion and fractionally past RT-DETRv2-M (0.581),
+> so the "closest zero-shot has come" and "rim is effectively zero across all
+> eight" claims above both belong to the pre-Astra roster: Astra takes `rim` to
+> 0.52 alone and 0.95 with crop-refine. One caveat keeps this from being a
+> completely clean knockout: Astra is a billed API — but so is Gemini, which is
+> *already inside* this fusion, so the ensemble was never key-free either. The
+> fusion's other apparent edge — **recall at 95% precision**, the labeling-quality
+> operating point this section cares most about — turned out not to be one.
+> Measured the same way (a confidence sweep on the committed `astra.json`, which
+> reproduces every per-model number in the fusion tables exactly), a single Astra
+> call reaches **0.908** against the ensemble's **0.582**, and the few-shot
+> variant **0.951**. Astra emits a real, varied confidence, so it *has* an
+> operating point — and it dominates there too. One wrinkle worth stating:
+> crop-refine, which wins on mAP, slightly *lowers* recall@95 (0.908 → 0.882),
+> because its extra ball/rim crop boxes add a few low-confidence detections that
+> cost precision — so the right Astra config is objective-dependent (crop-refine
+> for mAP, base or few-shot for labeling). The auto-labeling question is now
+> settled too, in Astra's favour.
+
+**Astra-anchored greedy fusion (2026-09-29).** If Astra alone already beats the
+old ensemble, does fusing *anything* onto Astra help? A forward-greedy sweep —
+start from {astra}, add the single model that most improves test mAP@50:95 each
+round (`scripts/fuse_astra_greedy.py`, WBF, on the committed dumps, no API/GPU) —
+answers yes for mAP and no for labeling:
+
+| step | combo | mAP@50:95 | Δ | recall@95% |
+| --- | --- | --- | --- | --- |
+| base | astra (via WBF) | 0.496 | — | **0.898** |
+| +1 | + LLMDet | 0.538 | **+0.042** | 0.804 |
+| +2 | + OWLv2 | **0.546** | +0.008 | 0.779 |
+| +3 | + YOLO-World | 0.546 | +0.000 | 0.647 |
+| +4… | + Grounding-DINO, OmDet, Gemini, Qwen3-VL, Florence-2 | declines | − | ↓ |
+
+**LLMDet is the one model that genuinely complements Astra** (+0.042 — it is the
+strongest open-weights row and adds `referee`/`number` mass where Astra is
+merely good, not perfect); OWLv2 adds a little more; everything after is noise or
+harm. But the peak, **Astra+LLMDet+OWLv2 ≈ 0.546, still sits below the fine-tuned
+floor (RT-DETRv2-M 0.581) and below single-model Astra+crop-refine (0.588)** — so
+combining zero-shot detectors gets *closer* to a fine-tuned detector than any
+open-weights fusion did, but does not reach it, and does not beat one good Astra
+pipeline. And on the **auto-labeling axis it strictly hurts**: recall@95%
+peaks at astra-alone (0.898) and every model added lowers it, because WBF averages
+in weaker boxes. The agreement-rescore operator is weaker still here (peak
+Astra+OWLv2+OmDet 0.508). Net: **the cheapest route to fine-tuned-level accuracy is
+one Astra crop-refine pass, not an ensemble.** Full curves:
+`results/vlm/fusion/astra_greedy_{test,agree_test}.json`.
 
 The per-model rows above come from the same dumps the test table earlier in this
 report renders, through the same scorer, so the two cannot disagree without one

@@ -79,6 +79,71 @@ models:
     # dump, not from this value.
     expected_map5095: 0.250
 
+  # GPT-6 Astra (OpenAI, added 2026-09-25). A NEW model with no prior published
+  # number -- expected_map5095 is deliberately null (VLM-02 informational-only
+  # mode), not a target to reproduce.
+  #
+  # SECOND BILLED-API ROW, and treated exactly like Gemini's: a hosted model
+  # reached over an API (`gpt-6-astra`), steered by a free-text instruction, not
+  # a class-vocabulary detector. So it is EXCLUDED from the equal-effort search
+  # (vlm_prompt_search.yaml) for the same two reasons Gemini is -- its input is a
+  # free-text prompt, and sweeping it costs money per image -- and instead gets a
+  # DISCLOSED, bespoke, hand-tuned prompt. No torch/GPU: pure API call (see
+  # inference/vlm/astra.py). reasoning_effort is Astra's accuracy/cost lever
+  # (low/medium/high/xhigh/max), stated on the row so the published effort is
+  # explicit.
+  #
+  # PROMPT + EFFORT EXPLORATION (2026-09-25, on the rented API runner, val split,
+  # scripts/explore_astra_prompts.py; full results in
+  # results/vlm/prompt_search/astra_explore.json). SIX hand-written candidates at
+  # low effort, full 96-image val:
+  #   c_gemini_style            0.4850  (winner) rim 0.62
+  #   c_bare_canonical          0.4617           rim 0.50
+  #   c_reasoning_exclusion     0.4610           rim 0.00
+  #   c_small_object_reasoning  0.4585           rim 0.00
+  #   c_small_object            0.4476           rim 0.00
+  #   c_domain                  0.4422           rim 0.00
+  # The single load-bearing lesson: Astra needs the LITERAL label "rim" -- every
+  # candidate phrasing it as "basketball hoop..." collapsed rim to EXACTLY 0.000,
+  # the opposite of what "name the structure" did for OWLv2/Qwen3-VL. The winning
+  # prompt is the same per-class-definition + count-cap instruction Gemini's row
+  # uses, on canonical labels.
+  #
+  # EFFORT A/B (2026-09-25, val, winning prompt): low 0.4850 vs medium 0.4844 --
+  # a tie on mAP@50:95 (medium is +0.008 on mAP@50 / +0.02 rim but fractionally
+  # LOWER on the headline metric), at ~2x the cost and latency. LOW is published:
+  # same accuracy, half the spend -- consistent with the "high barely helps"
+  # finding in OpenAI/Roboflow's own Astra evals. (high/xhigh/max were out of
+  # scope by decision; low+medium only.)
+  #
+  # See results/vlm/astra.json for the committed test prediction dump the
+  # published test number is computed from.
+  - name: astra
+    inferencer: astra
+    model_name: gpt-6-astra
+    classes:
+      - player
+      - ball
+      - referee
+      - rim
+      - number
+    reasoning_effort: low
+    prompt_template: >
+      Detect all basketball players, referees, the rim, the basketball, and
+      visible jersey numbers in this basketball game image.
+      Constraints:
+      - At most 10 players, 3 referees, 1 rim, and 1 ball per image.
+      - Each person gets exactly ONE bounding box with the most specific label.
+      Use EXACTLY these labels:
+      - "player" for any basketball player on the court
+      - "referee" for game officials
+      - "ball" for the basketball (only when NOT going through the rim)
+      - "rim" for the basketball hoop rim
+      - "number" for visible jersey numbers (tight box around the digits only)
+      Return each box as (x_min, y_min, x_max, y_max) integers in a 0-1000
+      normalised coordinate system and a confidence in [0, 1].
+    expected_map5095: null
+
   # ABLATION (2026-08-04). 2x2 overlapping tiles plus the full frame, and NMS
   # re-tuned INSIDE that regime. val 0.2400 -> 0.2879.
   #

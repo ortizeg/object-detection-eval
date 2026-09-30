@@ -63,6 +63,9 @@ class LLMDetInferencer(BaseInferencer):
         box_threshold: float = 0.01,
         text_threshold: float = 0.25,
         nms_iou_threshold: float = 0.5,
+        image_shortest_edge: int | None = None,
+        image_longest_edge: int | None = None,
+        torch_dtype: str = "float32",
         device: str = "auto",
     ) -> None:
         self.model_name = model_name
@@ -70,6 +73,25 @@ class LLMDetInferencer(BaseInferencer):
         self.box_threshold = box_threshold
         self.text_threshold = text_threshold
         self.nms_iou_threshold = nms_iou_threshold
+        #: Resolution lever (analogous to Qwen3-VL's min_pixels/max_pixels). The
+        #: mm-grounding-dino image processor resizes so the shortest side hits
+        #: ``shortest_edge`` (capped at ``longest_edge``); the checkpoint default
+        #: (~800/1333) DOWNSCALES this dataset's 1920x1080 frames, starving a
+        #: small `rim`/`ball` of pixels. Raising these upscales instead. ``None``
+        #: leaves the checkpoint default untouched.
+        self.image_shortest_edge = image_shortest_edge
+        self.image_longest_edge = image_longest_edge
+        #: Reduced-precision AUTOCAST dtype (weights stay float32; only the
+        #: forward-pass activations are cast). This is what lets the upscaled
+        #: resolution above fit on a 24 GB GPU without the fp32 OOM, while
+        #: side-stepping the mixed-dtype errors that loading the whole
+        #: grounding-dino-family model in bf16 triggers. ``None`` (the default,
+        #: float32) preserves the published row's behaviour exactly.
+        self._autocast_dtype: torch.dtype | None = {
+            "float32": None,
+            "float16": torch.float16,
+            "bfloat16": torch.bfloat16,
+        }[torch_dtype]
 
         # Build normalised lookup: lower-cased class name -> class index
         self._name_to_id: dict[str, int] = {
@@ -92,6 +114,17 @@ class LLMDetInferencer(BaseInferencer):
 
         logger.info(f"Loading LLMDet model {model_name} on {self._device}")
         self._processor = AutoProcessor.from_pretrained(model_name)
+        # Resolution override: force up/down-scaling by editing the image
+        # processor's size dict (the documented way, mirroring Qwen3-VL). Only
+        # the keys the caller supplied are changed; the rest keep their default.
+        if self.image_shortest_edge is not None or self.image_longest_edge is not None:
+            size = dict(self._processor.image_processor.size)
+            if self.image_shortest_edge is not None:
+                size["shortest_edge"] = self.image_shortest_edge
+            if self.image_longest_edge is not None:
+                size["longest_edge"] = self.image_longest_edge
+            self._processor.image_processor.size = size
+            logger.info(f"LLMDet image processor size overridden to {size}")
         self._model = AutoModelForZeroShotObjectDetection.from_pretrained(
             model_name,
             torch_dtype=torch.float32,
@@ -119,7 +152,11 @@ class LLMDetInferencer(BaseInferencer):
             ).to(self._device)
 
             with torch.no_grad():
-                outputs = self._model(**inputs)
+                if self._autocast_dtype is not None and self._device == "cuda":
+                    with torch.autocast(device_type="cuda", dtype=self._autocast_dtype):
+                        outputs = self._model(**inputs)
+                else:
+                    outputs = self._model(**inputs)
 
             results = self._processor.post_process_grounded_object_detection(
                 outputs,

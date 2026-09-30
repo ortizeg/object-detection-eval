@@ -1,0 +1,389 @@
+{
+  "method": "wbf",
+  "iou": 0.5,
+  "greedy_path": [
+    {
+      "added": "astra",
+      "combo": [
+        "astra"
+      ],
+      "mAP_50_95": 0.4963443875312805,
+      "mAP_50": 0.8193998336791992,
+      "recall_at_p95": 0.898
+    },
+    {
+      "added": "llmdet",
+      "combo": [
+        "astra",
+        "llmdet"
+      ],
+      "mAP_50_95": 0.538038432598114,
+      "mAP_50": 0.8224642276763916,
+      "recall_at_p95": 0.804
+    },
+    {
+      "added": "owlv2",
+      "combo": [
+        "astra",
+        "llmdet",
+        "owlv2"
+      ],
+      "mAP_50_95": 0.5458937287330627,
+      "mAP_50": 0.817179262638092,
+      "recall_at_p95": 0.779
+    },
+    {
+      "added": "yolo_world",
+      "combo": [
+        "astra",
+        "llmdet",
+        "owlv2",
+        "yolo_world"
+      ],
+      "mAP_50_95": 0.5462271571159363,
+      "mAP_50": 0.8117377161979675,
+      "recall_at_p95": 0.647
+    },
+    {
+      "added": "grounding_dino",
+      "combo": [
+        "astra",
+        "llmdet",
+        "owlv2",
+        "yolo_world",
+        "grounding_dino"
+      ],
+      "mAP_50_95": 0.545620322227478,
+      "mAP_50": 0.8050556182861328,
+      "recall_at_p95": 0.638
+    },
+    {
+      "added": "omdet_turbo",
+      "combo": [
+        "astra",
+        "llmdet",
+        "owlv2",
+        "yolo_world",
+        "grounding_dino",
+        "omdet_turbo"
+      ],
+      "mAP_50_95": 0.5390890836715698,
+      "mAP_50": 0.798019528388977,
+      "recall_at_p95": 0.604
+    },
+    {
+      "added": "gemini",
+      "combo": [
+        "astra",
+        "llmdet",
+        "owlv2",
+        "yolo_world",
+        "grounding_dino",
+        "omdet_turbo",
+        "gemini"
+      ],
+      "mAP_50_95": 0.5132617354393005,
+      "mAP_50": 0.7674034833908081,
+      "recall_at_p95": 0.675
+    },
+    {
+      "added": "qwen3_vl",
+      "combo": [
+        "astra",
+        "llmdet",
+        "owlv2",
+        "yolo_world",
+        "grounding_dino",
+        "omdet_turbo",
+        "gemini",
+        "qwen3_vl"
+      ],
+      "mAP_50_95": 0.5028901100158691,
+      "mAP_50": 0.735458493232727,
+      "recall_at_p95": 0.726
+    },
+    {
+      "added": "florence2",
+      "combo": [
+        "astra",
+        "llmdet",
+        "owlv2",
+        "yolo_world",
+        "grounding_dino",
+        "omdet_turbo",
+        "gemini",
+        "qwen3_vl",
+        "florence2"
+      ],
+      "mAP_50_95": 0.4914306104183197,
+      "mAP_50": 0.7144319415092468,
+      "recall_at_p95": 0.659
+    }
+  ],
+  "rounds": [
+    {
+      "from": [
+        "astra"
+      ],
+      "trials": [
+        {
+          "add": "llmdet",
+          "mAP_50_95": 0.538,
+          "recall_at_p95": 0.804
+        },
+        {
+          "add": "owlv2",
+          "mAP_50_95": 0.5298,
+          "recall_at_p95": 0.812
+        },
+        {
+          "add": "yolo_world",
+          "mAP_50_95": 0.5133,
+          "recall_at_p95": 0.847
+        },
+        {
+          "add": "grounding_dino",
+          "mAP_50_95": 0.5118,
+          "recall_at_p95": 0.867
+        },
+        {
+          "add": "omdet_turbo",
+          "mAP_50_95": 0.4994,
+          "recall_at_p95": 0.836
+        },
+        {
+          "add": "qwen3_vl",
+          "mAP_50_95": 0.4749,
+          "recall_at_p95": 0.749
+        },
+        {
+          "add": "florence2",
+          "mAP_50_95": 0.4534,
+          "recall_at_p95": 0.583
+        },
+        {
+          "add": "gemini",
+          "mAP_50_95": 0.446,
+          "recall_at_p95": 0.659
+        }
+      ]
+    },
+    {
+      "from": [
+        "astra",
+        "llmdet"
+      ],
+      "trials": [
+        {
+          "add": "owlv2",
+          "mAP_50_95": 0.5459,
+          "recall_at_p95": 0.779
+        },
+        {
+          "add": "yolo_world",
+          "mAP_50_95": 0.5409,
+          "recall_at_p95": 0.78
+        },
+        {
+          "add": "grounding_dino",
+          "mAP_50_95": 0.5398,
+          "recall_at_p95": 0.811
+        },
+        {
+          "add": "omdet_turbo",
+          "mAP_50_95": 0.534,
+          "recall_at_p95": 0.803
+        },
+        {
+          "add": "qwen3_vl",
+          "mAP_50_95": 0.5109,
+          "recall_at_p95": 0.75
+        },
+        {
+          "add": "gemini",
+          "mAP_50_95": 0.4961,
+          "recall_at_p95": 0.768
+        },
+        {
+          "add": "florence2",
+          "mAP_50_95": 0.4935,
+          "recall_at_p95": 0.606
+        }
+      ]
+    },
+    {
+      "from": [
+        "astra",
+        "llmdet",
+        "owlv2"
+      ],
+      "trials": [
+        {
+          "add": "yolo_world",
+          "mAP_50_95": 0.5462,
+          "recall_at_p95": 0.647
+        },
+        {
+          "add": "grounding_dino",
+          "mAP_50_95": 0.545,
+          "recall_at_p95": 0.728
+        },
+        {
+          "add": "omdet_turbo",
+          "mAP_50_95": 0.5423,
+          "recall_at_p95": 0.742
+        },
+        {
+          "add": "qwen3_vl",
+          "mAP_50_95": 0.5203,
+          "recall_at_p95": 0.732
+        },
+        {
+          "add": "florence2",
+          "mAP_50_95": 0.5137,
+          "recall_at_p95": 0.617
+        },
+        {
+          "add": "gemini",
+          "mAP_50_95": 0.5121,
+          "recall_at_p95": 0.782
+        }
+      ]
+    },
+    {
+      "from": [
+        "astra",
+        "llmdet",
+        "owlv2",
+        "yolo_world"
+      ],
+      "trials": [
+        {
+          "add": "grounding_dino",
+          "mAP_50_95": 0.5456,
+          "recall_at_p95": 0.638
+        },
+        {
+          "add": "omdet_turbo",
+          "mAP_50_95": 0.5433,
+          "recall_at_p95": 0.622
+        },
+        {
+          "add": "qwen3_vl",
+          "mAP_50_95": 0.5214,
+          "recall_at_p95": 0.732
+        },
+        {
+          "add": "florence2",
+          "mAP_50_95": 0.5155,
+          "recall_at_p95": 0.624
+        },
+        {
+          "add": "gemini",
+          "mAP_50_95": 0.5135,
+          "recall_at_p95": 0.723
+        }
+      ]
+    },
+    {
+      "from": [
+        "astra",
+        "llmdet",
+        "owlv2",
+        "yolo_world",
+        "grounding_dino"
+      ],
+      "trials": [
+        {
+          "add": "omdet_turbo",
+          "mAP_50_95": 0.5391,
+          "recall_at_p95": 0.604
+        },
+        {
+          "add": "qwen3_vl",
+          "mAP_50_95": 0.5181,
+          "recall_at_p95": 0.737
+        },
+        {
+          "add": "gemini",
+          "mAP_50_95": 0.5151,
+          "recall_at_p95": 0.66
+        },
+        {
+          "add": "florence2",
+          "mAP_50_95": 0.5127,
+          "recall_at_p95": 0.615
+        }
+      ]
+    },
+    {
+      "from": [
+        "astra",
+        "llmdet",
+        "owlv2",
+        "yolo_world",
+        "grounding_dino",
+        "omdet_turbo"
+      ],
+      "trials": [
+        {
+          "add": "gemini",
+          "mAP_50_95": 0.5133,
+          "recall_at_p95": 0.675
+        },
+        {
+          "add": "qwen3_vl",
+          "mAP_50_95": 0.5124,
+          "recall_at_p95": 0.724
+        },
+        {
+          "add": "florence2",
+          "mAP_50_95": 0.5067,
+          "recall_at_p95": 0.599
+        }
+      ]
+    },
+    {
+      "from": [
+        "astra",
+        "llmdet",
+        "owlv2",
+        "yolo_world",
+        "grounding_dino",
+        "omdet_turbo",
+        "gemini"
+      ],
+      "trials": [
+        {
+          "add": "qwen3_vl",
+          "mAP_50_95": 0.5029,
+          "recall_at_p95": 0.726
+        },
+        {
+          "add": "florence2",
+          "mAP_50_95": 0.4974,
+          "recall_at_p95": 0.653
+        }
+      ]
+    },
+    {
+      "from": [
+        "astra",
+        "llmdet",
+        "owlv2",
+        "yolo_world",
+        "grounding_dino",
+        "omdet_turbo",
+        "gemini",
+        "qwen3_vl"
+      ],
+      "trials": [
+        {
+          "add": "florence2",
+          "mAP_50_95": 0.4914,
+          "recall_at_p95": 0.659
+        }
+      ]
+    }
+  ]
+}
