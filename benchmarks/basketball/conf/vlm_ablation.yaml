@@ -604,6 +604,108 @@ elements:
       - gemini-3.6-flash
       - gemini-robotics-er-2-preview
 
+  # 2026-10 REFRESH (docs/plans/gemini-refresh-2026-10.md). Models released
+  # since the August sweep, on the published prompt. `gemini-pro-latest` was
+  # re-resolved and still serves gemini-3.1-pro-preview (the published row), so
+  # there is no newer Pro to try; `gemini-flash-latest` serves 3.8-flash.
+  # `gemini-omni-1.1-flash` is listed on the key but rejects generate_content
+  # ("400 INVALID_ARGUMENT: This model only supports Interactions API"), so it
+  # cannot run through this inferencer; not an arm.
+  - name: model_2026_10
+    knob: model_name
+    applies_to: [gemini]
+    values:
+      - gemini-3.8-flash
+      - gemini-3.7-flash
+
+  # 2026-10 REFRESH, ROUND 2 -- prompt shape on the new Flash models. Each
+  # element changes ONE thing off the published prompt, pinned to one model
+  # (both Flash models run, because their Round-1 gap is inside the noise).
+  #
+  # box_2d: Google's documented native detection format,
+  # `box_2d: [ymin, xmin, ymax, xmax]` on 0-1000, as both the response schema
+  # and one appended sentence naming the order. The published row instead uses
+  # named x_min..y_max fields, chosen in July to stop xywh/xyxy confusion.
+  # image_first: image part before the text part.
+  # no_caps: the August cap-free prompt (a null on Pro), re-checked on Flash.
+  # noise: identical re-draws of the Round-1 arm -- Flash's own run-to-run
+  # spread, which is the bar every other delta here has to clear.
+  - name: box2d_38
+    knob: gemini_box_format
+    applies_to: [gemini]
+    fixed:
+      model_name: gemini-3.8-flash
+      prompt_template: |
+        Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - At most 10 players, 3 referees, 1 rim, and 1 ball per image. - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - "player" for any basketball player on the court - "referee" for game officials - "ball" for the basketball (only when NOT going through the rim) - "rim" for the basketball hoop rim - "number" for visible jersey numbers (tight box around the digits only) Return each box as box_2d [ymin, xmin, ymax, xmax] normalized to 0-1000.
+    values: [box_2d]
+
+  # box_2d was the only Round-2 arm positive on BOTH models, and on 3.8 its
+  # mAP@50 sat above all three baseline draws -- one draw cannot separate that
+  # from Flash's sd 0.011, so it gets the same three draws the baseline got.
+  - name: box2d_38_noise
+    knob: sample
+    applies_to: [gemini]
+    fixed:
+      gemini_box_format: box_2d
+      model_name: gemini-3.8-flash
+      prompt_template: |
+        Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - At most 10 players, 3 referees, 1 rim, and 1 ball per image. - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - "player" for any basketball player on the court - "referee" for game officials - "ball" for the basketball (only when NOT going through the rim) - "rim" for the basketball hoop rim - "number" for visible jersey numbers (tight box around the digits only) Return each box as box_2d [ymin, xmin, ymax, xmax] normalized to 0-1000.
+    values: [1, 2]
+
+  - name: image_first_38
+    knob: gemini_image_first
+    applies_to: [gemini]
+    fixed:
+      model_name: gemini-3.8-flash
+    values: [true]
+
+  - name: no_caps_38
+    knob: prompt_template
+    applies_to: [gemini]
+    fixed:
+      model_name: gemini-3.8-flash
+    values:
+      - |
+        Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - "player" for any basketball player on the court - "referee" for game officials - "ball" for the basketball (only when NOT going through the rim) - "rim" for the basketball hoop rim - "number" for visible jersey numbers (tight box around the digits only)
+
+  - name: noise_38
+    knob: sample
+    applies_to: [gemini]
+    fixed:
+      model_name: gemini-3.8-flash
+    values: [1, 2]
+  - name: box2d_37
+    knob: gemini_box_format
+    applies_to: [gemini]
+    fixed:
+      model_name: gemini-3.7-flash
+      prompt_template: |
+        Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - At most 10 players, 3 referees, 1 rim, and 1 ball per image. - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - "player" for any basketball player on the court - "referee" for game officials - "ball" for the basketball (only when NOT going through the rim) - "rim" for the basketball hoop rim - "number" for visible jersey numbers (tight box around the digits only) Return each box as box_2d [ymin, xmin, ymax, xmax] normalized to 0-1000.
+    values: [box_2d]
+
+  - name: image_first_37
+    knob: gemini_image_first
+    applies_to: [gemini]
+    fixed:
+      model_name: gemini-3.7-flash
+    values: [true]
+
+  - name: no_caps_37
+    knob: prompt_template
+    applies_to: [gemini]
+    fixed:
+      model_name: gemini-3.7-flash
+    values:
+      - |
+        Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - "player" for any basketball player on the court - "referee" for game officials - "ball" for the basketball (only when NOT going through the rim) - "rim" for the basketball hoop rim - "number" for visible jersey numbers (tight box around the digits only)
+
+  - name: noise_37
+    knob: sample
+    applies_to: [gemini]
+    fixed:
+      model_name: gemini-3.7-flash
+    values: [1, 2]
+
   # ROUND 2 -- 2x2 overlapping tiles plus the full frame.
   #
   # The biggest lever for every open-weights model that took it (+0.026 to

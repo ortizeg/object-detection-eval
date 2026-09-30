@@ -116,6 +116,11 @@ class Arm(BaseModel, frozen=True):
     #: Gemini only: the free-text instruction it is steered by. Its analogue of
     #: the class vocabulary the open-weights models receive.
     prompt_template: str | None = None
+    #: Gemini only: response box schema (``named_xyxy`` published, ``box_2d``
+    #: Google's native ``[ymin, xmin, ymax, xmax]``) and content order. Both
+    #: change what the model is asked, so both are forward-pass signature.
+    gemini_box_format: str = "named_xyxy"
+    gemini_image_first: bool = False
     #: Which independent draw this arm is. Changes nothing about the
     #: configuration and everything about the cache key, so a generative model
     #: can be run twice under identical settings to measure its own
@@ -199,6 +204,12 @@ class Arm(BaseModel, frozen=True):
             f"prompt{hashlib.sha256((self.prompt_template or '-').encode()).hexdigest()[:8]}",
             f"sample{self.sample}",
         ]
+        # Appended only when off-default, so every arm cached before these knobs
+        # existed keeps its signature and its cache.
+        if self.gemini_box_format != "named_xyxy":
+            parts.append(f"fmt{self.gemini_box_format}")
+        if self.gemini_image_first:
+            parts.append("imgfirst")
         if not self.replayable:
             parts += [f"box{self.box_threshold}", f"nms{self.nms_iou_threshold}"]
         return "__".join(parts).replace("/", "_").replace(" ", "-")
@@ -540,6 +551,8 @@ def build_inferencer(arm: Arm, *, raw_mode: bool) -> Any:
             model_name=arm.model_name,
             classes=arm.classes,
             prompt_template=arm.prompt_template,
+            box_format=arm.gemini_box_format,  # type: ignore[arg-type]
+            image_first=arm.gemini_image_first,
         )
     if arm.inferencer == "qwen3_vl":
         from object_detection_eval.inference.vlm.qwen3_vl import Qwen3VLInferencer

@@ -349,3 +349,52 @@ def test_headline_ignores_published_fields_the_ablation_schema_does_not_track(
     table = ablation_headline_table(log, published)
     assert "0.234" in table
     assert "none — baseline beat every arm tried" not in table
+
+
+def test_headline_averages_repeat_draws_instead_of_taking_the_best(tmp_path: Path) -> None:
+    """A generative model's repeat draws are one configuration.
+
+    Reporting the best of three draws would publish the max over the model's
+    own noise, and "repeat draw 2" would read as a change that was kept. Both
+    sides of the delta are the mean over their draws; `sample` is never listed.
+    """
+    base_cfg = {"model_name": "pro", "sample": 0}
+    new_cfg = {"model_name": "flash", "gemini_box_format": "box_2d"}
+    log = load_ablation_log(
+        _write_log(
+            tmp_path / "valid_arms.json",
+            [
+                _arm("gemini__baseline", "gemini", "baseline", 0.250, base_cfg),
+                # An older row written before `gemini_box_format` existed: an
+                # absent key is the default, so this is still a baseline draw.
+                _arm(
+                    "gemini__noise__1",
+                    "gemini",
+                    "noise",
+                    0.260,
+                    {"model_name": "pro", "sample": 1},
+                    baseline="gemini__baseline",
+                    delta=0.010,
+                ),
+                *(
+                    _arm(
+                        f"gemini__flash__{i}",
+                        "gemini",
+                        "flash",
+                        score,
+                        {**new_cfg, "sample": i},
+                        baseline="gemini__baseline",
+                        delta=score - 0.250,
+                    )
+                    for i, score in enumerate((0.300, 0.330, 0.310))
+                ),
+            ],
+        )
+    )
+    table = ablation_headline_table(log, {"gemini": new_cfg})
+    row = next(line for line in table.splitlines() if line.startswith("| gemini"))
+    assert "0.255" in row  # (0.250 + 0.260) / 2
+    assert "**0.313**" in row  # mean of 0.300 / 0.330 / 0.310, not the best draw
+    assert "0.330" not in row
+    assert "repeat draw" not in row
+    assert "mean of 2 vs 3 draws" in row

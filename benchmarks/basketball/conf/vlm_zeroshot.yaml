@@ -47,9 +47,31 @@
 tolerance: 0.02
 
 models:
+  # 2026-10 REFRESH (docs/plans/gemini-refresh-2026-10.md). Model and box
+  # format changed; the instruction text is the July prompt plus one sentence
+  # naming the coordinate order.
+  #
+  # MODEL: gemini-3.1-pro-preview -> gemini-3.8-flash. Val mAP@50:95 0.2555 ->
+  # 0.3198 (three-draw mean), about 0.06, with gains on every class (`rim` AP50
+  # 0.013 -> 0.13-0.18). gemini-3.7-flash ties it (0.3173). 3.8 is published
+  # because it is the newest model (`gemini-flash-latest` serves it) and is GA,
+  # which also retires the preview-pin risk the August survey flagged.
+  # `gemini-pro-latest` still serves 3.1-pro-preview, so there is no newer Pro.
+  #
+  # BOX FORMAT: box_2d, Google's documented native `[ymin, xmin, ymax, xmax]`
+  # array, replacing the named x_min..y_max fields chosen in July. Three draws
+  # each on 3.8-flash, val: 0.3282 (sd 0.0007) vs 0.3198 (sd 0.0110). The +0.008
+  # on mAP@50:95 is inside the noise and is NOT claimed as a gain. Adopted
+  # because two things do separate: `number` AP50 (every box_2d draw 0.33-0.36
+  # vs every named-field draw 0.26-0.30) and draw-to-draw spread, 15x tighter.
+  # The second matters for a row whose number is one draw of a generative model.
+  #
+  # Image-first ordering and the cap-free prompt were also tried on both Flash
+  # models. Both changed sign between models, i.e. noise, and neither was adopted.
   - name: gemini
     inferencer: gemini
-    model_name: gemini-3.1-pro-preview
+    model_name: gemini-3.8-flash
+    gemini_box_format: box_2d
     classes:
       - ball
       - number
@@ -68,6 +90,7 @@ models:
       - "ball" for the basketball (only when NOT going through the rim)
       - "rim" for the basketball hoop rim
       - "number" for visible jersey numbers (tight box around the digits only)
+      Return each box as box_2d [ymin, xmin, ymax, xmax] normalized to 0-1000.
     # 0.250, not the 0.265 this line carried from Phase 5 until 2026-08-07.
     # `results/vlm/gemini.json` -- the dump every published Gemini number is
     # computed from, and which no later work re-ran -- scores 0.2497. The stale
@@ -77,7 +100,11 @@ models:
     # real regression and could have failed a legitimate re-run in the other
     # direction. The published report was always correct: it renders from the
     # dump, not from this value.
-    expected_map5095: 0.250
+    #
+    # 2026-10: the 0.250 above described the gemini-3.1-pro-preview row. This
+    # row is a new configuration. Its single test run (2026-10-12) measured
+    # 0.3258 (mAP@50 0.5084 per results/vlm/gemini.json); the target is set from it.
+    expected_map5095: 0.326
 
   # GPT-6 Astra (OpenAI, added 2026-09-25). A NEW model with no prior published
   # number -- expected_map5095 is deliberately null (VLM-02 informational-only
