@@ -440,6 +440,11 @@ ceiling on those classes and prompting for "more" adds bench/crowd false
 positives — the same over-enumeration Qwen3-VL shows.) Net: the small-object
 classes both respond to zooming (`rim` 0.52→0.95 via crop-refine, `number`
 0.86→0.90 via per-player crop); the near-ceiling classes do not want extra prompting.
+Because the two zoom passes touch disjoint classes, stacking them is projected to
+**~0.594** test mAP@50:95 (rim 0.95 + number 0.90), edging crop-refine's 0.588 —
+an *estimate* spliced from the two committed dumps (crop-refine for every class
+except `number`, number-crop for `number`), not a full end-to-end run, which was
+judged not worth the extra ~12 API calls/image for a projected +0.006.
 
 One further idea was tried and **did not work, recorded here because the negative
 is informative**: a *self-prompt recall pass* — draw pass 1's confident

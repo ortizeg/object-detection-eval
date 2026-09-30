@@ -104,6 +104,18 @@ pattern: **both small classes respond to zooming** — rim via crop-refine
 classes (player/referee) do not benefit from extra prompting (the self-prompt
 negative above).
 
+**Stacking crop-refine + number-crop (estimate, not a real run): ~0.594 test
+mAP@50:95 — the projected best config.** The two passes touch disjoint classes
+(ball/rim vs number), so grafting number-crop's `number` boxes onto the
+crop-refine run (all other classes from crop-refine) estimates the combined
+pipeline: rim 0.952 + number 0.900 → **0.5936**, edging crop-refine's 0.5878 by
+~+0.006. It is a *splice* of two independently-run dumps (different non-det Astra
+base passes), reproducible from `astra_crop_refine_test.json` +
+`astra_base_numcrop_test.json` (crop-refine dets for class≠number ∪ number-crop
+dets for class=number, scored via `compute_metrics`); a true end-to-end
+`--crop-refine --number-crop` run (~12 API calls/image) was judged not worth ~$50
+for a projected +0.006. Treated as an estimate, not a published number.
+
 ## Cross-model note
 
 The resolution lever that helped Qwen3-VL was also tried on **LLMDet** (not Astra):
