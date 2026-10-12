@@ -64,6 +64,7 @@ from object_detection_eval.data.coco_gt import load_coco_gt
 from object_detection_eval.data.image import ImageLoader
 from object_detection_eval.data.taxonomy import resolve_taxonomy
 from object_detection_eval.inference.vlm.ablation import CACHE_FLOOR_THRESHOLD, replay
+from object_detection_eval.inference.vlm.anchor_crop import AnchorCropConfig
 from object_detection_eval.inference.vlm.filters import DEFAULT_SINGLETON_TOP_K
 from object_detection_eval.metrics.detection_map import compute_metrics
 from object_detection_eval.schemas.detection import BoundingBox, Detection
@@ -141,6 +142,11 @@ class Arm(BaseModel, frozen=True):
     #: YOLOE only: class -> phrases averaged into that class's text embedding.
     #: Part of the forward-pass signature, since it changes what the model sees.
     prompt_ensembles: dict[str, list[str]] | None = None
+    #: YOLOE only: class-agnostic NMS; ``None`` keeps the ultralytics default.
+    agnostic_nms: bool | None = None
+    #: YOLOE only: crop-and-re-detect second pass (e.g. ``number`` inside each
+    #: ``player`` box). ``None`` = one full-frame pass.
+    anchor_crop: AnchorCropConfig | None = None
     #: Inference resolution, where the backend exposes one (ultralytics `imgsz`).
     imgsz: int | None = None
     #: Overlapping-tile grid, e.g. ``[2, 2]``. ``None`` runs the whole image once.
@@ -198,21 +204,27 @@ class Arm(BaseModel, frozen=True):
             f"imgsz{self.imgsz}",
             f"tiles{self.tiles}@{self.tile_overlap}",
             f"maxdet{self.max_det}",
-            f"ens{_ensemble_digest(self.prompt_ensembles)}",
             f"minpx{self.min_pixels}",
             f"maxpx{self.max_pixels}",
             f"prompt{hashlib.sha256((self.prompt_template or '-').encode()).hexdigest()[:8]}",
             f"sample{self.sample}",
         ]
+        # Appended only when set, so every arm without an ensemble keeps the key
+        # its cache was written under (see fuse_vlm.py's CACHE KEY DRIFT note).
+        if self.prompt_ensembles:
+            parts.append(f"ens{_ensemble_digest(self.prompt_ensembles)}")
+        if self.agnostic_nms is not None:
+            parts.append(f"agnostic{self.agnostic_nms}")
+        if self.anchor_crop is not None:
+            blob = self.anchor_crop.model_dump_json().encode()
+            parts.append(f"crop{hashlib.sha256(blob).hexdigest()[:8]}")
         if not self.replayable:
             parts += [f"box{self.box_threshold}", f"nms{self.nms_iou_threshold}"]
         return "__".join(parts).replace("/", "_").replace(" ", "-")
 
 
-def _ensemble_digest(ensembles: dict[str, list[str]] | None) -> str:
-    """Short stable hash of a prompt-ensemble mapping, ``-`` when unset."""
-    if not ensembles:
-        return "-"
+def _ensemble_digest(ensembles: dict[str, list[str]]) -> str:
+    """Short stable hash of a prompt-ensemble mapping."""
     blob = json.dumps(ensembles, sort_keys=True).encode()
     return hashlib.sha256(blob).hexdigest()[:8]
 
@@ -549,6 +561,7 @@ def build_inferencer(arm: Arm, *, raw_mode: bool) -> Any:
             model_name=arm.model_name,
             classes=arm.classes,
             prompt_ensembles=arm.prompt_ensembles,
+            agnostic_nms=arm.agnostic_nms if arm.agnostic_nms is not None else True,
             box_threshold=box_threshold,
             nms_iou_threshold=nms_iou,
             imgsz=arm.imgsz if arm.imgsz is not None else 640,
@@ -585,6 +598,32 @@ def build_inferencer(arm: Arm, *, raw_mode: bool) -> Any:
     raise ValueError(msg)
 
 
+def _wrap_anchor_crop(inferencer: Any, arm: Arm) -> Any:
+    """Add the crop-and-re-detect second pass, if the arm asks for one.
+
+    The refiner is the arm's own model prompted for the target class alone, so
+    it is built through :func:`build_inferencer` like any other arm.
+    """
+    crop = arm.anchor_crop
+    if crop is None:
+        return inferencer
+    if arm.inferencer != "yoloe":
+        msg = f"arm {arm.id!r}: anchor_crop is only wired for yoloe"
+        raise ValueError(msg)
+    refiner_arm = arm.model_copy(
+        update={
+            "classes": crop.refiner_classes,
+            "prompt_ensembles": None,
+            "imgsz": crop.refiner_imgsz,
+            "box_threshold": crop.refiner_box_threshold,
+            "nms_iou_threshold": crop.refiner_nms_iou_threshold,
+            "tiles": None,
+            "anchor_crop": None,
+        }
+    )
+    return crop.wrap(inferencer, build_inferencer(refiner_arm, raw_mode=False), arm.classes)
+
+
 def _wrap_tiled(inferencer: Any, arm: Arm, *, raw_mode: bool = False) -> Any:
     """Wrap an inferencer in the overlapping-tile slicer, if the arm asks for one."""
     if arm.tiles is None:
@@ -619,8 +658,9 @@ def collect_raw(
     holds that arm's finished detections and only the filters replay — which is
     still enough to make ``singleton_top_k`` free for it.
     """
-    inferencer = _wrap_tiled(
-        build_inferencer(arm, raw_mode=arm.replayable), arm, raw_mode=arm.replayable
+    inferencer = _wrap_anchor_crop(
+        _wrap_tiled(build_inferencer(arm, raw_mode=arm.replayable), arm, raw_mode=arm.replayable),
+        arm,
     )
     raw_map: dict[str, list[Detection]] = {}
     for i, filename in enumerate(filenames, start=1):
@@ -753,7 +793,9 @@ def score_arm_live(
     """
     from object_detection_eval.inference.vlm.protocol import score_split
 
-    inferencer = _wrap_tiled(build_inferencer(arm, raw_mode=False), arm, raw_mode=False)
+    inferencer = _wrap_anchor_crop(
+        _wrap_tiled(build_inferencer(arm, raw_mode=False), arm, raw_mode=False), arm
+    )
     pred_map = score_split(
         inferencer,
         image_dir=image_dir,

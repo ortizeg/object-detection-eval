@@ -108,6 +108,10 @@ class YOLOWorldInferencer(BaseInferencer):
             model.set_classes(self.classes)
         return model
 
+    def _predict_kwargs(self) -> dict[str, Any]:
+        """Extra ``predict`` arguments a subclass needs; none for YOLO-World."""
+        return {}
+
     def predict(
         self,
         image: npt.NDArray[np.uint8],
@@ -132,6 +136,7 @@ class YOLOWorldInferencer(BaseInferencer):
                 max_det=self.max_det,
                 device=self._device,
                 verbose=False,
+                **self._predict_kwargs(),
             )
         except Exception:
             logger.exception(f"{type(self).__name__} inference failed")

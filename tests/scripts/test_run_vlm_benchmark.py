@@ -49,7 +49,8 @@ _EXPECTED_NAMES = [
     "florence2",
     "yolo_world",
     "yoloe",
-    "yoloe_ensemble",
+    "yoloe_number_crop",
+    "yoloe_ensemble_number_crop",
     "llmdet",
     "qwen3_vl",
 ]
@@ -62,8 +63,9 @@ _EXPECTED_TARGETS = {
     "grounding_dino": 0.293,
     "florence2": 0.238,
     "yolo_world": 0.189,
-    "yoloe": 0.276,
-    "yoloe_ensemble": 0.291,
+    "yoloe": 0.278,
+    "yoloe_number_crop": 0.311,
+    "yoloe_ensemble_number_crop": 0.332,
 }
 #: Rows with no target (VLM-02's informational-only mode -- see the None-check
 #: in `_print_result`). Their expected_map5095 is deliberately null, not

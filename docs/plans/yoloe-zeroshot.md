@@ -82,22 +82,60 @@ YOLO-World it cannot be replayed from a raw-detection cache.
 - [x] Round 4: prompt ensembling kept as a separate disclosed row (val 0.2679).
       The rim-word check came back negative (box-convention mismatch)
 - [x] Round 5: test, once per row. `yoloe` 0.2761, `yoloe_ensemble` 0.2912
+      (both superseded by Round 6)
 - [x] Report updated
+- [x] Round 6: follow-ups (2026-10-12), below
+
+## Round 6: follow-ups (2026-10-12)
+
+Asked for after Round 5: try Astra-style crop-and-refine for `rim` and
+`number`, and work through the Round 5 follow-up list. Same rules: val first,
+0.002 floor, one test run per configuration.
+
+| Follow-up | Val | Outcome |
+| --- | --- | --- |
+| Class-aware NMS (found while testing multi-label) | 0.2512 → 0.2607 | **Adopted into the equal-effort row.** `YOLOE.predict` forces `agnostic_nms=True`; every other row suppresses per class |
+| NMS IoU re-swept under it | 0.5–0.7 all ≤ 0.2605 | 0.8 kept |
+| Multi-label NMS (every class above threshold per anchor) | 0.2428 (−0.008) | Rejected. Adds low-confidence referee copies of player boxes |
+| Per-player number crop (refiner word `number`) | 0.2805 (+0.020) | **Disclosed row** `yoloe_number_crop` |
+| Same, refiner word `jersey number` | 0.2618 | Rejected |
+| `number` from a second 1920 px pass (scratch) | 0.2680 | Dominated by the crop (0.41 vs 0.53 `number` AP50) |
+| Prompt ensemble on the class-aware stack | 0.2779 (+0.017) | Kept for the disclosed stack |
+| Ensemble + number crop | 0.2999 | **Disclosed row** `yoloe_ensemble_number_crop` |
+| Rim crop-refine around hoop boxes (4 words, scratch) | ≤ 0.2514 | Null. The hoop box sits on the backboard |
+| Rim crop-refine around ball boxes (scratch) | ≤ 0.2513 | Null. Rim AP50 ≤ 0.002 |
+| Add YOLOE to the WBF fusion (5 locally cached members) | 0.4042 → 0.4057 | Null (+0.0015) and recall at P95 down. Not added |
+
+Scratch arms (marked above) were run with a throwaway script on cached passes,
+not through `ablate_vlm.py`, because none were adopted. Every adopted or
+published arm is in `valid_arms.json`.
+
+**Rim diagnosis, corrected.** Round 4 read the rim as a box-convention mismatch
+on the hoop boxes. A closer look shows the hoop class mostly lands on the
+backboard (its top box contains the GT rim in 5 of 96 val frames). The box
+nearest the rim is usually `orange basketball` (82 of 96, median IoU 0.43). Crop-
+refine needs a first-pass box on the right object, and YOLOE's first pass does
+not provide one.
+
+**Test.** `yoloe` was run on test a second time after the class-aware fix.
+That is disclosed in the manifest and the report.
 
 ## Outcome
 
 | Row | Val | Test |
 | --- | --- | --- |
 | YOLO-World (published) | 0.177 | 0.189 |
-| **YOLOE, equal effort** | 0.251 | **0.276** |
-| YOLOE + prompt ensemble (disclosed) | 0.268 | 0.291 |
+| **YOLOE, equal effort** | 0.261 | **0.278** (first run, before class-aware NMS: 0.276) |
+| YOLOE + number crop (disclosed) | 0.281 | 0.311 |
+| YOLOE + prompt ensemble + number crop (disclosed) | 0.300 | 0.332 |
 | LLMDet-large (published) | 0.359 | 0.388 |
 
 ## Follow-ups (not done)
 
-- Multi-label NMS: score every class per anchor instead of only the argmax.
-  It targets the `person`/`referee` collision, but needs a patch to the
-  ultralytics predictor.
-- A two-resolution pass: `number` from 1920 px, everything else from 1280.
-- Adding YOLOE to the fusion ensemble. The fusion was fixed before YOLOE
-  existed, and re-opening it means a fresh val search.
+- Box tightness. The best row's mAP@50 (0.488) is close to LLMDet's (0.506)
+  while mAP@50:95 is not, so the remaining gap is loose boxes and the ball.
+- The ablation summary table renders stacked elements (several fields changed
+  from the root baseline) as `?` / "reverted" even when they shipped. This
+  predates YOLOE and affects every model's stacked rows.
+- Fusion with YOLOE on the full eight members needs the LLMDet, Qwen3-VL and
+  YOLO-World val caches from the GPU box.

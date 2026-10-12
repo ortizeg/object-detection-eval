@@ -130,9 +130,22 @@ def test_predict_converts_boxes_and_forwards_settings() -> None:
     assert fake.predict_kwargs["iou"] == 0.8
     assert fake.predict_kwargs["imgsz"] == 1280
     assert fake.predict_kwargs["max_det"] == 300
+    # ultralytics' YOLOE default, passed explicitly so it is visible.
+    assert fake.predict_kwargs["agnostic_nms"] is True
     assert len(dets) == 1
     det = dets[0]
     assert det.class_id == 0
     assert det.confidence == pytest.approx(0.9)
     assert det.bbox.w == pytest.approx(0.5)
     assert det.bbox.h == pytest.approx(0.5)
+
+
+def test_class_aware_nms_is_passed_on_every_call() -> None:
+    """``YOLOE.predict`` resets ``overrides``, so the flag must travel per call."""
+    inf = YOLOEInferencer(classes=["player"], agnostic_nms=False, device="cpu")
+    fake = _FakeYOLOE.instances[0]
+    fake.predict_result = _boxes([[0, 0, 10, 10]], [0.9], [0])
+
+    inf.predict(np.zeros((20, 20, 3), dtype=np.uint8))
+
+    assert fake.predict_kwargs["agnostic_nms"] is False

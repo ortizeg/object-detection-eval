@@ -869,3 +869,122 @@ elements:
           [referee in a striped shirt, referee, basketball official,
            referee in a black and white striped shirt]
         basketball hoop and backboard: [basketball hoop and backboard, basketball hoop, rim]
+
+  # ===== YOLOE Round 6: follow-ups (2026-10-12) ============================
+  # CLASS-AWARE NMS. `YOLOE.predict` forces `agnostic_nms=True` on every call,
+  # an ultralytics default that applies to YOLOE alone. Every other row here,
+  # YOLO-World included, suppresses per class. A post-processing setting, the
+  # same tier as the NMS IoU, so it is part of the equal-effort stack. It was
+  # missed in Round 3 because ultralytics resets the override inside
+  # `predict`, so it has to be passed per call (see YOLOEInferencer).
+  - name: class_aware_nms
+    knob: agnostic_nms
+    applies_to: [yoloe]
+    fixed:
+      imgsz: 1280
+      box_threshold: 0.001
+      nms_iou_threshold: 0.8
+      classes:
+        [basketball player in a team uniform, orange basketball, referee in a striped shirt,
+         basketball hoop and backboard, number]
+    values: [false]
+
+  # NMS 0.8 was chosen under class-agnostic suppression, so it is re-swept.
+  - name: nms_on_class_aware
+    knob: nms_iou_threshold
+    applies_to: [yoloe]
+    fixed:
+      imgsz: 1280
+      box_threshold: 0.001
+      agnostic_nms: false
+      classes:
+        [basketball player in a team uniform, orange basketball, referee in a striped shirt,
+         basketball hoop and backboard, number]
+    values: [0.5, 0.6, 0.7]
+
+  # Class-aware NMS ADOPTED into the equal-effort stack: 0.2607 vs 0.2512
+  # (+0.0095, all of it `player`, 0.867 -> 0.941). Re-sweeping the IoU under it
+  # keeps 0.8 (0.5 0.2564, 0.6 0.2597, 0.7 0.2605). Equal-effort val: 0.2607.
+  #
+  # Everything below is DISCLOSED extra work, on top of that stack.
+  #
+  # NUMBER CROP (pipeline variant, like tiling or Astra's crop-refine). Crop
+  # each `player` box (conf >= 0.1, +10%), re-detect `number` inside it with a
+  # second YOLOE prompted for that class alone (640 px), and merge with the
+  # full-frame numbers by per-class NMS 0.5. One number per player turns a tiny
+  # multi-instance class into a single-instance one in each crop.
+  - name: number_crop
+    knob: anchor_crop
+    applies_to: [yoloe]
+    fixed:
+      imgsz: 1280
+      box_threshold: 0.001
+      nms_iou_threshold: 0.8
+      agnostic_nms: false
+      classes:
+        [basketball player in a team uniform, orange basketball, referee in a striped shirt,
+         basketball hoop and backboard, number]
+    values:
+      - anchor: basketball player in a team uniform
+        target: number
+        refiner_classes: [number]
+      - anchor: basketball player in a team uniform
+        target: number
+        refiner_classes: [jersey number]
+
+  # The Round 4 `extended` prompt ensemble, re-measured on the class-aware stack.
+  - name: prompt_ensemble_on_class_aware
+    knob: prompt_ensembles
+    applies_to: [yoloe]
+    fixed:
+      imgsz: 1280
+      box_threshold: 0.001
+      nms_iou_threshold: 0.8
+      agnostic_nms: false
+      classes:
+        [basketball player in a team uniform, orange basketball, referee in a striped shirt,
+         basketball hoop and backboard, number]
+    values:
+      - basketball player in a team uniform:
+          [basketball player in a team uniform, basketball player, player, athlete in a jersey]
+        orange basketball: [orange basketball, basketball, ball, sports ball, leather basketball]
+        referee in a striped shirt:
+          [referee in a striped shirt, referee, basketball official,
+           referee in a black and white striped shirt]
+        basketball hoop and backboard: [basketball hoop and backboard, basketball hoop, rim]
+
+  # Both stacked: the ensemble lifts player/referee, the crop lifts `number`.
+  - name: number_crop_on_ensemble
+    knob: anchor_crop
+    applies_to: [yoloe]
+    fixed:
+      imgsz: 1280
+      box_threshold: 0.001
+      nms_iou_threshold: 0.8
+      agnostic_nms: false
+      classes:
+        [basketball player in a team uniform, orange basketball, referee in a striped shirt,
+         basketball hoop and backboard, number]
+      prompt_ensembles:
+        basketball player in a team uniform:
+          [basketball player in a team uniform, basketball player, player, athlete in a jersey]
+        orange basketball: [orange basketball, basketball, ball, sports ball, leather basketball]
+        referee in a striped shirt:
+          [referee in a striped shirt, referee, basketball official,
+           referee in a black and white striped shirt]
+        basketball hoop and backboard: [basketball hoop and backboard, basketball hoop, rim]
+    values:
+      - anchor: basketball player in a team uniform
+        target: number
+        refiner_classes: [number]
+
+  # RESULTS. Ensemble + crop 0.2999. The crop and the ensemble help different
+  # classes and add up. Published as disclosed rows `yoloe_number_crop` and
+  # `yoloe_ensemble_number_crop` in vlm_zeroshot.yaml.
+  #
+  # Not logged as arms (scratch, none adopted): multi-label NMS on the
+  # class-aware stack 0.2428 (referee AP50 0.456 -> 0.323); rim crop-refine
+  # around hoop boxes and around ball boxes, rim AP50 <= 0.008 either way.
+  # The Round 4 rim note above is corrected there: the hoop class lands on the
+  # backboard, and the box nearest the GT rim is usually `orange basketball`.
+  # See docs/plans/yoloe-zeroshot.md, Round 6.

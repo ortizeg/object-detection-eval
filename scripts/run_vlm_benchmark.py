@@ -57,6 +57,7 @@ from pydantic import BaseModel, Field
 from object_detection_eval.data.coco_gt import load_coco_gt
 from object_detection_eval.data.taxonomy import resolve_taxonomy
 from object_detection_eval.inference.base import BaseInferencer
+from object_detection_eval.inference.vlm.anchor_crop import AnchorCropConfig
 from object_detection_eval.inference.vlm.protocol import score_split
 from object_detection_eval.metrics.detection_map import compute_metrics
 
@@ -94,10 +95,15 @@ class ManifestEntry(BaseModel, frozen=True):
     #: class's prompt (CLIP-style prompt ensembling). ``None`` encodes each
     #: class string on its own, like every other row.
     prompt_ensembles: dict[str, list[str]] | None = None
+    #: YOLOE only: class-agnostic NMS. ``None`` keeps ultralytics' YOLOE default
+    #: (agnostic); ``False`` suppresses per class like every other row.
+    agnostic_nms: bool | None = None
     #: Overlapping-tile grid, e.g. ``[2, 2]``. ``None`` runs the whole frame
     #: once. The single largest win the 2026-08-04 ablation found, and the only
     #: resolution lever the models with fixed-size processors have.
     tiles: list[int] | None = None
+    #: Crop-and-re-detect second pass (YOLOE only so far). ``None`` = one pass.
+    anchor_crop: AnchorCropConfig | None = None
     tile_overlap: float = Field(default=0.2, ge=0.0, lt=1.0)
     task: str | None = None
     caption: str | None = None
@@ -225,6 +231,7 @@ def _yoloe_factory(entry: ManifestEntry) -> BaseInferencer:
         model_name=entry.model_name,
         classes=entry.classes,
         prompt_ensembles=entry.prompt_ensembles,
+        agnostic_nms=entry.agnostic_nms if entry.agnostic_nms is not None else True,
         box_threshold=entry.box_threshold if entry.box_threshold is not None else 0.01,
         nms_iou_threshold=(entry.nms_iou_threshold if entry.nms_iou_threshold is not None else 0.5),
         imgsz=entry.imgsz if entry.imgsz is not None else 640,
@@ -304,6 +311,33 @@ def _maybe_tiled(inferencer: BaseInferencer, entry: ManifestEntry) -> Any:
     )
 
 
+def _maybe_anchor_crop(inferencer: Any, entry: ManifestEntry) -> Any:
+    """Wrap the row in the crop-and-re-detect second pass if it asks for one.
+
+    The refiner is a second instance of the row's own model, prompted for the
+    target class alone, so the row stays a single-model, zero-shot pipeline.
+    """
+    crop = entry.anchor_crop
+    if crop is None:
+        return inferencer
+    if entry.inferencer != "yoloe":
+        msg = f"{entry.name}: anchor_crop is only wired for yoloe rows"
+        raise ValueError(msg)
+    refiner = _yoloe_factory(
+        entry.model_copy(
+            update={
+                "classes": crop.refiner_classes,
+                "prompt_ensembles": None,
+                "imgsz": crop.refiner_imgsz,
+                "box_threshold": crop.refiner_box_threshold,
+                "nms_iou_threshold": crop.refiner_nms_iou_threshold,
+                "anchor_crop": None,
+            }
+        )
+    )
+    return crop.wrap(inferencer, refiner, entry.classes)
+
+
 def _assert_preconditions(args: argparse.Namespace) -> None:
     """Halt with a clear message if the ground-truth annotations are missing."""
     gt_path = args.data_root / "test" / "_annotations.coco.json"
@@ -338,7 +372,7 @@ def _score_entry(
     module's docstring for why the order is load-bearing.
     """
     factory = _INFERENCER_FACTORIES[entry.inferencer]
-    inferencer = _maybe_tiled(factory(entry), entry)
+    inferencer = _maybe_anchor_crop(_maybe_tiled(factory(entry), entry), entry)
     label_map = dict(enumerate(entry.classes))
 
     pred_map = score_split(

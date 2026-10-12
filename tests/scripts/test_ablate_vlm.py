@@ -180,6 +180,13 @@ def test_only_the_checkpoint_re_search_pins_a_second_field(manifest: Any) -> Non
         # Disclosed Round-4 work, measured on top of the finished stack.
         "rim_word",
         "prompt_ensemble",
+        # Round 6 (2026-10-12): the class-aware NMS fix and the disclosed work
+        # measured on top of it.
+        "class_aware_nms",
+        "nms_on_class_aware",
+        "number_crop",
+        "prompt_ensemble_on_class_aware",
+        "number_crop_on_ensemble",
     }
 
 
@@ -339,8 +346,20 @@ def test_forward_pass_knobs_do_change_the_signature(sut: types.ModuleType) -> No
         ("max_det", 1000),
         ("min_pixels", 4_096_000),
         ("max_pixels", 8_192_000),
+        ("prompt_ensembles", {"referee": ["referee", "basketball official"]}),
     ]:
         assert _arm(sut, id=field, **{field: value}).signature() != base.signature(), field
+
+
+def test_an_arm_without_prompt_ensembles_keeps_its_pre_ensemble_cache_key(
+    sut: types.ModuleType,
+) -> None:
+    """Adding the ensemble knob must not re-key every cache already on disk.
+
+    fuse_vlm.py rebuilds the same key independently, so a part that is always
+    present would silently orphan every model's val cache.
+    """
+    assert "__ens" not in _arm(sut).signature()
 
 
 def test_yolo_world_arms_are_not_replayed(sut: types.ModuleType) -> None:

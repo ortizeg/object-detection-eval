@@ -378,8 +378,20 @@ models:
   #   3. Stacked on 1280: the six candidates re-scored (c4 wins), box 0.001
   #      +0.0082, the per-class composition (c4 + bare `number`) +0.0125,
   #      then NMS 0.8 +0.0051. Val 0.2512.
-  # `rim` stays at exactly 0.000 under every arm. It is a box-convention
-  # mismatch, documented with the rim_word arms in vlm_ablation.yaml.
+  #   4. Class-aware NMS (Round 6, 2026-10-12) +0.0095, all of it `player`.
+  #      `YOLOE.predict` forces class-agnostic NMS on every call; every other
+  #      row suppresses per class. Missed in Round 3 because ultralytics resets
+  #      the override inside `predict`. IoU re-swept under it: 0.8 holds.
+  #      Val 0.2607.
+  #
+  # SECOND TEST LOOK, disclosed. The row was first run on test on 2026-10-11
+  # without step 4: mAP@50:95 0.2761, mAP@50 0.3811. Step 4 was found and
+  # adopted on val only, then test was run once more for the corrected config.
+  #
+  # `rim` stays at exactly 0.000 under every arm. The hoop class lands on the
+  # backboard. In 82 of 96 val frames the box closest to the GT rim is an
+  # `orange basketball` box: YOLOE sees the orange ring as the ball. Crop-
+  # refining around hoop boxes or around ball boxes (Round 6) did not move it.
   - name: yoloe
     inferencer: yoloe
     model_name: yoloe-26x-seg.pt
@@ -391,23 +403,55 @@ models:
       - number
     box_threshold: 0.001
     nms_iou_threshold: 0.8
+    agnostic_nms: false
     imgsz: 1280
     max_det: 300
-    # TEST (2026-10-11, Apple M-series MPS, run once): mAP@50:95 0.2761,
-    # mAP@50 0.3811. +0.087 over YOLO-World on the same runtime.
-    expected_map5095: 0.276
+    # TEST (2026-10-12, MPS, second look, see above): mAP@50:95 0.2777. The
+    # +0.0095 val gain from class-aware NMS shrank to +0.0016 on test.
+    expected_map5095: 0.278
 
-  # YOLOE-26x + PROMPT ENSEMBLING. DISCLOSED EXTRA EFFORT, not an
-  # equal-effort row. Same configuration as `yoloe` above, but four of the
-  # five classes are prompted with the mean MobileCLIP embedding of several
+  # YOLOE-26x + NUMBER CROP. DISCLOSED PIPELINE VARIANT, the open-weights
+  # analogue of Astra's per-player number crop. The `yoloe` config above, plus
+  # a second pass: crop each `player` box (conf >= 0.1, +10%), re-detect
+  # `number` inside it with a second YOLOE prompted for `number` alone at
+  # 640 px, and merge with the full-frame numbers by per-class NMS 0.5. Still
+  # one model, still zero-shot. Val 0.2805 (+0.0198 over `yoloe`), all of it
+  # `number` (AP50 0.233 -> 0.535). Prompting the refiner with `jersey number`
+  # instead gave 0.2618. A second full-frame pass at 1920 px for `number` alone
+  # (scratch, not in the ablation log) reached only 0.412 `number` AP50.
+  - name: yoloe_number_crop
+    inferencer: yoloe
+    model_name: yoloe-26x-seg.pt
+    classes:
+      - basketball player in a team uniform
+      - orange basketball
+      - referee in a striped shirt
+      - basketball hoop and backboard
+      - number
+    box_threshold: 0.001
+    nms_iou_threshold: 0.8
+    agnostic_nms: false
+    imgsz: 1280
+    max_det: 300
+    anchor_crop:
+      anchor: basketball player in a team uniform
+      target: number
+      refiner_classes: [number]
+    # TEST (2026-10-12, MPS, run once): mAP@50:95 0.3109, +0.033 over `yoloe`.
+    expected_map5095: 0.311
+
+  # YOLOE-26x + PROMPT ENSEMBLING + NUMBER CROP. DISCLOSED EXTRA EFFORT, the
+  # most work any YOLOE configuration got. `yoloe_number_crop`, plus four of
+  # the five classes prompted with the mean MobileCLIP embedding of several
   # phrases instead of one. Some phrases come from the shared pool and some
   # were hand-written (athlete in a jersey, leather basketball, basketball
-  # official, referee in a black and white striped shirt). The label stays
-  # the class string, so scoring is unchanged. Val 0.2679 (+0.0167 over the
-  # equal-effort stack). The pool-only ensemble scored 0.2538, and averaging
-  # `number` too cost 0.007: vlm_ablation.yaml's prompt_ensemble element.
-  # Fixed on val BEFORE either YOLOE row was run on test.
-  - name: yoloe_ensemble
+  # official, referee in a black and white striped shirt). The label stays the
+  # class string, so scoring is unchanged. On the class-aware stack the
+  # ensemble alone scores val 0.2779 (referee AP50 0.456 -> 0.597), and with
+  # the number crop 0.2999. The two help different classes, so they add up.
+  # Replaces the 2026-10-11 `yoloe_ensemble` row (agnostic NMS, no crop; test
+  # 0.2912), which was superseded on val before this row reached test.
+  - name: yoloe_ensemble_number_crop
     inferencer: yoloe
     model_name: yoloe-26x-seg.pt
     classes:
@@ -426,12 +470,15 @@ models:
       basketball hoop and backboard: [basketball hoop and backboard, basketball hoop, rim]
     box_threshold: 0.001
     nms_iou_threshold: 0.8
+    agnostic_nms: false
     imgsz: 1280
     max_det: 300
-    # TEST (2026-10-11, MPS, run once): mAP@50:95 0.2912, mAP@50 0.3991.
-    # +0.015 over the equal-effort `yoloe` row: player and referee up, ball
-    # down (0.295 -> 0.250 AP50).
-    expected_map5095: 0.291
+    anchor_crop:
+      anchor: basketball player in a team uniform
+      target: number
+      refiner_classes: [number]
+    # TEST (2026-10-12, MPS, run once): mAP@50:95 0.3315, +0.054 over `yoloe`.
+    expected_map5095: 0.332
 
   # LLMDet-large (added 2026-08-17) -- the seventh row. Architecturally
   # mm-grounding-dino: same HF calling convention as Grounding DINO

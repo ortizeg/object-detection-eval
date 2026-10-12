@@ -49,6 +49,13 @@ class YOLOEInferencer(YOLOWorldInferencer):
             is CLIP-style prompt ensembling. The class string stays the label,
             so taxonomy remapping is unaffected. Include the class string itself
             in the list if it should take part in the mean.
+        agnostic_nms: Whether NMS ignores class. ``YOLOE.predict`` forces it
+            on at every call, an ultralytics default for YOLOE only (YOLO-World
+            and every other row here suppress per class). So the setting is
+            passed per call: ``predict`` would reset it in ``overrides``. With
+            it on, a confident box of one class suppresses an overlapping box
+            of another, e.g. a `referee` box removes the `player` box on the
+            same person.
         **kwargs: Forwarded to :class:`YOLOWorldInferencer` (thresholds,
             ``imgsz``, ``max_det``, ``device``).
     """
@@ -58,9 +65,11 @@ class YOLOEInferencer(YOLOWorldInferencer):
         model_name: str = "yoloe-26x-seg.pt",
         classes: list[str] | None = None,
         prompt_ensembles: dict[str, list[str]] | None = None,
+        agnostic_nms: bool = True,
         **kwargs: Any,
     ) -> None:
         self.prompt_ensembles = prompt_ensembles or {}
+        self.agnostic_nms = agnostic_nms
         unknown = sorted(set(self.prompt_ensembles) - set(classes or []))
         if unknown:
             msg = f"prompt_ensembles names classes not in the vocabulary: {unknown}"
@@ -74,6 +83,9 @@ class YOLOEInferencer(YOLOWorldInferencer):
         if self.classes:
             model.set_classes(self.classes, self._text_embeddings(model))
         return model
+
+    def _predict_kwargs(self) -> dict[str, Any]:
+        return {"agnostic_nms": self.agnostic_nms}
 
     def _text_embeddings(self, model: Any) -> Any:
         """Encode the vocabulary to RepRTA-processed embeddings, ``(1, nc, D)``.

@@ -13,7 +13,8 @@ than frame-to-frame noise", not as a population claim.
 Usage::
 
     pixi run python scripts/run_vlm_paired_bootstrap.py \\
-        --pair yoloe:yolo_world --pair yoloe_ensemble:yoloe --pair llmdet:yoloe
+        --pair yoloe:yolo_world --pair yoloe_number_crop:yoloe \\
+        --pair yoloe_ensemble_number_crop:yoloe --pair llmdet:yoloe_ensemble_number_crop
 """
 
 from __future__ import annotations
@@ -26,6 +27,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+import numpy.typing as npt
 from loguru import logger
 
 from object_detection_eval.data.coco_gt import load_coco_gt
@@ -46,7 +48,7 @@ def _init_worker(gt_map: Any, preds: Any, filenames: list[str]) -> None:
     _STATE.update(gt_map=gt_map, preds=preds, filenames=filenames)
 
 
-def _score(draw: np.ndarray) -> dict[str, float]:
+def _score(draw: npt.NDArray[np.int64]) -> dict[str, float]:
     """mAP@50:95 for every row on one shared draw."""
     gt_r = resample_map(_STATE["gt_map"], _STATE["filenames"], draw)
     return {

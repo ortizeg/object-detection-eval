@@ -589,6 +589,12 @@ _ABLATION_ELEMENTS: tuple[tuple[str, str], ...] = (
     # Disclosed, beyond equal effort (see vlm_ablation.yaml's Round 4 note).
     ("rim_word", "Rim word (disclosed)"),
     ("prompt_ensemble", "Prompt ensembling (disclosed)"),
+    # YOLOE Round 6 (2026-10-12): the class-aware NMS fix, then disclosed work.
+    ("class_aware_nms", "Class-aware NMS"),
+    ("nms_on_class_aware", "NMS re-swept under class-aware NMS"),
+    ("number_crop", "Per-player number crop (disclosed)"),
+    ("prompt_ensemble_on_class_aware", "Prompt ensembling on the class-aware stack (disclosed)"),
+    ("number_crop_on_ensemble", "Number crop on the ensemble (disclosed)"),
 )
 
 #: Element deltas below this are reported as no effect rather than as a win.
@@ -789,6 +795,8 @@ _CHANGE_LABELS = {
     "prompt_template": "prompt",
     "sample": "repeat draw",
     "prompt_ensembles": "prompt ensembling",
+    "agnostic_nms": "class-agnostic NMS",
+    "anchor_crop": "number crop",
 }
 
 
@@ -804,6 +812,10 @@ def _describe_change(key: str, value: Any) -> str:
         return label
     if key == "model_name":
         return f"{label} `{str(value).split('/')[-1]}`"
+    if key == "agnostic_nms":
+        return "class-aware NMS" if value is False else label
+    if key == "anchor_crop":
+        return label
     return f"{label} {value}"
 
 

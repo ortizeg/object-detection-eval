@@ -167,8 +167,8 @@ adopting a smaller "win" is fitting the val split.
 | owlv2 | 0.240 | **0.288** | +0.0479 | NMS IoU 0.5, tiling 2x2 |
 | grounding_dino | 0.244 | **0.278** | +0.0338 | NMS IoU 0.7, tiling 2x2 |
 | qwen3_vl | 0.265 | 0.265 | — | none — baseline beat every arm tried |
+| yoloe | 0.201 | **0.261** | +0.0594 | vocabulary, box threshold 0.001, NMS IoU 0.8, class-aware NMS, input size 1280 |
 | gemini | 0.258 | 0.258 | — | none — baseline beat every arm tried |
-| yoloe | 0.201 | **0.251** | +0.0498 | vocabulary, box threshold 0.001, NMS IoU 0.8, input size 1280 |
 | florence2 | 0.125 | **0.234** | +0.1094 | checkpoint `Florence-2-large`, NMS IoU 0.4, tiling 2x2 |
 | omdet_turbo | 0.181 | **0.216** | +0.0353 | vocabulary, tiling 2x2 |
 | yolo_world | 0.132 | **0.177** | +0.0453 | vocabulary, box threshold 0.001, NMS IoU 0.7, input size 1280 |
@@ -326,6 +326,11 @@ re-rendering fails the drift gate.
 | yoloe | Input resolution on the composed vocabulary | 2 | `?` | 0.246 | +0.0442 | reverted |
 | yoloe | Rim word (disclosed) | 2 | `?` | 0.251 | +0.0498 | reverted |
 | yoloe | Prompt ensembling (disclosed) | 3 | `?` | 0.268 | +0.0665 | reverted |
+| yoloe | Class-aware NMS | 1 | `?` | 0.261 | +0.0594 | reverted |
+| yoloe | NMS re-swept under class-aware NMS | 3 | `?` | 0.260 | +0.0591 | reverted |
+| yoloe | Per-player number crop (disclosed) | 2 | `?` | 0.281 | +0.0791 | reverted |
+| yoloe | Prompt ensembling on the class-aware stack (disclosed) | 1 | `?` | 0.278 | +0.0765 | reverted |
+| yoloe | Number crop on the ensemble (disclosed) | 1 | `?` | 0.300 | +0.0985 | reverted |
 <!-- TABLE:vlm_ablation END -->
 
 </details>
@@ -380,7 +385,7 @@ never emit, while the singleton cap *constrains* the zero-shot rows.
 
 ## The zero-shot ceiling
 
-Ten zero-shot models, plus one disclosed YOLOE variant, scored on the merged-5 test split. The table is recomputed
+Ten zero-shot models, plus two disclosed YOLOE variants, scored on the merged-5 test split. The table is recomputed
 from the committed prediction dumps in `results/vlm/*.json` (never transcribed):
 
 <!-- TABLE:vlm_summary START -->
@@ -393,8 +398,9 @@ from the committed prediction dumps in `results/vlm/*.json` (never transcribed):
 | OmDet-Turbo | 0.211 | 0.297 | 0.219 |
 | Florence-2 | 0.238 | 0.323 | 0.255 |
 | YOLO-World | 0.189 | 0.241 | 0.209 |
-| YOLOE | 0.276 | 0.381 | 0.323 |
-| YOLOE + prompt ensemble | 0.291 | 0.399 | 0.344 |
+| YOLOE | 0.278 | 0.385 | 0.325 |
+| YOLOE + number crop | 0.311 | 0.463 | 0.353 |
+| YOLOE + prompt ensemble + number crop | 0.331 | 0.488 | 0.381 |
 | LLMDet-large | 0.388 | 0.506 | 0.432 |
 | Qwen3-VL | 0.318 | 0.452 | 0.337 |
 <!-- TABLE:vlm_summary END -->
@@ -577,7 +583,7 @@ model-vs-model comparison in this report. Only text prompts are scored. YOLOE's
 visual prompts are few-shot, and its prompt-free checkpoints can't be steered to
 our vocabulary.
 
-**Equal-effort row: 0.276 test, up from YOLO-World's 0.189.** The process was the
+**Equal-effort row: 0.278 test, up from YOLO-World's 0.189.** The process was the
 one every open-weights row got, all on val:
 
 1. The six-candidate search picked `c2_contrastive` at 0.201. That is already
@@ -587,7 +593,18 @@ one every open-weights row got, all on val:
    0.036–0.050.
 3. On the 1280 stack: the six candidates were re-scored, box threshold 0.001
    (+0.008), the per-class composition took the bare word `number` from `c5`
-   (+0.013, all of it `number`), and NMS 0.8 (+0.005). Val ended at 0.251.
+   (+0.013, all of it `number`), and NMS 0.8 (+0.005). Val 0.251.
+4. Class-aware NMS (+0.010, all of it `player`). `YOLOE.predict` forces
+   class-agnostic NMS on every call, an ultralytics default for YOLOE only.
+   Every other row here, YOLO-World included, suppresses per class. Because
+   ultralytics resets the setting inside `predict`, the first round missed it
+   and it has to be passed per call. Re-sweeping the IoU under it kept 0.8.
+   Val 0.261.
+
+**This row has been run on test twice, and that is disclosed.** The first run
+(2026-10-11) lacked step 4 and scored 0.276. Step 4 was found and adopted on val
+only, and the corrected config was run once more: 0.278. Most of the +0.010 val
+gain did not carry over to test (+0.002).
 
 The run used Apple MPS. Every step is a `yoloe__*` arm in the ablation table
 above.
@@ -596,48 +613,77 @@ above.
 YOLO-World scores `referee` 0.000 under all six vocabularies. Without the COCO
 word `person` it can't find players either (`player` AP50 ~0.01 for `c1`–`c5`).
 So it can only ground the COCO words its CLIP vocabulary was trained around.
-YOLOE gets `referee` 0.34–0.43 on val from every domain vocabulary, and 0.545 on
+YOLOE gets `referee` 0.34–0.43 on val from every domain vocabulary, and 0.52 on
 test. It fails in exactly one case: the COCO vocabulary, where `person` sits next
 to `referee`. ultralytics keeps one label per anchor (the argmax), and `person`
 wins every referee anchor for *both* models. The collision is shared. The
-inability to recover from it is YOLO-World's alone.
+inability to recover from it is YOLO-World's alone. Letting an anchor carry every
+class above threshold (multi-label NMS, how ultralytics' own `val` scores mAP)
+was tried on the domain vocabulary and lost 0.008 on val: it adds low-confidence
+`referee` copies of player boxes, and referee AP50 fell from 0.46 to 0.32.
 
-**Disclosed extra row: prompt ensembling, 0.291 test.** YOLOE accepts text
+**Disclosed row: per-player number crop, 0.311 test.** The open-weights analogue
+of Astra's number crop. There is at most one jersey number per player, so a
+second pass crops each `player` box (confidence ≥ 0.1, +10%) and re-detects
+`number` inside it with a second YOLOE prompted for `number` alone, at 640 px. The
+crop's boxes are merged with the full-frame numbers by per-class NMS. It is still
+one model and still zero-shot, but it is a pipeline beyond what the equal-effort
+rows got, so it is a separate row. On val it added +0.020, all of it `number`
+(AP50 0.233 → 0.535). On test it added more: +0.033, with `number` going from
+0.179 to 0.567, level with LLMDet's 0.571. A plain second pass at 1920 px for
+`number` alone reached only 0.41 `number` AP50 on val, so the crop is what does
+the work, not the extra resolution.
+
+**Disclosed row: prompt ensemble + number crop, 0.331 test.** YOLOE accepts text
 embeddings directly, so a class can be prompted with the mean MobileCLIP
 embedding of several phrases rather than one, as CLIP does for zero-shot
-classification. This goes beyond equal effort, so it is reported as a separate
-row, not as the YOLOE result. It averages the shared pool's phrases for each
-class plus four hand-written synonyms. On val it beat the equal-effort stack by
-+0.017; the pool-only version gained just +0.003. Both configurations were fixed
-on val before either ran on test, and each ran on test once. On test the
-ensemble's gain is player (0.887 → 0.927) and referee (0.545 → 0.640), partly
-paid for by ball (0.295 → 0.250). Paired bootstrap of the gap: +0.015, 95% CI [+0.005, +0.025]. That CI
-resamples frames, not the 3 test clips (`run_clustered_bootstrap.py` explains
-why that makes it too narrow), so read it as larger than frame-to-frame noise,
-and only that.
+classification. This row averages the shared pool's phrases for each class plus
+four hand-written synonyms, on top of the number crop. The two help different
+classes and add up: on val the ensemble alone gave +0.017 (referee 0.46 → 0.60),
+and with the crop the stack reached 0.300. On test, player rises to 0.947 and
+referee to 0.629, partly paid for by ball (0.295 → 0.250). This is the most work
+any YOLOE configuration got. It replaces a 2026-10-11 ensemble-only row (0.291
+test, agnostic NMS), which was superseded on val before this one reached test.
+Every configuration was fixed on val before it ran on test.
 
-**`rim` is still exactly 0.000, and no wording fixes it.** A diagnostic on 25
-val rims found the model's "hoop" boxes do overlap the rim, but they take in the
-net (~60×60 px). The ground truth boxes only the ring (median 64×22 px). The best
-IoU is 0.34, and no phrase moves it: "basketball rim" and "rim" leave every class
-bit-for-bit unchanged. This is a box-convention mismatch, the same failure the
-open-weights rows share, and Astra's crop-refine is the only thing in this
-report that has fixed it.
+**How large the gaps are.** Paired bootstrap on test
+(`results/vlm/bootstrap/paired_deltas.json`):
 
-**Where it lands.** YOLOE is now the best *real-time* open-vocabulary row:
-+0.087 over YOLO-World on the same runtime (95% CI [+0.073, +0.102], paired,
-frame-level, `results/vlm/bootstrap/paired_deltas.json`). It is still well
-behind LLMDet-large (0.388); even the ensemble row trails it by 0.097 (CI
-[+0.082, +0.111]). The gap is mostly `number` (0.179 vs 0.571 AP50), and raising
-YOLOE's resolution further won't close it: at 1600–1920 px `number` climbs to
-0.36–0.45 but ball and player fall by more. YOLOE is not in the eight-model
-fusion, which was fixed before it was added.
+| Comparison | Δ mAP@50:95 | 95% CI |
+| --- | --- | --- |
+| YOLOE − YOLO-World | +0.089 | [+0.077, +0.102] |
+| YOLOE + number crop − YOLOE | +0.033 | [+0.028, +0.038] |
+| YOLOE + ensemble + number crop − YOLOE | +0.054 | [+0.044, +0.063] |
+| LLMDet-large − YOLOE + ensemble + number crop | +0.057 | [+0.042, +0.070] |
 
-**Not tried, logged as follow-ups:** multi-label NMS (scoring every class per
-anchor rather than the argmax, which is how ultralytics' own `val` computes mAP).
-It would target exactly the person/referee collision above, but it isn't exposed
-through the predict API YOLO-World is scored with. Also untried: a two-resolution
-pass that takes `number` from a 1920 px pass and everything else from 1280.
+These CIs resample frames, not the 3 test clips (`run_clustered_bootstrap.py`
+explains why that makes them too narrow). Read them as "larger than
+frame-to-frame noise", and only that.
+
+**`rim` is still exactly 0.000, and crop-refine does not rescue it here.** The
+diagnostic is sharper than first reported. The hoop class lands on the
+backboard: in only 5 of 96 val frames does YOLOE's top "hoop" box contain the GT
+rim. The box closest to the rim is almost always an `orange basketball` box (82
+of 96 frames, median IoU 0.43): YOLOE reads the orange ring as the ball. Two
+crop-refine variants were tried on val, re-detecting "basketball rim" in zoomed
+crops around the hoop boxes and, separately, around the top five ball boxes. Rim
+AP50 stayed at ≤0.002 in both. Astra's crop-refine fixes the rim because Astra's
+first pass already puts a rim box on the rim. YOLOE's first pass does not, so
+there is nothing correct to refine.
+
+**Where it lands.** YOLOE is the best *real-time* open-vocabulary row, at 0.278
+equal-effort and 0.331 with the disclosed number crop and ensemble. It now beats
+LLMDet-large on `player` and `number` AP50. It still trails LLMDet overall
+(0.388): the rest of the gap is ball (0.250 vs 0.407 AP50), and boxes that are
+found but loose. mAP@50 is close (0.488 vs 0.506), while mAP@50:95 is not.
+
+**Not added to the fusion.** On val, the five fusion members whose caches are
+available locally (Florence-2, Gemini, Grounding-DINO, OmDet-Turbo, OWLv2) fuse
+to 0.4042 under the published WBF operator. Adding YOLOE's equal-effort output
+gives 0.4057 (+0.0015, inside the 0.002 floor), and recall at 95% precision
+drops (0.556 → 0.547). LLMDet's, Qwen3-VL's and YOLO-World's val caches live on
+the GPU box and were not re-run for this check. YOLOE stays out of the
+eight-model fusion, whose test number is unchanged.
 
 ## Per-class failure analysis: where zero-shot breaks
 
@@ -656,8 +702,9 @@ makes the pattern unmistakable:
 | OmDet-Turbo | 0.805 | 0.187 | 0.369 | 0.000 | 0.127 |
 | Florence-2 | 0.749 | 0.151 | 0.560 | 0.000 | 0.152 |
 | YOLO-World | 0.840 | 0.311 | 0.000 | 0.005 | 0.051 |
-| YOLOE | 0.887 | 0.295 | 0.545 | 0.000 | 0.179 |
-| YOLOE + prompt ensemble | 0.927 | 0.250 | 0.640 | 0.000 | 0.179 |
+| YOLOE | 0.935 | 0.295 | 0.516 | 0.000 | 0.179 |
+| YOLOE + number crop | 0.935 | 0.295 | 0.516 | 0.000 | 0.567 |
+| YOLOE + prompt ensemble + number crop | 0.947 | 0.250 | 0.629 | 0.000 | 0.616 |
 | LLMDet-large | 0.880 | 0.407 | 0.673 | 0.001 | 0.571 |
 | Qwen3-VL | 0.934 | 0.334 | 0.727 | 0.000 | 0.266 |
 <!-- TABLE:vlm_per_class END -->
@@ -694,7 +741,7 @@ COCO's `person`) and collapse on the small, domain-specific classes.**
   strength here — despite its hand-tuned-prompt advantage — is no longer unique
   to it. Describing the clothing explicitly was tried and made things *worse*,
   not better (see above). YOLOE is the exception: the clothing phrase *is* its
-  best referee prompt (0.545 test). YOLO-World's 0.000 has a different and more
+  best referee prompt (0.516 test). YOLO-World's 0.000 has a different and more
   specific cause — see [Does the COCO `person` alias manufacture false
   positives?](#does-the-coco-person-alias-manufacture-false-positives) below.
 
