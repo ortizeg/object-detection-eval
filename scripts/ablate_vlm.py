@@ -89,7 +89,8 @@ _FORBIDDEN_SEARCH_SPLIT = "test"
 #: Rather than approximate it, YOLO-World arms run live, one forward pass each.
 #: It is the cheapest model here, so the honest option is also the affordable
 #: one.
-_BACKEND_POSTPROCESS = frozenset({"yolo_world"})
+#: YOLOE shares YOLO-World's ultralytics post-processing, so the same applies.
+_BACKEND_POSTPROCESS = frozenset({"yolo_world", "yoloe"})
 
 
 class Arm(BaseModel, frozen=True):
@@ -137,6 +138,9 @@ class Arm(BaseModel, frozen=True):
 
     #: Ultralytics-only detection cap. Left ``None`` for everything else.
     max_det: int | None = None
+    #: YOLOE only: class -> phrases averaged into that class's text embedding.
+    #: Part of the forward-pass signature, since it changes what the model sees.
+    prompt_ensembles: dict[str, list[str]] | None = None
     #: Inference resolution, where the backend exposes one (ultralytics `imgsz`).
     imgsz: int | None = None
     #: Overlapping-tile grid, e.g. ``[2, 2]``. ``None`` runs the whole image once.
@@ -194,6 +198,7 @@ class Arm(BaseModel, frozen=True):
             f"imgsz{self.imgsz}",
             f"tiles{self.tiles}@{self.tile_overlap}",
             f"maxdet{self.max_det}",
+            f"ens{_ensemble_digest(self.prompt_ensembles)}",
             f"minpx{self.min_pixels}",
             f"maxpx{self.max_pixels}",
             f"prompt{hashlib.sha256((self.prompt_template or '-').encode()).hexdigest()[:8]}",
@@ -202,6 +207,14 @@ class Arm(BaseModel, frozen=True):
         if not self.replayable:
             parts += [f"box{self.box_threshold}", f"nms{self.nms_iou_threshold}"]
         return "__".join(parts).replace("/", "_").replace(" ", "-")
+
+
+def _ensemble_digest(ensembles: dict[str, list[str]] | None) -> str:
+    """Short stable hash of a prompt-ensemble mapping, ``-`` when unset."""
+    if not ensembles:
+        return "-"
+    blob = json.dumps(ensembles, sort_keys=True).encode()
+    return hashlib.sha256(blob).hexdigest()[:8]
 
 
 class Element(BaseModel, frozen=True):
@@ -524,6 +537,18 @@ def build_inferencer(arm: Arm, *, raw_mode: bool) -> Any:
         return YOLOWorldInferencer(
             model_name=arm.model_name,
             classes=arm.classes,
+            box_threshold=box_threshold,
+            nms_iou_threshold=nms_iou,
+            imgsz=arm.imgsz if arm.imgsz is not None else 640,
+            max_det=arm.max_det if arm.max_det is not None else 300,
+        )
+    if arm.inferencer == "yoloe":
+        from object_detection_eval.inference.vlm.yoloe import YOLOEInferencer
+
+        return YOLOEInferencer(
+            model_name=arm.model_name,
+            classes=arm.classes,
+            prompt_ensembles=arm.prompt_ensembles,
             box_threshold=box_threshold,
             nms_iou_threshold=nms_iou,
             imgsz=arm.imgsz if arm.imgsz is not None else 640,

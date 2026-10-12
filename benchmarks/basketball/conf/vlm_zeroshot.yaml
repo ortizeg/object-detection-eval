@@ -362,6 +362,77 @@ models:
     imgsz: 1280
     expected_map5095: 0.189
 
+  # YOLOE-26x (added 2026-10-11, docs/plans/yoloe-zeroshot.md). YOLO-World's
+  # successor on the same ultralytics runtime, with a MobileCLIP2 text encoder
+  # and a RepRTA head. Same licence posture as yolo_world above: AGPL runtime
+  # in the optional extra, weights downloaded at runtime, never vendored.
+  #
+  # EQUAL-EFFORT ROW. Every choice below was made on val, through the same
+  # process every open-weights row got:
+  #   1. Six-candidate prompt search (results/vlm/prompt_search/yoloe.json):
+  #      c2_contrastive won at 0.2014. It is also the first real-time row to
+  #      detect referees at all (AP50 0.43 vs YOLO-World's 0.000).
+  #   2. One-knob ablation (vlm_ablation.yaml, `yoloe__*` arms): imgsz 1280
+  #      +0.0218, the only single knob above the 0.002 floor. Smaller and
+  #      older checkpoints (26l, 11l, v8l) all lose 0.036-0.050.
+  #   3. Stacked on 1280: the six candidates re-scored (c4 wins), box 0.001
+  #      +0.0082, the per-class composition (c4 + bare `number`) +0.0125,
+  #      then NMS 0.8 +0.0051. Val 0.2512.
+  # `rim` stays at exactly 0.000 under every arm. It is a box-convention
+  # mismatch, documented with the rim_word arms in vlm_ablation.yaml.
+  - name: yoloe
+    inferencer: yoloe
+    model_name: yoloe-26x-seg.pt
+    classes:
+      - basketball player in a team uniform
+      - orange basketball
+      - referee in a striped shirt
+      - basketball hoop and backboard
+      - number
+    box_threshold: 0.001
+    nms_iou_threshold: 0.8
+    imgsz: 1280
+    max_det: 300
+    # TEST (2026-10-11, Apple M-series MPS, run once): mAP@50:95 0.2761,
+    # mAP@50 0.3811. +0.087 over YOLO-World on the same runtime.
+    expected_map5095: 0.276
+
+  # YOLOE-26x + PROMPT ENSEMBLING. DISCLOSED EXTRA EFFORT, not an
+  # equal-effort row. Same configuration as `yoloe` above, but four of the
+  # five classes are prompted with the mean MobileCLIP embedding of several
+  # phrases instead of one. Some phrases come from the shared pool and some
+  # were hand-written (athlete in a jersey, leather basketball, basketball
+  # official, referee in a black and white striped shirt). The label stays
+  # the class string, so scoring is unchanged. Val 0.2679 (+0.0167 over the
+  # equal-effort stack). The pool-only ensemble scored 0.2538, and averaging
+  # `number` too cost 0.007: vlm_ablation.yaml's prompt_ensemble element.
+  # Fixed on val BEFORE either YOLOE row was run on test.
+  - name: yoloe_ensemble
+    inferencer: yoloe
+    model_name: yoloe-26x-seg.pt
+    classes:
+      - basketball player in a team uniform
+      - orange basketball
+      - referee in a striped shirt
+      - basketball hoop and backboard
+      - number
+    prompt_ensembles:
+      basketball player in a team uniform:
+        [basketball player in a team uniform, basketball player, player, athlete in a jersey]
+      orange basketball: [orange basketball, basketball, ball, sports ball, leather basketball]
+      referee in a striped shirt:
+        [referee in a striped shirt, referee, basketball official,
+         referee in a black and white striped shirt]
+      basketball hoop and backboard: [basketball hoop and backboard, basketball hoop, rim]
+    box_threshold: 0.001
+    nms_iou_threshold: 0.8
+    imgsz: 1280
+    max_det: 300
+    # TEST (2026-10-11, MPS, run once): mAP@50:95 0.2912, mAP@50 0.3991.
+    # +0.015 over the equal-effort `yoloe` row: player and referee up, ball
+    # down (0.295 -> 0.250 AP50).
+    expected_map5095: 0.291
+
   # LLMDet-large (added 2026-08-17) -- the seventh row. Architecturally
   # mm-grounding-dino: same HF calling convention as Grounding DINO
   # (AutoModelForZeroShotObjectDetection + post_process_grounded_object_detection),

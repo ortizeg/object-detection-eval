@@ -169,6 +169,17 @@ def test_only_the_checkpoint_re_search_pins_a_second_field(manifest: Any) -> Non
         "nms_on_combined",
         "tiles",
         "referee_word",
+        # YOLOE's stack, built in several measured moves rather than one
+        # `combined` arm (vlm_ablation.yaml, 2026-10-11).
+        "vocabulary_on_combined",
+        "box_threshold_on_combined",
+        "vocab_on_stack",
+        "nms_on_stack",
+        "nms_on_composed",
+        "imgsz_on_composed",
+        # Disclosed Round-4 work, measured on top of the finished stack.
+        "rim_word",
+        "prompt_ensemble",
     }
 
 

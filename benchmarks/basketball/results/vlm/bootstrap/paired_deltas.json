@@ -1,0 +1,44 @@
+{
+  "split": "test",
+  "unit": "image (NOT clip-clustered; see module docstring)",
+  "iterations": 1000,
+  "seed": 42,
+  "point_map5095": {
+    "llmdet": 0.3883121609687805,
+    "yolo_world": 0.18917140364646912,
+    "yoloe": 0.2761293053627014,
+    "yoloe_ensemble": 0.2911683917045593
+  },
+  "pairs": [
+    {
+      "a": "yoloe",
+      "b": "yolo_world",
+      "delta": 0.0869579017162323,
+      "ci95": [
+        0.07298539429903031,
+        0.10150215476751327
+      ],
+      "p_a_not_better": 0.0
+    },
+    {
+      "a": "yoloe_ensemble",
+      "b": "yoloe",
+      "delta": 0.01503908634185791,
+      "ci95": [
+        0.00512801855802536,
+        0.024597982317209235
+      ],
+      "p_a_not_better": 0.001
+    },
+    {
+      "a": "llmdet",
+      "b": "yoloe_ensemble",
+      "delta": 0.09714376926422119,
+      "ci95": [
+        0.08213249817490578,
+        0.11099836379289627
+      ],
+      "p_a_not_better": 0.0
+    }
+  ]
+}

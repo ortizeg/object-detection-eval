@@ -578,6 +578,17 @@ _ABLATION_ELEMENTS: tuple[tuple[str, str], ...] = (
     ("nms_on_tiles", "NMS re-swept under tiling"),
     ("combined", "All accepted changes together"),
     ("nms_on_combined", "NMS re-swept on the full stack"),
+    # YOLOE's combination stage (2026-10-11). Same idea as the three above,
+    # spelled out per step because its stack was built in several moves.
+    ("vocabulary_on_combined", "Vocabulary re-search (new resolution)"),
+    ("box_threshold_on_combined", "`box_threshold` on the stack"),
+    ("vocab_on_stack", "Per-class vocabulary on the stack"),
+    ("nms_on_stack", "NMS on the stack"),
+    ("nms_on_composed", "NMS on the composed vocabulary"),
+    ("imgsz_on_composed", "Input resolution on the composed vocabulary"),
+    # Disclosed, beyond equal effort (see vlm_ablation.yaml's Round 4 note).
+    ("rim_word", "Rim word (disclosed)"),
+    ("prompt_ensemble", "Prompt ensembling (disclosed)"),
 )
 
 #: Element deltas below this are reported as no effect rather than as a win.
@@ -712,6 +723,16 @@ def ablation_headline_table(
         # missing key must not read as a mismatch.
         if any(key in arm.config and arm.config[key] != value for key, value in published.items()):
             continue
+        # The converse: a knob the arm varies but the manifest row never states
+        # is running at the model's baseline value, so an arm that moved it was
+        # not adopted. Without this, YOLOE's disclosed prompt-ensemble arm
+        # matched the equal-effort `yoloe` row, which states no ensembles at all.
+        base_arm = baselines.get(arm.model)
+        if base_arm is not None and any(
+            key not in published and value != base_arm.config.get(key)
+            for key, value in arm.config.items()
+        ):
+            continue
         if arm.map_50_95 > best[arm.model].map_50_95:
             best[arm.model] = arm
 
@@ -767,6 +788,7 @@ _CHANGE_LABELS = {
     "processor_nms_threshold": "processor NMS",
     "prompt_template": "prompt",
     "sample": "repeat draw",
+    "prompt_ensembles": "prompt ensembling",
 }
 
 
@@ -775,7 +797,7 @@ def _describe_change(key: str, value: Any) -> str:
     label = _CHANGE_LABELS.get(key, key)
     if key == "tiles":
         return f"{label} {value[0]}x{value[1]}" if value else f"no {label}"
-    if key in ("classes", "prompt_template"):
+    if key in ("classes", "prompt_template", "prompt_ensembles"):
         # Never inline the value: a class list is long and a Gemini prompt is
         # several hundred characters, either of which turns a table cell into a
         # wall of text.

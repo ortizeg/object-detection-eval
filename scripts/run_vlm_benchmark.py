@@ -90,6 +90,10 @@ class ManifestEntry(BaseModel, frozen=True):
     #: Ultralytics-only: letterbox size and per-image detection cap.
     imgsz: int | None = Field(default=None, ge=32)
     max_det: int | None = Field(default=None, ge=1)
+    #: YOLOE only: class -> phrases whose text embeddings are averaged into that
+    #: class's prompt (CLIP-style prompt ensembling). ``None`` encodes each
+    #: class string on its own, like every other row.
+    prompt_ensembles: dict[str, list[str]] | None = None
     #: Overlapping-tile grid, e.g. ``[2, 2]``. ``None`` runs the whole frame
     #: once. The single largest win the 2026-08-04 ablation found, and the only
     #: resolution lever the models with fixed-size processors have.
@@ -214,6 +218,20 @@ def _yolo_world_factory(entry: ManifestEntry) -> BaseInferencer:
     )
 
 
+def _yoloe_factory(entry: ManifestEntry) -> BaseInferencer:
+    from object_detection_eval.inference.vlm.yoloe import YOLOEInferencer
+
+    return YOLOEInferencer(
+        model_name=entry.model_name,
+        classes=entry.classes,
+        prompt_ensembles=entry.prompt_ensembles,
+        box_threshold=entry.box_threshold if entry.box_threshold is not None else 0.01,
+        nms_iou_threshold=(entry.nms_iou_threshold if entry.nms_iou_threshold is not None else 0.5),
+        imgsz=entry.imgsz if entry.imgsz is not None else 640,
+        max_det=entry.max_det if entry.max_det is not None else 300,
+    )
+
+
 def _gemini_factory(entry: ManifestEntry) -> BaseInferencer:
     from object_detection_eval.inference.vlm.gemini import GeminiInferencer
 
@@ -253,6 +271,7 @@ _INFERENCER_FACTORIES: dict[str, Callable[[ManifestEntry], BaseInferencer]] = {
     "grounding_dino": _grounding_dino_factory,
     "florence2": _florence2_factory,
     "yolo_world": _yolo_world_factory,
+    "yoloe": _yoloe_factory,
     "qwen3_vl": _qwen3_vl_factory,
     "llmdet": _llmdet_factory,
 }

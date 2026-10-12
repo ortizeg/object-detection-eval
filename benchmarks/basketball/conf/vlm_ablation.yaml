@@ -156,6 +156,23 @@ models:
       min_pixels: 4096000
       max_pixels: 8192000
 
+  # YOLOE, added 2026-10-11 (docs/plans/yoloe-zeroshot.md). The baseline is
+  # the equal-effort prompt-search winner (c2_contrastive, val 0.2014,
+  # results/vlm/prompt_search/yoloe.json) at the search's starting settings,
+  # which match YOLO-World's search row. Every YOLOE element below is
+  # scoped to `yoloe` alone and mirrors the knobs YOLO-World was swept on.
+  - name: yoloe
+    config:
+      inferencer: yoloe
+      model_name: yoloe-26x-seg.pt
+      classes:
+        [basketball player in a team uniform, basketball, referee in a striped shirt,
+         basketball hoop, jersey number]
+      box_threshold: 0.01
+      nms_iou_threshold: 0.5
+      imgsz: 640
+      max_det: 300
+
 # ---------------------------------------------------------------------------
 # Elements. One knob each; arms are generated as baseline-plus-one-change.
 # ---------------------------------------------------------------------------
@@ -631,3 +648,224 @@ elements:
     fixed:
       tiles: [2, 2]
     values: [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.9]
+
+  # ---------------------------------------------------------------------------
+  # YOLOE (2026-10-11). The same knobs YOLO-World was swept on, one at a time
+  # off the yoloe baseline above. Every arm runs live (ultralytics NMS is not
+  # replayable -- see _BACKEND_POSTPROCESS in ablate_vlm.py).
+  # ---------------------------------------------------------------------------
+
+  # Per-class best phrase from the six-candidate search: c2 everywhere except
+  # `number`, where c5's bare word scored highest (AP50 0.0036 vs 0.0017). The
+  # same assembly rule every other row's vocab_per_class_best arm used.
+  - name: vocab_per_class_best
+    knob: classes
+    applies_to: [yoloe]
+    values:
+      - [basketball player in a team uniform, basketball, referee in a striped shirt,
+         basketball hoop, number]
+
+  - name: checkpoint
+    knob: model_name
+    applies_to: [yoloe]
+    values: [yoloe-26l-seg.pt, yoloe-11l-seg.pt, yoloe-v8l-seg.pt]
+
+  - name: imgsz
+    knob: imgsz
+    applies_to: [yoloe]
+    values: [960, 1280, 1600]
+
+  - name: nms_iou
+    knob: nms_iou_threshold
+    applies_to: [yoloe]
+    values: [0.3, 0.4, 0.6, 0.7, 0.8, 0.9]
+
+  - name: box_threshold
+    knob: box_threshold
+    applies_to: [yoloe]
+    values: [0.001, 0.005, 0.02, 0.05]
+
+  - name: singleton_top_k
+    knob: singleton_top_k
+    applies_to: [yoloe]
+    values: [1, 2, 5, 10]
+
+  - name: max_det
+    knob: max_det
+    applies_to: [yoloe]
+    values: [1000]
+
+  - name: tiles
+    knob: tiles
+    applies_to: [yoloe]
+    values:
+      - [2, 2]
+
+  # --- YOLOE combination stage (after the single-knob pass above) ---------
+  # Single-knob result on val (baseline 0.2014): imgsz 1280 is the only knob
+  # clearing the 0.002 floor (+0.0218; 960 +0.0118, 1600 +0.0182). Every other
+  # knob sits inside the floor (best: NMS 0.8 +0.0020, box 0.001 +0.0017) or
+  # loses (smaller checkpoints -0.036 to -0.050, 2x2 tiles -0.0092). imgsz 1280
+  # is ADOPTED; the arms below are measured on top of it.
+  #
+  # The vocabulary won its search at 640, where `number` was effectively
+  # undetectable (AP50 0.002) and so could not vote. At 1280 it is 0.070, so
+  # the same six candidates are re-scored at the new resolution: the same rule
+  # Florence-2's `vocabulary_on_new_checkpoint` element follows. Same pool, no
+  # new phrases, so no extra prompt effort.
+  - name: vocabulary_on_combined
+    knob: classes
+    applies_to: [yoloe]
+    fixed:
+      imgsz: 1280
+    values:
+      - [person, sports ball, referee, basketball hoop, jersey number]
+      - [basketball player, basketball, referee, basketball hoop, jersey number]
+      - [basketball player, orange basketball, referee, basketball hoop and backboard,
+         jersey number on a uniform]
+      - [basketball player in a team uniform, orange basketball, referee in a striped shirt,
+         basketball hoop and backboard, jersey number on a uniform]
+      - [player, ball, referee, rim, number]
+
+  - name: nms_on_combined
+    knob: nms_iou_threshold
+    applies_to: [yoloe]
+    fixed:
+      imgsz: 1280
+    values: [0.6, 0.7, 0.8, 0.9]
+
+  - name: box_threshold_on_combined
+    knob: box_threshold
+    applies_to: [yoloe]
+    fixed:
+      imgsz: 1280
+    values: [0.001, 0.005]
+
+  # --- YOLOE stack: imgsz 1280 + box 0.001 + c4 vocabulary ------------------
+  # Measured against imgsz 1280 alone (0.2232): c4 vocabulary +0.0037, box
+  # 0.001 +0.0082, NMS 0.8 +0.0023 (on the floor). Vocabulary and threshold
+  # are adopted and stacked below; NMS is re-swept on the stack because
+  # suppression interacts with the threshold.
+  #
+  # Per-class assembly at 1280: c4/c2 win player, ball and referee, and bare
+  # `number` (c5) more than doubles jersey-number AP50 (0.064 -> 0.175) while
+  # its other four bare words tank. So the composed vocabulary takes c4's
+  # first four classes and c5's `number`, exactly the vocab_per_class_best
+  # rule, applied at the adopted resolution.
+  - name: vocab_on_stack
+    knob: classes
+    applies_to: [yoloe]
+    fixed:
+      imgsz: 1280
+      box_threshold: 0.001
+    values:
+      - [basketball player in a team uniform, orange basketball, referee in a striped shirt,
+         basketball hoop and backboard, jersey number on a uniform]
+      - [basketball player in a team uniform, orange basketball, referee in a striped shirt,
+         basketball hoop and backboard, number]
+
+  - name: nms_on_stack
+    knob: nms_iou_threshold
+    applies_to: [yoloe]
+    fixed:
+      imgsz: 1280
+      box_threshold: 0.001
+      classes:
+        [basketball player in a team uniform, orange basketball, referee in a striped shirt,
+         basketball hoop and backboard, jersey number on a uniform]
+    values: [0.6, 0.7, 0.8]
+
+  # The composed vocabulary (c4 + bare `number`) is ADOPTED: 0.2461 vs c4's
+  # 0.2336 on the same stack (+0.0125, all of it `number`). NMS 0.8 helped c4
+  # (+0.0034, player up, number down), so it is re-swept on the composed
+  # vocabulary, whose `number` class is now worth protecting.
+  - name: nms_on_composed
+    knob: nms_iou_threshold
+    applies_to: [yoloe]
+    fixed:
+      imgsz: 1280
+      box_threshold: 0.001
+      classes:
+        [basketball player in a team uniform, orange basketball, referee in a striped shirt,
+         basketball hoop and backboard, number]
+    values: [0.4, 0.6, 0.7, 0.8]
+
+  - name: imgsz_on_composed
+    knob: imgsz
+    applies_to: [yoloe]
+    fixed:
+      box_threshold: 0.001
+      classes:
+        [basketball player in a team uniform, orange basketball, referee in a striped shirt,
+         basketball hoop and backboard, number]
+    values: [1600, 1920]
+
+  # NMS 0.8 ADOPTED on the composed vocabulary: 0.2512 vs 0.2461 at 0.5
+  # (+0.0051; player +0.025, number -0.015). Raising resolution further trades
+  # classes against each other rather than helping: 1600 0.2456, 1920 0.2366,
+  # with `number` climbing (0.361, 0.446) while ball and player fall. imgsz
+  # stays 1280. The equal-effort stack ends here, at val 0.2512.
+  #
+  # ===== YOLOE Round 4: extra prompt work, DISCLOSED ======================
+  # Everything below goes beyond the equal effort the other rows got
+  # (docs/plans/yoloe-zeroshot.md, Round 4). Adopted only on the same 0.002
+  # bar. If adopted, the report says this row received more prompt work.
+  #
+  # RIM. Exactly 0.000 AP50 in every arm above. A diagnostic on 25 val rims
+  # (stack config) shows a box-convention mismatch, not a missing detection.
+  # GT rims are tight on the ring (median 64x22 px). YOLOE's hoop boxes take
+  # in the net (~60x60), so the best class-3 IoU is 0.34 and none reach 0.5.
+  # The only other boxes on the rim are low-confidence `orange basketball`
+  # hits on the orange ring. Two rim words are logged so the negative is
+  # reproducible.
+  - name: rim_word
+    knob: classes
+    applies_to: [yoloe]
+    fixed:
+      imgsz: 1280
+      box_threshold: 0.001
+      nms_iou_threshold: 0.8
+    values:
+      - [basketball player in a team uniform, orange basketball, referee in a striped shirt,
+         basketball rim, number]
+      - [basketball player in a team uniform, orange basketball, referee in a striped shirt,
+         rim, number]
+
+  # PROMPT ENSEMBLING. YOLOE takes text embeddings directly, so a class can be
+  # prompted with the MEAN of several phrases' MobileCLIP embeddings (CLIP's
+  # prompt-ensembling trick) instead of one phrase. The label stays the class
+  # string, so scoring is unchanged.
+  #   pool_all     -- each class averages every phrase the six-candidate pool
+  #                   ever gave it. No new words.
+  #   pool_no_num  -- same, but `number` keeps its bare word (the composed
+  #                   vocabulary's whole gain came from that word).
+  #   extended     -- pool_no_num plus new hand-written synonyms.
+  - name: prompt_ensemble
+    knob: prompt_ensembles
+    applies_to: [yoloe]
+    fixed:
+      imgsz: 1280
+      box_threshold: 0.001
+      nms_iou_threshold: 0.8
+      classes:
+        [basketball player in a team uniform, orange basketball, referee in a striped shirt,
+         basketball hoop and backboard, number]
+    values:
+      - basketball player in a team uniform:
+          [basketball player in a team uniform, basketball player, player]
+        orange basketball: [orange basketball, basketball, ball, sports ball]
+        referee in a striped shirt: [referee in a striped shirt, referee]
+        basketball hoop and backboard: [basketball hoop and backboard, basketball hoop, rim]
+        number: [number, jersey number, jersey number on a uniform]
+      - basketball player in a team uniform:
+          [basketball player in a team uniform, basketball player, player]
+        orange basketball: [orange basketball, basketball, ball, sports ball]
+        referee in a striped shirt: [referee in a striped shirt, referee]
+        basketball hoop and backboard: [basketball hoop and backboard, basketball hoop, rim]
+      - basketball player in a team uniform:
+          [basketball player in a team uniform, basketball player, player, athlete in a jersey]
+        orange basketball: [orange basketball, basketball, ball, sports ball, leather basketball]
+        referee in a striped shirt:
+          [referee in a striped shirt, referee, basketball official,
+           referee in a black and white striped shirt]
+        basketball hoop and backboard: [basketball hoop and backboard, basketball hoop, rim]
