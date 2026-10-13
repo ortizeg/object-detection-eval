@@ -61,3 +61,8 @@ aliases:
   man in a striped shirt: referee
   basketball official: referee
   black and white striped shirt: referee
+
+  # --- DINO-X Pro bespoke prompts (2026-10, round 4 of
+  # docs/plans/dinox-pro-2026-10.md; disclosed extra, NOT equal-effort).
+  basketball rim: rim
+  orange basketball rim: rim

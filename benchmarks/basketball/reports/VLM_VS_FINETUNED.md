@@ -362,13 +362,14 @@ never emit, while the singleton cap *constrains* the zero-shot rows.
 
 ## The zero-shot ceiling
 
-Nine zero-shot VLMs, scored on the merged-5 test split. The table is recomputed
+Ten zero-shot VLMs, scored on the merged-5 test split. The table is recomputed
 from the committed prediction dumps in `results/vlm/*.json` (never transcribed):
 
 <!-- TABLE:vlm_summary START -->
 | Model | mAP@50:95 | mAP@50 | mAP@75 |
 | --- | --- | --- | --- |
 | GPT-6 Astra | 0.501 | 0.823 | 0.507 |
+| DINO-X Pro | 0.439 | 0.564 | 0.489 |
 | Gemini | 0.250 | 0.430 | 0.252 |
 | OWLv2 | 0.315 | 0.476 | 0.367 |
 | Grounding-DINO | 0.293 | 0.352 | 0.318 |
@@ -401,6 +402,53 @@ is 0.073 clear of OWLv2's 0.315, the previous open-weights leader. Qwen3-VL-8B
 inference took it from 0.188 (tied for last) to 0.318. Both rows' tuning is
 summarised in [Two more rows: LLMDet-large and
 Qwen3-VL-8B](#two-more-rows-llmdet-large-and-qwen3-vl-8b) below.
+
+**DINO-X Pro is second, at 0.439. It is also billed, but it went through the
+equal-effort search.** Added 2026-10-12. DINO-X is IDEA Research's successor to
+Grounding DINO, and its Pro variant exists only as a hosted API. Unlike Gemini
+and Astra, it takes a class vocabulary rather than a free-text instruction. So
+it faced the same six shared candidates as the open-weights rows (winner:
+`c1_domain`, val 0.342) and then the same ablation levers. 2x2 tiling was worth
++0.087 on val, the largest single gain; local NMS and a 1536 downscale were
+nulls. On test it sits 0.146 above its predecessor Grounding-DINO and 0.050
+above LLMDet-large (paired image-level 95% CI [+0.037, +0.063]). It sits 0.062
+below Astra (CI [−0.080, −0.045]). Those intervals resample frames, and the test
+set is three clips, so treat them as too narrow; the
+[3-clip caveat](FINAL_COMPARISON_640.md#️-the-94-images-are-3-video-clips-not-94-independent-samples) applies. It shares the table's commonest failure:
+`rim` AP@50 is 0.002. That is a box-extent mismatch, not a miss. The GT boxes the
+ring; DINO-X's "basketball hoop" box includes the net (median best IoU 0.41,
+2.1x the GT area). A disclosed, non-equal-effort variant that prompts `rim` by
+name plus four discarded distractor phrases (backboard, net, spectator, coach)
+reached **0.484 on val**, level with Astra's 0.485, with rim at 0.21; on test it
+scores **0.467**. The undocumented `DINO-X-PREVIEW-1.0` model id, with the
+headline config, scores **0.478** test. Neither replaces the headline row.
+
+**The rim fix that works for DINO-X costs nothing: trim the box.** (Added
+2026-10-13, disclosed extra.) The ring is the top third of DINO-X's hoop-and-net
+box. Keeping only the top 35% of each rim-class box takes rim AP@50 from 0.002 to
+**0.596** on test, and the row from 0.439 to **0.520**, level with Astra's base
+row (0.501): DINO-X Pro + trim minus Astra is +0.019, paired 95% CI [−0.004,
++0.040]. The fraction was set
+on val (peak 0.35, a smooth curve from 0.15 to 0.5), and it is a hand-set box
+rule, so it is reported apart from the headline row. It needs no extra API calls.
+Astra's crop-refine idea, ported to DINO-X, did **not** work: inside a zoomed
+crop, DINO-X's top "rim" box is often some other small object, and the line
+scored 0.448 test, only +0.008 over the headline row.
+
+**Fusing it with Astra's crop-refine gives the best zero-shot result in this
+report: 0.651.** (Disclosed extra, 2026-10-13.) Weighted box fusion (IoU 0.55,
+equal weights, the fusion round's pre-committed operator) of Astra crop-refine
+and DINO-X Pro + trim scores **0.651** test mAP@50:95, against 0.588 for Astra
+crop-refine alone (+0.065, paired 95% CI [+0.056, +0.073]). Unlike the earlier Astra greedy fusion, the
+pair was chosen on val, where every DINO-X × Astra pair beat its Astra member.
+DINO-X adds ball (0.69 → 0.75) and number (0.85 → 0.90). Its own CI is [0.634,
+0.671]. That overlaps RF-DETR-M (0.646, [0.629, 0.666]) and YOLOX-M (0.672), and
+it clears RTMDet-M (0.628), DAMO-YOLO-M (0.619) and RT-DETRv2-M (0.581). So it
+is level with the middle of the fine-tuned table, not just its floor. The
+intervals resample frames from three clips, so they are too narrow. It is two billed APIs and about seven calls per
+image, and recall at 95% precision does not improve (0.873 vs 0.882). Plan, every
+arm and all amendments:
+[docs/plans/dinox-pro-2026-10.md](../../../docs/plans/dinox-pro-2026-10.md).
 
 **"Below half the worst fine-tuned detector" now depends entirely on whether you
 count the paid API.** Against the lowest-ranked fine-tuned detector's **0.581**
@@ -556,6 +604,7 @@ makes the pattern unmistakable:
 | Model | player | ball | referee | rim | number |
 | --- | --- | --- | --- | --- | --- |
 | GPT-6 Astra | 0.980 | 0.776 | 0.979 | 0.521 | 0.861 |
+| DINO-X Pro | 0.919 | 0.567 | 0.628 | 0.002 | 0.702 |
 | Gemini | 0.923 | 0.316 | 0.717 | 0.036 | 0.156 |
 | OWLv2 | 0.901 | 0.583 | 0.388 | 0.002 | 0.505 |
 | Grounding-DINO | 0.867 | 0.355 | 0.533 | 0.000 | 0.006 |

@@ -40,6 +40,7 @@ _DEFAULT_TAXONOMY_DIR = _REPO_ROOT / "benchmarks" / "basketball" / "conf" / "tax
 #: (and therefore in the rendered report tables).
 _VLM_FILES: dict[str, str] = {
     "GPT-6 Astra": "astra.json",
+    "DINO-X Pro": "dinox_pro.json",
     "Gemini": "gemini.json",
     "OWLv2": "owlv2.json",
     "Grounding-DINO": "grounding_dino.json",

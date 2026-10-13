@@ -1,0 +1,190 @@
+{
+  "iou": 0.55,
+  "method": "wbf",
+  "valid": [
+    {
+      "combo": "astra_crop_refine",
+      "mAP_50_95": 0.5397,
+      "mAP_50": 0.8439,
+      "per_class_ap50": {
+        "player": 0.979,
+        "ball": 0.64,
+        "referee": 0.889,
+        "rim": 0.838,
+        "number": 0.873
+      },
+      "recall_at_p95": 0.852
+    },
+    {
+      "combo": "astra_base_numcrop",
+      "mAP_50_95": 0.4926,
+      "mAP_50": 0.8254,
+      "per_class_ap50": {
+        "player": 0.978,
+        "ball": 0.708,
+        "referee": 0.911,
+        "rim": 0.609,
+        "number": 0.921
+      },
+      "recall_at_p95": 0.872
+    },
+    {
+      "combo": "dinox_pro",
+      "mAP_50_95": 0.4294,
+      "mAP_50": 0.5775,
+      "per_class_ap50": {
+        "player": 0.909,
+        "ball": 0.5,
+        "referee": 0.713,
+        "rim": 0.003,
+        "number": 0.761
+      },
+      "recall_at_p95": 0.259
+    },
+    {
+      "combo": "dinox_pro_bespoke",
+      "mAP_50_95": 0.4836,
+      "mAP_50": 0.6516,
+      "per_class_ap50": {
+        "player": 0.938,
+        "ball": 0.516,
+        "referee": 0.836,
+        "rim": 0.214,
+        "number": 0.754
+      },
+      "recall_at_p95": 0.438
+    },
+    {
+      "combo": "dinox_pro_rimtrim",
+      "mAP_50_95": 0.4985,
+      "mAP_50": 0.6871,
+      "per_class_ap50": {
+        "player": 0.909,
+        "ball": 0.5,
+        "referee": 0.713,
+        "rim": 0.551,
+        "number": 0.761
+      },
+      "recall_at_p95": 0.262
+    },
+    {
+      "combo": "astra_crop_refine+dinox_pro",
+      "mAP_50_95": 0.5794,
+      "mAP_50": 0.8614,
+      "per_class_ap50": {
+        "player": 0.978,
+        "ball": 0.707,
+        "referee": 0.933,
+        "rim": 0.767,
+        "number": 0.921
+      },
+      "recall_at_p95": 0.84
+    },
+    {
+      "combo": "astra_crop_refine+dinox_pro_bespoke",
+      "mAP_50_95": 0.5997,
+      "mAP_50": 0.8812,
+      "per_class_ap50": {
+        "player": 0.979,
+        "ball": 0.716,
+        "referee": 0.941,
+        "rim": 0.854,
+        "number": 0.915
+      },
+      "recall_at_p95": 0.871
+    },
+    {
+      "combo": "astra_crop_refine+dinox_pro_rimtrim",
+      "mAP_50_95": 0.6112,
+      "mAP_50": 0.885,
+      "per_class_ap50": {
+        "player": 0.978,
+        "ball": 0.707,
+        "referee": 0.933,
+        "rim": 0.885,
+        "number": 0.921
+      },
+      "recall_at_p95": 0.867
+    },
+    {
+      "combo": "astra_base_numcrop+dinox_pro",
+      "mAP_50_95": 0.5314,
+      "mAP_50": 0.8376,
+      "per_class_ap50": {
+        "player": 0.978,
+        "ball": 0.726,
+        "referee": 0.943,
+        "rim": 0.597,
+        "number": 0.944
+      },
+      "recall_at_p95": 0.842
+    },
+    {
+      "combo": "astra_base_numcrop+dinox_pro_bespoke",
+      "mAP_50_95": 0.5477,
+      "mAP_50": 0.8658,
+      "per_class_ap50": {
+        "player": 0.978,
+        "ball": 0.733,
+        "referee": 0.95,
+        "rim": 0.731,
+        "number": 0.938
+      },
+      "recall_at_p95": 0.879
+    },
+    {
+      "combo": "astra_base_numcrop+dinox_pro_rimtrim",
+      "mAP_50_95": 0.5627,
+      "mAP_50": 0.8756,
+      "per_class_ap50": {
+        "player": 0.978,
+        "ball": 0.726,
+        "referee": 0.943,
+        "rim": 0.787,
+        "number": 0.944
+      },
+      "recall_at_p95": 0.862
+    }
+  ],
+  "test": [
+    {
+      "combo": "astra_crop_refine",
+      "mAP_50_95": 0.5878,
+      "mAP_50": 0.8895,
+      "per_class_ap50": {
+        "player": 0.98,
+        "ball": 0.688,
+        "referee": 0.98,
+        "rim": 0.952,
+        "number": 0.848
+      },
+      "recall_at_p95": 0.882
+    },
+    {
+      "combo": "dinox_pro_rimtrim",
+      "mAP_50_95": 0.5196,
+      "mAP_50": 0.6825,
+      "per_class_ap50": {
+        "player": 0.919,
+        "ball": 0.567,
+        "referee": 0.628,
+        "rim": 0.596,
+        "number": 0.702
+      },
+      "recall_at_p95": 0.302
+    },
+    {
+      "combo": "astra_crop_refine+dinox_pro_rimtrim",
+      "mAP_50_95": 0.6512,
+      "mAP_50": 0.9154,
+      "per_class_ap50": {
+        "player": 0.978,
+        "ball": 0.749,
+        "referee": 0.98,
+        "rim": 0.968,
+        "number": 0.901
+      },
+      "recall_at_p95": 0.873
+    }
+  ]
+}

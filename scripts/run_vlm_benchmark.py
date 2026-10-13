@@ -102,6 +102,10 @@ class ManifestEntry(BaseModel, frozen=True):
     #: (low/medium/high/xhigh/max). None omits the parameter. Higher = better
     #: localisation, steeply higher per-image cost.
     reasoning_effort: str | None = None
+    #: DINO-X (billed API) only: the API's own server-side NMS IoU, and an
+    #: optional longest-edge downscale before upload (None = native).
+    dinox_iou_threshold: float = Field(default=0.8, ge=0.0, le=1.0)
+    dinox_max_size: int | None = Field(default=None, ge=32)
     expected_map5095: float | None = Field(default=None, ge=0.0, le=1.0)
 
 
@@ -235,6 +239,21 @@ def _astra_factory(entry: ManifestEntry) -> BaseInferencer:
     )
 
 
+def _dinox_factory(entry: ManifestEntry) -> BaseInferencer:
+    from object_detection_eval.inference.vlm.dinox import DinoXInferencer
+
+    return DinoXInferencer(
+        model_name=entry.model_name,
+        classes=entry.classes,
+        bbox_threshold=entry.box_threshold if entry.box_threshold is not None else 0.01,
+        iou_threshold=entry.dinox_iou_threshold,
+        # A tiled row suppresses ONCE, on the merged tile output (_maybe_tiled);
+        # this is the configuration scripts/explore_dinox.py chose it under.
+        nms_iou_threshold=None if entry.tiles else entry.nms_iou_threshold,
+        max_size=entry.dinox_max_size,
+    )
+
+
 def _qwen3_vl_factory(entry: ManifestEntry) -> BaseInferencer:
     from object_detection_eval.inference.vlm.qwen3_vl import Qwen3VLInferencer
 
@@ -248,6 +267,7 @@ def _qwen3_vl_factory(entry: ManifestEntry) -> BaseInferencer:
 _INFERENCER_FACTORIES: dict[str, Callable[[ManifestEntry], BaseInferencer]] = {
     "gemini": _gemini_factory,
     "astra": _astra_factory,
+    "dinox": _dinox_factory,
     "owlv2": _owlv2_factory,
     "omdet_turbo": _omdet_turbo_factory,
     "grounding_dino": _grounding_dino_factory,

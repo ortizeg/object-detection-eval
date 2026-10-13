@@ -1,0 +1,145 @@
+# dinox_explore.yaml -- val-split arms for the DINO-X Pro row.
+# Plan of record: docs/plans/dinox-pro-2026-10.md (adoption rule fixed there
+# BEFORE any result). Run with scripts/explore_dinox.py; every arm's result,
+# winners and losers alike, lands in results/vlm/prompt_search/dinox_explore.json.
+#
+# Fetch settings shared by every arm unless stated: model DINO-X-1.0 (= DINO-X
+# Pro), native 1920x1080 upload, server bbox_threshold 0.01 (the box_threshold
+# every open-weights row runs at), server NMS IoU 0.8 (the API default).
+
+split: valid
+
+arms:
+  # ROUND 1 -- the equal-effort search. These six vocabularies are copied
+  # VERBATIM from vlm_prompt_search.yaml, the same candidates every
+  # open-weights row faced; no others. The winner is the row's vocabulary.
+  - id: c0_coco_control
+    round: 1
+    classes: [person, sports ball, referee, basketball hoop, jersey number]
+  - id: c1_domain
+    round: 1
+    classes: [basketball player, basketball, referee, basketball hoop, jersey number]
+  - id: c2_contrastive
+    round: 1
+    classes:
+      - basketball player in a team uniform
+      - basketball
+      - referee in a striped shirt
+      - basketball hoop
+      - jersey number
+  - id: c3_small_object
+    round: 1
+    classes:
+      - basketball player
+      - orange basketball
+      - referee
+      - basketball hoop and backboard
+      - jersey number on a uniform
+  - id: c4_contrastive_small_object
+    round: 1
+    classes:
+      - basketball player in a team uniform
+      - orange basketball
+      - referee in a striped shirt
+      - basketball hoop and backboard
+      - jersey number on a uniform
+  - id: c5_bare_canonical
+    round: 1
+    classes: [player, ball, referee, rim, number]
+
+  # ROUND 2 -- local per-class NMS on the R1 winner (c1_domain). Free: the
+  # server responses are already cached; only post-processing differs.
+  - {id: r2_nms_0.5, round: 2, nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+  - {id: r2_nms_0.6, round: 2, nms_iou_threshold: 0.6, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+  - {id: r2_nms_0.7, round: 2, nms_iou_threshold: 0.7, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+
+  # ROUND 3 -- paid levers on the R1 winner, the same ones the open-weights
+  # rows were ablated over. Tiling = 2x2 overlapping tiles + the full frame
+  # (full frame is cached from R1); its merge NMS is swept, as every tiled row's
+  # was, because tiling manufactures cross-tile duplicates.
+  - {id: r3a_tiled_nms0.5, round: 3, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+  - {id: r3a_tiled_nms0.6, round: 3, tiles: [2, 2], nms_iou_threshold: 0.6, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+  - {id: r3a_tiled_nms0.7, round: 3, tiles: [2, 2], nms_iou_threshold: 0.7, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+  # Added after the first three: merge-NMS improved monotonically 0.7 -> 0.5,
+  # so the sweep continues downward until it turns.
+  - {id: r3a_tiled_nms0.4, round: 3, tiles: [2, 2], nms_iou_threshold: 0.4, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+  - {id: r3a_tiled_nms0.3, round: 3, tiles: [2, 2], nms_iou_threshold: 0.3, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+  - {id: r3b_max1536, round: 3, max_size: 1536, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+  - {id: r3c_preview_model, round: 3, model_name: DINO-X-PREVIEW-1.0, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+  # DINO-X-PREVIEW-1.0 is an UNDOCUMENTED model id (listed only in the API's
+  # validation error). It is not the row's model -- the row is DINO-X Pro,
+  # `DINO-X-1.0` -- so it is reported as its own labelled line. Tiled here to
+  # see whether its gain composes with tiling's.
+  - {id: r3d_preview_tiled_nms0.5, round: 3, model_name: DINO-X-PREVIEW-1.0, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+
+  # ROUND 4 -- DINO-X-specific prompt engineering. DISCLOSED EXTRA: beyond the
+  # equal effort every other row received, so a winner here is reported as its
+  # own labelled line and never replaces the headline row. Motivated by R1:
+  # per-class best phrases differ across candidates (bare `number` 0.57 vs
+  # `jersey number` 0.34; `rim` 0.08 vs `basketball hoop` 0.00), and the hoop
+  # collapse is a box-extent mismatch -- GT boxes the ring only, DINO-X's
+  # "hoop" box includes the net (median best IoU 0.41, area ratio 2.1).
+  - id: r4a_mixed_best_phrase
+    round: 4
+    note: best R1 phrase per class
+    classes: [basketball player, basketball, referee, rim, number]
+  - id: r4b_basketball_rim
+    round: 4
+    note: rim named with its object context
+    classes: [basketball player, basketball, referee, basketball rim, number]
+  - id: r4c_distractors
+    round: 4
+    note: backboard/net absorb the hoop-structure boxes; spectator/coach absorb off-court people
+    classes: [basketball player, basketball, referee, rim, number, backboard, net, spectator, coach]
+    distractors: [backboard, net, spectator, coach]
+  - id: r4d_orange_rim
+    round: 4
+    note: rim named by colour, the cue that separates ring from white net
+    classes: [basketball player, basketball, referee, orange basketball rim, number]
+
+  # ROUND 5 -- determinism: the R1 winner re-fetched with the cache bypassed.
+  - {id: r5_refetch_c1, round: 5, no_cache: true, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+
+  # ROUND 4, composed -- the R4 winner (r4c_distractors, +0.031 untiled) under
+  # the adopted R3 tiling, so the disclosed-extra line is the best DINO-X Pro
+  # configuration found, not a strawman.
+  - id: r4c_distractors_tiled_nms0.5
+    round: 4
+    note: r4c vocabulary + adopted 2x2 tiling
+    classes: [basketball player, basketball, referee, rim, number, backboard, net, spectator, coach]
+    distractors: [backboard, net, spectator, coach]
+    tiles: [2, 2]
+    nms_iou_threshold: 0.5
+
+  # ROUND 6 -- rim top-band trim, zero API calls (served from the R3a/R4c
+  # caches). DISCLOSED EXTRA. Keeps the top fraction of each rim-class box,
+  # because the pre-analysis found the box runs taller than the ring. See the
+  # plan's Rounds 6-8.
+  - {id: r6_trim0.3_headline, round: 6, rim_trim: 0.3, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+  - {id: r6_trim0.5_headline, round: 6, rim_trim: 0.5, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+  - {id: r6_trim0.7_headline, round: 6, rim_trim: 0.7, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+  - {id: r6_trim0.85_headline, round: 6, rim_trim: 0.85, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+  # Amendment 2026-10-13: the headline sweep peaked at its lower edge (0.3),
+  # so it is extended until it turns, as the R3a merge-NMS sweep was.
+  - {id: r6_trim0.15_headline, round: 6, rim_trim: 0.15, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+  - {id: r6_trim0.2_headline, round: 6, rim_trim: 0.2, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+  - {id: r6_trim0.25_headline, round: 6, rim_trim: 0.25, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+  - {id: r6_trim0.35_headline, round: 6, rim_trim: 0.35, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+  - {id: r6_trim0.4_headline, round: 6, rim_trim: 0.4, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+  - {id: r6_trim0.3_bespoke, round: 6, rim_trim: 0.3, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, rim, number, backboard, net, spectator, coach], distractors: [backboard, net, spectator, coach]}
+  - {id: r6_trim0.5_bespoke, round: 6, rim_trim: 0.5, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, rim, number, backboard, net, spectator, coach], distractors: [backboard, net, spectator, coach]}
+  - {id: r6_trim0.7_bespoke, round: 6, rim_trim: 0.7, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, rim, number, backboard, net, spectator, coach], distractors: [backboard, net, spectator, coach]}
+  - {id: r6_trim0.85_bespoke, round: 6, rim_trim: 0.85, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, rim, number, backboard, net, spectator, coach], distractors: [backboard, net, spectator, coach]}
+
+  # ROUND 8 -- rim crop-refine (rim_refine.CropRefine), billed: about 3 crop
+  # calls per image. DISCLOSED EXTRA, Astra's crop-refine idea. The pass-1
+  # config is the headline row; the refiner sees only a zoomed crop around
+  # each of the top-3 rim-class boxes. The refiner prompt's first phrase is
+  # the target, and any others are distractors whose boxes are discarded.
+  - {id: r8_refine_rim_headline, round: 8, refine: {classes: [rim]}, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+  - {id: r8_refine_rimdist_headline, round: 8, refine: {classes: [rim, net, backboard]}, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+  # Score carried by the refined box, swept from the refiner's cache (0 calls).
+  - {id: r8_refine_rim_headline_confref, round: 8, refine: {classes: [rim], confidence: refiner}, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+  - {id: r8_refine_rim_headline_confprod, round: 8, refine: {classes: [rim], confidence: product}, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+  - {id: r8_refine_rimdist_headline_confref, round: 8, refine: {classes: [rim, net, backboard], confidence: refiner}, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+  - {id: r8_refine_rimdist_headline_confprod, round: 8, refine: {classes: [rim, net, backboard], confidence: product}, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}

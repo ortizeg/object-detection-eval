@@ -52,3 +52,9 @@ site/
 # MkDocs staging tree, assembled by scripts/stage_docs.py from README + reports + docs
 site_src/
 .env
+
+# DINO-X val prediction dumps and the fused Astra+DINO-X test dump: large and
+# regenerable (docs/plans/dinox-pro-2026-10.md, "Prediction files"). Only the
+# DINO-X test dumps that back published numbers are committed.
+benchmarks/basketball/results/vlm/dinox_*_valid.json
+benchmarks/basketball/results/vlm/fusion/*dinox*_test.json
