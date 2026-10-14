@@ -27,6 +27,7 @@ from typing import Literal
 import numpy as np
 import numpy.typing as npt
 from google import genai
+from google.genai import errors as genai_errors
 from google.genai.types import GenerateContentConfig, HttpOptions
 from loguru import logger
 from PIL import Image
@@ -111,6 +112,9 @@ class GeminiInferencer(BaseInferencer):
             row's; ``box_2d`` is Google's native layout. The prompt should name
             the coordinate order to match -- the schema alone does not.
         image_first: Send the image before the prompt instead of after it.
+        request_timeout_s: Per-request ceiling; defaults to
+            ``_REQUEST_TIMEOUT_MS``. Raise it for slow models -- Gemini 4 Argon
+            took 136s on one val image on 2026-10-14.
     """
 
     _MAX_RETRIES: int = 5
@@ -136,6 +140,7 @@ class GeminiInferencer(BaseInferencer):
         prompt_template: str | None = None,
         box_format: BoxFormat = "named_xyxy",
         image_first: bool = False,
+        request_timeout_s: float | None = None,
     ) -> None:
         self.model_name = model_name
         self.classes = classes
@@ -162,7 +167,13 @@ class GeminiInferencer(BaseInferencer):
             response_schema=(
                 list[GeminiBox2DDetection] if box_format == "box_2d" else list[GeminiDetection]
             ),
-            http_options=HttpOptions(timeout=self._REQUEST_TIMEOUT_MS),
+            http_options=HttpOptions(
+                timeout=(
+                    int(request_timeout_s * 1000)
+                    if request_timeout_s is not None
+                    else self._REQUEST_TIMEOUT_MS
+                )
+            ),
         )
 
         self._prompt = prompt_template or (
@@ -231,8 +242,21 @@ class GeminiInferencer(BaseInferencer):
                 # A read timeout is transient too: on 2026-10-12 ten parallel val
                 # sweeps each lost one image to the same ~4-minute service stall,
                 # and without a retry each became a silent "no detections".
-                is_retryable = isinstance(exc, TimeoutError) or any(
-                    code in exc_str for code in ("503", "429", "UNAVAILABLE", "timed out")
+                # Every 5xx is the server's fault, not the request's: a 2026-10-14
+                # sweep lost one image each to a 502 and a 504 DEADLINE_EXCEEDED
+                # that were not in the list below and so were never retried.
+                is_retryable = isinstance(exc, (TimeoutError, genai_errors.ServerError)) or any(
+                    code in exc_str
+                    for code in (
+                        "500",
+                        "502",
+                        "503",
+                        "504",
+                        "429",
+                        "UNAVAILABLE",
+                        "DEADLINE_EXCEEDED",
+                        "timed out",
+                    )
                 )
                 if is_retryable and attempt < self._MAX_RETRIES:
                     logger.warning(

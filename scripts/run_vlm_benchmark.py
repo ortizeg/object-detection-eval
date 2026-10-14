@@ -114,6 +114,8 @@ class ManifestEntry(BaseModel, frozen=True):
     #: Gemini only: see ``GeminiInferencer``'s ``box_format``/``image_first``.
     gemini_box_format: str = "named_xyxy"
     gemini_image_first: bool = False
+    #: Gemini only: per-request timeout in seconds (``None`` = inferencer default).
+    gemini_request_timeout_s: float | None = None
     #: Billed OpenAI/Anthropic rows only: reasoning effort the row published at
     #: (low/medium/high/xhigh/max). ``default`` omits the parameter so the
     #: provider's own default runs -- the setting the Ultralytics Platform
@@ -260,6 +262,7 @@ def _gemini_factory(entry: ManifestEntry) -> BaseInferencer:
         prompt_template=entry.prompt_template,
         box_format=entry.gemini_box_format,  # type: ignore[arg-type]
         image_first=entry.gemini_image_first,
+        request_timeout_s=entry.gemini_request_timeout_s,
     )
 
 

@@ -203,6 +203,15 @@ def test_only_the_checkpoint_re_search_pins_a_second_field(manifest: Any) -> Non
         # Round 7 (2026-10-15): disclosed box calibration on both stacks.
         "box_pad",
         "box_pad_on_ensemble_crop",
+        # Gemini 4 Argon (2026-10-14): the same exploration pinned to Argon, plus a
+        # longer request timeout (docs/plans/gemini-argon-2026-10.md).
+        "model_argon",
+        "box2d_argon",
+        "image_first_argon",
+        "no_caps_argon",
+        "rim_def_argon",
+        "no_caps_box2d_argon",
+        "rim_def_38",
     }
 
 
@@ -557,3 +566,35 @@ def test_element_filter_accepts_several_names(sut: types.ModuleType, manifest: A
     )
     elements = {a.element for a in sut.select_arms(manifest, args)}
     assert elements == {"baseline", "nms_iou", "box_threshold"}
+
+
+def test_request_timeout_is_transport_not_signature() -> None:
+    """Raising a slow model's timeout must not orphan its raw-detection cache."""
+    from ablate_vlm import Arm
+
+    base = Arm(
+        id="g",
+        model="gemini",
+        element="baseline",
+        inferencer="gemini",
+        model_name="gemini-4-argon",
+        classes=["player"],
+    )
+    slow = base.model_copy(update={"gemini_request_timeout_s": 300.0})
+    assert slow.signature() == base.signature()
+
+
+def test_workers_refused_for_local_models(tmp_path: Path) -> None:
+    """Threading is only safe for API calls; a local model shares one device."""
+    from ablate_vlm import Arm, collect_raw
+
+    arm = Arm(
+        id="o",
+        model="owl",
+        element="baseline",
+        inferencer="owlv2",
+        model_name="google/owlv2-base",
+        classes=["player"],
+    )
+    with pytest.raises(ValueError, match="--workers"):
+        collect_raw(arm, tmp_path, ["a.jpg"], workers=4)

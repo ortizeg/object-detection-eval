@@ -68,10 +68,22 @@ models:
   #
   # Image-first ordering and the cap-free prompt were also tried on both Flash
   # models. Both changed sign between models, i.e. noise, and neither was adopted.
+  #
+  # 2026-10-14 ARGON (docs/plans/gemini-argon-2026-10.md). MODEL: gemini-3.8-flash
+  # -> gemini-4-argon, same box_2d format. Val, three-draw means: 3.8 + box_2d
+  # 0.3282 -> Argon + box_2d 0.3799 -> Argon + box_2d + rim line 0.4140 (sd 0.007).
+  #
+  # RIM LINE: Argon put a rim in every val image but boxed hoop + net (median box
+  # height 0.059 of the frame vs GT 0.021); this dataset labels the ring only, so
+  # the rim line now says so. Rim AP50 0.01-0.04 -> 0.68-0.72 on Argon. The same
+  # line on 3.8-flash is a null (0.3196, rim ~0.15), so the Argon gap is the model,
+  # not the prompt. Cap-free (+0.005) and image-first (-0.007) were not adopted.
   - name: gemini
     inferencer: gemini
-    model_name: gemini-3.8-flash
+    model_name: gemini-4-argon
     gemini_box_format: box_2d
+    # Transport only: one cold Argon call took 136s, past the 120s default.
+    gemini_request_timeout_s: 300
     classes:
       - ball
       - number
@@ -88,7 +100,8 @@ models:
       - "player" for any basketball player on the court
       - "referee" for game officials
       - "ball" for the basketball (only when NOT going through the rim)
-      - "rim" for the basketball hoop rim
+      - "rim" for the metal hoop ring only (a thin, wide box around the ring;
+      exclude the net and the backboard)
       - "number" for visible jersey numbers (tight box around the digits only)
       Return each box as box_2d [ymin, xmin, ymax, xmax] normalized to 0-1000.
     # 0.250, not the 0.265 this line carried from Phase 5 until 2026-08-07.
@@ -103,8 +116,11 @@ models:
     #
     # 2026-10: the 0.250 above described the gemini-3.1-pro-preview row. This
     # row is a new configuration. Its single test run (2026-10-12) measured
-    # 0.3258 (mAP@50 0.5084 per results/vlm/gemini.json); the target is set from it.
-    expected_map5095: 0.326
+    # 0.3258 (mAP@50 0.5084); that dump is in git history at the 2026-10-12 commit.
+    #
+    # 2026-10-14: Argon row, one test run, 0.4311 (mAP@50 0.7468 per
+    # results/vlm/gemini.json). The target is set from it.
+    expected_map5095: 0.431
 
   # GPT-6 Astra (OpenAI, added 2026-09-25). A NEW model with no prior published
   # number -- expected_map5095 is deliberately null (VLM-02 informational-only

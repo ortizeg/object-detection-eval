@@ -230,6 +230,36 @@ class TestGeminiInferencerPredict:
         assert len(dets) == 1
         assert mock_client.models.generate_content.call_count == 2
 
+    @pytest.mark.parametrize(
+        "message", ["502 Bad Gateway.", "504 DEADLINE_EXCEEDED. Deadline expired"]
+    )
+    def test_predict_retries_on_any_5xx(
+        self, _mock_genai, monkeypatch: pytest.MonkeyPatch, message: str
+    ) -> None:
+        """A 502 or 504 is transient; not retrying it records a silent empty image."""
+        monkeypatch.setenv("GEMINI_API_KEY", "dummy-key")
+        _mock_genai, mock_client = _mock_genai
+
+        success_response = MagicMock()
+        success_response.parsed = [
+            GeminiDetection(
+                bbox=GeminiBBox(x_min=0, y_min=0, x_max=500, y_max=500),
+                label="player",
+                confidence=1.0,
+            )
+        ]
+        mock_client.models.generate_content.side_effect = [
+            RuntimeError(message),
+            success_response,
+        ]
+
+        inferencer = GeminiInferencer(model_name="gemini-2.5-pro", classes=["player"])
+        with patch("object_detection_eval.inference.vlm.gemini.time.sleep"):
+            dets = inferencer.predict(np.zeros((480, 640, 3), dtype=np.uint8), 640, 480)
+
+        assert len(dets) == 1
+        assert mock_client.models.generate_content.call_count == 2
+
 
 class TestBoxFormatAndOrdering:
     """The opt-in native ``box_2d`` schema and image-first content order."""

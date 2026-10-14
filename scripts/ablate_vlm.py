@@ -53,6 +53,7 @@ import hashlib
 import json
 import sys
 import traceback
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any
 
@@ -92,6 +93,8 @@ _FORBIDDEN_SEARCH_SPLIT = "test"
 #: one.
 #: YOLOE shares YOLO-World's ultralytics post-processing, so the same applies.
 _BACKEND_POSTPROCESS = frozenset({"yolo_world", "yoloe"})
+#: Inferencers that are pure network calls and safe to run from several threads.
+_CONCURRENT_INFERENCERS = frozenset({"gemini"})
 
 
 class Arm(BaseModel, frozen=True):
@@ -123,6 +126,9 @@ class Arm(BaseModel, frozen=True):
     #: change what the model is asked, so both are forward-pass signature.
     gemini_box_format: str = "named_xyxy"
     gemini_image_first: bool = False
+    #: Gemini only: per-request timeout. Transport, not model input, so it is
+    #: deliberately NOT in the signature -- raising it must not orphan a cache.
+    gemini_request_timeout_s: float | None = None
     #: Which independent draw this arm is. Changes nothing about the
     #: configuration and everything about the cache key, so a generative model
     #: can be run twice under identical settings to measure its own
@@ -595,6 +601,7 @@ def build_inferencer(arm: Arm, *, raw_mode: bool) -> Any:
             prompt_template=arm.prompt_template,
             box_format=arm.gemini_box_format,  # type: ignore[arg-type]
             image_first=arm.gemini_image_first,
+            request_timeout_s=arm.gemini_request_timeout_s,
         )
     if arm.inferencer == "qwen3_vl":
         from object_detection_eval.inference.vlm.qwen3_vl import Qwen3VLInferencer
@@ -666,6 +673,7 @@ def collect_raw(
     arm: Arm,
     image_dir: Path,
     filenames: list[str],
+    workers: int = 1,
 ) -> dict[str, list[Detection]]:
     """Run one forward pass per image and keep the detections.
 
@@ -674,20 +682,36 @@ def collect_raw(
     the backend has already applied its own threshold and NMS, so the cache
     holds that arm's finished detections and only the filters replay — which is
     still enough to make ``singleton_top_k`` free for it.
+
+    ``workers > 1`` overlaps requests and is only allowed for API-backed
+    inferencers: Gemini 4 Argon takes minutes per image, so a sequential arm is
+    hours of waiting on the network. Local models share one device and stay
+    sequential. Result order is irrelevant -- the map is keyed by filename.
     """
+    if workers > 1 and arm.inferencer not in _CONCURRENT_INFERENCERS:
+        msg = f"--workers {workers} is only supported for {sorted(_CONCURRENT_INFERENCERS)}"
+        raise ValueError(msg)
     inferencer = _wrap_anchor_crop(
         _wrap_tiled(build_inferencer(arm, raw_mode=arm.replayable), arm, raw_mode=arm.replayable),
         arm,
     )
-    raw_map: dict[str, list[Detection]] = {}
-    for i, filename in enumerate(filenames, start=1):
+
+    def _one(filename: str) -> list[Detection]:
         loader = ImageLoader(image_dir / filename)
         image = loader.read()
-        raw_map[filename] = inferencer.predict(
+        dets: list[Detection] = inferencer.predict(
             image, image_width=loader.width, image_height=loader.height
         )
-        if i % 25 == 0:
-            logger.info(f"  {arm.model}: {i}/{len(filenames)} images")
+        return dets
+
+    raw_map: dict[str, list[Detection]] = {}
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        for i, (filename, dets) in enumerate(
+            zip(filenames, pool.map(_one, filenames), strict=True), start=1
+        ):
+            raw_map[filename] = dets
+            if i % 25 == 0:
+                logger.info(f"  {arm.model}: {i}/{len(filenames)} images")
     unload = getattr(inferencer, "unload", None)
     if unload is not None:
         unload()
@@ -702,6 +726,7 @@ def load_or_collect_raw(
     split: str,
     *,
     refresh: bool,
+    workers: int = 1,
 ) -> dict[str, list[Detection]]:
     """Cached :func:`collect_raw`, keyed by the arm's forward-pass signature."""
     path = _cache_path(cache_dir, split, arm.signature())
@@ -714,7 +739,7 @@ def load_or_collect_raw(
         logger.warning(f"cache for {arm.signature()} covers a different image set; rebuilding")
 
     logger.info(f"forward pass: {arm.signature()}")
-    raw_map = collect_raw(arm, image_dir, filenames)
+    raw_map = collect_raw(arm, image_dir, filenames, workers=workers)
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w") as f:
         json.dump(_serialise(raw_map), f)
@@ -948,6 +973,12 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument(
+        "--workers",
+        type=int,
+        default=1,
+        help="Concurrent requests per forward pass (API-backed inferencers only).",
+    )
+    parser.add_argument(
         "--verify-tolerance",
         type=float,
         default=1e-6,
@@ -1036,7 +1067,13 @@ def main() -> None:
     for signature, group in groups.items():
         try:
             raw_map = load_or_collect_raw(
-                group[0], split_dir, filenames, args.cache_dir, split, refresh=args.refresh_cache
+                group[0],
+                split_dir,
+                filenames,
+                args.cache_dir,
+                split,
+                refresh=args.refresh_cache,
+                workers=args.workers,
             )
         except Exception:
             # A sweep is a hundred independent measurements; letting one bad
