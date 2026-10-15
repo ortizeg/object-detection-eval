@@ -8,6 +8,7 @@
     "yolo_world": 0.18917140364646912,
     "yoloe": 0.2777418792247772,
     "yoloe_ensemble_number_crop": 0.33149829506874084,
+    "yoloe_ensemble_number_crop_box_pad": 0.37494954466819763,
     "yoloe_number_crop": 0.3109133839607239
   },
   "pairs": [
@@ -42,14 +43,24 @@
       "p_a_not_better": 0.0
     },
     {
-      "a": "llmdet",
+      "a": "yoloe_ensemble_number_crop_box_pad",
       "b": "yoloe_ensemble_number_crop",
-      "delta": 0.05681386590003967,
+      "delta": 0.04345124959945679,
       "ci95": [
-        0.04223893284797668,
-        0.06980046853423118
+        0.038664428144693376,
+        0.048143033683300016
       ],
       "p_a_not_better": 0.0
+    },
+    {
+      "a": "llmdet",
+      "b": "yoloe_ensemble_number_crop_box_pad",
+      "delta": 0.013362616300582886,
+      "ci95": [
+        -0.0021443851292133327,
+        0.027519280463457096
+      ],
+      "p_a_not_better": 0.053
     }
   ]
 }

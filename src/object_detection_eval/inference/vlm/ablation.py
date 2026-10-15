@@ -24,6 +24,7 @@ never imports an inferencer.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import TYPE_CHECKING
 
 import supervision as sv
@@ -32,6 +33,7 @@ from object_detection_eval.data.taxonomy import remap_detections
 from object_detection_eval.inference.vlm.filters import (
     DEFAULT_SINGLETON_TOP_K,
     area_outliers,
+    pad_boxes,
     single_best_per_class,
 )
 from object_detection_eval.inference.vlm.nms import per_class_nms
@@ -64,6 +66,7 @@ def replay(
     nms_iou_threshold: float | None,
     max_area_fraction: float = 0.05,
     singleton_top_k: int = DEFAULT_SINGLETON_TOP_K,
+    box_pad: Mapping[int, float] | None = None,
 ) -> sv.Detections:
     """Score-ready detections for one image, from cached pre-NMS raw output.
 
@@ -71,6 +74,7 @@ def replay(
     :func:`~object_detection_eval.inference.vlm.protocol.score_split`::
 
         threshold -> per-class NMS -> remap -> area_outliers -> singleton top-k
+            -> pad_boxes (only when ``box_pad`` is set)
 
     Args:
         raw: Cached detections in the model's own label space, thresholded no
@@ -87,6 +91,8 @@ def replay(
             :func:`~object_detection_eval.inference.vlm.filters.area_outliers`.
         singleton_top_k: Passed through to
             :func:`~object_detection_eval.inference.vlm.filters.single_best_per_class`.
+        box_pad: Eval class id -> per-side growth, passed to
+            :func:`~object_detection_eval.inference.vlm.filters.pad_boxes`.
     """
     kept = [d for d in raw if d.confidence > box_threshold]
     if nms_iou_threshold is not None:
@@ -94,4 +100,6 @@ def replay(
     remapped = remap_detections(kept, label_map, name_to_id)
     area_filtered = area_outliers(remapped, max_area_fraction=max_area_fraction)
     final = single_best_per_class(area_filtered, top_k=singleton_top_k)
+    if box_pad:
+        final = pad_boxes(final, box_pad)
     return detections_to_sv(final, image_width, image_height)

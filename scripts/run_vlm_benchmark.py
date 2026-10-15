@@ -104,6 +104,9 @@ class ManifestEntry(BaseModel, frozen=True):
     tiles: list[int] | None = None
     #: Crop-and-re-detect second pass (YOLOE only so far). ``None`` = one pass.
     anchor_crop: AnchorCropConfig | None = None
+    #: Eval class name -> per-side box growth (see ``filters.pad_boxes``). A
+    #: box-convention correction fitted on val, so only a disclosed row sets it.
+    box_pad: dict[str, float] | None = None
     tile_overlap: float = Field(default=0.2, ge=0.0, lt=1.0)
     task: str | None = None
     caption: str | None = None
@@ -358,6 +361,19 @@ def _assert_images_exist(data_root: Path, filenames: list[str]) -> None:
         raise FileNotFoundError(msg)
 
 
+def _box_pad_ids(
+    box_pad: dict[str, float] | None, name_to_id: dict[str, int]
+) -> dict[int, float] | None:
+    """``box_pad`` keyed by eval class id; an unknown class name is an error."""
+    if not box_pad:
+        return None
+    unknown = sorted(set(box_pad) - set(name_to_id))
+    if unknown:
+        msg = f"box_pad names classes the taxonomy does not have: {unknown}"
+        raise ValueError(msg)
+    return {name_to_id[name]: pad for name, pad in box_pad.items()}
+
+
 def _score_entry(
     entry: ManifestEntry,
     args: argparse.Namespace,
@@ -381,6 +397,7 @@ def _score_entry(
         filenames=list(gt_map.keys()),
         label_map=label_map,
         name_to_id=name_to_id,
+        box_pad=_box_pad_ids(entry.box_pad, name_to_id),
     )
 
     if hasattr(inferencer, "unload"):

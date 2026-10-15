@@ -14,7 +14,9 @@ Usage::
 
     pixi run python scripts/run_vlm_paired_bootstrap.py \\
         --pair yoloe:yolo_world --pair yoloe_number_crop:yoloe \\
-        --pair yoloe_ensemble_number_crop:yoloe --pair llmdet:yoloe_ensemble_number_crop
+        --pair yoloe_ensemble_number_crop:yoloe \\
+        --pair yoloe_ensemble_number_crop_box_pad:yoloe_ensemble_number_crop \\
+        --pair llmdet:yoloe_ensemble_number_crop_box_pad
 """
 
 from __future__ import annotations

@@ -8237,6 +8237,7 @@
         "prompt_ensembles": null,
         "agnostic_nms": null,
         "anchor_crop": null,
+        "box_pad": null,
         "imgsz": 640,
         "tiles": null,
         "tile_overlap": 0.2,
@@ -10264,6 +10265,8 @@
         "max_area_fraction": 0.05,
         "max_det": 300,
         "prompt_ensembles": null,
+        "agnostic_nms": null,
+        "anchor_crop": null,
         "imgsz": 1280,
         "tiles": null,
         "tile_overlap": 0.2,
@@ -10308,6 +10311,8 @@
         "max_area_fraction": 0.05,
         "max_det": 300,
         "prompt_ensembles": null,
+        "agnostic_nms": null,
+        "anchor_crop": null,
         "imgsz": 1280,
         "tiles": null,
         "tile_overlap": 0.2,
@@ -10973,6 +10978,1007 @@
         "max_pixels": null
       },
       "delta_map5095": 0.09852379560470581
+    },
+    {
+      "arm": "yoloe__box_pad__--player---0.01---ball---0.01---referee-633d9fc6",
+      "substrate": "mps",
+      "model": "yoloe",
+      "element": "box_pad",
+      "baseline": "yoloe__baseline",
+      "mAP_50_95": 0.27580738067626953,
+      "mAP_50": 0.3942793905735016,
+      "per_class_ap50": {
+        "player": 0.9420375823974609,
+        "ball": 0.3311154544353485,
+        "referee": 0.45405566692352295,
+        "rim": 0.0,
+        "number": 0.24418824911117554
+      },
+      "config": {
+        "inferencer": "yoloe",
+        "model_name": "yoloe-26x-seg.pt",
+        "classes": [
+          "basketball player in a team uniform",
+          "orange basketball",
+          "referee in a striped shirt",
+          "basketball hoop and backboard",
+          "number"
+        ],
+        "task": null,
+        "prompt_template": null,
+        "sample": 0,
+        "box_threshold": 0.001,
+        "nms_iou_threshold": 0.8,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": 300,
+        "prompt_ensembles": null,
+        "agnostic_nms": false,
+        "anchor_crop": null,
+        "box_pad": {
+          "player": 0.01,
+          "ball": 0.01,
+          "referee": 0.01,
+          "rim": 0.01,
+          "number": 0.01
+        },
+        "imgsz": 1280,
+        "tiles": null,
+        "tile_overlap": 0.2,
+        "min_pixels": null,
+        "max_pixels": null
+      },
+      "delta_map5095": 0.074419766664505
+    },
+    {
+      "arm": "yoloe__box_pad__--player---0.02---ball---0.02---referee-8d4a7ae2",
+      "substrate": "mps",
+      "model": "yoloe",
+      "element": "box_pad",
+      "baseline": "yoloe__baseline",
+      "mAP_50_95": 0.28505831956863403,
+      "mAP_50": 0.3944614827632904,
+      "per_class_ap50": {
+        "player": 0.9429171085357666,
+        "ball": 0.3311154544353485,
+        "referee": 0.4517272710800171,
+        "rim": 0.0,
+        "number": 0.24654753506183624
+      },
+      "config": {
+        "inferencer": "yoloe",
+        "model_name": "yoloe-26x-seg.pt",
+        "classes": [
+          "basketball player in a team uniform",
+          "orange basketball",
+          "referee in a striped shirt",
+          "basketball hoop and backboard",
+          "number"
+        ],
+        "task": null,
+        "prompt_template": null,
+        "sample": 0,
+        "box_threshold": 0.001,
+        "nms_iou_threshold": 0.8,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": 300,
+        "prompt_ensembles": null,
+        "agnostic_nms": false,
+        "anchor_crop": null,
+        "box_pad": {
+          "player": 0.02,
+          "ball": 0.02,
+          "referee": 0.02,
+          "rim": 0.02,
+          "number": 0.02
+        },
+        "imgsz": 1280,
+        "tiles": null,
+        "tile_overlap": 0.2,
+        "min_pixels": null,
+        "max_pixels": null
+      },
+      "delta_map5095": 0.0836707055568695
+    },
+    {
+      "arm": "yoloe__box_pad__--player---0.03---ball---0.03---referee-6209e2f7",
+      "substrate": "mps",
+      "model": "yoloe",
+      "element": "box_pad",
+      "baseline": "yoloe__baseline",
+      "mAP_50_95": 0.2841707170009613,
+      "mAP_50": 0.39598581194877625,
+      "per_class_ap50": {
+        "player": 0.9433283805847168,
+        "ball": 0.3311154544353485,
+        "referee": 0.4517272710800171,
+        "rim": 0.0,
+        "number": 0.25375789403915405
+      },
+      "config": {
+        "inferencer": "yoloe",
+        "model_name": "yoloe-26x-seg.pt",
+        "classes": [
+          "basketball player in a team uniform",
+          "orange basketball",
+          "referee in a striped shirt",
+          "basketball hoop and backboard",
+          "number"
+        ],
+        "task": null,
+        "prompt_template": null,
+        "sample": 0,
+        "box_threshold": 0.001,
+        "nms_iou_threshold": 0.8,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": 300,
+        "prompt_ensembles": null,
+        "agnostic_nms": false,
+        "anchor_crop": null,
+        "box_pad": {
+          "player": 0.03,
+          "ball": 0.03,
+          "referee": 0.03,
+          "rim": 0.03,
+          "number": 0.03
+        },
+        "imgsz": 1280,
+        "tiles": null,
+        "tile_overlap": 0.2,
+        "min_pixels": null,
+        "max_pixels": null
+      },
+      "delta_map5095": 0.08278310298919678
+    },
+    {
+      "arm": "yoloe__box_pad__--player---0.04---ball---0.04---referee-16bf482f",
+      "substrate": "mps",
+      "model": "yoloe",
+      "element": "box_pad",
+      "baseline": "yoloe__baseline",
+      "mAP_50_95": 0.28007325530052185,
+      "mAP_50": 0.3969191312789917,
+      "per_class_ap50": {
+        "player": 0.943547248840332,
+        "ball": 0.3311154544353485,
+        "referee": 0.4517272710800171,
+        "rim": 0.0,
+        "number": 0.25820571184158325
+      },
+      "config": {
+        "inferencer": "yoloe",
+        "model_name": "yoloe-26x-seg.pt",
+        "classes": [
+          "basketball player in a team uniform",
+          "orange basketball",
+          "referee in a striped shirt",
+          "basketball hoop and backboard",
+          "number"
+        ],
+        "task": null,
+        "prompt_template": null,
+        "sample": 0,
+        "box_threshold": 0.001,
+        "nms_iou_threshold": 0.8,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": 300,
+        "prompt_ensembles": null,
+        "agnostic_nms": false,
+        "anchor_crop": null,
+        "box_pad": {
+          "player": 0.04,
+          "ball": 0.04,
+          "referee": 0.04,
+          "rim": 0.04,
+          "number": 0.04
+        },
+        "imgsz": 1280,
+        "tiles": null,
+        "tile_overlap": 0.2,
+        "min_pixels": null,
+        "max_pixels": null
+      },
+      "delta_map5095": 0.07868564128875732
+    },
+    {
+      "arm": "yoloe__box_pad__--player---0.02---ball---0.02---referee-57d538dd",
+      "substrate": "mps",
+      "model": "yoloe",
+      "element": "box_pad",
+      "baseline": "yoloe__baseline",
+      "mAP_50_95": 0.2879575192928314,
+      "mAP_50": 0.3967783451080322,
+      "per_class_ap50": {
+        "player": 0.9429171085357666,
+        "ball": 0.3311154544353485,
+        "referee": 0.4517272710800171,
+        "rim": 0.0,
+        "number": 0.2581319212913513
+      },
+      "config": {
+        "inferencer": "yoloe",
+        "model_name": "yoloe-26x-seg.pt",
+        "classes": [
+          "basketball player in a team uniform",
+          "orange basketball",
+          "referee in a striped shirt",
+          "basketball hoop and backboard",
+          "number"
+        ],
+        "task": null,
+        "prompt_template": null,
+        "sample": 0,
+        "box_threshold": 0.001,
+        "nms_iou_threshold": 0.8,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": 300,
+        "prompt_ensembles": null,
+        "agnostic_nms": false,
+        "anchor_crop": null,
+        "box_pad": {
+          "player": 0.02,
+          "ball": 0.02,
+          "referee": 0.02,
+          "rim": 0.02,
+          "number": 0.05
+        },
+        "imgsz": 1280,
+        "tiles": null,
+        "tile_overlap": 0.2,
+        "min_pixels": null,
+        "max_pixels": null
+      },
+      "delta_map5095": 0.0865699052810669
+    },
+    {
+      "arm": "yoloe__box_pad__--player---0.02---ball---0.02---referee-e7e3eb2c",
+      "substrate": "mps",
+      "model": "yoloe",
+      "element": "box_pad",
+      "baseline": "yoloe__baseline",
+      "mAP_50_95": 0.28911691904067993,
+      "mAP_50": 0.3962517976760864,
+      "per_class_ap50": {
+        "player": 0.9429171085357666,
+        "ball": 0.3311154544353485,
+        "referee": 0.4517272710800171,
+        "rim": 0.0,
+        "number": 0.2554992437362671
+      },
+      "config": {
+        "inferencer": "yoloe",
+        "model_name": "yoloe-26x-seg.pt",
+        "classes": [
+          "basketball player in a team uniform",
+          "orange basketball",
+          "referee in a striped shirt",
+          "basketball hoop and backboard",
+          "number"
+        ],
+        "task": null,
+        "prompt_template": null,
+        "sample": 0,
+        "box_threshold": 0.001,
+        "nms_iou_threshold": 0.8,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": 300,
+        "prompt_ensembles": null,
+        "agnostic_nms": false,
+        "anchor_crop": null,
+        "box_pad": {
+          "player": 0.02,
+          "ball": 0.02,
+          "referee": 0.02,
+          "rim": 0.02,
+          "number": 0.08
+        },
+        "imgsz": 1280,
+        "tiles": null,
+        "tile_overlap": 0.2,
+        "min_pixels": null,
+        "max_pixels": null
+      },
+      "delta_map5095": 0.0877293050289154
+    },
+    {
+      "arm": "yoloe__box_pad__--player---0.03---ball---0.03---referee-81c55208",
+      "substrate": "mps",
+      "model": "yoloe",
+      "element": "box_pad",
+      "baseline": "yoloe__baseline",
+      "mAP_50_95": 0.2866002917289734,
+      "mAP_50": 0.3967285752296448,
+      "per_class_ap50": {
+        "player": 0.9433283805847168,
+        "ball": 0.3311154544353485,
+        "referee": 0.4517272710800171,
+        "rim": 0.0,
+        "number": 0.2574716806411743
+      },
+      "config": {
+        "inferencer": "yoloe",
+        "model_name": "yoloe-26x-seg.pt",
+        "classes": [
+          "basketball player in a team uniform",
+          "orange basketball",
+          "referee in a striped shirt",
+          "basketball hoop and backboard",
+          "number"
+        ],
+        "task": null,
+        "prompt_template": null,
+        "sample": 0,
+        "box_threshold": 0.001,
+        "nms_iou_threshold": 0.8,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": 300,
+        "prompt_ensembles": null,
+        "agnostic_nms": false,
+        "anchor_crop": null,
+        "box_pad": {
+          "player": 0.03,
+          "ball": 0.03,
+          "referee": 0.03,
+          "rim": 0.03,
+          "number": 0.06
+        },
+        "imgsz": 1280,
+        "tiles": null,
+        "tile_overlap": 0.2,
+        "min_pixels": null,
+        "max_pixels": null
+      },
+      "delta_map5095": 0.08521267771720886
+    },
+    {
+      "arm": "yoloe__box_pad_on_ensemble_crop__--player---0.01---ball---0.01---referee-633d9fc6",
+      "substrate": "mps",
+      "model": "yoloe",
+      "element": "box_pad_on_ensemble_crop",
+      "baseline": "yoloe__baseline",
+      "mAP_50_95": 0.32020673155784607,
+      "mAP_50": 0.4901450276374817,
+      "per_class_ap50": {
+        "player": 0.9428835511207581,
+        "ball": 0.3168399930000305,
+        "referee": 0.592010498046875,
+        "rim": 0.0,
+        "number": 0.5989910960197449
+      },
+      "config": {
+        "inferencer": "yoloe",
+        "model_name": "yoloe-26x-seg.pt",
+        "classes": [
+          "basketball player in a team uniform",
+          "orange basketball",
+          "referee in a striped shirt",
+          "basketball hoop and backboard",
+          "number"
+        ],
+        "task": null,
+        "prompt_template": null,
+        "sample": 0,
+        "box_threshold": 0.001,
+        "nms_iou_threshold": 0.8,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": 300,
+        "prompt_ensembles": {
+          "basketball player in a team uniform": [
+            "basketball player in a team uniform",
+            "basketball player",
+            "player",
+            "athlete in a jersey"
+          ],
+          "orange basketball": [
+            "orange basketball",
+            "basketball",
+            "ball",
+            "sports ball",
+            "leather basketball"
+          ],
+          "referee in a striped shirt": [
+            "referee in a striped shirt",
+            "referee",
+            "basketball official",
+            "referee in a black and white striped shirt"
+          ],
+          "basketball hoop and backboard": [
+            "basketball hoop and backboard",
+            "basketball hoop",
+            "rim"
+          ]
+        },
+        "agnostic_nms": false,
+        "anchor_crop": {
+          "anchor": "basketball player in a team uniform",
+          "target": "number",
+          "refiner_classes": [
+            "number"
+          ],
+          "refiner_imgsz": 640,
+          "refiner_box_threshold": 0.001,
+          "refiner_nms_iou_threshold": 0.5,
+          "pad": 1.1,
+          "anchor_conf": 0.1,
+          "merge_iou": 0.5
+        },
+        "box_pad": {
+          "player": 0.01,
+          "ball": 0.01,
+          "referee": 0.01,
+          "rim": 0.01,
+          "number": 0.01
+        },
+        "imgsz": 1280,
+        "tiles": null,
+        "tile_overlap": 0.2,
+        "min_pixels": null,
+        "max_pixels": null
+      },
+      "delta_map5095": 0.11881911754608154
+    },
+    {
+      "arm": "yoloe__box_pad_on_ensemble_crop__--player---0.02---ball---0.02---referee-8d4a7ae2",
+      "substrate": "mps",
+      "model": "yoloe",
+      "element": "box_pad_on_ensemble_crop",
+      "baseline": "yoloe__baseline",
+      "mAP_50_95": 0.33339613676071167,
+      "mAP_50": 0.49080735445022583,
+      "per_class_ap50": {
+        "player": 0.9433890581130981,
+        "ball": 0.3168399930000305,
+        "referee": 0.5875326991081238,
+        "rim": 0.0,
+        "number": 0.6062750816345215
+      },
+      "config": {
+        "inferencer": "yoloe",
+        "model_name": "yoloe-26x-seg.pt",
+        "classes": [
+          "basketball player in a team uniform",
+          "orange basketball",
+          "referee in a striped shirt",
+          "basketball hoop and backboard",
+          "number"
+        ],
+        "task": null,
+        "prompt_template": null,
+        "sample": 0,
+        "box_threshold": 0.001,
+        "nms_iou_threshold": 0.8,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": 300,
+        "prompt_ensembles": {
+          "basketball player in a team uniform": [
+            "basketball player in a team uniform",
+            "basketball player",
+            "player",
+            "athlete in a jersey"
+          ],
+          "orange basketball": [
+            "orange basketball",
+            "basketball",
+            "ball",
+            "sports ball",
+            "leather basketball"
+          ],
+          "referee in a striped shirt": [
+            "referee in a striped shirt",
+            "referee",
+            "basketball official",
+            "referee in a black and white striped shirt"
+          ],
+          "basketball hoop and backboard": [
+            "basketball hoop and backboard",
+            "basketball hoop",
+            "rim"
+          ]
+        },
+        "agnostic_nms": false,
+        "anchor_crop": {
+          "anchor": "basketball player in a team uniform",
+          "target": "number",
+          "refiner_classes": [
+            "number"
+          ],
+          "refiner_imgsz": 640,
+          "refiner_box_threshold": 0.001,
+          "refiner_nms_iou_threshold": 0.5,
+          "pad": 1.1,
+          "anchor_conf": 0.1,
+          "merge_iou": 0.5
+        },
+        "box_pad": {
+          "player": 0.02,
+          "ball": 0.02,
+          "referee": 0.02,
+          "rim": 0.02,
+          "number": 0.02
+        },
+        "imgsz": 1280,
+        "tiles": null,
+        "tile_overlap": 0.2,
+        "min_pixels": null,
+        "max_pixels": null
+      },
+      "delta_map5095": 0.13200852274894714
+    },
+    {
+      "arm": "yoloe__box_pad_on_ensemble_crop__--player---0.03---ball---0.03---referee-6209e2f7",
+      "substrate": "mps",
+      "model": "yoloe",
+      "element": "box_pad_on_ensemble_crop",
+      "baseline": "yoloe__baseline",
+      "mAP_50_95": 0.3359293043613434,
+      "mAP_50": 0.4930081367492676,
+      "per_class_ap50": {
+        "player": 0.9464609622955322,
+        "ball": 0.3168399930000305,
+        "referee": 0.5875326991081238,
+        "rim": 0.0,
+        "number": 0.6142070889472961
+      },
+      "config": {
+        "inferencer": "yoloe",
+        "model_name": "yoloe-26x-seg.pt",
+        "classes": [
+          "basketball player in a team uniform",
+          "orange basketball",
+          "referee in a striped shirt",
+          "basketball hoop and backboard",
+          "number"
+        ],
+        "task": null,
+        "prompt_template": null,
+        "sample": 0,
+        "box_threshold": 0.001,
+        "nms_iou_threshold": 0.8,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": 300,
+        "prompt_ensembles": {
+          "basketball player in a team uniform": [
+            "basketball player in a team uniform",
+            "basketball player",
+            "player",
+            "athlete in a jersey"
+          ],
+          "orange basketball": [
+            "orange basketball",
+            "basketball",
+            "ball",
+            "sports ball",
+            "leather basketball"
+          ],
+          "referee in a striped shirt": [
+            "referee in a striped shirt",
+            "referee",
+            "basketball official",
+            "referee in a black and white striped shirt"
+          ],
+          "basketball hoop and backboard": [
+            "basketball hoop and backboard",
+            "basketball hoop",
+            "rim"
+          ]
+        },
+        "agnostic_nms": false,
+        "anchor_crop": {
+          "anchor": "basketball player in a team uniform",
+          "target": "number",
+          "refiner_classes": [
+            "number"
+          ],
+          "refiner_imgsz": 640,
+          "refiner_box_threshold": 0.001,
+          "refiner_nms_iou_threshold": 0.5,
+          "pad": 1.1,
+          "anchor_conf": 0.1,
+          "merge_iou": 0.5
+        },
+        "box_pad": {
+          "player": 0.03,
+          "ball": 0.03,
+          "referee": 0.03,
+          "rim": 0.03,
+          "number": 0.03
+        },
+        "imgsz": 1280,
+        "tiles": null,
+        "tile_overlap": 0.2,
+        "min_pixels": null,
+        "max_pixels": null
+      },
+      "delta_map5095": 0.13454169034957886
+    },
+    {
+      "arm": "yoloe__box_pad_on_ensemble_crop__--player---0.04---ball---0.04---referee-16bf482f",
+      "substrate": "mps",
+      "model": "yoloe",
+      "element": "box_pad_on_ensemble_crop",
+      "baseline": "yoloe__baseline",
+      "mAP_50_95": 0.3347285985946655,
+      "mAP_50": 0.4931158423423767,
+      "per_class_ap50": {
+        "player": 0.9467101693153381,
+        "ball": 0.3168399930000305,
+        "referee": 0.5873638391494751,
+        "rim": 0.0,
+        "number": 0.6146652698516846
+      },
+      "config": {
+        "inferencer": "yoloe",
+        "model_name": "yoloe-26x-seg.pt",
+        "classes": [
+          "basketball player in a team uniform",
+          "orange basketball",
+          "referee in a striped shirt",
+          "basketball hoop and backboard",
+          "number"
+        ],
+        "task": null,
+        "prompt_template": null,
+        "sample": 0,
+        "box_threshold": 0.001,
+        "nms_iou_threshold": 0.8,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": 300,
+        "prompt_ensembles": {
+          "basketball player in a team uniform": [
+            "basketball player in a team uniform",
+            "basketball player",
+            "player",
+            "athlete in a jersey"
+          ],
+          "orange basketball": [
+            "orange basketball",
+            "basketball",
+            "ball",
+            "sports ball",
+            "leather basketball"
+          ],
+          "referee in a striped shirt": [
+            "referee in a striped shirt",
+            "referee",
+            "basketball official",
+            "referee in a black and white striped shirt"
+          ],
+          "basketball hoop and backboard": [
+            "basketball hoop and backboard",
+            "basketball hoop",
+            "rim"
+          ]
+        },
+        "agnostic_nms": false,
+        "anchor_crop": {
+          "anchor": "basketball player in a team uniform",
+          "target": "number",
+          "refiner_classes": [
+            "number"
+          ],
+          "refiner_imgsz": 640,
+          "refiner_box_threshold": 0.001,
+          "refiner_nms_iou_threshold": 0.5,
+          "pad": 1.1,
+          "anchor_conf": 0.1,
+          "merge_iou": 0.5
+        },
+        "box_pad": {
+          "player": 0.04,
+          "ball": 0.04,
+          "referee": 0.04,
+          "rim": 0.04,
+          "number": 0.04
+        },
+        "imgsz": 1280,
+        "tiles": null,
+        "tile_overlap": 0.2,
+        "min_pixels": null,
+        "max_pixels": null
+      },
+      "delta_map5095": 0.133340984582901
+    },
+    {
+      "arm": "yoloe__box_pad_on_ensemble_crop__--player---0.02---ball---0.02---referee-57d538dd",
+      "substrate": "mps",
+      "model": "yoloe",
+      "element": "box_pad_on_ensemble_crop",
+      "baseline": "yoloe__baseline",
+      "mAP_50_95": 0.3457668125629425,
+      "mAP_50": 0.4921925663948059,
+      "per_class_ap50": {
+        "player": 0.9433890581130981,
+        "ball": 0.3168399930000305,
+        "referee": 0.5875326991081238,
+        "rim": 0.0,
+        "number": 0.6132011413574219
+      },
+      "config": {
+        "inferencer": "yoloe",
+        "model_name": "yoloe-26x-seg.pt",
+        "classes": [
+          "basketball player in a team uniform",
+          "orange basketball",
+          "referee in a striped shirt",
+          "basketball hoop and backboard",
+          "number"
+        ],
+        "task": null,
+        "prompt_template": null,
+        "sample": 0,
+        "box_threshold": 0.001,
+        "nms_iou_threshold": 0.8,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": 300,
+        "prompt_ensembles": {
+          "basketball player in a team uniform": [
+            "basketball player in a team uniform",
+            "basketball player",
+            "player",
+            "athlete in a jersey"
+          ],
+          "orange basketball": [
+            "orange basketball",
+            "basketball",
+            "ball",
+            "sports ball",
+            "leather basketball"
+          ],
+          "referee in a striped shirt": [
+            "referee in a striped shirt",
+            "referee",
+            "basketball official",
+            "referee in a black and white striped shirt"
+          ],
+          "basketball hoop and backboard": [
+            "basketball hoop and backboard",
+            "basketball hoop",
+            "rim"
+          ]
+        },
+        "agnostic_nms": false,
+        "anchor_crop": {
+          "anchor": "basketball player in a team uniform",
+          "target": "number",
+          "refiner_classes": [
+            "number"
+          ],
+          "refiner_imgsz": 640,
+          "refiner_box_threshold": 0.001,
+          "refiner_nms_iou_threshold": 0.5,
+          "pad": 1.1,
+          "anchor_conf": 0.1,
+          "merge_iou": 0.5
+        },
+        "box_pad": {
+          "player": 0.02,
+          "ball": 0.02,
+          "referee": 0.02,
+          "rim": 0.02,
+          "number": 0.05
+        },
+        "imgsz": 1280,
+        "tiles": null,
+        "tile_overlap": 0.2,
+        "min_pixels": null,
+        "max_pixels": null
+      },
+      "delta_map5095": 0.14437919855117798
+    },
+    {
+      "arm": "yoloe__box_pad_on_ensemble_crop__--player---0.02---ball---0.02---referee-e7e3eb2c",
+      "substrate": "mps",
+      "model": "yoloe",
+      "element": "box_pad_on_ensemble_crop",
+      "baseline": "yoloe__baseline",
+      "mAP_50_95": 0.35074809193611145,
+      "mAP_50": 0.49108266830444336,
+      "per_class_ap50": {
+        "player": 0.9433890581130981,
+        "ball": 0.3168399930000305,
+        "referee": 0.5875326991081238,
+        "rim": 0.0,
+        "number": 0.6076515913009644
+      },
+      "config": {
+        "inferencer": "yoloe",
+        "model_name": "yoloe-26x-seg.pt",
+        "classes": [
+          "basketball player in a team uniform",
+          "orange basketball",
+          "referee in a striped shirt",
+          "basketball hoop and backboard",
+          "number"
+        ],
+        "task": null,
+        "prompt_template": null,
+        "sample": 0,
+        "box_threshold": 0.001,
+        "nms_iou_threshold": 0.8,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": 300,
+        "prompt_ensembles": {
+          "basketball player in a team uniform": [
+            "basketball player in a team uniform",
+            "basketball player",
+            "player",
+            "athlete in a jersey"
+          ],
+          "orange basketball": [
+            "orange basketball",
+            "basketball",
+            "ball",
+            "sports ball",
+            "leather basketball"
+          ],
+          "referee in a striped shirt": [
+            "referee in a striped shirt",
+            "referee",
+            "basketball official",
+            "referee in a black and white striped shirt"
+          ],
+          "basketball hoop and backboard": [
+            "basketball hoop and backboard",
+            "basketball hoop",
+            "rim"
+          ]
+        },
+        "agnostic_nms": false,
+        "anchor_crop": {
+          "anchor": "basketball player in a team uniform",
+          "target": "number",
+          "refiner_classes": [
+            "number"
+          ],
+          "refiner_imgsz": 640,
+          "refiner_box_threshold": 0.001,
+          "refiner_nms_iou_threshold": 0.5,
+          "pad": 1.1,
+          "anchor_conf": 0.1,
+          "merge_iou": 0.5
+        },
+        "box_pad": {
+          "player": 0.02,
+          "ball": 0.02,
+          "referee": 0.02,
+          "rim": 0.02,
+          "number": 0.08
+        },
+        "imgsz": 1280,
+        "tiles": null,
+        "tile_overlap": 0.2,
+        "min_pixels": null,
+        "max_pixels": null
+      },
+      "delta_map5095": 0.14936047792434692
+    },
+    {
+      "arm": "yoloe__box_pad_on_ensemble_crop__--player---0.03---ball---0.03---referee-81c55208",
+      "substrate": "mps",
+      "model": "yoloe",
+      "element": "box_pad_on_ensemble_crop",
+      "baseline": "yoloe__baseline",
+      "mAP_50_95": 0.3461897075176239,
+      "mAP_50": 0.49238765239715576,
+      "per_class_ap50": {
+        "player": 0.9464609622955322,
+        "ball": 0.3168399930000305,
+        "referee": 0.5875326991081238,
+        "rim": 0.0,
+        "number": 0.6111047267913818
+      },
+      "config": {
+        "inferencer": "yoloe",
+        "model_name": "yoloe-26x-seg.pt",
+        "classes": [
+          "basketball player in a team uniform",
+          "orange basketball",
+          "referee in a striped shirt",
+          "basketball hoop and backboard",
+          "number"
+        ],
+        "task": null,
+        "prompt_template": null,
+        "sample": 0,
+        "box_threshold": 0.001,
+        "nms_iou_threshold": 0.8,
+        "processor_nms_threshold": null,
+        "text_threshold": null,
+        "singleton_top_k": 3,
+        "max_area_fraction": 0.05,
+        "max_det": 300,
+        "prompt_ensembles": {
+          "basketball player in a team uniform": [
+            "basketball player in a team uniform",
+            "basketball player",
+            "player",
+            "athlete in a jersey"
+          ],
+          "orange basketball": [
+            "orange basketball",
+            "basketball",
+            "ball",
+            "sports ball",
+            "leather basketball"
+          ],
+          "referee in a striped shirt": [
+            "referee in a striped shirt",
+            "referee",
+            "basketball official",
+            "referee in a black and white striped shirt"
+          ],
+          "basketball hoop and backboard": [
+            "basketball hoop and backboard",
+            "basketball hoop",
+            "rim"
+          ]
+        },
+        "agnostic_nms": false,
+        "anchor_crop": {
+          "anchor": "basketball player in a team uniform",
+          "target": "number",
+          "refiner_classes": [
+            "number"
+          ],
+          "refiner_imgsz": 640,
+          "refiner_box_threshold": 0.001,
+          "refiner_nms_iou_threshold": 0.5,
+          "pad": 1.1,
+          "anchor_conf": 0.1,
+          "merge_iou": 0.5
+        },
+        "box_pad": {
+          "player": 0.03,
+          "ball": 0.03,
+          "referee": 0.03,
+          "rim": 0.03,
+          "number": 0.06
+        },
+        "imgsz": 1280,
+        "tiles": null,
+        "tile_overlap": 0.2,
+        "min_pixels": null,
+        "max_pixels": null
+      },
+      "delta_map5095": 0.14480209350585938
     }
   ]
 }

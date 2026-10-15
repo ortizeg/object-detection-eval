@@ -85,6 +85,7 @@ YOLO-World it cannot be replayed from a raw-detection cache.
       (both superseded by Round 6)
 - [x] Report updated
 - [x] Round 6: follow-ups (2026-10-12), below
+- [x] Round 7: box tightness, ball, and the ablation table (2026-10-15), below
 
 ## Round 6: follow-ups (2026-10-12)
 
@@ -120,6 +121,70 @@ not provide one.
 **Test.** `yoloe` was run on test a second time after the class-aware fix.
 That is disclosed in the manifest and the report.
 
+## Round 7: box tightness, ball, ablation table (2026-10-15)
+
+Asked for: every Round 6 follow-up except the 8-member fusion. Same rules.
+
+**Box tightness: YOLOE's boxes are too small, not loose.** On val (class-aware
+stack), matching each GT box to the highest-confidence same-class prediction
+gives a median edge offset per side as a fraction of the GT box:
+
+| Class | YOLOE | Grounding-DINO |
+| --- | --- | --- |
+| player | −2.6 to −3.5% (L/R), −1.4% (T/B) | within 1% |
+| referee | −1.8 / −5.3% (L/R) | within 2% |
+| ball | −1.3 to −4.7% | −2% (T) |
+| number | −6 to −8% | +6 to +15% |
+
+The shrink is the same at 640 px (players −2.2/−3.4%), so it is the model and
+not the resize. The conversion code takes ultralytics' `xyxy` as given. A box
+3% short on every side clears IoU 0.5 and misses at 0.75+, which is where the
+mAP@50 → mAP@50:95 drop was.
+
+| Arm (val) | Equal-effort stack | Ensemble + crop stack |
+| --- | --- | --- |
+| no padding | 0.2607 | 0.2999 |
+| 1% all | 0.2758 | 0.3202 |
+| 2% all | 0.2851 | 0.3334 |
+| 3% all | 0.2842 | 0.3359 |
+| 4% all | 0.2801 | 0.3347 |
+| 2%, `number` 5% | 0.2880 | 0.3458 |
+| **2%, `number` 8%** | **0.2891** | **0.3507** |
+| 3%, `number` 6% | 0.2866 | 0.3462 |
+
+`box_pad` is a replay-time step (after every filter, not in the cache key). The
+live path was verified against the cache for the chosen arm (gap 0). It is a
+correction fitted on labelled val boxes and no other row got it, so it is a
+disclosed row only: `yoloe_ensemble_number_crop_box_pad`, test **0.3749**
+(+0.043 over 0.3315, CI [+0.039, +0.048]; mAP@75 0.381 → 0.425, LLMDet 0.432).
+LLMDet − this row: +0.013, frame-level CI [−0.002, +0.028], so not separable.
+The equal-effort row does not take it.
+
+**Ball: a ranking failure, unsolved.** YOLOE has a correct ball box (IoU ≥ 0.5)
+in 65 of 88 val ball frames, but its top `ball` box is wrong in 56. Looking at
+those frames, it is nearly always the orange bracket where the rim meets the
+backboard. The singleton top-3 then loses the real ball in 20 frames. Tried on
+val (scratch, all on the equal-effort stack):
+
+| Fix | Val | Outcome |
+| --- | --- | --- |
+| Down-weight `ball` boxes inside YOLOE's own hoop box (72-cell grid) | ≤ +0.006, unstable | Rejected. Hoop boxes score a median 0.005 |
+| Extra prompts: `basketball rim`, `orange rim bracket`, `backboard` (4 variants) | +0.0000 | Rejected. Published top-3 ball boxes unchanged |
+| Zoom on top-10 ball candidates, re-score with a 2nd YOLOE (3× / 6× crops, 2 vocabularies, 3 score rules) | −0.005 to −0.042 | Rejected. Zoomed crops lose court context |
+
+**Ablation table fix.** Stacked elements (several fields away from the root
+baseline) rendered as `?` / "reverted" for every model, including shipped
+ones. `ablation_summary_table` now derives each arm's parent as the nearest
+configuration measured in an earlier element. It reports only the fields that
+step changed, with Δ against that parent, and labels a step only a disclosed
+manifest row runs with that row's name. Large negative deltas no longer read
+"within noise". Existing single-element rows are unchanged.
+
+**Bug found on the way.** `basketball rim` had no merged5 alias, so Round 4's
+`rim_word` arm silently dropped its rim boxes. Alias added, arm re-run:
+unchanged (rim 0.000, 0.2512). `ablate_vlm.py` now refuses arms with
+unresolvable classes, and a test checks the committed manifest.
+
 ## Outcome
 
 | Row | Val | Test |
@@ -128,14 +193,15 @@ That is disclosed in the manifest and the report.
 | **YOLOE, equal effort** | 0.261 | **0.278** (first run, before class-aware NMS: 0.276) |
 | YOLOE + number crop (disclosed) | 0.281 | 0.311 |
 | YOLOE + prompt ensemble + number crop (disclosed) | 0.300 | 0.332 |
+| YOLOE + prompt ensemble + number crop + box calibration (disclosed) | 0.351 | 0.375 |
 | LLMDet-large (published) | 0.359 | 0.388 |
 
 ## Follow-ups (not done)
 
-- Box tightness. The best row's mAP@50 (0.488) is close to LLMDet's (0.506)
-  while mAP@50:95 is not, so the remaining gap is loose boxes and the ball.
-- The ablation summary table renders stacked elements (several fields changed
-  from the root baseline) as `?` / "reverted" even when they shipped. This
-  predates YOLOE and affects every model's stacked rows.
 - Fusion with YOLOE on the full eight members needs the LLMDet, Qwen3-VL and
   YOLO-World val caches from the GPU box.
+- Ball. Three val fixes failed (Round 7). What remains untried: a
+  stronger verifier than YOLOE itself on the top-k ball crops, which would
+  make it a two-model row.
+- Box calibration for the other rows. Only YOLOE was offered it. OWLv2's boxes
+  are also about 2% small per side on val, so the knob is not YOLOE-specific.

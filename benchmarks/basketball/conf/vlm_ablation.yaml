@@ -818,6 +818,12 @@ elements:
   # The only other boxes on the rim are low-confidence `orange basketball`
   # hits on the orange ring. Two rim words are logged so the negative is
   # reproducible.
+  #
+  # CORRECTION (2026-10-15): `basketball rim` had no merged5 alias when this
+  # first ran, so that arm's rim boxes were dropped unscored. With the alias
+  # added and the arm re-run, the score is unchanged (rim AP50 still 0.000,
+  # mAP@50:95 0.2512). ablate_vlm.py now refuses any arm whose classes do not
+  # resolve.
   - name: rim_word
     knob: classes
     applies_to: [yoloe]
@@ -988,3 +994,73 @@ elements:
   # The Round 4 rim note above is corrected there: the hoop class lands on the
   # backboard, and the box nearest the GT rim is usually `orange basketball`.
   # See docs/plans/yoloe-zeroshot.md, Round 6.
+
+  # ---- YOLOE Round 7 (2026-10-15): box calibration --------------------------
+  #
+  # YOLOE's boxes sit INSIDE the annotators' on every class: median edge offset
+  # -2 to -3.5% of the box per side for player/referee/ball, -6 to -8% for
+  # `number` (val, class-aware stack; the same at 640 px, so it is the model,
+  # not the resize). AP@50 does not care; AP@75 and above do. `box_pad` grows
+  # each published box about its centre by a per-class fraction per side. It
+  # is applied after every filter and replays from cache.
+  #
+  # DISCLOSED: a geometric correction fitted on labelled val boxes, and no
+  # other row was offered it. Values are per eval class.
+  - name: box_pad
+    knob: box_pad
+    applies_to: [yoloe]
+    fixed:
+      imgsz: 1280
+      box_threshold: 0.001
+      nms_iou_threshold: 0.8
+      agnostic_nms: false
+      classes:
+        [basketball player in a team uniform, orange basketball, referee in a striped shirt,
+         basketball hoop and backboard, number]
+    values: &box_pad_values
+      - {player: 0.01, ball: 0.01, referee: 0.01, rim: 0.01, number: 0.01}
+      - {player: 0.02, ball: 0.02, referee: 0.02, rim: 0.02, number: 0.02}
+      - {player: 0.03, ball: 0.03, referee: 0.03, rim: 0.03, number: 0.03}
+      - {player: 0.04, ball: 0.04, referee: 0.04, rim: 0.04, number: 0.04}
+      - {player: 0.02, ball: 0.02, referee: 0.02, rim: 0.02, number: 0.05}
+      - {player: 0.02, ball: 0.02, referee: 0.02, rim: 0.02, number: 0.08}
+      - {player: 0.03, ball: 0.03, referee: 0.03, rim: 0.03, number: 0.06}
+
+  # The same grid on the best disclosed stack (ensemble + number crop).
+  - name: box_pad_on_ensemble_crop
+    knob: box_pad
+    applies_to: [yoloe]
+    fixed:
+      imgsz: 1280
+      box_threshold: 0.001
+      nms_iou_threshold: 0.8
+      agnostic_nms: false
+      classes:
+        [basketball player in a team uniform, orange basketball, referee in a striped shirt,
+         basketball hoop and backboard, number]
+      prompt_ensembles:
+        basketball player in a team uniform:
+          [basketball player in a team uniform, basketball player, player, athlete in a jersey]
+        orange basketball: [orange basketball, basketball, ball, sports ball, leather basketball]
+        referee in a striped shirt:
+          [referee in a striped shirt, referee, basketball official,
+           referee in a black and white striped shirt]
+        basketball hoop and backboard: [basketball hoop and backboard, basketball hoop, rim]
+      anchor_crop:
+        anchor: basketball player in a team uniform
+        target: number
+        refiner_classes: [number]
+    values: *box_pad_values
+
+  # RESULTS. Best on both stacks: 2% per side for player/ball/referee/rim, 8%
+  # for `number`. Equal-effort stack 0.2607 -> 0.2891, ensemble + crop 0.2999
+  # -> 0.3507 (live path verified, gap 0). Published as the disclosed row
+  # `yoloe_ensemble_number_crop_box_pad`. The equal-effort `yoloe` row does
+  # not take it.
+  #
+  # BALL, not logged as arms (scratch, none adopted). YOLOE's top `ball` box is
+  # wrong in 56 of 88 val ball frames, almost always on the orange rim bracket.
+  # Down-weighting ball boxes inside YOLOE's own hoop box gave at most +0.006
+  # (unstable across the grid). Extra rim/bracket/backboard prompts left the
+  # published ball boxes unchanged. Zoomed re-scoring of the top-10 candidates
+  # gave -0.005 to -0.042. See docs/plans/yoloe-zeroshot.md, Round 7.

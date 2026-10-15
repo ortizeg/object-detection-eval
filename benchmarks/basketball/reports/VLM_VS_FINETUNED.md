@@ -259,6 +259,13 @@ what `vlm_zeroshot.yaml` actually runs, so the table cannot claim a change was
 adopted that never reached the published config, and editing that config without
 re-rendering fails the drift gate.
 
+Later elements are stacked on earlier winners. For those, "Best" names only the
+fields that step changed and Δ is measured against the arm it was built on,
+which is the closest configuration measured in an earlier element. "Same as the
+stack" means the sweep's winner was a configuration already measured. A
+disclosed step that the equal-effort row does not run, but a disclosed
+manifest row does, is labelled with that row's name.
+
 <!-- TABLE:vlm_ablation START -->
 | Model | Element | Tried | Best | val mAP@50:95 | Δ | Verdict |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -280,12 +287,12 @@ re-rendering fails the drift gate.
 | yolo_world | Singleton `top_k` | 5 | `2` | 0.132 | +0.0001 | reverted (within noise) |
 | yoloe | Singleton `top_k` | 4 | `10` | 0.202 | +0.0005 | reverted (within noise) |
 | florence2 | Checkpoint | 3 | `microsoft/Florence-2-large` | 0.155 | +0.0300 | **kept** |
-| grounding_dino | Checkpoint | 1 | `IDEA-Research/grounding-dino-tiny` | 0.212 | -0.0324 | reverted (within noise) |
-| owlv2 | Checkpoint | 2 | `google/owlv2-base-patch16-ensemble` | 0.180 | -0.0601 | reverted (within noise) |
-| yolo_world | Checkpoint | 3 | `yolov8l-worldv2.pt` | 0.122 | -0.0100 | reverted (within noise) |
-| yoloe | Checkpoint | 3 | `yoloe-26l-seg.pt` | 0.166 | -0.0356 | reverted (within noise) |
+| grounding_dino | Checkpoint | 1 | `IDEA-Research/grounding-dino-tiny` | 0.212 | -0.0324 | reverted |
+| owlv2 | Checkpoint | 2 | `google/owlv2-base-patch16-ensemble` | 0.180 | -0.0601 | reverted |
+| yolo_world | Checkpoint | 3 | `yolov8l-worldv2.pt` | 0.122 | -0.0100 | reverted |
+| yoloe | Checkpoint | 3 | `yoloe-26l-seg.pt` | 0.166 | -0.0356 | reverted |
 | florence2 | Per-class best vocabulary | 1 | `['player', 'basketball', 'referee', 'rim', 'number']` | 0.124 | -0.0002 | reverted (within noise) |
-| grounding_dino | Per-class best vocabulary | 1 | `['player', 'basketball', 'referee', 'rim', 'jersey number']` | 0.242 | -0.0022 | reverted (within noise) |
+| grounding_dino | Per-class best vocabulary | 1 | `['player', 'basketball', 'referee', 'rim', 'jersey number']` | 0.242 | -0.0022 | reverted |
 | omdet_turbo | Per-class best vocabulary | 1 | `['basketball player', 'basketball', 'referee', 'rim', 'number']` | 0.187 | +0.0060 | **kept** |
 | owlv2 | Per-class best vocabulary | 1 | `['basketball player', 'basketball', 'referee', 'rim', 'number']` | 0.250 | +0.0102 | reverted |
 | yolo_world | Per-class best vocabulary | 1 | `['person', 'basketball', 'referee', 'basketball hoop', 'jersey number on a uniform']` | 0.164 | +0.0324 | **kept** |
@@ -295,42 +302,44 @@ re-rendering fails the drift gate.
 | yolo_world | Input resolution | 3 | `1280` | 0.145 | +0.0134 | **kept** |
 | yoloe | Input resolution | 3 | `1280` | 0.223 | +0.0218 | **kept** |
 | florence2 | Add NMS | 4 | `0.3` | 0.125 | +0.0000 | reverted (within noise) |
-| florence2 | Vocabulary re-search (new checkpoint) | 6 | `microsoft/Florence-2-large` | 0.155 | +0.0300 | **kept** |
+| florence2 | Vocabulary re-search (new checkpoint) | 6 | no change | 0.155 | +0.0000 | same as the stack |
 | florence2 | Overlapping tiles 2x2 | 1 | `[2, 2]` | 0.135 | +0.0104 | **kept** |
-| gemini | Overlapping tiles 2x2 | 1 | `[2, 2]` | 0.160 | -0.0981 | reverted (within noise) |
+| gemini | Overlapping tiles 2x2 | 1 | `[2, 2]` | 0.160 | -0.0981 | reverted |
 | grounding_dino | Overlapping tiles 2x2 | 1 | `[2, 2]` | 0.278 | +0.0337 | **kept** |
 | omdet_turbo | Overlapping tiles 2x2 | 1 | `[2, 2]` | 0.207 | +0.0260 | **kept** |
 | owlv2 | Overlapping tiles 2x2 | 1 | `[2, 2]` | 0.283 | +0.0431 | **kept** |
-| yolo_world | Overlapping tiles 2x2 | 1 | `[2, 2]` | 0.079 | -0.0528 | reverted (within noise) |
-| yoloe | Overlapping tiles 2x2 | 1 | `[2, 2]` | 0.192 | -0.0092 | reverted (within noise) |
-| florence2 | NMS re-swept under tiling | 4 | `?` | 0.189 | +0.0646 | reverted |
-| gemini | NMS re-swept under tiling | 7 | `?` | 0.238 | -0.0207 | reverted (within noise) |
-| grounding_dino | NMS re-swept under tiling | 9 | `?` | 0.278 | +0.0338 | reverted |
-| omdet_turbo | NMS re-swept under tiling | 9 | `?` | 0.207 | +0.0263 | reverted |
-| owlv2 | NMS re-swept under tiling | 9 | `?` | 0.288 | +0.0479 | reverted |
-| florence2 | All accepted changes together | 1 | `?` | 0.165 | +0.0407 | reverted |
-| grounding_dino | All accepted changes together | 1 | `?` | 0.278 | +0.0338 | reverted |
-| omdet_turbo | All accepted changes together | 1 | `?` | 0.216 | +0.0353 | reverted |
-| owlv2 | All accepted changes together | 1 | `?` | 0.287 | +0.0466 | reverted |
-| yolo_world | All accepted changes together | 1 | `?` | 0.177 | +0.0450 | reverted |
-| florence2 | NMS re-swept on the full stack | 5 | `?` | 0.234 | +0.1094 | reverted |
-| omdet_turbo | NMS re-swept on the full stack | 5 | `?` | 0.216 | +0.0353 | reverted |
-| owlv2 | NMS re-swept on the full stack | 5 | `?` | 0.287 | +0.0468 | reverted |
-| yolo_world | NMS re-swept on the full stack | 4 | `?` | 0.177 | +0.0453 | reverted |
-| yoloe | NMS re-swept on the full stack | 4 | `?` | 0.225 | +0.0241 | reverted |
-| yoloe | Vocabulary re-search (new resolution) | 5 | `?` | 0.227 | +0.0255 | reverted |
-| yoloe | `box_threshold` on the stack | 2 | `?` | 0.231 | +0.0300 | reverted |
-| yoloe | Per-class vocabulary on the stack | 2 | `?` | 0.246 | +0.0447 | reverted |
-| yoloe | NMS on the stack | 3 | `?` | 0.237 | +0.0357 | reverted |
-| yoloe | NMS on the composed vocabulary | 4 | `?` | 0.251 | +0.0498 | reverted |
-| yoloe | Input resolution on the composed vocabulary | 2 | `?` | 0.246 | +0.0442 | reverted |
-| yoloe | Rim word (disclosed) | 2 | `?` | 0.251 | +0.0498 | reverted |
-| yoloe | Prompt ensembling (disclosed) | 3 | `?` | 0.268 | +0.0665 | reverted |
-| yoloe | Class-aware NMS | 1 | `?` | 0.261 | +0.0594 | reverted |
-| yoloe | NMS re-swept under class-aware NMS | 3 | `?` | 0.260 | +0.0591 | reverted |
-| yoloe | Per-player number crop (disclosed) | 2 | `?` | 0.281 | +0.0791 | reverted |
-| yoloe | Prompt ensembling on the class-aware stack (disclosed) | 1 | `?` | 0.278 | +0.0765 | reverted |
-| yoloe | Number crop on the ensemble (disclosed) | 1 | `?` | 0.300 | +0.0985 | reverted |
+| yolo_world | Overlapping tiles 2x2 | 1 | `[2, 2]` | 0.079 | -0.0528 | reverted |
+| yoloe | Overlapping tiles 2x2 | 1 | `[2, 2]` | 0.192 | -0.0092 | reverted |
+| florence2 | NMS re-swept under tiling | 4 | `0.3` | 0.189 | +0.0542 | reverted |
+| gemini | NMS re-swept under tiling | 7 | `0.2` | 0.238 | +0.0774 | reverted |
+| grounding_dino | NMS re-swept under tiling | 9 | `0.7` | 0.278 | +0.0001 | reverted (within noise) |
+| omdet_turbo | NMS re-swept under tiling | 9 | `0.6` | 0.207 | +0.0003 | reverted (within noise) |
+| owlv2 | NMS re-swept under tiling | 9 | `0.5` | 0.288 | +0.0048 | **kept** |
+| florence2 | All accepted changes together | 1 | `microsoft/Florence-2-large` | 0.165 | +0.0303 | **kept** |
+| grounding_dino | All accepted changes together | 1 | no change | 0.278 | +0.0000 | same as the stack |
+| omdet_turbo | All accepted changes together | 1 | `['basketball player', 'basketball', 'referee', 'rim', 'number']` | 0.216 | +0.0093 | **kept** |
+| owlv2 | All accepted changes together | 1 | `['basketball player', 'basketball', 'referee', 'rim', 'number']` | 0.287 | -0.0012 | reverted (within noise) |
+| yolo_world | All accepted changes together | 1 | vocabulary, box threshold 0.001, NMS IoU 0.8 | 0.177 | +0.0316 | reverted |
+| florence2 | NMS re-swept on the full stack | 5 | `0.4` | 0.234 | +0.0687 | **kept** |
+| omdet_turbo | NMS re-swept on the full stack | 5 | no change | 0.216 | +0.0000 | same as the stack |
+| owlv2 | NMS re-swept on the full stack | 5 | `0.4` | 0.287 | +0.0002 | reverted (within noise) |
+| yolo_world | NMS re-swept on the full stack | 4 | `0.7` | 0.177 | +0.0004 | reverted (within noise) |
+| yoloe | NMS re-swept on the full stack | 4 | `0.8` | 0.225 | +0.0023 | **kept** |
+| yoloe | Vocabulary re-search (new resolution) | 5 | `['basketball player in a team uniform', 'orange basketball', 'referee in a striped shirt', 'basketball hoop and backboard', 'jersey number on a uniform']` | 0.227 | +0.0037 | reverted |
+| yoloe | `box_threshold` on the stack | 2 | `0.001` | 0.231 | +0.0082 | **kept** |
+| yoloe | Per-class vocabulary on the stack | 2 | `['basketball player in a team uniform', 'orange basketball', 'referee in a striped shirt', 'basketball hoop and backboard', 'number']` | 0.246 | +0.0148 | **kept** |
+| yoloe | NMS on the stack | 3 | `0.8` | 0.237 | +0.0034 | **kept** |
+| yoloe | NMS on the composed vocabulary | 4 | `['basketball player in a team uniform', 'orange basketball', 'referee in a striped shirt', 'basketball hoop and backboard', 'number']` | 0.251 | +0.0142 | **kept** |
+| yoloe | Input resolution on the composed vocabulary | 2 | `1600` | 0.246 | -0.0005 | reverted (within noise) |
+| yoloe | Rim word (disclosed) | 2 | `['basketball player in a team uniform', 'orange basketball', 'referee in a striped shirt', 'basketball rim', 'number']` | 0.251 | +0.0000 | reverted (within noise) |
+| yoloe | Prompt ensembling (disclosed) | 3 | prompt ensembling | 0.268 | +0.0166 | disclosed row `yoloe_ensemble_number_crop`, `yoloe_ensemble_number_crop_box_pad` |
+| yoloe | Class-aware NMS | 1 | class-aware NMS | 0.261 | +0.0095 | **kept** |
+| yoloe | NMS re-swept under class-aware NMS | 3 | `0.7` | 0.260 | -0.0003 | reverted (within noise) |
+| yoloe | Per-player number crop (disclosed) | 2 | number crop | 0.281 | +0.0198 | disclosed row `yoloe_ensemble_number_crop`, `yoloe_ensemble_number_crop_box_pad`, `yoloe_number_crop` |
+| yoloe | Prompt ensembling on the class-aware stack (disclosed) | 1 | prompt ensembling | 0.278 | +0.0171 | disclosed row `yoloe_ensemble_number_crop`, `yoloe_ensemble_number_crop_box_pad` |
+| yoloe | Number crop on the ensemble (disclosed) | 1 | number crop | 0.300 | +0.0220 | disclosed row `yoloe_ensemble_number_crop`, `yoloe_ensemble_number_crop_box_pad`, `yoloe_number_crop` |
+| yoloe | Box calibration (disclosed) | 7 | box calibration 2%/8% | 0.289 | +0.0284 | disclosed row `yoloe_ensemble_number_crop_box_pad` |
+| yoloe | Box calibration on ensemble + crop (disclosed) | 7 | box calibration 2%/8% | 0.351 | +0.0508 | disclosed row `yoloe_ensemble_number_crop_box_pad` |
 <!-- TABLE:vlm_ablation END -->
 
 </details>
@@ -385,7 +394,7 @@ never emit, while the singleton cap *constrains* the zero-shot rows.
 
 ## The zero-shot ceiling
 
-Ten zero-shot models, plus two disclosed YOLOE variants, scored on the merged-5 test split. The table is recomputed
+Ten zero-shot models, plus three disclosed YOLOE variants, scored on the merged-5 test split. The table is recomputed
 from the committed prediction dumps in `results/vlm/*.json` (never transcribed):
 
 <!-- TABLE:vlm_summary START -->
@@ -401,6 +410,7 @@ from the committed prediction dumps in `results/vlm/*.json` (never transcribed):
 | YOLOE | 0.278 | 0.385 | 0.325 |
 | YOLOE + number crop | 0.311 | 0.463 | 0.353 |
 | YOLOE + prompt ensemble + number crop | 0.331 | 0.488 | 0.381 |
+| YOLOE + prompt ensemble + number crop + box calibration | 0.375 | 0.488 | 0.425 |
 | LLMDet-large | 0.388 | 0.506 | 0.432 |
 | Qwen3-VL | 0.318 | 0.452 | 0.337 |
 <!-- TABLE:vlm_summary END -->
@@ -646,6 +656,22 @@ any YOLOE configuration got. It replaces a 2026-10-11 ensemble-only row (0.291
 test, agnostic NMS), which was superseded on val before this one reached test.
 Every configuration was fixed on val before it ran on test.
 
+**Disclosed row: + box calibration, 0.375 test.** YOLOE's boxes are not loose.
+They are *small*. Matching each val GT box to its highest-confidence prediction
+gives a median edge offset of −2 to −3.5% of the box per side for player,
+referee and ball, and −6 to −8% for `number`. The same shrink appears at 640 px,
+so it comes from the model, not the resize. Grounding-DINO's edges sit within 1%.
+A box that is 3% short on every side still clears IoU 0.5 and fails at 0.75 and
+above, which is why mAP@50 was already close to LLMDet's and mAP@50:95 was not.
+This row grows each published box about its centre after every filter: 2% per
+side for player, ball, referee and rim, 8% for `number`. Those values were chosen
+on val from a 7-value grid (`box_pad_on_ensemble_crop`, 0.300 → 0.351). It is
+the only row in this report with a correction fitted on labelled boxes, and no
+other model was offered it, so it says nothing about how far the others would
+move. On test it adds +0.043. AP50 barely changes (0.488 → 0.488), mAP@75 goes
+from 0.381 to 0.425 (LLMDet: 0.432), and the stack lands at 0.375 against
+LLMDet's 0.388.
+
 **How large the gaps are.** Paired bootstrap on test
 (`results/vlm/bootstrap/paired_deltas.json`):
 
@@ -654,11 +680,15 @@ Every configuration was fixed on val before it ran on test.
 | YOLOE − YOLO-World | +0.089 | [+0.077, +0.102] |
 | YOLOE + number crop − YOLOE | +0.033 | [+0.028, +0.038] |
 | YOLOE + ensemble + number crop − YOLOE | +0.054 | [+0.044, +0.063] |
-| LLMDet-large − YOLOE + ensemble + number crop | +0.057 | [+0.042, +0.070] |
+| + box calibration − YOLOE + ensemble + number crop | +0.044 | [+0.039, +0.048] |
+| LLMDet-large − YOLOE + ensemble + number crop + box calibration | +0.013 | [−0.002, +0.028] |
 
 These CIs resample frames, not the 3 test clips (`run_clustered_bootstrap.py`
 explains why that makes them too narrow). Read them as "larger than
-frame-to-frame noise", and only that.
+frame-to-frame noise", and only that. The last row does not clear even that
+bar: the fully disclosed YOLOE stack is not distinguishable from LLMDet-large on
+this test set. That is a comparison between a row that received a val-fitted
+box correction and one that did not.
 
 **`rim` is still exactly 0.000, and crop-refine does not rescue it here.** The
 diagnostic is sharper than first reported. The hoop class lands on the
@@ -671,11 +701,29 @@ AP50 stayed at ≤0.002 in both. Astra's crop-refine fixes the rim because Astra
 first pass already puts a rim box on the rim. YOLOE's first pass does not, so
 there is nothing correct to refine.
 
+**`ball` is a ranking failure, and none of three fixes worked.** On val, YOLOE
+puts a box on the real ball (IoU ≥ 0.5) in 65 of 88 ball frames, but its
+highest-scoring `ball` box is wrong in 56 of them. Inspecting those boxes shows
+the same object almost every time: the orange bracket where the rim meets the
+backboard. The singleton top-3 cut then drops the real ball in 20 frames. Three
+fixes were tried on val, and none was adopted:
+
+- Down-weighting `ball` boxes that sit inside YOLOE's own hoop box: at most
+  +0.006 across a 72-setting grid, with neighbouring settings negative. YOLOE's
+  hoop boxes score a median 0.005, too weak to anchor on.
+- Extra prompts that could claim the bracket ("basketball rim", "orange rim
+  bracket", "backboard"): the published top-3 ball boxes did not change in any
+  variant. The bracket keeps its `ball` label.
+- Zooming on each of the top-10 ball candidates and re-scoring it with a second
+  YOLOE pass (crop 3× or 6× the box): −0.005 to −0.042. Without court context, the
+  zoomed pass fires on anything orange.
+
 **Where it lands.** YOLOE is the best *real-time* open-vocabulary row, at 0.278
-equal-effort and 0.331 with the disclosed number crop and ensemble. It now beats
-LLMDet-large on `player` and `number` AP50. It still trails LLMDet overall
-(0.388): the rest of the gap is ball (0.250 vs 0.407 AP50), and boxes that are
-found but loose. mAP@50 is close (0.488 vs 0.506), while mAP@50:95 is not.
+equal-effort, 0.331 with the disclosed number crop and ensemble, and 0.375 with
+box calibration on top. It beats LLMDet-large on `player` and `number` AP50, and
+box calibration closes most of the strict-IoU gap (mAP@75 0.425 vs 0.432). At
+0.375 vs 0.388 it is within frame-level noise of LLMDet. What remains is the
+ball (0.250 vs 0.407 AP50).
 
 **Not added to the fusion.** On val, the five fusion members whose caches are
 available locally (Florence-2, Gemini, Grounding-DINO, OmDet-Turbo, OWLv2) fuse
@@ -705,6 +753,7 @@ makes the pattern unmistakable:
 | YOLOE | 0.935 | 0.295 | 0.516 | 0.000 | 0.179 |
 | YOLOE + number crop | 0.935 | 0.295 | 0.516 | 0.000 | 0.567 |
 | YOLOE + prompt ensemble + number crop | 0.947 | 0.250 | 0.629 | 0.000 | 0.616 |
+| YOLOE + prompt ensemble + number crop + box calibration | 0.952 | 0.250 | 0.630 | 0.000 | 0.607 |
 | LLMDet-large | 0.880 | 0.407 | 0.673 | 0.001 | 0.571 |
 | Qwen3-VL | 0.934 | 0.334 | 0.727 | 0.000 | 0.266 |
 <!-- TABLE:vlm_per_class END -->

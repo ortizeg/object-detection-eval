@@ -480,6 +480,47 @@ models:
     # TEST (2026-10-12, MPS, run once): mAP@50:95 0.3315, +0.054 over `yoloe`.
     expected_map5095: 0.332
 
+  # YOLOE-26x + PROMPT ENSEMBLING + NUMBER CROP + BOX CALIBRATION. DISCLOSED,
+  # and the one row here with a correction fitted on labelled val boxes.
+  # YOLOE's boxes sit inside the annotators' on every class (median edge offset
+  # about -2 to -3.5% of the box per side for people and ball, -6 to -8% for
+  # `number`, the same at 640 px). `box_pad` grows each published box about its
+  # centre, per side: 2% for player/ball/referee/rim, 8% for `number`. Chosen
+  # on val from a 7-value grid (vlm_ablation.yaml `box_pad_on_ensemble_crop`):
+  # 0.2999 -> 0.3507. On the equal-effort stack the same values give 0.2607 ->
+  # 0.2891. No other row was offered this knob, so it says nothing about the
+  # other models' boxes.
+  - name: yoloe_ensemble_number_crop_box_pad
+    inferencer: yoloe
+    model_name: yoloe-26x-seg.pt
+    classes:
+      - basketball player in a team uniform
+      - orange basketball
+      - referee in a striped shirt
+      - basketball hoop and backboard
+      - number
+    prompt_ensembles:
+      basketball player in a team uniform:
+        [basketball player in a team uniform, basketball player, player, athlete in a jersey]
+      orange basketball: [orange basketball, basketball, ball, sports ball, leather basketball]
+      referee in a striped shirt:
+        [referee in a striped shirt, referee, basketball official,
+         referee in a black and white striped shirt]
+      basketball hoop and backboard: [basketball hoop and backboard, basketball hoop, rim]
+    box_threshold: 0.001
+    nms_iou_threshold: 0.8
+    agnostic_nms: false
+    imgsz: 1280
+    max_det: 300
+    anchor_crop:
+      anchor: basketball player in a team uniform
+      target: number
+      refiner_classes: [number]
+    box_pad: {player: 0.02, ball: 0.02, referee: 0.02, rim: 0.02, number: 0.08}
+    # TEST (2026-10-15, MPS, run once): mAP@50:95 0.3749, +0.043 over
+    # `yoloe_ensemble_number_crop` (0.3315).
+    expected_map5095: 0.375
+
   # LLMDet-large (added 2026-08-17) -- the seventh row. Architecturally
   # mm-grounding-dino: same HF calling convention as Grounding DINO
   # (AutoModelForZeroShotObjectDetection + post_process_grounded_object_detection),

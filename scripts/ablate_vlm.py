@@ -147,6 +147,10 @@ class Arm(BaseModel, frozen=True):
     #: YOLOE only: crop-and-re-detect second pass (e.g. ``number`` inside each
     #: ``player`` box). ``None`` = one full-frame pass.
     anchor_crop: AnchorCropConfig | None = None
+    #: Eval class name -> per-side box growth, applied after every filter (see
+    #: ``filters.pad_boxes``). Post-processing, so NOT in the signature: a sweep
+    #: over it replays one cached pass.
+    box_pad: dict[str, float] | None = None
     #: Inference resolution, where the backend exposes one (ultralytics `imgsz`).
     imgsz: int | None = None
     #: Overlapping-tile grid, e.g. ``[2, 2]``. ``None`` runs the whole image once.
@@ -742,6 +746,17 @@ def _row(arm: Arm, metrics: dict[str, Any], substrate: str) -> dict[str, Any]:
     }
 
 
+def _box_pad_ids(arm: Arm, name_to_id: dict[str, int]) -> dict[int, float] | None:
+    """The arm's ``box_pad`` keyed by eval class id; an unknown name is an error."""
+    if not arm.box_pad:
+        return None
+    unknown = sorted(set(arm.box_pad) - set(name_to_id))
+    if unknown:
+        msg = f"arm {arm.id!r}: box_pad names classes the taxonomy does not have: {unknown}"
+        raise ValueError(msg)
+    return {name_to_id[name]: pad for name, pad in arm.box_pad.items()}
+
+
 def score_arm_from_cache(
     arm: Arm,
     raw_map: dict[str, list[Detection]],
@@ -772,6 +787,7 @@ def score_arm_from_cache(
             nms_iou_threshold=nms_iou,
             max_area_fraction=arm.max_area_fraction,
             singleton_top_k=arm.singleton_top_k,
+            box_pad=_box_pad_ids(arm, name_to_id),
         )
     return _row(arm, compute_metrics(gt_map, pred_map, id_to_name), substrate)
 
@@ -804,6 +820,7 @@ def score_arm_live(
         name_to_id=name_to_id,
         max_area_fraction=arm.max_area_fraction,
         singleton_top_k=arm.singleton_top_k,
+        box_pad=_box_pad_ids(arm, name_to_id),
     )
     unload = getattr(inferencer, "unload", None)
     if unload is not None:
@@ -972,6 +989,23 @@ def main() -> None:
     logger.info(f"substrate: {substrate}")
 
     name_to_id, id_to_name = resolve_taxonomy(args.taxonomy)
+
+    # Fail fast on unaliased vocabulary, as search_vlm_prompts.py does. A class
+    # with no eval mapping is dropped by remap_detections, so it scores as zero
+    # detections rather than as a bad prompt. The Round 4 `rim_word` arm
+    # `basketball rim` was scored exactly that way before this check existed.
+    unmapped = {
+        arm.id: missing
+        for arm in arms
+        if (missing := [c for c in arm.classes if c.lower() not in name_to_id])
+    }
+    if unmapped:
+        logger.error(
+            f"arms with classes that have no {args.taxonomy} mapping: {unmapped}. Add them "
+            f"to the taxonomy's `aliases` block."
+        )
+        sys.exit(2)
+
     split_dir = args.data_root / split
     gt_map = load_coco_gt(split_dir / "_annotations.coco.json", name_to_id)
     filenames = list(gt_map.keys())

@@ -187,6 +187,9 @@ def test_only_the_checkpoint_re_search_pins_a_second_field(manifest: Any) -> Non
         "number_crop",
         "prompt_ensemble_on_class_aware",
         "number_crop_on_ensemble",
+        # Round 7 (2026-10-15): disclosed box calibration on both stacks.
+        "box_pad",
+        "box_pad_on_ensemble_crop",
     }
 
 
@@ -194,6 +197,23 @@ def test_every_model_gets_exactly_one_baseline_arm(manifest: Any) -> None:
     arms = manifest.expand()
     baselines = [a for a in arms if a.element == "baseline"]
     assert sorted(a.model for a in baselines) == sorted(m.name for m in manifest.models)
+
+
+def test_every_arm_class_resolves_in_the_eval_taxonomy(manifest: Any) -> None:
+    """An unaliased class is dropped at remap, so it scores as zero detections.
+
+    Regression: YOLOE's `rim_word` arm prompted `basketball rim` before the
+    alias existed, and its rim boxes were silently discarded.
+    """
+    from object_detection_eval.data.taxonomy import resolve_taxonomy
+
+    name_to_id, _ = resolve_taxonomy("merged5")
+    unmapped = {
+        arm.id: missing
+        for arm in manifest.expand()
+        if (missing := [c for c in arm.classes if c.lower() not in name_to_id])
+    }
+    assert unmapped == {}
 
 
 def test_expansion_skips_an_arm_that_restates_the_baseline(sut: types.ModuleType) -> None:
@@ -327,6 +347,7 @@ def test_post_processing_knobs_stay_out_of_the_signature(sut: types.ModuleType) 
         ("box_threshold", 0.05),
         ("singleton_top_k", 10),
         ("max_area_fraction", 0.02),
+        ("box_pad", {"player": 0.02}),
     ]:
         other = _arm(sut, id=field, **{"nms_iou_threshold": 0.3, field: value})
         assert other.signature() == base.signature(), field
