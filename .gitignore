@@ -52,3 +52,6 @@ site/
 # MkDocs staging tree, assembled by scripts/stage_docs.py from README + reports + docs
 site_src/
 .env
+
+# Text encoders ultralytics downloads next to YOLO-World / YOLOE weights.
+mobileclip*.ts

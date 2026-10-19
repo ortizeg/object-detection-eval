@@ -221,6 +221,17 @@ def _build_inferencer(model: SearchModel, classes: list[str]) -> SupportsPredict
                 model.nms_iou_threshold if model.nms_iou_threshold is not None else 0.5
             ),
         )
+    if model.inferencer == "yoloe":
+        from object_detection_eval.inference.vlm.yoloe import YOLOEInferencer
+
+        return YOLOEInferencer(
+            model_name=model.model_name,
+            classes=classes,
+            box_threshold=model.box_threshold if model.box_threshold is not None else 0.01,
+            nms_iou_threshold=(
+                model.nms_iou_threshold if model.nms_iou_threshold is not None else 0.5
+            ),
+        )
     if model.inferencer == "qwen3_vl":
         from object_detection_eval.inference.vlm.qwen3_vl import Qwen3VLInferencer
 
