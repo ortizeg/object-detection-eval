@@ -203,5 +203,13 @@ unresolvable classes, and a test checks the committed manifest.
 - Ball. Three val fixes failed (Round 7). What remains untried: a
   stronger verifier than YOLOE itself on the top-k ball crops, which would
   make it a two-model row.
-- Box calibration for the other rows. Only YOLOE was offered it. OWLv2's boxes
-  are also about 2% small per side on val, so the knob is not YOLOE-specific.
+- **Box calibration for the other rows — do this next, once the in-flight
+  model rows land.** Only YOLOE was offered it. OWLv2's boxes are also about 2%
+  small per side on val, so the knob is not YOLOE-specific. It matters because
+  the calibrated YOLOE row (0.375) is statistically tied with LLMDet-large
+  (0.388), and the comparison is lopsided until LLMDet and the rest get the
+  same offer. Recipe, per model: measure the median per-side edge offset on val
+  (each GT box against its highest-confidence same-class prediction), sweep the
+  `box_pad` grid from `box_pad_on_ensemble_crop` in `vlm_ablation.yaml` on that
+  model's best arm, adopt only above the 0.002 floor, and publish any win as a
+  disclosed row with one test run. Re-run the paired bootstrap after.
