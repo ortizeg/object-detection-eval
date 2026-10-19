@@ -29,6 +29,19 @@
       "recall_at_p95": 0.872
     },
     {
+      "combo": "astra_crop_refine_numcrop",
+      "mAP_50_95": 0.5454,
+      "mAP_50": 0.8584,
+      "per_class_ap50": {
+        "player": 0.979,
+        "ball": 0.61,
+        "referee": 0.899,
+        "rim": 0.907,
+        "number": 0.897
+      },
+      "recall_at_p95": 0.864
+    },
+    {
       "combo": "dinox_pro",
       "mAP_50_95": 0.4294,
       "mAP_50": 0.5775,
@@ -66,6 +79,19 @@
         "number": 0.761
       },
       "recall_at_p95": 0.262
+    },
+    {
+      "combo": "dinox_preview_rimtrim",
+      "mAP_50_95": 0.4978,
+      "mAP_50": 0.6909,
+      "per_class_ap50": {
+        "player": 0.878,
+        "ball": 0.696,
+        "referee": 0.826,
+        "rim": 0.335,
+        "number": 0.72
+      },
+      "recall_at_p95": 0.193
     },
     {
       "combo": "astra_crop_refine+dinox_pro",
@@ -107,6 +133,19 @@
       "recall_at_p95": 0.867
     },
     {
+      "combo": "astra_crop_refine+dinox_preview_rimtrim",
+      "mAP_50_95": 0.6174,
+      "mAP_50": 0.8952,
+      "per_class_ap50": {
+        "player": 0.977,
+        "ball": 0.751,
+        "referee": 0.938,
+        "rim": 0.891,
+        "number": 0.918
+      },
+      "recall_at_p95": 0.869
+    },
+    {
       "combo": "astra_base_numcrop+dinox_pro",
       "mAP_50_95": 0.5314,
       "mAP_50": 0.8376,
@@ -144,9 +183,165 @@
         "number": 0.944
       },
       "recall_at_p95": 0.862
+    },
+    {
+      "combo": "astra_base_numcrop+dinox_preview_rimtrim",
+      "mAP_50_95": 0.5642,
+      "mAP_50": 0.8777,
+      "per_class_ap50": {
+        "player": 0.977,
+        "ball": 0.769,
+        "referee": 0.953,
+        "rim": 0.749,
+        "number": 0.94
+      },
+      "recall_at_p95": 0.86
+    },
+    {
+      "combo": "astra_crop_refine_numcrop+dinox_pro",
+      "mAP_50_95": 0.5813,
+      "mAP_50": 0.8836,
+      "per_class_ap50": {
+        "player": 0.977,
+        "ball": 0.688,
+        "referee": 0.941,
+        "rim": 0.879,
+        "number": 0.933
+      },
+      "recall_at_p95": 0.841
+    },
+    {
+      "combo": "astra_crop_refine_numcrop+dinox_pro_bespoke",
+      "mAP_50_95": 0.5972,
+      "mAP_50": 0.8894,
+      "per_class_ap50": {
+        "player": 0.978,
+        "ball": 0.696,
+        "referee": 0.945,
+        "rim": 0.901,
+        "number": 0.926
+      },
+      "recall_at_p95": 0.872
+    },
+    {
+      "combo": "astra_crop_refine_numcrop+dinox_pro_rimtrim",
+      "mAP_50_95": 0.6072,
+      "mAP_50": 0.8895,
+      "per_class_ap50": {
+        "player": 0.977,
+        "ball": 0.688,
+        "referee": 0.941,
+        "rim": 0.908,
+        "number": 0.933
+      },
+      "recall_at_p95": 0.868
+    },
+    {
+      "combo": "astra_crop_refine_numcrop+dinox_preview_rimtrim",
+      "mAP_50_95": 0.6144,
+      "mAP_50": 0.8986,
+      "per_class_ap50": {
+        "player": 0.973,
+        "ball": 0.745,
+        "referee": 0.942,
+        "rim": 0.906,
+        "number": 0.928
+      },
+      "recall_at_p95": 0.868
+    },
+    {
+      "combo": "astra_crop_refine+dinox_pro_rimtrim [rank]",
+      "mAP_50_95": 0.5746,
+      "mAP_50": 0.8084,
+      "per_class_ap50": {
+        "player": 0.948,
+        "ball": 0.64,
+        "referee": 0.802,
+        "rim": 0.843,
+        "number": 0.809
+      },
+      "recall_at_p95": 0.801
+    },
+    {
+      "combo": "astra_crop_refine+dinox_pro_rimtrim+dinox_preview_rimtrim",
+      "mAP_50_95": 0.6239,
+      "mAP_50": 0.8803,
+      "per_class_ap50": {
+        "player": 0.975,
+        "ball": 0.735,
+        "referee": 0.937,
+        "rim": 0.825,
+        "number": 0.929
+      },
+      "recall_at_p95": 0.874
+    },
+    {
+      "combo": "astra_crop_refine+dinox_pro_rimtrim+trex_fewshot",
+      "mAP_50_95": 0.6023,
+      "mAP_50": 0.8673,
+      "per_class_ap50": {
+        "player": 0.973,
+        "ball": 0.698,
+        "referee": 0.915,
+        "rim": 0.883,
+        "number": 0.867
+      },
+      "recall_at_p95": 0.803
+    },
+    {
+      "combo": "astra_crop_refine+dinox_pro_rimtrim+dinox_preview_rimtrim+llmdet",
+      "mAP_50_95": 0.6207,
+      "mAP_50": 0.8696,
+      "per_class_ap50": {
+        "player": 0.971,
+        "ball": 0.705,
+        "referee": 0.931,
+        "rim": 0.833,
+        "number": 0.909
+      },
+      "recall_at_p95": 0.729
+    },
+    {
+      "combo": "astra_crop_refine+dinox_pro_rimtrim+dinox_preview_rimtrim+owlv2_rimtrim",
+      "mAP_50_95": 0.6179,
+      "mAP_50": 0.8692,
+      "per_class_ap50": {
+        "player": 0.974,
+        "ball": 0.734,
+        "referee": 0.933,
+        "rim": 0.786,
+        "number": 0.92
+      },
+      "recall_at_p95": 0.795
+    },
+    {
+      "combo": "astra_crop_refine+dinox_pro_rimtrim+dinox_preview_rimtrim+llmdet+owlv2_rimtrim",
+      "mAP_50_95": 0.6129,
+      "mAP_50": 0.8592,
+      "per_class_ap50": {
+        "player": 0.968,
+        "ball": 0.711,
+        "referee": 0.925,
+        "rim": 0.791,
+        "number": 0.901
+      },
+      "recall_at_p95": 0.708
     }
   ],
   "test": [
+    {
+      "combo": "astra_crop_refine+dinox_pro_rimtrim",
+      "mAP_50_95": 0.6512,
+      "mAP_50": 0.9154,
+      "per_class_ap50": {
+        "player": 0.978,
+        "ball": 0.749,
+        "referee": 0.98,
+        "rim": 0.968,
+        "number": 0.901
+      },
+      "recall_at_p95": 0.873
+    },
     {
       "combo": "astra_crop_refine",
       "mAP_50_95": 0.5878,
@@ -174,17 +369,30 @@
       "recall_at_p95": 0.302
     },
     {
-      "combo": "astra_crop_refine+dinox_pro_rimtrim",
-      "mAP_50_95": 0.6512,
-      "mAP_50": 0.9154,
+      "combo": "dinox_preview_rimtrim",
+      "mAP_50_95": 0.5166,
+      "mAP_50": 0.6961,
       "per_class_ap50": {
-        "player": 0.978,
-        "ball": 0.749,
-        "referee": 0.98,
-        "rim": 0.968,
-        "number": 0.901
+        "player": 0.922,
+        "ball": 0.718,
+        "referee": 0.831,
+        "rim": 0.304,
+        "number": 0.706
       },
-      "recall_at_p95": 0.873
+      "recall_at_p95": 0.328
+    },
+    {
+      "combo": "astra_crop_refine+dinox_pro_rimtrim+dinox_preview_rimtrim",
+      "mAP_50_95": 0.6707,
+      "mAP_50": 0.9069,
+      "per_class_ap50": {
+        "player": 0.977,
+        "ball": 0.778,
+        "referee": 0.981,
+        "rim": 0.885,
+        "number": 0.914
+      },
+      "recall_at_p95": 0.879
     }
   ]
 }

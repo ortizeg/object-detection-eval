@@ -143,3 +143,27 @@ arms:
   - {id: r8_refine_rim_headline_confprod, round: 8, refine: {classes: [rim], confidence: product}, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
   - {id: r8_refine_rimdist_headline_confref, round: 8, refine: {classes: [rim, net, backboard], confidence: refiner}, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
   - {id: r8_refine_rimdist_headline_confprod, round: 8, refine: {classes: [rim, net, backboard], confidence: product}, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+
+  # ---------------------------------------------------------------------------
+  # Rounds 9-12 (2026-10-15). Rules fixed in the plan doc before any result.
+  # ROUND 9 -- rim trim on the preview model (0 calls: val responses cached).
+  - {id: r9_trim0.5_preview, round: 9, rim_trim: 0.5, model_name: DINO-X-PREVIEW-1.0, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+  - {id: r9_trim0.4_preview, round: 9, rim_trim: 0.4, model_name: DINO-X-PREVIEW-1.0, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+  - {id: r9_trim0.35_preview, round: 9, rim_trim: 0.35, model_name: DINO-X-PREVIEW-1.0, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+  - {id: r9_trim0.3_preview, round: 9, rim_trim: 0.3, model_name: DINO-X-PREVIEW-1.0, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+  - {id: r9_trim0.25_preview, round: 9, rim_trim: 0.25, model_name: DINO-X-PREVIEW-1.0, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [basketball player, basketball, referee, basketball hoop, jersey number]}
+
+  # ROUND 11a -- ball term only, untiled screen vs c1_domain (96 calls each).
+  # Every other phrase is c1_domain's. Aliases map wordings the taxonomy lacks.
+  - {id: r11a_ball_ball, round: 11, classes: [basketball player, ball, referee, basketball hoop, jersey number]}
+  - {id: r11a_ball_sportsball, round: 11, classes: [basketball player, sports ball, referee, basketball hoop, jersey number]}
+  - {id: r11a_ball_orangeball, round: 11, aliases: {orange ball: ball}, classes: [basketball player, orange ball, referee, basketball hoop, jersey number]}
+  - {id: r11a_ball_orangebasketball, round: 11, classes: [basketball player, orange basketball, referee, basketball hoop, jersey number]}
+  - {id: r11a_ball_basketballball, round: 11, aliases: {basketball ball: ball}, classes: [basketball player, basketball ball, referee, basketball hoop, jersey number]}
+
+  # ROUND 12 -- T-Rex-2.0 with train exemplars (FEW-SHOT, not zero-shot).
+  # classes only label the five exemplar categories; T-Rex2 never sees them.
+  - {id: r12_trex_k1, round: 12, exemplars: {k: 1}, classes: [player, ball, referee, rim, number]}
+  - {id: r12_trex_k4, round: 12, exemplars: {k: 4}, classes: [player, ball, referee, rim, number]}
+  # The better K on val (k1), 2x2 tiles + full frame, merge NMS 0.5, per the plan.
+  - {id: r12_trex_k1_tiled, round: 12, exemplars: {k: 1}, tiles: [2, 2], nms_iou_threshold: 0.5, classes: [player, ball, referee, rim, number]}

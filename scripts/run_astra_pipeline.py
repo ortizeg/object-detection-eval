@@ -80,9 +80,10 @@ def main() -> None:
     from object_detection_eval.inference.vlm.astra_crop_refine import CropRefineInferencer
     from object_detection_eval.inference.vlm.astra_self_prompt import AstraSelfPromptInferencer
 
-    inferencer: Any = AstraInferencer(
+    astra = AstraInferencer(
         classes=_CLASSES, prompt_template=_BASE_PROMPT, reasoning_effort=args.effort
     )
+    inferencer: Any = astra
     stages = ["base"]
     if args.self_prompt:
         inferencer = AstraSelfPromptInferencer(
@@ -97,7 +98,7 @@ def main() -> None:
     if args.number_crop:
         from object_detection_eval.inference.vlm.astra_number_crop import AstraNumberCropInferencer
 
-        inferencer = AstraNumberCropInferencer(base=inferencer, classes=_CLASSES)
+        inferencer = AstraNumberCropInferencer(base=inferencer, classes=_CLASSES, astra=astra)
         stages.append("numcrop")
 
     split_dir = args.data_root / args.split

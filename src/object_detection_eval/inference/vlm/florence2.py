@@ -145,8 +145,10 @@ class Florence2Inferencer(BaseInferencer):
             return per_class_nms(detections, self.nms_iou_threshold)
 
         except Exception:
+            # Re-raise, never return []: a crashed forward pass (e.g. an op the
+            # MPS backend lacks) would otherwise score as "found nothing".
             logger.exception("Florence-2 inference failed")
-            return []
+            raise
 
     def unload(self) -> None:
         """Free GPU memory."""

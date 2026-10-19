@@ -435,19 +435,42 @@ Astra's crop-refine idea, ported to DINO-X, did **not** work: inside a zoomed
 crop, DINO-X's top "rim" box is often some other small object, and the line
 scored 0.448 test, only +0.008 over the headline row.
 
-**Fusing it with Astra's crop-refine gives the best zero-shot result in this
-report: 0.651.** (Disclosed extra, 2026-10-13.) Weighted box fusion (IoU 0.55,
-equal weights, the fusion round's pre-committed operator) of Astra crop-refine
-and DINO-X Pro + trim scores **0.651** test mAP@50:95, against 0.588 for Astra
-crop-refine alone (+0.065, paired 95% CI [+0.056, +0.073]). Unlike the earlier Astra greedy fusion, the
-pair was chosen on val, where every DINO-X × Astra pair beat its Astra member.
-DINO-X adds ball (0.69 → 0.75) and number (0.85 → 0.90). Its own CI is [0.634,
-0.671]. That overlaps RF-DETR-M (0.646, [0.629, 0.666]) and YOLOX-M (0.672), and
-it clears RTMDet-M (0.628), DAMO-YOLO-M (0.619) and RT-DETRv2-M (0.581). So it
-is level with the middle of the fine-tuned table, not just its floor. The
-intervals resample frames from three clips, so they are too narrow. It is two billed APIs and about seven calls per
-image, and recall at 95% precision does not improve (0.873 vs 0.882). Plan, every
-arm and all amendments:
+The same trim also rescues the preview model (0.478 → **0.517** test, trim
+fraction 0.3 set on val) and **OWLv2** (0.315 → **0.394**, rim AP@50 0.002 →
+0.736). OWLv2 makes the same box-takes-in-the-net mistake. It does nothing for
+Grounding DINO, LLMDet, Florence-2, OmDet-Turbo or YOLO-World, which never put
+a box on the ring. (Disclosed extras, 2026-10-15. The headline rows are unchanged.)
+
+**Fusing DINO-X with Astra's crop-refine gives the best zero-shot result in
+this report: 0.671, level with YOLOX-M.** (Disclosed extra, 2026-10-13, extended
+2026-10-15.) The fusion is weighted box fusion (IoU 0.55, equal weights, the
+fusion round's pre-committed operator) of three members: Astra crop-refine,
+DINO-X Pro + trim and DINO-X preview + trim. It scores **0.671** test
+mAP@50:95, against 0.588 for Astra crop-refine alone and 0.651 for the first,
+two-member version. Every member and operator was chosen on val, unlike the
+earlier Astra greedy fusion. Test was run once per adopted configuration.
+Against the fine-tuned rows, using the **clip-clustered** paired bootstrap (the
+honest interval for a three-clip test set):
+
+- YOLOX-M (0.672): a tie, CI [−0.014, +0.008].
+- RF-DETR-M (0.646) and RTMDet-M (0.628): the fusion is ahead.
+- DEIM-M (0.686): the fusion is behind, CI [−0.027, −0.008].
+
+So it sits in the middle of the fine-tuned table. DINO-X adds ball
+(0.69 → 0.78) and number (0.85 → 0.91). Recall at 95% precision does not
+improve (0.879 vs 0.882). It takes two billed APIs and about 12 calls per image.
+
+Several attempts to push past it failed on val:
+
+- Rank-normalised fusion: 0.575 against 0.611.
+- LLMDet or OWLv2 + trim as an extra member: 0.618-0.621 against 0.624.
+- Swapping in Astra crop-refine + number crop run end to end, which is
+  0.587 on test by itself, level with crop-refine alone.
+- Rewording the ball prompt: no gain across five wordings.
+- T-Rex-2.0 detecting from train-frame example boxes (few-shot): 0.14 val,
+  because the API floors scores at 0.30.
+
+Plan, every arm and all amendments:
 [docs/plans/dinox-pro-2026-10.md](../../../docs/plans/dinox-pro-2026-10.md).
 
 **"Below half the worst fine-tuned detector" now depends entirely on whether you

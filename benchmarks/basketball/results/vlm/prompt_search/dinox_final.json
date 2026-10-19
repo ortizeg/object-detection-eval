@@ -183,6 +183,56 @@
         "rim": 0.06950617581605911,
         "number": 0.7024641633033752
       }
+    },
+    {
+      "name": "dinox_preview_rimtrim",
+      "arm": "r9_trim0.3_preview",
+      "round": 9,
+      "note": "",
+      "config": {
+        "classes": [
+          "basketball player",
+          "basketball",
+          "referee",
+          "basketball hoop",
+          "jersey number"
+        ],
+        "distractors": [],
+        "aliases": {},
+        "model_name": "DINO-X-PREVIEW-1.0",
+        "bbox_threshold": 0.01,
+        "iou_threshold": 0.8,
+        "score_threshold": 0.0,
+        "nms_iou_threshold": 0.5,
+        "max_size": null,
+        "tiles": [
+          2,
+          2
+        ],
+        "tile_overlap": 0.2,
+        "no_cache": false,
+        "rim_trim": 0.3,
+        "refine": null,
+        "exemplars": null
+      },
+      "api_calls": 0,
+      "mAP_50_95": 0.5165892839431763,
+      "mAP_50": 0.6961216926574707,
+      "mAP_75": 0.5570976138114929,
+      "per_class_ap50": {
+        "player": 0.9217566847801208,
+        "ball": 0.7180473804473877,
+        "referee": 0.8311079144477844,
+        "rim": 0.30404141545295715,
+        "number": 0.7056549191474915
+      },
+      "per_class_ap50_95": {
+        "player": 0.7761400938034058,
+        "ball": 0.46966537833213806,
+        "referee": 0.7703908681869507,
+        "rim": 0.19479939341545105,
+        "number": 0.37195074558258057
+      }
     }
   ]
 }

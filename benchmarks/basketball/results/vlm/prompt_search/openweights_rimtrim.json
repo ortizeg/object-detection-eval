@@ -1,0 +1,751 @@
+{
+  "rule": "Pre-registered 2026-10-15, before any score: per row, the best f on val is adopted only if it beats f=1.0 on val by more than 0.005. If the best f sits at the grid's lower edge the grid is extended until it turns. The transfer arm (f=0.35, the DINO-X val winner, no per-row tuning) is recorded for every row. An adopted row runs on test exactly once; it is a disclosed extra and never changes the headline row.",
+  "grid": [
+    1.0,
+    0.85,
+    0.7,
+    0.5,
+    0.4,
+    0.35,
+    0.3,
+    0.25,
+    0.2
+  ],
+  "transfer_f": 0.35,
+  "valid": {
+    "owlv2": {
+      "sweep": [
+        {
+          "f": 1.0,
+          "mAP_50_95": 0.2875,
+          "mAP_50": 0.4627,
+          "per_class_ap50": {
+            "player": 0.878,
+            "ball": 0.593,
+            "referee": 0.3,
+            "rim": 0.011,
+            "number": 0.532
+          }
+        },
+        {
+          "f": 0.85,
+          "mAP_50_95": 0.2887,
+          "mAP_50": 0.4701,
+          "per_class_ap50": {
+            "player": 0.878,
+            "ball": 0.593,
+            "referee": 0.3,
+            "rim": 0.047,
+            "number": 0.532
+          }
+        },
+        {
+          "f": 0.7,
+          "mAP_50_95": 0.2892,
+          "mAP_50": 0.4735,
+          "per_class_ap50": {
+            "player": 0.878,
+            "ball": 0.593,
+            "referee": 0.3,
+            "rim": 0.065,
+            "number": 0.532
+          }
+        },
+        {
+          "f": 0.5,
+          "mAP_50_95": 0.2993,
+          "mAP_50": 0.5237,
+          "per_class_ap50": {
+            "player": 0.878,
+            "ball": 0.593,
+            "referee": 0.3,
+            "rim": 0.316,
+            "number": 0.532
+          }
+        },
+        {
+          "f": 0.4,
+          "mAP_50_95": 0.3253,
+          "mAP_50": 0.6011,
+          "per_class_ap50": {
+            "player": 0.878,
+            "ball": 0.593,
+            "referee": 0.3,
+            "rim": 0.702,
+            "number": 0.532
+          }
+        },
+        {
+          "f": 0.35,
+          "mAP_50_95": 0.3416,
+          "mAP_50": 0.5936,
+          "per_class_ap50": {
+            "player": 0.878,
+            "ball": 0.593,
+            "referee": 0.3,
+            "rim": 0.665,
+            "number": 0.532
+          }
+        },
+        {
+          "f": 0.3,
+          "mAP_50_95": 0.3474,
+          "mAP_50": 0.585,
+          "per_class_ap50": {
+            "player": 0.878,
+            "ball": 0.593,
+            "referee": 0.3,
+            "rim": 0.622,
+            "number": 0.532
+          }
+        },
+        {
+          "f": 0.25,
+          "mAP_50_95": 0.3248,
+          "mAP_50": 0.5757,
+          "per_class_ap50": {
+            "player": 0.878,
+            "ball": 0.593,
+            "referee": 0.3,
+            "rim": 0.576,
+            "number": 0.532
+          }
+        },
+        {
+          "f": 0.2,
+          "mAP_50_95": 0.2968,
+          "mAP_50": 0.529,
+          "per_class_ap50": {
+            "player": 0.878,
+            "ball": 0.593,
+            "referee": 0.3,
+            "rim": 0.342,
+            "number": 0.532
+          }
+        }
+      ],
+      "adopted_f": 0.3
+    },
+    "grounding_dino": {
+      "sweep": [
+        {
+          "f": 1.0,
+          "mAP_50_95": 0.278,
+          "mAP_50": 0.3581,
+          "per_class_ap50": {
+            "player": 0.856,
+            "ball": 0.477,
+            "referee": 0.444,
+            "rim": 0.0,
+            "number": 0.013
+          }
+        },
+        {
+          "f": 0.85,
+          "mAP_50_95": 0.278,
+          "mAP_50": 0.3581,
+          "per_class_ap50": {
+            "player": 0.856,
+            "ball": 0.477,
+            "referee": 0.444,
+            "rim": 0.0,
+            "number": 0.013
+          }
+        },
+        {
+          "f": 0.7,
+          "mAP_50_95": 0.278,
+          "mAP_50": 0.3581,
+          "per_class_ap50": {
+            "player": 0.856,
+            "ball": 0.477,
+            "referee": 0.444,
+            "rim": 0.0,
+            "number": 0.013
+          }
+        },
+        {
+          "f": 0.5,
+          "mAP_50_95": 0.278,
+          "mAP_50": 0.3581,
+          "per_class_ap50": {
+            "player": 0.856,
+            "ball": 0.477,
+            "referee": 0.444,
+            "rim": 0.0,
+            "number": 0.013
+          }
+        },
+        {
+          "f": 0.4,
+          "mAP_50_95": 0.278,
+          "mAP_50": 0.3581,
+          "per_class_ap50": {
+            "player": 0.856,
+            "ball": 0.477,
+            "referee": 0.444,
+            "rim": 0.0,
+            "number": 0.013
+          }
+        },
+        {
+          "f": 0.35,
+          "mAP_50_95": 0.278,
+          "mAP_50": 0.3581,
+          "per_class_ap50": {
+            "player": 0.856,
+            "ball": 0.477,
+            "referee": 0.444,
+            "rim": 0.0,
+            "number": 0.013
+          }
+        },
+        {
+          "f": 0.3,
+          "mAP_50_95": 0.278,
+          "mAP_50": 0.3581,
+          "per_class_ap50": {
+            "player": 0.856,
+            "ball": 0.477,
+            "referee": 0.444,
+            "rim": 0.0,
+            "number": 0.013
+          }
+        },
+        {
+          "f": 0.25,
+          "mAP_50_95": 0.278,
+          "mAP_50": 0.3581,
+          "per_class_ap50": {
+            "player": 0.856,
+            "ball": 0.477,
+            "referee": 0.444,
+            "rim": 0.0,
+            "number": 0.013
+          }
+        },
+        {
+          "f": 0.2,
+          "mAP_50_95": 0.278,
+          "mAP_50": 0.3581,
+          "per_class_ap50": {
+            "player": 0.856,
+            "ball": 0.477,
+            "referee": 0.444,
+            "rim": 0.0,
+            "number": 0.013
+          }
+        }
+      ],
+      "adopted_f": null
+    },
+    "florence2": {
+      "sweep": [
+        {
+          "f": 1.0,
+          "mAP_50_95": 0.234,
+          "mAP_50": 0.3312,
+          "per_class_ap50": {
+            "player": 0.712,
+            "ball": 0.234,
+            "referee": 0.434,
+            "rim": 0.0,
+            "number": 0.275
+          }
+        },
+        {
+          "f": 0.85,
+          "mAP_50_95": 0.234,
+          "mAP_50": 0.3312,
+          "per_class_ap50": {
+            "player": 0.712,
+            "ball": 0.234,
+            "referee": 0.434,
+            "rim": 0.0,
+            "number": 0.275
+          }
+        },
+        {
+          "f": 0.7,
+          "mAP_50_95": 0.234,
+          "mAP_50": 0.3312,
+          "per_class_ap50": {
+            "player": 0.712,
+            "ball": 0.234,
+            "referee": 0.434,
+            "rim": 0.0,
+            "number": 0.275
+          }
+        },
+        {
+          "f": 0.5,
+          "mAP_50_95": 0.234,
+          "mAP_50": 0.3312,
+          "per_class_ap50": {
+            "player": 0.712,
+            "ball": 0.234,
+            "referee": 0.434,
+            "rim": 0.0,
+            "number": 0.275
+          }
+        },
+        {
+          "f": 0.4,
+          "mAP_50_95": 0.234,
+          "mAP_50": 0.3312,
+          "per_class_ap50": {
+            "player": 0.712,
+            "ball": 0.234,
+            "referee": 0.434,
+            "rim": 0.0,
+            "number": 0.275
+          }
+        },
+        {
+          "f": 0.35,
+          "mAP_50_95": 0.234,
+          "mAP_50": 0.3312,
+          "per_class_ap50": {
+            "player": 0.712,
+            "ball": 0.234,
+            "referee": 0.434,
+            "rim": 0.0,
+            "number": 0.275
+          }
+        },
+        {
+          "f": 0.3,
+          "mAP_50_95": 0.234,
+          "mAP_50": 0.3312,
+          "per_class_ap50": {
+            "player": 0.712,
+            "ball": 0.234,
+            "referee": 0.434,
+            "rim": 0.0,
+            "number": 0.275
+          }
+        },
+        {
+          "f": 0.25,
+          "mAP_50_95": 0.234,
+          "mAP_50": 0.3312,
+          "per_class_ap50": {
+            "player": 0.712,
+            "ball": 0.234,
+            "referee": 0.434,
+            "rim": 0.0,
+            "number": 0.275
+          }
+        },
+        {
+          "f": 0.2,
+          "mAP_50_95": 0.234,
+          "mAP_50": 0.3312,
+          "per_class_ap50": {
+            "player": 0.712,
+            "ball": 0.234,
+            "referee": 0.434,
+            "rim": 0.0,
+            "number": 0.275
+          }
+        }
+      ],
+      "adopted_f": null
+    },
+    "omdet_turbo": {
+      "sweep": [
+        {
+          "f": 1.0,
+          "mAP_50_95": 0.2159,
+          "mAP_50": 0.3207,
+          "per_class_ap50": {
+            "player": 0.823,
+            "ball": 0.272,
+            "referee": 0.321,
+            "rim": 0.0,
+            "number": 0.187
+          }
+        },
+        {
+          "f": 0.85,
+          "mAP_50_95": 0.2159,
+          "mAP_50": 0.3207,
+          "per_class_ap50": {
+            "player": 0.823,
+            "ball": 0.272,
+            "referee": 0.321,
+            "rim": 0.0,
+            "number": 0.187
+          }
+        },
+        {
+          "f": 0.7,
+          "mAP_50_95": 0.2159,
+          "mAP_50": 0.3207,
+          "per_class_ap50": {
+            "player": 0.823,
+            "ball": 0.272,
+            "referee": 0.321,
+            "rim": 0.0,
+            "number": 0.187
+          }
+        },
+        {
+          "f": 0.5,
+          "mAP_50_95": 0.2165,
+          "mAP_50": 0.3222,
+          "per_class_ap50": {
+            "player": 0.823,
+            "ball": 0.272,
+            "referee": 0.321,
+            "rim": 0.008,
+            "number": 0.187
+          }
+        },
+        {
+          "f": 0.4,
+          "mAP_50_95": 0.2169,
+          "mAP_50": 0.3222,
+          "per_class_ap50": {
+            "player": 0.823,
+            "ball": 0.272,
+            "referee": 0.321,
+            "rim": 0.008,
+            "number": 0.187
+          }
+        },
+        {
+          "f": 0.35,
+          "mAP_50_95": 0.2171,
+          "mAP_50": 0.3222,
+          "per_class_ap50": {
+            "player": 0.823,
+            "ball": 0.272,
+            "referee": 0.321,
+            "rim": 0.008,
+            "number": 0.187
+          }
+        },
+        {
+          "f": 0.3,
+          "mAP_50_95": 0.2168,
+          "mAP_50": 0.3222,
+          "per_class_ap50": {
+            "player": 0.823,
+            "ball": 0.272,
+            "referee": 0.321,
+            "rim": 0.008,
+            "number": 0.187
+          }
+        },
+        {
+          "f": 0.25,
+          "mAP_50_95": 0.2163,
+          "mAP_50": 0.3219,
+          "per_class_ap50": {
+            "player": 0.823,
+            "ball": 0.272,
+            "referee": 0.321,
+            "rim": 0.006,
+            "number": 0.187
+          }
+        },
+        {
+          "f": 0.2,
+          "mAP_50_95": 0.216,
+          "mAP_50": 0.3216,
+          "per_class_ap50": {
+            "player": 0.823,
+            "ball": 0.272,
+            "referee": 0.321,
+            "rim": 0.005,
+            "number": 0.187
+          }
+        }
+      ],
+      "adopted_f": null
+    },
+    "yolo_world": {
+      "sweep": [
+        {
+          "f": 1.0,
+          "mAP_50_95": 0.1771,
+          "mAP_50": 0.2353,
+          "per_class_ap50": {
+            "player": 0.793,
+            "ball": 0.332,
+            "referee": 0.0,
+            "rim": 0.0,
+            "number": 0.051
+          }
+        },
+        {
+          "f": 0.85,
+          "mAP_50_95": 0.1771,
+          "mAP_50": 0.2353,
+          "per_class_ap50": {
+            "player": 0.793,
+            "ball": 0.332,
+            "referee": 0.0,
+            "rim": 0.0,
+            "number": 0.051
+          }
+        },
+        {
+          "f": 0.7,
+          "mAP_50_95": 0.1771,
+          "mAP_50": 0.2353,
+          "per_class_ap50": {
+            "player": 0.793,
+            "ball": 0.332,
+            "referee": 0.0,
+            "rim": 0.0,
+            "number": 0.051
+          }
+        },
+        {
+          "f": 0.5,
+          "mAP_50_95": 0.1785,
+          "mAP_50": 0.2421,
+          "per_class_ap50": {
+            "player": 0.793,
+            "ball": 0.332,
+            "referee": 0.0,
+            "rim": 0.034,
+            "number": 0.051
+          }
+        },
+        {
+          "f": 0.4,
+          "mAP_50_95": 0.1805,
+          "mAP_50": 0.2454,
+          "per_class_ap50": {
+            "player": 0.793,
+            "ball": 0.332,
+            "referee": 0.0,
+            "rim": 0.051,
+            "number": 0.051
+          }
+        },
+        {
+          "f": 0.35,
+          "mAP_50_95": 0.1821,
+          "mAP_50": 0.2454,
+          "per_class_ap50": {
+            "player": 0.793,
+            "ball": 0.332,
+            "referee": 0.0,
+            "rim": 0.051,
+            "number": 0.051
+          }
+        },
+        {
+          "f": 0.3,
+          "mAP_50_95": 0.1828,
+          "mAP_50": 0.2454,
+          "per_class_ap50": {
+            "player": 0.793,
+            "ball": 0.332,
+            "referee": 0.0,
+            "rim": 0.051,
+            "number": 0.051
+          }
+        },
+        {
+          "f": 0.25,
+          "mAP_50_95": 0.1812,
+          "mAP_50": 0.2454,
+          "per_class_ap50": {
+            "player": 0.793,
+            "ball": 0.332,
+            "referee": 0.0,
+            "rim": 0.051,
+            "number": 0.051
+          }
+        },
+        {
+          "f": 0.2,
+          "mAP_50_95": 0.1785,
+          "mAP_50": 0.2454,
+          "per_class_ap50": {
+            "player": 0.793,
+            "ball": 0.332,
+            "referee": 0.0,
+            "rim": 0.051,
+            "number": 0.051
+          }
+        }
+      ],
+      "adopted_f": 0.3
+    },
+    "llmdet": {
+      "sweep": [
+        {
+          "f": 1.0,
+          "mAP_50_95": 0.359,
+          "mAP_50": 0.5158,
+          "per_class_ap50": {
+            "player": 0.847,
+            "ball": 0.445,
+            "referee": 0.589,
+            "rim": 0.024,
+            "number": 0.675
+          }
+        },
+        {
+          "f": 0.85,
+          "mAP_50_95": 0.3586,
+          "mAP_50": 0.5158,
+          "per_class_ap50": {
+            "player": 0.847,
+            "ball": 0.445,
+            "referee": 0.589,
+            "rim": 0.024,
+            "number": 0.675
+          }
+        },
+        {
+          "f": 0.7,
+          "mAP_50_95": 0.3572,
+          "mAP_50": 0.5158,
+          "per_class_ap50": {
+            "player": 0.847,
+            "ball": 0.445,
+            "referee": 0.589,
+            "rim": 0.024,
+            "number": 0.675
+          }
+        },
+        {
+          "f": 0.5,
+          "mAP_50_95": 0.3563,
+          "mAP_50": 0.5111,
+          "per_class_ap50": {
+            "player": 0.847,
+            "ball": 0.445,
+            "referee": 0.589,
+            "rim": 0.0,
+            "number": 0.675
+          }
+        },
+        {
+          "f": 0.4,
+          "mAP_50_95": 0.3563,
+          "mAP_50": 0.5111,
+          "per_class_ap50": {
+            "player": 0.847,
+            "ball": 0.445,
+            "referee": 0.589,
+            "rim": 0.0,
+            "number": 0.675
+          }
+        },
+        {
+          "f": 0.35,
+          "mAP_50_95": 0.3563,
+          "mAP_50": 0.5111,
+          "per_class_ap50": {
+            "player": 0.847,
+            "ball": 0.445,
+            "referee": 0.589,
+            "rim": 0.0,
+            "number": 0.675
+          }
+        },
+        {
+          "f": 0.3,
+          "mAP_50_95": 0.3563,
+          "mAP_50": 0.5111,
+          "per_class_ap50": {
+            "player": 0.847,
+            "ball": 0.445,
+            "referee": 0.589,
+            "rim": 0.0,
+            "number": 0.675
+          }
+        },
+        {
+          "f": 0.25,
+          "mAP_50_95": 0.3563,
+          "mAP_50": 0.5111,
+          "per_class_ap50": {
+            "player": 0.847,
+            "ball": 0.445,
+            "referee": 0.589,
+            "rim": 0.0,
+            "number": 0.675
+          }
+        },
+        {
+          "f": 0.2,
+          "mAP_50_95": 0.3563,
+          "mAP_50": 0.5111,
+          "per_class_ap50": {
+            "player": 0.847,
+            "ball": 0.445,
+            "referee": 0.589,
+            "rim": 0.0,
+            "number": 0.675
+          }
+        }
+      ],
+      "adopted_f": null
+    }
+  },
+  "test": {
+    "owlv2": {
+      "committed_headline_mAP_50_95": 0.3148,
+      "rerun_f1": {
+        "f": 1.0,
+        "mAP_50_95": 0.3148,
+        "mAP_50": 0.476,
+        "per_class_ap50": {
+          "player": 0.901,
+          "ball": 0.583,
+          "referee": 0.388,
+          "rim": 0.002,
+          "number": 0.505
+        }
+      },
+      "trimmed": {
+        "f": 0.3,
+        "mAP_50_95": 0.3943,
+        "mAP_50": 0.6229,
+        "per_class_ap50": {
+          "player": 0.901,
+          "ball": 0.583,
+          "referee": 0.388,
+          "rim": 0.736,
+          "number": 0.505
+        }
+      }
+    },
+    "yolo_world": {
+      "committed_headline_mAP_50_95": 0.1892,
+      "rerun_f1": {
+        "f": 1.0,
+        "mAP_50_95": 0.1894,
+        "mAP_50": 0.2423,
+        "per_class_ap50": {
+          "player": 0.84,
+          "ball": 0.314,
+          "referee": 0.0,
+          "rim": 0.006,
+          "number": 0.052
+        }
+      },
+      "trimmed": {
+        "f": 0.3,
+        "mAP_50_95": 0.19,
+        "mAP_50": 0.2425,
+        "per_class_ap50": {
+          "player": 0.84,
+          "ball": 0.314,
+          "referee": 0.0,
+          "rim": 0.007,
+          "number": 0.052
+        }
+      }
+    }
+  }
+}

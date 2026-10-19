@@ -123,8 +123,10 @@ class YOLOWorldInferencer(BaseInferencer):
                 verbose=False,
             )
         except Exception:
+            # Re-raise, never return []: a crashed forward pass (e.g. an op the
+            # MPS backend lacks) would otherwise score as "found nothing".
             logger.exception("YOLO-World inference failed")
-            return []
+            raise
 
         if not results:
             return []

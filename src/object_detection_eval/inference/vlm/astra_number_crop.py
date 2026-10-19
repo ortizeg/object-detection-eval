@@ -21,6 +21,8 @@ crop-refine's ~2/frame -- measure on val before test. No torch.
 
 from __future__ import annotations
 
+from typing import Any
+
 import numpy as np
 import numpy.typing as npt
 from loguru import logger
@@ -45,23 +47,28 @@ class AstraNumberCropInferencer:
         conf_threshold: Only anchor boxes at/above this confidence are cropped --
             a spurious "player" on the crowd would just add a spurious number.
         reasoning_effort: Effort for the focused `number` calls (defaults to base).
+        astra: The Astra client whose model and effort the `number` refiner
+            copies. Defaults to ``base``; pass it when ``base`` is a wrapper
+            (e.g. crop-refine) rather than a bare ``AstraInferencer``.
     """
 
     def __init__(
         self,
-        base: AstraInferencer,
+        base: Any,
         classes: list[str],
         anchor_class: str = "player",
         target_class: str = "number",
         pad: float = 1.1,
         conf_threshold: float = 0.5,
         reasoning_effort: str | None = None,
+        astra: AstraInferencer | None = None,
     ) -> None:
+        source = astra if astra is not None else base
         self.base = base
         self.classes = classes
-        self.model_name = base.model_name
+        self.model_name = source.model_name
         self.reasoning_effort = (
-            reasoning_effort if reasoning_effort is not None else base.reasoning_effort
+            reasoning_effort if reasoning_effort is not None else source.reasoning_effort
         )
         self.anchor_class = anchor_class
         self.target_class = target_class
@@ -70,7 +77,7 @@ class AstraNumberCropInferencer:
         self._target_id = classes.index(target_class)
 
         self._refiner = AstraInferencer(
-            model_name=base.model_name,
+            model_name=self.model_name,
             classes=[target_class],
             reasoning_effort=self.reasoning_effort,
             prompt_template=(

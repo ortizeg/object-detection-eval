@@ -115,3 +115,13 @@ def test_final_requires_a_committed_arm(mod, monkeypatch: pytest.MonkeyPatch) ->
     with pytest.raises(SystemExit) as exc:
         mod.main()
     assert exc.value.code == 2
+
+
+def test_aliases_resolve_extra_wordings(mod) -> None:
+    name_to_id = {"ball": 1, "rim": 3}
+    arm = mod.Arm(id="a", round=11, classes=["orange ball", "rim"], aliases={"orange ball": "ball"})
+    assert mod.unmapped_phrases(arm, name_to_id) == []
+    assert mod.arm_name_to_id(arm, name_to_id)["orange ball"] == 1
+    bad = mod.Arm(id="b", round=11, classes=["x"], aliases={"x": "nope"})
+    with pytest.raises(ValueError):
+        mod.arm_name_to_id(bad, name_to_id)

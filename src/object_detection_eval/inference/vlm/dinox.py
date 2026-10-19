@@ -124,6 +124,9 @@ class DinoXInferencer(BaseInferencer):
         max_retries: Attempts per image for transient failures.
     """
 
+    #: V2 task path; subclasses serving another model on the same API override it.
+    _detection_path: str = _DETECTION_PATH
+
     _INITIAL_BACKOFF: float = 2.0
     _MAX_BACKOFF: float = 60.0
     _MAX_POLL_S: float = 180.0
@@ -195,7 +198,7 @@ class DinoXInferencer(BaseInferencer):
             score = float(obj.get("score", 0.0))
             if score < self.score_threshold:
                 continue
-            class_id = self._name_to_id.get(str(obj.get("category", "")).lower().strip())
+            class_id = self._class_id(obj)
             bbox = obj.get("bbox")
             if class_id is None or not bbox:
                 continue
@@ -222,6 +225,18 @@ class DinoXInferencer(BaseInferencer):
         self._client.close()
 
     # ---------------------------------------------------------------- internals
+
+    def _class_id(self, obj: dict[str, Any]) -> int | None:
+        """Vocabulary index of one returned object, or ``None`` if it is not ours."""
+        return self._name_to_id.get(str(obj.get("category", "")).lower().strip())
+
+    def _upload_extras(self) -> dict[str, Any]:
+        """Body fields sent with the request but kept out of the cache key.
+
+        For fields too large to hash as JSON (reference images); the key body
+        from :meth:`_request_body` must then carry a digest of them instead.
+        """
+        return {}
 
     def _request_body(self) -> dict[str, Any]:
         return {
@@ -263,6 +278,7 @@ class DinoXInferencer(BaseInferencer):
         if not ok:  # pragma: no cover - cv2 failure
             msg = "JPEG encoding failed"
             raise DinoXAPIError(msg)
+        body.update(self._upload_extras())
         body["image"] = "data:image/jpeg;base64," + base64.b64encode(buf.tobytes()).decode()
 
         result = self._run_task(body)
@@ -306,7 +322,7 @@ class DinoXInferencer(BaseInferencer):
 
     def _trigger_and_poll(self, body: dict[str, Any], idempotency_key: str) -> dict[str, Any]:
         rsp = self._client.post(
-            _DETECTION_PATH, json=body, headers={"Idempotency-Key": idempotency_key}
+            self._detection_path, json=body, headers={"Idempotency-Key": idempotency_key}
         )
         payload = _json_or_raise(rsp)
         code = payload.get("code")

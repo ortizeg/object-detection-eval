@@ -77,6 +77,13 @@ class RefineSpec(BaseModel, frozen=True):
     confidence: Literal["base", "refiner", "product"] = "base"
 
 
+class ExemplarSpec(BaseModel, frozen=True):
+    """T-Rex-2.0 visual prompt from ``k`` train frames (``trex.pick_exemplars``). Few-shot."""
+
+    k: int = Field(ge=1)
+    split: Literal["train"] = "train"
+
+
 class Arm(BaseModel, frozen=True):
     """One configuration to score on val."""
 
@@ -86,6 +93,8 @@ class Arm(BaseModel, frozen=True):
     classes: list[str] = Field(min_length=1)
     #: Phrases prompted only to absorb confusions; their boxes are discarded.
     distractors: list[str] = Field(default_factory=list)
+    #: Phrase -> taxonomy name, for prompt wordings the taxonomy does not list.
+    aliases: dict[str, str] = Field(default_factory=dict)
     model_name: str = "DINO-X-1.0"
     bbox_threshold: float = Field(default=0.01, ge=0.0, le=1.0)
     iou_threshold: float = Field(default=0.8, ge=0.0, le=1.0)
@@ -99,6 +108,8 @@ class Arm(BaseModel, frozen=True):
     #: Keep only this top fraction of each rim-class box (``TopBandTrim``).
     rim_trim: float | None = Field(default=None, gt=0.0, le=1.0)
     refine: RefineSpec | None = None
+    #: Swap DINO-X for T-Rex-2.0 prompted with train exemplars (few-shot).
+    exemplars: ExemplarSpec | None = None
 
 
 class ExploreConfig(BaseModel, frozen=True):
@@ -111,10 +122,21 @@ def load_config(path: Path) -> ExploreConfig:
         return ExploreConfig.model_validate(yaml.safe_load(f))
 
 
+def arm_name_to_id(arm: Arm, name_to_id: dict[str, int]) -> dict[str, int]:
+    """The taxonomy's phrase map plus the arm's declared aliases."""
+    out = dict(name_to_id)
+    for phrase, target in arm.aliases.items():
+        if target.lower() not in name_to_id:
+            raise ValueError(f"arm {arm.id!r}: alias target {target!r} is not in the taxonomy")
+        out[phrase.lower()] = name_to_id[target.lower()]
+    return out
+
+
 def unmapped_phrases(arm: Arm, name_to_id: dict[str, int]) -> list[str]:
     """Phrases that are neither taxonomy-resolvable nor declared distractors."""
+    known = arm_name_to_id(arm, name_to_id)
     declared = {d.lower() for d in arm.distractors}
-    return [c for c in arm.classes if c.lower() not in name_to_id and c.lower() not in declared]
+    return [c for c in arm.classes if c.lower() not in known and c.lower() not in declared]
 
 
 def best_result(rows: list[dict[str, Any]], round_: int | None = None) -> dict[str, Any] | None:
@@ -125,19 +147,28 @@ def best_result(rows: list[dict[str, Any]], round_: int | None = None) -> dict[s
     return max(pool, key=lambda r: r["mAP_50_95"])
 
 
-def _build(arm: Arm, cache_dir: Path | None, rim_ids: set[int]) -> tuple[list[Any], Any]:
-    """Return (every DinoXInferencer the arm calls, the predictor to score with).
+def _build(
+    arm: Arm, cache_dir: Path | None, rim_ids: set[int], exemplars: list[Any] | None = None
+) -> tuple[list[Any], Any]:
+    """Return (every API client the arm calls, the predictor to score with).
 
     ``rim_ids`` are the arm's prompt-space label ids that resolve to ``rim``;
-    the trim and refine stages act on those boxes only.
+    the trim and refine stages act on those boxes only. ``exemplars``
+    (``trex.Exemplar``) are required for, and only used by, T-Rex arms.
     """
     from object_detection_eval.inference.vlm.dinox import DinoXInferencer
+    from object_detection_eval.inference.vlm.trex import TRexInferencer
 
     kwargs: dict[str, Any] = {}
     if arm.no_cache:
         kwargs["cache_dir"] = cache_dir  # a fresh, arm-private cache
-    inner = DinoXInferencer(
-        model_name=arm.model_name,
+    if arm.exemplars is not None:
+        if not exemplars:
+            raise ValueError(f"arm {arm.id!r} needs exemplars")
+        kwargs["exemplars"] = exemplars
+    cls: Any = TRexInferencer if arm.exemplars is not None else DinoXInferencer
+    inner = cls(
+        model_name="T-Rex-2.0" if arm.exemplars is not None else arm.model_name,
         classes=arm.classes,
         bbox_threshold=arm.bbox_threshold,
         iou_threshold=arm.iou_threshold,
@@ -191,7 +222,46 @@ def _build(arm: Arm, cache_dir: Path | None, rim_ids: set[int]) -> tuple[list[An
 def rim_label_ids(arm: Arm, name_to_id: dict[str, int], rim_name: str = "rim") -> set[int]:
     """The arm's prompt-space label ids that the taxonomy maps to ``rim``."""
     rim_id = name_to_id[rim_name]
-    return {i for i, c in enumerate(arm.classes) if name_to_id.get(c.lower()) == rim_id}
+    known = arm_name_to_id(arm, name_to_id)
+    return {i for i, c in enumerate(arm.classes) if known.get(c.lower()) == rim_id}
+
+
+def load_exemplars(arm: Arm, data_root: Path, name_to_id: dict[str, int]) -> list[Any] | None:
+    """Read the arm's train exemplars (fixed rule in ``trex.pick_exemplars``)."""
+    if arm.exemplars is None:
+        return None
+    from object_detection_eval.inference.vlm.trex import Exemplar, pick_exemplars
+
+    # Exemplar class ids live in the arm's prompt space: map each taxonomy id
+    # back to the arm phrase that names it.
+    known = arm_name_to_id(arm, name_to_id)
+    tax_to_arm = {known[c.lower()]: i for i, c in enumerate(arm.classes) if c.lower() in known}
+    split_dir = data_root / arm.exemplars.split
+    picked = pick_exemplars(split_dir, name_to_id, len(tax_to_arm), arm.exemplars.k)
+    out = []
+    for file_name, boxes in picked:
+        image = ImageLoader(split_dir / file_name).read()
+        mapped = [(tax_to_arm[c], x1, y1, x2, y2) for c, x1, y1, x2, y2 in boxes]
+        out.append(Exemplar(image, mapped))
+    logger.info(f"{arm.id}: exemplars {[f for f, _ in picked]}")
+    return out
+
+
+def per_class_ap50_95(
+    gt_map: dict[str, Any], pred_map: dict[str, Any], id_to_name: dict[int, str]
+) -> dict[str, float]:
+    """Per-class AP averaged over IoU 0.50:0.95 (``compute_metrics`` reports AP50 only)."""
+    import supervision as sv
+    from supervision.metrics import MeanAveragePrecision
+
+    metric = MeanAveragePrecision()
+    for filename, gt in gt_map.items():
+        metric.update(predictions=pred_map.get(filename, sv.Detections.empty()), targets=gt)
+    result = metric.compute()
+    return {
+        id_to_name.get(int(c), str(int(c))): float(result.ap_per_class[i].mean())
+        for i, c in enumerate(result.matched_classes)
+    }
 
 
 def _prefetch(predictor: Any, image_dir: Path, filenames: list[str], workers: int) -> None:
@@ -256,14 +326,15 @@ def _score_arm(
     """Fetch (concurrently), score through ``score_split``; return (log row, pred_map)."""
     filenames = list(gt_map.keys())
     fresh_cache = _NOCACHE_ROOT / arm.id if arm.no_cache else None
-    clients, predictor = _build(arm, fresh_cache, rim_label_ids(arm, name_to_id))
+    exemplars = load_exemplars(arm, split_dir.parent, name_to_id)
+    clients, predictor = _build(arm, fresh_cache, rim_label_ids(arm, name_to_id), exemplars)
     _prefetch(predictor, split_dir, filenames, workers)
     pred_map = score_split(
         predictor,
         image_dir=split_dir,
         filenames=filenames,
         label_map=dict(enumerate(arm.classes)),
-        name_to_id=name_to_id,
+        name_to_id=arm_name_to_id(arm, name_to_id),
     )
     metrics = compute_metrics(gt_map, pred_map, id_to_name)
     row = {
@@ -276,6 +347,7 @@ def _score_arm(
         "mAP_50": float(metrics["mAP_50"]),
         "mAP_75": float(metrics["mAP_75"]),
         "per_class_ap50": {k: float(v) for k, v in dict(metrics["per_class_ap50"]).items()},
+        "per_class_ap50_95": per_class_ap50_95(gt_map, pred_map, id_to_name),
     }
     for c in clients:
         c.unload()
@@ -294,6 +366,9 @@ def _check_vocab(arms: list[Arm], name_to_id: dict[str, int], taxonomy: str) -> 
             sys.exit(2)
         if (arm.refine or arm.rim_trim) and not rim_label_ids(arm, name_to_id):
             logger.error(f"arm {arm.id!r}: refine/trim set but no phrase maps to rim")
+            sys.exit(2)
+        if arm.refine and arm.exemplars:
+            logger.error(f"arm {arm.id!r}: refine is DINO-X only and cannot take exemplars")
             sys.exit(2)
 
 
