@@ -111,9 +111,11 @@ class ManifestEntry(BaseModel, frozen=True):
     task: str | None = None
     caption: str | None = None
     prompt_template: str | None = None
-    #: Astra (billed API) only: reasoning effort the row published at
-    #: (low/medium/high/xhigh/max). None omits the parameter. Higher = better
-    #: localisation, steeply higher per-image cost.
+    #: Billed OpenAI/Anthropic rows only: reasoning effort the row published at
+    #: (low/medium/high/xhigh/max). ``default`` omits the parameter so the
+    #: provider's own default runs -- the setting the Ultralytics Platform
+    #: auto-annotation benchmark compared every provider at. Unset keeps each
+    #: inferencer's historical default (``low`` for OpenAI rows).
     reasoning_effort: str | None = None
     #: DINO-X (billed API) only: the API's own server-side NMS IoU, and an
     #: optional longest-edge downscale before upload (None = native).
@@ -263,7 +265,7 @@ def _astra_factory(entry: ManifestEntry) -> BaseInferencer:
         model_name=entry.model_name,
         classes=entry.classes,
         prompt_template=entry.prompt_template,
-        reasoning_effort=entry.reasoning_effort if entry.reasoning_effort is not None else "low",
+        reasoning_effort=_effort(entry, unset="low"),
     )
 
 
@@ -282,6 +284,24 @@ def _dinox_factory(entry: ManifestEntry) -> BaseInferencer:
     )
 
 
+def _claude_factory(entry: ManifestEntry) -> BaseInferencer:
+    from object_detection_eval.inference.vlm.claude import ClaudeInferencer
+
+    return ClaudeInferencer(
+        model_name=entry.model_name,
+        classes=entry.classes,
+        prompt_template=entry.prompt_template,
+        effort=_effort(entry, unset=None),
+    )
+
+
+def _effort(entry: ManifestEntry, unset: str | None) -> str | None:
+    """Resolve a row's effort: ``default`` -> omit (None), unset -> ``unset``."""
+    if entry.reasoning_effort == "default":
+        return None
+    return entry.reasoning_effort if entry.reasoning_effort is not None else unset
+
+
 def _qwen3_vl_factory(entry: ManifestEntry) -> BaseInferencer:
     from object_detection_eval.inference.vlm.qwen3_vl import Qwen3VLInferencer
 
@@ -296,6 +316,7 @@ _INFERENCER_FACTORIES: dict[str, Callable[[ManifestEntry], BaseInferencer]] = {
     "gemini": _gemini_factory,
     "astra": _astra_factory,
     "dinox": _dinox_factory,
+    "claude": _claude_factory,
     "owlv2": _owlv2_factory,
     "omdet_turbo": _omdet_turbo_factory,
     "grounding_dino": _grounding_dino_factory,

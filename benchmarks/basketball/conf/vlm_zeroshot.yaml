@@ -144,6 +144,138 @@ models:
       normalised coordinate system and a confidence in [0, 1].
     expected_map5095: null
 
+  # BLOG-PARITY ROWS (added 2026-10-14). The Ultralytics Platform
+  # auto-annotation benchmark (36 datasets, class-prompted, "every provider at
+  # its default reasoning effort") published GPT-6.1 Sol 0.491, Claude Opus 5.5
+  # 0.476 and GPT-6 Astra 0.470 mAP50. The rows below put the models it ranked
+  # that this table lacked onto our split, under our protocol. (Gemini 4 Argon
+  # is handled on the gemini-refresh branch.)
+  #
+  # They run at `reasoning_effort: default` (the parameter is omitted), matching
+  # that benchmark's setting (sol_low adds a matched-effort check). All reuse the Astra row's
+  # winning prompt verbatim except for the coordinate sentence: there was no
+  # per-model prompt search, so these are untuned rows and the report must say
+  # so. New models, no prior number: expected_map5095 is null.
+  #
+  # Sol is an OpenAI model on the same chat-completions + structured-output
+  # surface as Astra, so it reuses the Astra inferencer unchanged.
+  - name: sol
+    inferencer: astra
+    model_name: gpt-6.1-sol
+    classes:
+      - player
+      - ball
+      - referee
+      - rim
+      - number
+    reasoning_effort: default
+    prompt_template: >
+      Detect all basketball players, referees, the rim, the basketball, and
+      visible jersey numbers in this basketball game image.
+      Constraints:
+      - At most 10 players, 3 referees, 1 rim, and 1 ball per image.
+      - Each person gets exactly ONE bounding box with the most specific label.
+      Use EXACTLY these labels:
+      - "player" for any basketball player on the court
+      - "referee" for game officials
+      - "ball" for the basketball (only when NOT going through the rim)
+      - "rim" for the basketball hoop rim
+      - "number" for visible jersey numbers (tight box around the digits only)
+      Return each box as (x_min, y_min, x_max, y_max) integers in a 0-1000
+      normalised coordinate system and a confidence in [0, 1].
+    expected_map5095: null
+
+  # Sol at `low`: matched effort with the published `astra` row (same OpenAI
+  # effort scale), so Sol vs Astra can be read at equal effort as well as at
+  # the provider default. Identical prompt to `sol`; only the effort differs.
+  - name: sol_low
+    inferencer: astra
+    model_name: gpt-6.1-sol
+    classes:
+      - player
+      - ball
+      - referee
+      - rim
+      - number
+    reasoning_effort: low
+    prompt_template: >
+      Detect all basketball players, referees, the rim, the basketball, and
+      visible jersey numbers in this basketball game image.
+      Constraints:
+      - At most 10 players, 3 referees, 1 rim, and 1 ball per image.
+      - Each person gets exactly ONE bounding box with the most specific label.
+      Use EXACTLY these labels:
+      - "player" for any basketball player on the court
+      - "referee" for game officials
+      - "ball" for the basketball (only when NOT going through the rim)
+      - "rim" for the basketball hoop rim
+      - "number" for visible jersey numbers (tight box around the digits only)
+      Return each box as (x_min, y_min, x_max, y_max) integers in a 0-1000
+      normalised coordinate system and a confidence in [0, 1].
+    expected_map5095: null
+
+  # Astra at the provider-default effort: the blog's setting, so the three
+  # OpenAI/Anthropic rows compare like for like. A PARITY row, not a replacement:
+  # the published `astra` row stays at `low`, chosen on val (it tied medium at
+  # half the cost). Identical prompt to `astra`; only the effort differs.
+  - name: astra_default
+    inferencer: astra
+    model_name: gpt-6-astra
+    classes:
+      - player
+      - ball
+      - referee
+      - rim
+      - number
+    reasoning_effort: default
+    prompt_template: >
+      Detect all basketball players, referees, the rim, the basketball, and
+      visible jersey numbers in this basketball game image.
+      Constraints:
+      - At most 10 players, 3 referees, 1 rim, and 1 ball per image.
+      - Each person gets exactly ONE bounding box with the most specific label.
+      Use EXACTLY these labels:
+      - "player" for any basketball player on the court
+      - "referee" for game officials
+      - "ball" for the basketball (only when NOT going through the rim)
+      - "rim" for the basketball hoop rim
+      - "number" for visible jersey numbers (tight box around the digits only)
+      Return each box as (x_min, y_min, x_max, y_max) integers in a 0-1000
+      normalised coordinate system and a confidence in [0, 1].
+    expected_map5095: null
+
+  # Claude Opus 5.5 answers in the PIXEL grid of the image it receives, not a
+  # 0-1000 frame (see inference/vlm/claude.py). The inferencer downscales each
+  # frame to a 1568 px long edge itself and fills {width}/{height} below, so the
+  # coordinate sentence is the only change from the Astra/Sol prompt. No refusal
+  # fallback model is configured: every box in this row is from Opus 5.5.
+  - name: claude_opus
+    inferencer: claude
+    model_name: claude-opus-5-5
+    classes:
+      - player
+      - ball
+      - referee
+      - rim
+      - number
+    reasoning_effort: default
+    prompt_template: >
+      Detect all basketball players, referees, the rim, the basketball, and
+      visible jersey numbers in this basketball game image.
+      Constraints:
+      - At most 10 players, 3 referees, 1 rim, and 1 ball per image.
+      - Each person gets exactly ONE bounding box with the most specific label.
+      Use EXACTLY these labels:
+      - "player" for any basketball player on the court
+      - "referee" for game officials
+      - "ball" for the basketball (only when NOT going through the rim)
+      - "rim" for the basketball hoop rim
+      - "number" for visible jersey numbers (tight box around the digits only)
+      The image is {width} pixels wide and {height} pixels tall. Return each box
+      as (x_min, y_min, x_max, y_max) integer pixel coordinates in this image
+      (0,0 = top-left) and a confidence in [0, 1].
+    expected_map5095: null
+
   # ABLATION (2026-08-04). 2x2 overlapping tiles plus the full frame, and NMS
   # re-tuned INSIDE that regime. val 0.2400 -> 0.2879.
   #
