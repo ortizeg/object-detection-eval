@@ -73,6 +73,9 @@ google-genai = ">=1.63.0, <2"
 # the standalone `astra`/`vlm-astra` feature below; listed here so the full vlm
 # env can run every API row (Gemini + Astra) too.
 openai = ">=1.55.0"
+# Claude (Anthropic) is NOT listed here, and has no pyproject extra: either
+# change re-solves every environment and moves pins the published rows depend
+# on (onnxruntime, ultralytics, ...). It runs only in `vlm-claude`.
 # YOLO-World. AGPL-3.0, optional-extra-only — see pyproject's [vlm] note.
 ultralytics = ">=8.3, <9"
 # YOLO-World's prompt-then-detect encodes the class vocabulary with CLIP.
@@ -90,6 +93,13 @@ clip-anytorch = "*"
 # [environments] below. Mirrors pyproject.toml's `astra` extra.
 [feature.astra.pypi-dependencies]
 openai = ">=1.55.0"
+
+# Claude (Anthropic) zero-shot inferencer. TORCH-FREE, same rationale as
+# [feature.astra]: only the SDK on top of the core scoring deps. Composed as
+# `vlm-claude` in [environments]. Unlike `astra` there is no matching
+# pyproject extra -- see the note in [feature.vlm.pypi-dependencies].
+[feature.claude.pypi-dependencies]
+anthropic = ">=1.13, <2"
 
 # Qwen3-VL-8B zero-shot inferencer. A SEPARATE feature from [feature.vlm],
 # not an addition to it: Qwen3-VL requires transformers>=4.57.0, and
@@ -279,6 +289,8 @@ vlm = ["dev", "vlm"]
 vlm-qwen3vl = ["dev", "qwen3vl"]
 # GPT-6 Astra (OpenAI). Torch-free API runner — see [feature.astra].
 vlm-astra = ["dev", "astra"]
+# Claude (Anthropic). Torch-free API runner — see [feature.claude].
+vlm-claude = ["dev", "claude"]
 # LLMDet-large only, isolated from `vlm` (see [feature.llmdet] for why).
 llmdet = ["dev", "llmdet"]
 # Cross-platform: core (CPU onnxruntime) + dev + the graph-surgery tooling.

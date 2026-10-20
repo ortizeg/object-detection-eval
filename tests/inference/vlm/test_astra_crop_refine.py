@@ -1,9 +1,9 @@
-"""Tests for the crop-refine geometry -- offline via importorskip(openai).
+"""Tests for the crop-refine pipeline -- fully offline.
 
-Only the pure geometry (``crop_window`` / ``remap_crop_detection``) is exercised;
-the two-pass ``predict`` hits a billed API and is covered by the val/test runs.
-``astra_crop_refine`` imports ``AstraInferencer`` at module top, so ``openai``
-must be importable -- guarded here the same way the other astra tests are.
+The pure geometry (``crop_window`` / ``remap_crop_detection``) and the two-pass
+``predict`` with injected fake refiners are exercised here; the default Astra
+refiners hit a billed API and are covered by the val/test runs. The module
+imports ``AstraInferencer`` lazily, so no ``openai`` guard is needed.
 """
 
 from __future__ import annotations
@@ -11,9 +11,8 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-pytest.importorskip("openai")
-
 from object_detection_eval.inference.vlm.astra_crop_refine import (
+    CropRefineInferencer,
     crop_window,
     remap_crop_detection,
 )
@@ -73,3 +72,49 @@ def test_remap_partial_crop_box() -> None:
     # y = (200 + 0.25*400)/1000 = 300/1000 = 0.3 ; h = 0.5*400/1000 = 0.2
     assert out.bbox.y == pytest.approx(0.3)
     assert out.bbox.h == pytest.approx(0.2)
+
+
+class _Fixed:
+    """Stub inferencer: returns the same detections for any image."""
+
+    def __init__(self, dets: list[Detection]) -> None:
+        self.dets = dets
+        self.calls = 0
+
+    def predict(self, image, image_width=None, image_height=None) -> list[Detection]:
+        self.calls += 1
+        return list(self.dets)
+
+
+def test_injected_refiner_replaces_only_its_class() -> None:
+    player = Detection(bbox=BoundingBox(x=0.1, y=0.1, w=0.2, h=0.4), confidence=0.9, class_id=0)
+    rim = Detection(bbox=BoundingBox(x=0.45, y=0.45, w=0.1, h=0.1), confidence=0.8, class_id=3)
+    # The refiner finds the rim filling the crop's centre half.
+    tight = Detection(bbox=BoundingBox(x=0.25, y=0.25, w=0.5, h=0.5), confidence=0.95, class_id=0)
+    refiner = _Fixed([tight])
+    pipeline = CropRefineInferencer(
+        base=_Fixed([player, rim]),
+        classes=["player", "ball", "referee", "rim", "number"],
+        refiners={"rim": refiner},
+    )
+
+    out = pipeline.predict(np.zeros((1000, 1000, 3), dtype=np.uint8))
+
+    assert refiner.calls == 1
+    assert pipeline.refine_classes == {"rim"}
+    assert out[0] == player
+    assert out[1].class_id == 3
+    assert out[1].confidence == pytest.approx(0.95)
+    # Crop is pad 1.5 x the 100 px box = 150 px centred on (500, 500): [425, 575).
+    assert out[1].bbox.x == pytest.approx(0.4625)
+    assert out[1].bbox.w == pytest.approx(0.075)
+
+
+def test_injected_refiner_finding_nothing_keeps_pass1_box() -> None:
+    rim = Detection(bbox=BoundingBox(x=0.45, y=0.45, w=0.1, h=0.1), confidence=0.8, class_id=3)
+    pipeline = CropRefineInferencer(
+        base=_Fixed([rim]),
+        classes=["player", "ball", "referee", "rim", "number"],
+        refiners={"rim": _Fixed([])},
+    )
+    assert pipeline.predict(np.zeros((1000, 1000, 3), dtype=np.uint8)) == [rim]
