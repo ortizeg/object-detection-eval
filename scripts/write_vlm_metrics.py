@@ -44,6 +44,7 @@ _VLM_FILES: dict[str, str] = {
     "GPT-6.1 Sol": "sol.json",
     "GPT-6.1 Sol (low effort)": "sol_low.json",
     "Claude Opus 5.5": "claude_opus.json",
+    "DINO-X Pro": "dinox_pro.json",
     "Gemini": "gemini.json",
     "OWLv2": "owlv2.json",
     "Grounding-DINO": "grounding_dino.json",

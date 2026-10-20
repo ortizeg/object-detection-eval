@@ -3,8 +3,9 @@
 Verbatim port of the source repo's ``GroundingDINOInferencer`` (VLM-01):
 dot-joined class prompt, box + text thresholds,
 ``post_process_grounded_object_detection``, concatenated-label resolution
-with a small-object size sanity check, per-class greedy NMS, and the
-try/except-on-failure -> ``[]`` behaviour. Not re-exported from
+with a small-object size sanity check, per-class greedy NMS. One deliberate
+departure: a failed forward pass is logged and re-raised, never turned into
+``[]`` (2026-10-18), so a crash cannot score as an empty frame. Not re-exported from
 ``inference/vlm/__init__.py`` (VLM-04).
 """
 
@@ -127,8 +128,10 @@ class GroundingDINOInferencer(BaseInferencer):
             return per_class_nms(detections, self.nms_iou_threshold)
 
         except Exception:
+            # Re-raise, never return []: a crashed forward pass (e.g. an op the
+            # MPS backend lacks) would otherwise score as "found nothing".
             logger.exception("Grounding DINO inference failed")
-            return []
+            raise
 
     def unload(self) -> None:
         """Free GPU memory."""

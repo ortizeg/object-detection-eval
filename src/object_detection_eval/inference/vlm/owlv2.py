@@ -2,8 +2,9 @@
 
 Verbatim port of the source repo's ``OWLv2Inferencer`` (VLM-01): device
 auto-resolve, ``Owlv2Processor``/``Owlv2ForObjectDetection``,
-``post_process_grounded_object_detection``, per-class greedy NMS, and the
-try/except-on-failure -> ``[]`` behaviour. ``torch``/``PIL``/``transformers``
+``post_process_grounded_object_detection``, per-class greedy NMS. One deliberate
+departure: a failed forward pass is logged and re-raised, never turned into
+``[]`` (2026-10-18), so a crash cannot score as an empty frame. ``torch``/``PIL``/``transformers``
 stay at module top -- they only load under the ``[vlm]`` extra, and this
 module is never imported from ``inference/vlm/__init__.py`` (VLM-04).
 """
@@ -114,8 +115,10 @@ class OWLv2Inferencer(BaseInferencer):
             return per_class_nms(detections, self.nms_iou_threshold)
 
         except Exception:
+            # Re-raise, never return []: a crashed forward pass (e.g. an op the
+            # MPS backend lacks) would otherwise score as "found nothing".
             logger.exception("OWLv2 inference failed")
-            return []
+            raise
 
     def unload(self) -> None:
         """Free GPU memory."""

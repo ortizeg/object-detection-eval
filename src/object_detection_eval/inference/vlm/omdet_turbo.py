@@ -3,8 +3,9 @@
 Verbatim port of the source repo's ``OmDetTurboInferencer`` (VLM-01):
 classes-as-text-queries input, ``AutoProcessor``/
 ``AutoModelForZeroShotObjectDetection``, the timm-backbone meta-buffer
-materialisation workaround, box threshold, per-class greedy NMS, and the
-try/except-on-failure -> ``[]`` behaviour. ``timm`` is only needed at
+materialisation workaround, box threshold, per-class greedy NMS. One deliberate
+departure: a failed forward pass is logged and re-raised, never turned into
+``[]`` (2026-10-18), so a crash cannot score as an empty frame. ``timm`` is only needed at
 model-load time under the ``[vlm]`` extra and is never imported directly
 here (it is pulled in transitively by transformers' AutoBackbone). Not
 re-exported from ``inference/vlm/__init__.py`` (VLM-04).
@@ -139,8 +140,10 @@ class OmDetTurboInferencer(BaseInferencer):
             return per_class_nms(detections, self.nms_iou_threshold)
 
         except Exception:
+            # Re-raise, never return []: a crashed forward pass (e.g. an op the
+            # MPS backend lacks) would otherwise score as "found nothing".
             logger.exception("OmDet-Turbo inference failed")
-            return []
+            raise
 
     @staticmethod
     def _materialize_meta_buffers(model: torch.nn.Module) -> None:

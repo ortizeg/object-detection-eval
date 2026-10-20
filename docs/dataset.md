@@ -236,6 +236,7 @@ up front.
 | `man in a striped shirt` | referee |
 | `basketball official` | referee |
 | `black and white striped shirt` | referee |
+| `orange basketball rim` | rim |
 <!-- TABLE:taxonomy_aliases END -->
 
 ### Annotation counts, 10 raw categories

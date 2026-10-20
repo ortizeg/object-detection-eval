@@ -53,6 +53,21 @@ from pydantic import BaseModel, Field
 from object_detection_eval.inference.base import BaseInferencer
 from object_detection_eval.schemas.detection import BoundingBox, Detection
 
+#: A 400 the server raises for its own fault, not the request's. Observed once on
+#: 2026-10-15, mid-run on an otherwise ordinary val frame; the same request
+#: succeeded on re-send. Matched by message because it shares status 400 with
+#: genuinely bad requests, which must still fail fast.
+_TRANSIENT_400_MARKERS: tuple[str, ...] = ("something went wrong reading your request",)
+
+
+class AstraAPIError(RuntimeError):
+    """An Astra request that failed for a reason retrying will not fix.
+
+    Raised instead of returning ``[]``: an outage, an exhausted balance or a
+    rejected request must never be scored as "the model found nothing".
+    """
+
+
 #: Per-class BGR colours for rendering few-shot example boxes. Distinct, saturated
 #: hues so the model can tell classes apart visually; the label text is drawn too,
 #: so colour is a redundant cue rather than the only one.
@@ -299,6 +314,13 @@ class AstraInferencer(BaseInferencer):
         ``image_width``/``image_height`` are accepted for interface parity (and
         for ``TiledInferencer``) but unused: Astra's boxes are normalised to a
         fixed 0-1000 scale, independent of source pixel dimensions.
+
+        Returns ``[]`` only when the model itself answered with nothing usable
+        (a refusal, an empty or unparseable reply). Any failure to GET an
+        answer raises :class:`AstraAPIError` once retries are exhausted, or
+        immediately for permanent errors, so it cannot be scored as an empty
+        frame. There is no response cache, so a raise mid-run loses that run's
+        paid calls; the run must be restarted.
         """
         data_url = self._encode_image(image)
 
@@ -355,11 +377,11 @@ class AstraInferencer(BaseInferencer):
                     marker in code or marker in exc_text
                     for marker in ("insufficient_quota", "credit_balance_exhausted")
                 ):
-                    logger.error(
+                    msg = (
                         "Astra request failed: OpenAI account has no credits "
                         "(insufficient_quota). Not retrying -- add credits and re-run."
                     )
-                    return []
+                    raise AstraAPIError(msg) from exc
                 if attempt < self._MAX_RETRIES:
                     # Honour the server's Retry-After when it sends one (rate
                     # limits often do); otherwise use capped exponential backoff.
@@ -371,13 +393,21 @@ class AstraInferencer(BaseInferencer):
                     time.sleep(wait)
                     backoff = min(backoff * 2, self._MAX_BACKOFF)
                     continue
-                logger.exception(f"Astra inference failed after {attempt} attempts")
-                return []
+                msg = f"Astra inference failed after {attempt} attempts: {type(exc).__name__}"
+                raise AstraAPIError(msg) from exc
 
             except APIStatusError as exc:
                 # 5xx and 429 are transient; other 4xx are permanent (bad request,
                 # auth, model not found) — retrying those just burns money/time.
-                is_retryable = exc.status_code == 429 or 500 <= exc.status_code < 600
+                # The exception is a 400 whose message marks a server-side fault.
+                is_retryable = (
+                    exc.status_code == 429
+                    or 500 <= exc.status_code < 600
+                    or (
+                        exc.status_code == 400
+                        and any(m in str(exc).lower() for m in _TRANSIENT_400_MARKERS)
+                    )
+                )
                 if is_retryable and attempt < self._MAX_RETRIES:
                     wait = self._retry_wait(exc, backoff)
                     logger.warning(
@@ -387,17 +417,12 @@ class AstraInferencer(BaseInferencer):
                     time.sleep(wait)
                     backoff = min(backoff * 2, self._MAX_BACKOFF)
                     continue
-                logger.exception(f"Astra inference failed (HTTP {exc.status_code})")
-                return []
+                msg = f"Astra inference failed (HTTP {exc.status_code}) after {attempt} attempt(s)"
+                raise AstraAPIError(msg) from exc
 
-            except Exception:
-                # Safety net (mirrors gemini.py's broad catch): an unexpected
-                # error on one image must return [] and let the sweep continue,
-                # not crash a 96-image run. Non-retryable by definition.
-                logger.exception("Astra inference failed (unexpected error)")
-                return []
-
-        return []  # unreachable, but keeps mypy happy
+        # Unreachable: every iteration returns, continues, or raises.
+        msg = "Astra retry loop exited without a result"
+        raise AstraAPIError(msg)
 
     # ------------------------------------------------------------------
     # Internal helpers

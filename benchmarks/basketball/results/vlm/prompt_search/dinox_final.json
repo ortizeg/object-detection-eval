@@ -1,0 +1,238 @@
+{
+  "split": "test",
+  "results": [
+    {
+      "name": "dinox_pro_bespoke",
+      "arm": "r4c_distractors_tiled_nms0.5",
+      "round": 4,
+      "note": "r4c vocabulary + adopted 2x2 tiling",
+      "config": {
+        "classes": [
+          "basketball player",
+          "basketball",
+          "referee",
+          "rim",
+          "number",
+          "backboard",
+          "net",
+          "spectator",
+          "coach"
+        ],
+        "distractors": [
+          "backboard",
+          "net",
+          "spectator",
+          "coach"
+        ],
+        "model_name": "DINO-X-1.0",
+        "bbox_threshold": 0.01,
+        "iou_threshold": 0.8,
+        "score_threshold": 0.0,
+        "nms_iou_threshold": 0.5,
+        "max_size": null,
+        "tiles": [
+          2,
+          2
+        ],
+        "tile_overlap": 0.2,
+        "no_cache": false,
+        "rim_trim": null,
+        "refine": null
+      },
+      "api_calls": 12,
+      "mAP_50_95": 0.4672921299934387,
+      "mAP_50": 0.6180135011672974,
+      "mAP_75": 0.5179105401039124,
+      "per_class_ap50": {
+        "player": 0.9379270076751709,
+        "ball": 0.554597020149231,
+        "referee": 0.7506466507911682,
+        "rim": 0.14355523884296417,
+        "number": 0.7033417224884033
+      }
+    },
+    {
+      "name": "dinox_preview",
+      "arm": "r3d_preview_tiled_nms0.5",
+      "round": 3,
+      "note": "",
+      "config": {
+        "classes": [
+          "basketball player",
+          "basketball",
+          "referee",
+          "basketball hoop",
+          "jersey number"
+        ],
+        "distractors": [],
+        "model_name": "DINO-X-PREVIEW-1.0",
+        "bbox_threshold": 0.01,
+        "iou_threshold": 0.8,
+        "score_threshold": 0.0,
+        "nms_iou_threshold": 0.5,
+        "max_size": null,
+        "tiles": [
+          2,
+          2
+        ],
+        "tile_overlap": 0.2,
+        "no_cache": false,
+        "rim_trim": null,
+        "refine": null
+      },
+      "api_calls": 470,
+      "mAP_50_95": 0.47769102454185486,
+      "mAP_50": 0.6358768939971924,
+      "mAP_75": 0.512618362903595,
+      "per_class_ap50": {
+        "player": 0.9217566847801208,
+        "ball": 0.7180473804473877,
+        "referee": 0.8311079144477844,
+        "rim": 0.0028176731429994106,
+        "number": 0.7056549191474915
+      }
+    },
+    {
+      "name": "dinox_pro_rimtrim",
+      "arm": "r6_trim0.35_headline",
+      "round": 6,
+      "note": "",
+      "config": {
+        "classes": [
+          "basketball player",
+          "basketball",
+          "referee",
+          "basketball hoop",
+          "jersey number"
+        ],
+        "distractors": [],
+        "model_name": "DINO-X-1.0",
+        "bbox_threshold": 0.01,
+        "iou_threshold": 0.8,
+        "score_threshold": 0.0,
+        "nms_iou_threshold": 0.5,
+        "max_size": null,
+        "tiles": [
+          2,
+          2
+        ],
+        "tile_overlap": 0.2,
+        "no_cache": false,
+        "rim_trim": 0.35,
+        "refine": null
+      },
+      "api_calls": 0,
+      "mAP_50_95": 0.5195745229721069,
+      "mAP_50": 0.6825109720230103,
+      "mAP_75": 0.5852807760238647,
+      "per_class_ap50": {
+        "player": 0.9189775586128235,
+        "ball": 0.5674241781234741,
+        "referee": 0.6280501484870911,
+        "rim": 0.5956386923789978,
+        "number": 0.7024641633033752
+      }
+    },
+    {
+      "name": "dinox_pro_crop_refine",
+      "arm": "r8_refine_rimdist_headline",
+      "round": 8,
+      "note": "",
+      "config": {
+        "classes": [
+          "basketball player",
+          "basketball",
+          "referee",
+          "basketball hoop",
+          "jersey number"
+        ],
+        "distractors": [],
+        "model_name": "DINO-X-1.0",
+        "bbox_threshold": 0.01,
+        "iou_threshold": 0.8,
+        "score_threshold": 0.0,
+        "nms_iou_threshold": 0.5,
+        "max_size": null,
+        "tiles": [
+          2,
+          2
+        ],
+        "tile_overlap": 0.2,
+        "no_cache": false,
+        "rim_trim": null,
+        "refine": {
+          "classes": [
+            "rim",
+            "net",
+            "backboard"
+          ],
+          "top_k": 3,
+          "pad": 1.5,
+          "min_crop_frac": 0.12,
+          "confidence": "base"
+        }
+      },
+      "api_calls": 282,
+      "mAP_50_95": 0.44745007157325745,
+      "mAP_50": 0.5772844552993774,
+      "mAP_75": 0.49715766310691833,
+      "per_class_ap50": {
+        "player": 0.9189775586128235,
+        "ball": 0.5674241781234741,
+        "referee": 0.6280501484870911,
+        "rim": 0.06950617581605911,
+        "number": 0.7024641633033752
+      }
+    },
+    {
+      "name": "dinox_preview_rimtrim",
+      "arm": "r9_trim0.3_preview",
+      "round": 9,
+      "note": "",
+      "config": {
+        "classes": [
+          "basketball player",
+          "basketball",
+          "referee",
+          "basketball hoop",
+          "jersey number"
+        ],
+        "distractors": [],
+        "aliases": {},
+        "model_name": "DINO-X-PREVIEW-1.0",
+        "bbox_threshold": 0.01,
+        "iou_threshold": 0.8,
+        "score_threshold": 0.0,
+        "nms_iou_threshold": 0.5,
+        "max_size": null,
+        "tiles": [
+          2,
+          2
+        ],
+        "tile_overlap": 0.2,
+        "no_cache": false,
+        "rim_trim": 0.3,
+        "refine": null,
+        "exemplars": null
+      },
+      "api_calls": 0,
+      "mAP_50_95": 0.5165892839431763,
+      "mAP_50": 0.6961216926574707,
+      "mAP_75": 0.5570976138114929,
+      "per_class_ap50": {
+        "player": 0.9217566847801208,
+        "ball": 0.7180473804473877,
+        "referee": 0.8311079144477844,
+        "rim": 0.30404141545295715,
+        "number": 0.7056549191474915
+      },
+      "per_class_ap50_95": {
+        "player": 0.7761400938034058,
+        "ball": 0.46966537833213806,
+        "referee": 0.7703908681869507,
+        "rim": 0.19479939341545105,
+        "number": 0.37195074558258057
+      }
+    }
+  ]
+}

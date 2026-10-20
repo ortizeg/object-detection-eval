@@ -329,8 +329,10 @@ class Qwen3VLInferencer(BaseInferencer):
             return self._parse_response(output_text)
 
         except Exception:
+            # Re-raise, never return []: a crashed forward pass (e.g. an op the
+            # MPS backend lacks) would otherwise score as "found nothing".
             logger.exception("Qwen3-VL inference failed")
-            return []
+            raise
 
     def unload(self) -> None:
         """Free GPU memory."""

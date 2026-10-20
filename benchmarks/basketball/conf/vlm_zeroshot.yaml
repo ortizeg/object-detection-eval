@@ -728,8 +728,7 @@ models:
     text_threshold: 0.25
     nms_iou_threshold: 0.5
     tiles: [2, 2]
-    expected_map5095: null
-
+    expected_map5095: 0.439
   # Qwen3-VL-8B (added 2026-08-17). Apache-2.0. A NEW model with no prior
   # published number -- expected_map5095 is deliberately null (VLM-02
   # informational-only mode), not a target to reproduce.
@@ -845,3 +844,47 @@ models:
 # on the objects. Reporting it alongside five open-vocabulary DETECTORS invited
 # the reading that a detector had been benchmarked and failed, which is not what
 # happened. It also carried no reproduction target, so it gated nothing.
+
+  # DINO-X Pro (IDEA Research, added 2026-10-11). Plan of record and every val
+  # arm: docs/plans/dinox-pro-2026-10.md, results/vlm/prompt_search/
+  # dinox_explore.json. `DINO-X-1.0` is DINO-X Pro's id on DeepDataSpace's V2
+  # API; there are no open weights. Torch-free: inference/vlm/dinox.py speaks
+  # the REST API over httpx (the vendor SDK is avoided -- it ships the API token
+  # to a third-party Sentry host).
+  #
+  # BILLED, BUT A CLASS-VOCABULARY DETECTOR -- so unlike Gemini/Astra it is NOT
+  # exempt from the equal-effort search. It faced the same six shared
+  # candidates on val, untiled (server bbox_threshold 0.01, server NMS 0.8):
+  #   c1_domain                    0.3420  (winner)
+  #   c5_bare_canonical            0.3362
+  #   c3_small_object              0.3105
+  #   c2_contrastive               0.2902
+  #   c4_contrastive_small_object  0.2382
+  #   c0_coco_control              0.2268
+  # then the same ablation levers the open rows got:
+  #   local NMS 0.5/0.6/0.7        <= 0.3417  reverted (server NMS suffices)
+  #   2x2 tiling, merge NMS 0.5    0.4294     KEPT (+0.087; merge NMS swept
+  #                                           0.3-0.7, peak at 0.5)
+  #   downscale to 1536            0.3390     reverted
+  # Refetching the winner with the cache bypassed scored 0.3419 vs 0.3420: the
+  # API is effectively deterministic, so the 0.005 floor of the adoption rule
+  # applies.
+  #
+  # `rim` is ~0 for every vocabulary containing "basketball hoop": GT boxes the
+  # RING only, DINO-X's hoop box includes the net (median best IoU 0.41, area
+  # 2.1x GT). This is the headline row's definition mismatch, not a bug.
+  - name: dinox_pro
+    inferencer: dinox
+    model_name: DINO-X-1.0
+    classes:
+      - basketball player
+      - basketball
+      - referee
+      - basketball hoop
+      - jersey number
+    box_threshold: 0.01
+    dinox_iou_threshold: 0.8
+    nms_iou_threshold: 0.5
+    tiles: [2, 2]
+    # 0.4393 from the single 2026-10-12 test run (results/vlm/dinox_pro.json).
+    expected_map5095: 0.439

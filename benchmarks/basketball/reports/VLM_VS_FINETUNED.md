@@ -394,7 +394,7 @@ never emit, while the singleton cap *constrains* the zero-shot rows.
 
 ## The zero-shot ceiling
 
-Twelve zero-shot models, plus three disclosed YOLOE variants and two
+Thirteen zero-shot models, plus three disclosed YOLOE variants and two
 extra-effort rows (GPT-6 Astra at default effort, GPT-6.1 Sol at low; see
 [Parity with the Ultralytics Platform
 benchmark](#parity-with-the-ultralytics-platform-benchmark)), scored on the
@@ -409,6 +409,7 @@ from the committed prediction dumps in `results/vlm/*.json` (never transcribed):
 | GPT-6.1 Sol | 0.481 | 0.781 | 0.481 |
 | GPT-6.1 Sol (low effort) | 0.489 | 0.791 | 0.503 |
 | Claude Opus 5.5 | 0.438 | 0.691 | 0.465 |
+| DINO-X Pro | 0.439 | 0.564 | 0.489 |
 | Gemini | 0.250 | 0.430 | 0.252 |
 | OWLv2 | 0.315 | 0.476 | 0.367 |
 | Grounding-DINO | 0.293 | 0.352 | 0.318 |
@@ -445,6 +446,76 @@ is 0.073 clear of OWLv2's 0.315, the previous open-weights leader. Qwen3-VL-8B
 inference took it from 0.188 (tied for last) to 0.318. Both rows' tuning is
 summarised in [Two more rows: LLMDet-large and
 Qwen3-VL-8B](#two-more-rows-llmdet-large-and-qwen3-vl-8b) below.
+
+**DINO-X Pro is second, at 0.439. It is also billed, but it went through the
+equal-effort search.** Added 2026-10-12. DINO-X is IDEA Research's successor to
+Grounding DINO, and its Pro variant exists only as a hosted API. Unlike Gemini
+and Astra, it takes a class vocabulary rather than a free-text instruction. So
+it faced the same six shared candidates as the open-weights rows (winner:
+`c1_domain`, val 0.342) and then the same ablation levers. 2x2 tiling was worth
++0.087 on val, the largest single gain; local NMS and a 1536 downscale were
+nulls. On test it sits 0.146 above its predecessor Grounding-DINO and 0.050
+above LLMDet-large (paired image-level 95% CI [+0.037, +0.063]). It sits 0.062
+below Astra (CI [−0.080, −0.045]). Those intervals resample frames, and the test
+set is three clips, so treat them as too narrow; the
+[3-clip caveat](FINAL_COMPARISON_640.md#️-the-94-images-are-3-video-clips-not-94-independent-samples) applies. It shares the table's commonest failure:
+`rim` AP@50 is 0.002. That is a box-extent mismatch, not a miss. The GT boxes the
+ring; DINO-X's "basketball hoop" box includes the net (median best IoU 0.41,
+2.1x the GT area). A disclosed, non-equal-effort variant that prompts `rim` by
+name plus four discarded distractor phrases (backboard, net, spectator, coach)
+reached **0.484 on val**, level with Astra's 0.485, with rim at 0.21; on test it
+scores **0.467**. The undocumented `DINO-X-PREVIEW-1.0` model id, with the
+headline config, scores **0.478** test. Neither replaces the headline row.
+
+**The rim fix that works for DINO-X costs nothing: trim the box.** (Added
+2026-10-13, disclosed extra.) The ring is the top third of DINO-X's hoop-and-net
+box. Keeping only the top 35% of each rim-class box takes rim AP@50 from 0.002 to
+**0.596** on test, and the row from 0.439 to **0.520**, level with Astra's base
+row (0.501): DINO-X Pro + trim minus Astra is +0.019, paired 95% CI [−0.004,
++0.040]. The fraction was set
+on val (peak 0.35, a smooth curve from 0.15 to 0.5), and it is a hand-set box
+rule, so it is reported apart from the headline row. It needs no extra API calls.
+Astra's crop-refine idea, ported to DINO-X, did **not** work: inside a zoomed
+crop, DINO-X's top "rim" box is often some other small object, and the line
+scored 0.448 test, only +0.008 over the headline row.
+
+The same trim also rescues the preview model (0.478 → **0.517** test, trim
+fraction 0.3 set on val) and **OWLv2** (0.315 → **0.394**, rim AP@50 0.002 →
+0.736). OWLv2 makes the same box-takes-in-the-net mistake. It does nothing for
+Grounding DINO, LLMDet, Florence-2, OmDet-Turbo or YOLO-World, which never put
+a box on the ring. (Disclosed extras, 2026-10-15. The headline rows are unchanged.)
+
+**Fusing DINO-X with Astra's crop-refine gives the best zero-shot result in
+this report: 0.671, level with YOLOX-M.** (Disclosed extra, 2026-10-13, extended
+2026-10-15.) The fusion is weighted box fusion (IoU 0.55, equal weights, the
+fusion round's pre-committed operator) of three members: Astra crop-refine,
+DINO-X Pro + trim and DINO-X preview + trim. It scores **0.671** test
+mAP@50:95, against 0.588 for Astra crop-refine alone and 0.651 for the first,
+two-member version. Every member and operator was chosen on val, unlike the
+earlier Astra greedy fusion. Test was run once per adopted configuration.
+Against the fine-tuned rows, using the **clip-clustered** paired bootstrap (the
+honest interval for a three-clip test set):
+
+- YOLOX-M (0.672): a tie, CI [−0.014, +0.008].
+- RF-DETR-M (0.646) and RTMDet-M (0.628): the fusion is ahead.
+- DEIM-M (0.686): the fusion is behind, CI [−0.027, −0.008].
+
+So it sits in the middle of the fine-tuned table. DINO-X adds ball
+(0.69 → 0.78) and number (0.85 → 0.91). Recall at 95% precision does not
+improve (0.879 vs 0.882). It takes two billed APIs and about 12 calls per image.
+
+Several attempts to push past it failed on val:
+
+- Rank-normalised fusion: 0.575 against 0.611.
+- LLMDet or OWLv2 + trim as an extra member: 0.618-0.621 against 0.624.
+- Swapping in Astra crop-refine + number crop run end to end, which is
+  0.587 on test by itself, level with crop-refine alone.
+- Rewording the ball prompt: no gain across five wordings.
+- T-Rex-2.0 detecting from train-frame example boxes (few-shot): 0.14 val,
+  because the API floors scores at 0.30.
+
+Plan, every arm and all amendments:
+[docs/plans/dinox-pro-2026-10.md](../../../docs/plans/dinox-pro-2026-10.md).
 
 **"Below half the worst fine-tuned detector" now depends entirely on whether you
 count the paid API.** Against the lowest-ranked fine-tuned detector's **0.581**
@@ -634,7 +705,9 @@ from averaging several noisy samples of each box, not from different models
 making different mistakes. Calling the best model three times is as good as
 mixing in the others, and simpler. Exploration, not a result: fusing Sol and Opus with Astra's
 crop-refine output gives 0.589, no better than crop-refine alone (0.588). Fusion
-and crop-refine fix the same thing, the rim boxes, so they do not stack.
+and crop-refine fix the same thing, the rim boxes, so they do not stack. Fusing DINO-X
+(trimmed) with crop-refine does stack, to 0.671, because DINO-X's errors differ
+from the API models' (see the DINO-X section above).
 
 **Rim-only crop-refine for Sol and Opus.** Astra's two-pass crop-refine pipeline
 (re-detect each ball and rim box on a zoomed crop) was run on val for both
@@ -902,6 +975,7 @@ makes the pattern unmistakable:
 | GPT-6.1 Sol | 0.979 | 0.652 | 0.990 | 0.449 | 0.837 |
 | GPT-6.1 Sol (low effort) | 0.979 | 0.669 | 0.978 | 0.465 | 0.862 |
 | Claude Opus 5.5 | 0.970 | 0.497 | 0.901 | 0.502 | 0.587 |
+| DINO-X Pro | 0.919 | 0.567 | 0.628 | 0.002 | 0.702 |
 | Gemini | 0.923 | 0.316 | 0.717 | 0.036 | 0.156 |
 | OWLv2 | 0.901 | 0.583 | 0.388 | 0.002 | 0.505 |
 | Grounding-DINO | 0.867 | 0.355 | 0.533 | 0.000 | 0.006 |

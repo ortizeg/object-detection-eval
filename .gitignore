@@ -53,5 +53,14 @@ site/
 site_src/
 .env
 
+# DINO-X val prediction dumps and the fused Astra+DINO-X test dump: large and
+# regenerable (docs/plans/dinox-pro-2026-10.md, "Prediction files"). Only the
+# DINO-X test dumps that back published numbers are committed.
+benchmarks/basketball/results/vlm/dinox_*_valid.json
+benchmarks/basketball/results/vlm/fusion/*dinox*_test.json
+benchmarks/basketball/results/vlm/trex_*_valid.json
+benchmarks/basketball/results/vlm/llmdet_valid.json
+benchmarks/basketball/results/vlm/owlv2*_valid.json
+
 # Text encoders ultralytics downloads next to YOLO-World / YOLOE weights.
 mobileclip*.ts

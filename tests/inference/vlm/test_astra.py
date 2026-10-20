@@ -20,9 +20,10 @@ import pytest
 
 pytest.importorskip("openai")
 
-from openai import APIConnectionError, RateLimitError
+from openai import APIConnectionError, BadRequestError, RateLimitError
 
 from object_detection_eval.inference.vlm.astra import (
+    AstraAPIError,
     AstraBBox,
     AstraDetection,
     AstraInferencer,
@@ -242,15 +243,16 @@ class TestAstraInferencerPredict:
             AstraInferencer(classes=["player"]).predict(np.zeros((10, 10, 3), dtype=np.uint8)) == []
         )
 
-    def test_predict_handles_unexpected_exception(
+    def test_predict_raises_unexpected_exception(
         self, _mock_openai, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         monkeypatch.setenv("OPENAI_KEY", "dummy-key")
         _, mock_client = _mock_openai
         _parse(mock_client).side_effect = RuntimeError("boom")
 
-        dets = AstraInferencer(classes=["player"]).predict(np.zeros((10, 10, 3), dtype=np.uint8))
-        assert dets == []
+        # A crash must surface, never score as an empty frame.
+        with pytest.raises(RuntimeError, match="boom"):
+            AstraInferencer(classes=["player"]).predict(np.zeros((10, 10, 3), dtype=np.uint8))
         # An unexpected error is non-retryable -- single call only.
         _parse(mock_client).assert_called_once()
 
@@ -261,7 +263,7 @@ class TestAstraInferencerPredict:
 
         Retrying a $0-balance account burns the whole ~155s backoff ladder per
         image on a state that won't change mid-sweep (found on the 2026-09-25
-        smoke run). It must return [] after a single call.
+        smoke run). It must raise after a single call.
         """
         monkeypatch.setenv("OPENAI_KEY", "dummy-key")
         _, mock_client = _mock_openai
@@ -277,10 +279,12 @@ class TestAstraInferencerPredict:
 
         inferencer = AstraInferencer(classes=["player"])
         inferencer._INITIAL_BACKOFF = 0.0
-        with patch("object_detection_eval.inference.vlm.astra.time.sleep") as mock_sleep:
-            dets = inferencer.predict(np.zeros((10, 10, 3), dtype=np.uint8))
+        with (
+            patch("object_detection_eval.inference.vlm.astra.time.sleep") as mock_sleep,
+            pytest.raises(AstraAPIError, match="no credits"),
+        ):
+            inferencer.predict(np.zeros((10, 10, 3), dtype=np.uint8))
 
-        assert dets == []
         _parse(mock_client).assert_called_once()
         mock_sleep.assert_not_called()
 
@@ -314,6 +318,55 @@ class TestAstraInferencerPredict:
 
         assert len(dets) == 1
         assert _parse(mock_client).call_count == 2
+
+
+def _bad_request(message: str) -> BadRequestError:
+    request = httpx.Request("POST", "https://api.openai.com/v1/chat/completions")
+    return BadRequestError(message, response=httpx.Response(400, request=request), body=None)
+
+
+class TestFailuresNeverScoreEmpty:
+    """2026-10-15: a one-off HTTP 400 became [] and scored a val frame as empty."""
+
+    def _predict(self, mock_client, side_effect):
+        _parse(mock_client).side_effect = side_effect
+        inferencer = AstraInferencer(classes=["player"])
+        inferencer._INITIAL_BACKOFF = 0.0
+        with patch("object_detection_eval.inference.vlm.astra.time.sleep"):
+            return inferencer.predict(np.zeros((10, 10, 3), dtype=np.uint8))
+
+    def test_transient_400_is_retried(self, _mock_openai, monkeypatch) -> None:
+        monkeypatch.setenv("OPENAI_KEY", "dummy-key")
+        _, mock_client = _mock_openai
+        ok = _completion(
+            parsed=AstraResponse(
+                detections=[
+                    AstraDetection(
+                        bbox=AstraBBox(x_min=0, y_min=0, x_max=500, y_max=500),
+                        label="player",
+                        confidence=1.0,
+                    )
+                ]
+            )
+        )
+        flaky = _bad_request("Something went wrong reading your request. Please try again.")
+        assert len(self._predict(mock_client, [flaky, ok])) == 1
+        assert _parse(mock_client).call_count == 2
+
+    def test_permanent_400_raises_without_retry(self, _mock_openai, monkeypatch) -> None:
+        monkeypatch.setenv("OPENAI_KEY", "dummy-key")
+        _, mock_client = _mock_openai
+        with pytest.raises(AstraAPIError, match="HTTP 400"):
+            self._predict(mock_client, _bad_request("Invalid value for 'model'."))
+        _parse(mock_client).assert_called_once()
+
+    def test_exhausted_retries_raise(self, _mock_openai, monkeypatch) -> None:
+        monkeypatch.setenv("OPENAI_KEY", "dummy-key")
+        _, mock_client = _mock_openai
+        request = httpx.Request("POST", "https://api.openai.com/v1/chat/completions")
+        with pytest.raises(AstraAPIError, match="after 8 attempts"):
+            self._predict(mock_client, APIConnectionError(request=request))
+        assert _parse(mock_client).call_count == 8
 
 
 class TestFewShot:

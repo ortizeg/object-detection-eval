@@ -139,8 +139,10 @@ class YOLOWorldInferencer(BaseInferencer):
                 **self._predict_kwargs(),
             )
         except Exception:
+            # Re-raise, never return []: a crashed forward pass (e.g. an op the
+            # MPS backend lacks) would otherwise score as "found nothing".
             logger.exception(f"{type(self).__name__} inference failed")
-            return []
+            raise
 
         if not results:
             return []

@@ -224,7 +224,7 @@ class TestLLMDetInferencer:
         assert dets[0].class_id == 1
         assert dets[0].confidence == pytest.approx(0.75)
 
-    def test_predict_handles_exception(self, _mock_transformers) -> None:
+    def test_predict_reraises_exception(self, _mock_transformers) -> None:
         mock_processor, _mock_model, _mock_torch = _mock_transformers
 
         mock_processor.side_effect = RuntimeError("boom")
@@ -235,8 +235,9 @@ class TestLLMDetInferencer:
         )
 
         fake_image = np.zeros((480, 640, 3), dtype=np.uint8)
-        dets = inferencer.predict(fake_image, 640, 480)
-        assert dets == []
+        # A crash must surface, not score as an empty frame.
+        with pytest.raises(RuntimeError, match="boom"):
+            inferencer.predict(fake_image, 640, 480)
 
 
 class TestResolveLabelConcatenated:
