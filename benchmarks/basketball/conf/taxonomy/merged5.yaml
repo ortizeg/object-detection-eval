@@ -49,6 +49,10 @@ aliases:
   # collapses on. These name the appearance rather than the object category.
   orange basketball: ball
   basketball hoop and backboard: rim
+  # Added 2026-10-15. YOLOE's Round 4 `rim_word` arm prompted this phrase
+  # before it was aliased, so its rim boxes were dropped unscored; that arm was
+  # re-run after the fix (see vlm_ablation.yaml).
+  basketball rim: rim
   jersey number on a uniform: number
 
   # --- YOLO-World referee-word investigation (260818-e01, targeted, NOT part
@@ -61,3 +65,7 @@ aliases:
   man in a striped shirt: referee
   basketball official: referee
   black and white striped shirt: referee
+
+  # --- DINO-X Pro bespoke prompts (2026-10, round 4 of
+  # docs/plans/dinox-pro-2026-10.md; disclosed extra, NOT equal-effort).
+  orange basketball rim: rim

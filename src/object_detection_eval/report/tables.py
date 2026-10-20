@@ -579,6 +579,26 @@ _ABLATION_ELEMENTS: tuple[tuple[str, str], ...] = (
     ("nms_on_tiles", "NMS re-swept under tiling"),
     ("combined", "All accepted changes together"),
     ("nms_on_combined", "NMS re-swept on the full stack"),
+    # YOLOE's combination stage (2026-10-11). Same idea as the three above,
+    # spelled out per step because its stack was built in several moves.
+    ("vocabulary_on_combined", "Vocabulary re-search (new resolution)"),
+    ("box_threshold_on_combined", "`box_threshold` on the stack"),
+    ("vocab_on_stack", "Per-class vocabulary on the stack"),
+    ("nms_on_stack", "NMS on the stack"),
+    ("nms_on_composed", "NMS on the composed vocabulary"),
+    ("imgsz_on_composed", "Input resolution on the composed vocabulary"),
+    # Disclosed, beyond equal effort (see vlm_ablation.yaml's Round 4 note).
+    ("rim_word", "Rim word (disclosed)"),
+    ("prompt_ensemble", "Prompt ensembling (disclosed)"),
+    # YOLOE Round 6 (2026-10-12): the class-aware NMS fix, then disclosed work.
+    ("class_aware_nms", "Class-aware NMS"),
+    ("nms_on_class_aware", "NMS re-swept under class-aware NMS"),
+    ("number_crop", "Per-player number crop (disclosed)"),
+    ("prompt_ensemble_on_class_aware", "Prompt ensembling on the class-aware stack (disclosed)"),
+    ("number_crop_on_ensemble", "Number crop on the ensemble (disclosed)"),
+    # YOLOE Round 7 (2026-10-15): box calibration, disclosed.
+    ("box_pad", "Box calibration (disclosed)"),
+    ("box_pad_on_ensemble_crop", "Box calibration on ensemble + crop (disclosed)"),
 )
 
 #: Element deltas below this are reported as no effect rather than as a win.
@@ -594,35 +614,87 @@ def _fmt_delta(value: float) -> str:
     return f"{value:+.4f}"
 
 
-def _varied_knob(arm: Any, baseline: Any) -> tuple[str, Any] | None:
-    """The single config field an arm changes, and its value.
+def _diff(config: Mapping[str, Any], other: Mapping[str, Any]) -> dict[str, Any]:
+    """The fields of ``config`` whose value ``other`` does not share."""
+    return {key: value for key, value in config.items() if other.get(key) != value}
 
-    Derived by comparison rather than recorded, so the rendered table cannot
-    claim an arm varied something it did not. Returns ``None`` if the arm
-    differs in zero or more than one field, which the ablation's own schema test
-    already forbids.
+
+def _step(arm: Any, earlier: Sequence[Any]) -> tuple[Any, dict[str, Any]]:
+    """The arm this one was built on, and the fields it changes over it.
+
+    The log records every delta against the model's root baseline, which is
+    right for a single-element arm and wrong for a stacked one: "NMS re-swept
+    under tiling" differs from the root in tiling *and* NMS, and only the NMS
+    part is what that element tested. So the parent is derived, not stored: the
+    arm measured in an earlier element (or the baseline) whose configuration is
+    nearest to this one. On a tie, the later element wins, because a stack is
+    built by extending the most recent step. For a single-element arm the
+    nearest is always the baseline, so those rows are unchanged.
     """
-    differing = [
-        (key, value) for key, value in arm.config.items() if baseline.config.get(key) != value
-    ]
-    return differing[0] if len(differing) == 1 else None
+    _, parent = min(
+        enumerate(earlier), key=lambda oc: (len(_diff(arm.config, oc[1].config)), -oc[0])
+    )
+    return parent, _diff(arm.config, parent.config)
+
+
+def _published_has(published: Mapping[str, Any], key: str, value: Any) -> bool:
+    """Whether a manifest row runs ``key`` at ``value``.
+
+    A nested config (``anchor_crop``) is written in the manifest without its
+    defaults, while the arm logs the full model dump, so for a mapping the
+    manifest's keys only have to agree.
+    """
+    if key not in published:
+        return False
+    stated = published[key]
+    if isinstance(stated, Mapping) and isinstance(value, Mapping):
+        return all(value.get(k) == v for k, v in stated.items())
+    return bool(stated == value)
+
+
+def _runs_step(published: Mapping[str, Any], step: Mapping[str, Any]) -> bool:
+    """Whether a manifest row runs every field of a (non-empty) step."""
+    return bool(step) and all(_published_has(published, k, v) for k, v in step.items())
+
+
+#: Knobs whose value reads badly in a cell (prose, a nested config, a bare bool).
+_DESCRIBED_KEYS = frozenset(
+    {"prompt_template", "prompt_ensembles", "agnostic_nms", "anchor_crop", "box_pad"}
+)
+
+
+def _describe_step(changed: Mapping[str, Any]) -> str:
+    """The step's change as a table cell: the value alone when it is one knob."""
+    if not changed:
+        return "no change"
+    if len(changed) == 1:
+        ((key, value),) = changed.items()
+        if key not in _DESCRIBED_KEYS:
+            return f"`{value}`"
+    return ", ".join(_describe_change(key, value) for key, value in changed.items())
 
 
 def ablation_summary_table(
     log: Any,
     adopted: Mapping[str, Mapping[str, Any]],
 ) -> str:
-    """Render the one-element-at-a-time ablation: best arm per model per element.
+    """Render the ablation one element at a time: the best arm per model per element.
 
     The verdict column is DERIVED, not stored: an element counts as kept only if
-    the value that won on val is the value the published manifest actually
-    runs. So the table cannot say "kept" about a change that never reached the
-    config, and editing the config without re-rendering fails the drift gate.
+    the change that won on val is what the published manifest actually runs. So
+    the table cannot say "kept" about a change that never reached the config,
+    and editing the config without re-rendering fails the drift gate.
+
+    Stacked elements are reported as the step they add (see :func:`_step`): the
+    "Best" cell names only the fields that step changed, and the delta is against
+    the arm it was built on. A step the equal-effort row did not adopt but a
+    disclosed manifest row runs is labelled with that row's name.
 
     Args:
         log: A loaded :class:`~object_detection_eval.report.loaders.AblationLog`.
-        adopted: ``{model_name: published_config}`` from the committed
-            ``vlm_zeroshot.yaml``, keyed by the same model names the log uses.
+        adopted: ``{row_name: published_config}`` from the committed
+            ``vlm_zeroshot.yaml``. A model's equal-effort row has the same name
+            the log uses; disclosed variants have other names.
 
     Returns:
         One row per (model, element) actually measured, ordered by element in
@@ -638,24 +710,48 @@ def ablation_summary_table(
     header = ["Model", "Element", "Tried", "Best", "val mAP@50:95", "Δ", "Verdict"]
     rows: list[list[str]] = []
 
-    for element, label in _ABLATION_ELEMENTS:
+    for position, (element, label) in enumerate(_ABLATION_ELEMENTS):
+        earlier_elements = [el for el, _ in _ABLATION_ELEMENTS[:position]]
         for model in sorted({m for el, m in by_key if el == element}):
             arms = by_key[(element, model)]
             base = baselines.get(model)
             best = max(arms, key=lambda a: a.map_50_95)
-            varied = _varied_knob(best, base) if base is not None else None
-            knob, value = varied if varied is not None else ("?", "?")
 
             delta = best.delta_map5095
-            published = adopted.get(model, {}).get(knob)
-            kept = delta is not None and delta >= ABLATION_NOISE_FLOOR and published == value
+            if base is None:
+                changed: dict[str, Any] = {}
+            else:
+                earlier = [base] + [
+                    a for el in earlier_elements for a in by_key.get((el, model), [])
+                ]
+                parent, changed = _step(best, earlier)
+                if delta is not None and parent is not base:
+                    delta = best.map_50_95 - parent.map_50_95
+
+            disclosed = [
+                name
+                for name, published in adopted.items()
+                if name != model
+                and published.get("inferencer") == best.config.get("inferencer")
+                and published.get("model_name") == best.config.get("model_name")
+                and _runs_step(published, changed)
+            ]
+            kept = _runs_step(adopted.get(model, {}), changed)
 
             if delta is None:
                 verdict = "not comparable"
+            elif base is not None and not changed:
+                # The sweep's winner is a configuration already measured: the
+                # element found nothing better than what it started from.
+                verdict = "same as the stack"
+            elif abs(delta) < ABLATION_NOISE_FLOOR:
+                verdict = "reverted (within noise)"
+            elif delta < 0:
+                verdict = "reverted"
             elif kept:
                 verdict = "**kept**"
-            elif delta < ABLATION_NOISE_FLOOR:
-                verdict = "reverted (within noise)"
+            elif disclosed:
+                verdict = "disclosed row " + ", ".join(f"`{n}`" for n in sorted(disclosed))
             else:
                 verdict = "reverted"
 
@@ -664,7 +760,7 @@ def ablation_summary_table(
                     model,
                     label,
                     str(len(arms)),
-                    f"`{value}`",
+                    _describe_step(changed) if base is not None else "`?`",
                     _fmt3(best.map_50_95),
                     _EM_DASH if delta is None else _fmt_delta(delta),
                     verdict,
@@ -732,6 +828,16 @@ def ablation_headline_table(
         # `caption` is derived from `classes`, not swept on its own) -- a
         # missing key must not read as a mismatch.
         if any(key in arm.config and arm.config[key] != value for key, value in published.items()):
+            continue
+        # The converse: a knob the arm varies but the manifest row never states
+        # is running at the model's baseline value, so an arm that moved it was
+        # not adopted. Without this, YOLOE's disclosed prompt-ensemble arm
+        # matched the equal-effort `yoloe` row, which states no ensembles at all.
+        base_arm = baselines.get(arm.model)
+        if base_arm is not None and any(
+            key not in published and value != base_arm.config.get(key)
+            for key, value in arm.config.items()
+        ):
             continue
         if score(arm) > score(best[arm.model]):
             best[arm.model] = arm
@@ -815,6 +921,10 @@ _CHANGE_LABELS = {
     "sample": "repeat draw",
     "gemini_box_format": "box format",
     "gemini_image_first": "image first",
+    "prompt_ensembles": "prompt ensembling",
+    "agnostic_nms": "class-agnostic NMS",
+    "anchor_crop": "number crop",
+    "box_pad": "box calibration",
 }
 
 
@@ -823,13 +933,20 @@ def _describe_change(key: str, value: Any) -> str:
     label = _CHANGE_LABELS.get(key, key)
     if key == "tiles":
         return f"{label} {value[0]}x{value[1]}" if value else f"no {label}"
-    if key in ("classes", "prompt_template"):
+    if key in ("classes", "prompt_template", "prompt_ensembles"):
         # Never inline the value: a class list is long and a Gemini prompt is
         # several hundred characters, either of which turns a table cell into a
         # wall of text.
         return label
     if key == "model_name":
         return f"{label} `{str(value).split('/')[-1]}`"
+    if key == "agnostic_nms":
+        return "class-aware NMS" if value is False else label
+    if key == "anchor_crop":
+        return label
+    if key == "box_pad":
+        pads = sorted(set(value.values())) if value else []
+        return f"{label} " + "/".join(f"{p:.0%}" for p in pads)
     return f"{label} {value}"
 
 

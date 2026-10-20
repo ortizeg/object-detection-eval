@@ -57,6 +57,7 @@ from pydantic import BaseModel, Field
 from object_detection_eval.data.coco_gt import load_coco_gt
 from object_detection_eval.data.taxonomy import resolve_taxonomy
 from object_detection_eval.inference.base import BaseInferencer
+from object_detection_eval.inference.vlm.anchor_crop import AnchorCropConfig
 from object_detection_eval.inference.vlm.protocol import score_split
 from object_detection_eval.metrics.detection_map import compute_metrics
 
@@ -90,10 +91,22 @@ class ManifestEntry(BaseModel, frozen=True):
     #: Ultralytics-only: letterbox size and per-image detection cap.
     imgsz: int | None = Field(default=None, ge=32)
     max_det: int | None = Field(default=None, ge=1)
+    #: YOLOE only: class -> phrases whose text embeddings are averaged into that
+    #: class's prompt (CLIP-style prompt ensembling). ``None`` encodes each
+    #: class string on its own, like every other row.
+    prompt_ensembles: dict[str, list[str]] | None = None
+    #: YOLOE only: class-agnostic NMS. ``None`` keeps ultralytics' YOLOE default
+    #: (agnostic); ``False`` suppresses per class like every other row.
+    agnostic_nms: bool | None = None
     #: Overlapping-tile grid, e.g. ``[2, 2]``. ``None`` runs the whole frame
     #: once. The single largest win the 2026-08-04 ablation found, and the only
     #: resolution lever the models with fixed-size processors have.
     tiles: list[int] | None = None
+    #: Crop-and-re-detect second pass (YOLOE only so far). ``None`` = one pass.
+    anchor_crop: AnchorCropConfig | None = None
+    #: Eval class name -> per-side box growth (see ``filters.pad_boxes``). A
+    #: box-convention correction fitted on val, so only a disclosed row sets it.
+    box_pad: dict[str, float] | None = None
     tile_overlap: float = Field(default=0.2, ge=0.0, lt=1.0)
     task: str | None = None
     caption: str | None = None
@@ -101,10 +114,16 @@ class ManifestEntry(BaseModel, frozen=True):
     #: Gemini only: see ``GeminiInferencer``'s ``box_format``/``image_first``.
     gemini_box_format: str = "named_xyxy"
     gemini_image_first: bool = False
-    #: Astra (billed API) only: reasoning effort the row published at
-    #: (low/medium/high/xhigh/max). None omits the parameter. Higher = better
-    #: localisation, steeply higher per-image cost.
+    #: Billed OpenAI/Anthropic rows only: reasoning effort the row published at
+    #: (low/medium/high/xhigh/max). ``default`` omits the parameter so the
+    #: provider's own default runs -- the setting the Ultralytics Platform
+    #: auto-annotation benchmark compared every provider at. Unset keeps each
+    #: inferencer's historical default (``low`` for OpenAI rows).
     reasoning_effort: str | None = None
+    #: DINO-X (billed API) only: the API's own server-side NMS IoU, and an
+    #: optional longest-edge downscale before upload (None = native).
+    dinox_iou_threshold: float = Field(default=0.8, ge=0.0, le=1.0)
+    dinox_max_size: int | None = Field(default=None, ge=32)
     expected_map5095: float | None = Field(default=None, ge=0.0, le=1.0)
 
 
@@ -217,6 +236,21 @@ def _yolo_world_factory(entry: ManifestEntry) -> BaseInferencer:
     )
 
 
+def _yoloe_factory(entry: ManifestEntry) -> BaseInferencer:
+    from object_detection_eval.inference.vlm.yoloe import YOLOEInferencer
+
+    return YOLOEInferencer(
+        model_name=entry.model_name,
+        classes=entry.classes,
+        prompt_ensembles=entry.prompt_ensembles,
+        agnostic_nms=entry.agnostic_nms if entry.agnostic_nms is not None else True,
+        box_threshold=entry.box_threshold if entry.box_threshold is not None else 0.01,
+        nms_iou_threshold=(entry.nms_iou_threshold if entry.nms_iou_threshold is not None else 0.5),
+        imgsz=entry.imgsz if entry.imgsz is not None else 640,
+        max_det=entry.max_det if entry.max_det is not None else 300,
+    )
+
+
 def _gemini_factory(entry: ManifestEntry) -> BaseInferencer:
     from object_detection_eval.inference.vlm.gemini import GeminiInferencer
 
@@ -236,8 +270,41 @@ def _astra_factory(entry: ManifestEntry) -> BaseInferencer:
         model_name=entry.model_name,
         classes=entry.classes,
         prompt_template=entry.prompt_template,
-        reasoning_effort=entry.reasoning_effort if entry.reasoning_effort is not None else "low",
+        reasoning_effort=_effort(entry, unset="low"),
     )
+
+
+def _dinox_factory(entry: ManifestEntry) -> BaseInferencer:
+    from object_detection_eval.inference.vlm.dinox import DinoXInferencer
+
+    return DinoXInferencer(
+        model_name=entry.model_name,
+        classes=entry.classes,
+        bbox_threshold=entry.box_threshold if entry.box_threshold is not None else 0.01,
+        iou_threshold=entry.dinox_iou_threshold,
+        # A tiled row suppresses ONCE, on the merged tile output (_maybe_tiled);
+        # this is the configuration scripts/explore_dinox.py chose it under.
+        nms_iou_threshold=None if entry.tiles else entry.nms_iou_threshold,
+        max_size=entry.dinox_max_size,
+    )
+
+
+def _claude_factory(entry: ManifestEntry) -> BaseInferencer:
+    from object_detection_eval.inference.vlm.claude import ClaudeInferencer
+
+    return ClaudeInferencer(
+        model_name=entry.model_name,
+        classes=entry.classes,
+        prompt_template=entry.prompt_template,
+        effort=_effort(entry, unset=None),
+    )
+
+
+def _effort(entry: ManifestEntry, unset: str | None) -> str | None:
+    """Resolve a row's effort: ``default`` -> omit (None), unset -> ``unset``."""
+    if entry.reasoning_effort == "default":
+        return None
+    return entry.reasoning_effort if entry.reasoning_effort is not None else unset
 
 
 def _qwen3_vl_factory(entry: ManifestEntry) -> BaseInferencer:
@@ -253,11 +320,14 @@ def _qwen3_vl_factory(entry: ManifestEntry) -> BaseInferencer:
 _INFERENCER_FACTORIES: dict[str, Callable[[ManifestEntry], BaseInferencer]] = {
     "gemini": _gemini_factory,
     "astra": _astra_factory,
+    "dinox": _dinox_factory,
+    "claude": _claude_factory,
     "owlv2": _owlv2_factory,
     "omdet_turbo": _omdet_turbo_factory,
     "grounding_dino": _grounding_dino_factory,
     "florence2": _florence2_factory,
     "yolo_world": _yolo_world_factory,
+    "yoloe": _yoloe_factory,
     "qwen3_vl": _qwen3_vl_factory,
     "llmdet": _llmdet_factory,
 }
@@ -290,6 +360,33 @@ def _maybe_tiled(inferencer: BaseInferencer, entry: ManifestEntry) -> Any:
     )
 
 
+def _maybe_anchor_crop(inferencer: Any, entry: ManifestEntry) -> Any:
+    """Wrap the row in the crop-and-re-detect second pass if it asks for one.
+
+    The refiner is a second instance of the row's own model, prompted for the
+    target class alone, so the row stays a single-model, zero-shot pipeline.
+    """
+    crop = entry.anchor_crop
+    if crop is None:
+        return inferencer
+    if entry.inferencer != "yoloe":
+        msg = f"{entry.name}: anchor_crop is only wired for yoloe rows"
+        raise ValueError(msg)
+    refiner = _yoloe_factory(
+        entry.model_copy(
+            update={
+                "classes": crop.refiner_classes,
+                "prompt_ensembles": None,
+                "imgsz": crop.refiner_imgsz,
+                "box_threshold": crop.refiner_box_threshold,
+                "nms_iou_threshold": crop.refiner_nms_iou_threshold,
+                "anchor_crop": None,
+            }
+        )
+    )
+    return crop.wrap(inferencer, refiner, entry.classes)
+
+
 def _assert_preconditions(args: argparse.Namespace) -> None:
     """Halt with a clear message if the ground-truth annotations are missing."""
     gt_path = args.data_root / "test" / "_annotations.coco.json"
@@ -310,6 +407,19 @@ def _assert_images_exist(data_root: Path, filenames: list[str]) -> None:
         raise FileNotFoundError(msg)
 
 
+def _box_pad_ids(
+    box_pad: dict[str, float] | None, name_to_id: dict[str, int]
+) -> dict[int, float] | None:
+    """``box_pad`` keyed by eval class id; an unknown class name is an error."""
+    if not box_pad:
+        return None
+    unknown = sorted(set(box_pad) - set(name_to_id))
+    if unknown:
+        msg = f"box_pad names classes the taxonomy does not have: {unknown}"
+        raise ValueError(msg)
+    return {name_to_id[name]: pad for name, pad in box_pad.items()}
+
+
 def _score_entry(
     entry: ManifestEntry,
     args: argparse.Namespace,
@@ -324,7 +434,7 @@ def _score_entry(
     module's docstring for why the order is load-bearing.
     """
     factory = _INFERENCER_FACTORIES[entry.inferencer]
-    inferencer = _maybe_tiled(factory(entry), entry)
+    inferencer = _maybe_anchor_crop(_maybe_tiled(factory(entry), entry), entry)
     label_map = dict(enumerate(entry.classes))
 
     pred_map = score_split(
@@ -333,6 +443,7 @@ def _score_entry(
         filenames=list(gt_map.keys()),
         label_map=label_map,
         name_to_id=name_to_id,
+        box_pad=_box_pad_ids(entry.box_pad, name_to_id),
     )
 
     if hasattr(inferencer, "unload"):

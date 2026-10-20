@@ -232,6 +232,11 @@ def published_detections(
             nms_iou_threshold=cfg["nms_iou_threshold"] if replayable else None,
             max_area_fraction=cfg["max_area_fraction"],
             singleton_top_k=cfg["singleton_top_k"],
+            box_pad=(
+                {name_to_id[k]: v for k, v in cfg["box_pad"].items()}
+                if cfg.get("box_pad")
+                else None
+            ),
         )
         # Back to normalised Detection so the fusion operators -- which are
         # resolution-agnostic by design -- can work in one coordinate space.

@@ -20,17 +20,28 @@ recall for a rim the first pass missed entirely (cropping needs somewhere to
 crop). It therefore helps localisation (the mAP@50:95 tail) more than AP50.
 
 Wraps any predict-capable inferencer for pass 1, and builds one focused
-single-class ``AstraInferencer`` per refine class for pass 2. No torch.
+single-class ``AstraInferencer`` per refine class for pass 2 -- or takes
+caller-built refiners, so a model with a different coordinate convention
+(Claude's pixel grid) can run the same pipeline. No torch.
 """
 
 from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import numpy.typing as npt
 from loguru import logger
 
-from object_detection_eval.inference.vlm.astra import AstraInferencer
-from object_detection_eval.schemas.detection import BoundingBox, Detection
+from object_detection_eval.inference.vlm.crop_geometry import crop_window, remap_crop_detection
+from object_detection_eval.schemas.detection import Detection
+
+__all__ = ["CropRefineInferencer", "crop_window", "remap_crop_detection"]
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from object_detection_eval.inference.vlm.protocol import SupportsPredict
 
 #: Focused, per-class descriptions for the zoomed refinement prompt. Kept small
 #: and literal (the "rim" lesson from the zero-shot search: literal label wins).
@@ -38,49 +49,6 @@ _REFINE_DESC: dict[str, str] = {
     "ball": "the orange basketball",
     "rim": "the basketball hoop rim",
 }
-
-
-def crop_window(
-    image: npt.NDArray[np.uint8],
-    bbox: BoundingBox,
-    w: int,
-    h: int,
-    pad: float,
-    min_crop_frac: float,
-) -> tuple[npt.NDArray[np.uint8], int, int, int, int]:
-    """Return ``(crop, ox, oy, cw, ch)``: a padded window centred on ``bbox``.
-
-    Padded to ``pad`` x the box size, floored to ``min_crop_frac`` of the shorter
-    side, clamped to the frame. Pure geometry (no API/torch), so it is unit-
-    testable without constructing an inferencer.
-    """
-    cx = (bbox.x + bbox.w / 2) * w
-    cy = (bbox.y + bbox.h / 2) * h
-    floor = min_crop_frac * min(w, h)
-    half_w = max(bbox.w * w * pad, floor) / 2
-    half_h = max(bbox.h * h * pad, floor) / 2
-
-    x1 = max(0, round(cx - half_w))
-    y1 = max(0, round(cy - half_h))
-    x2 = min(w, round(cx + half_w))
-    y2 = min(h, round(cy + half_h))
-    return image[y1:y2, x1:x2], x1, y1, x2 - x1, y2 - y1
-
-
-def remap_crop_detection(
-    crop_det: Detection, class_id: int, ox: int, oy: int, cw: int, ch: int, w: int, h: int
-) -> Detection:
-    """Map a crop-space detection (normalised to the crop) back to the frame."""
-    b = crop_det.bbox
-    fx = min(max((ox + b.x * cw) / w, 0.0), 1.0)
-    fy = min(max((oy + b.y * ch) / h, 0.0), 1.0)
-    fw = min((b.w * cw) / w, 1.0 - fx)
-    fh = min((b.h * ch) / h, 1.0 - fy)
-    return Detection(
-        bbox=BoundingBox(x=fx, y=fy, w=fw, h=fh),
-        confidence=crop_det.confidence,
-        class_id=class_id,
-    )
 
 
 class CropRefineInferencer:
@@ -97,29 +65,42 @@ class CropRefineInferencer:
         min_crop_frac: Floor on crop size as a fraction of the frame's shorter
             side, so a tiny ball box still yields a crop with usable context.
         reasoning_effort: Effort for the focused refiner calls (defaults to the
-            base's effort).
+            base's effort). Ignored when ``refiners`` is given.
+        refiners: Optional class name -> focused single-class inferencer for
+            pass 2. When omitted, one ``AstraInferencer`` per refine class is
+            built from ``base`` (which must then be an ``AstraInferencer``).
     """
 
     def __init__(
         self,
-        base: AstraInferencer,
+        base: Any,
         classes: list[str],
         refine_classes: set[str] | None = None,
         pad: float = 1.5,
         min_crop_frac: float = 0.12,
         reasoning_effort: str | None = None,
+        refiners: Mapping[str, SupportsPredict] | None = None,
     ) -> None:
         self.base = base
         self.classes = classes
         self.refine_classes = refine_classes or {"ball", "rim"}
         self.pad = pad
         self.min_crop_frac = min_crop_frac
+        if refiners is not None:
+            self.refine_classes = set(refiners)
+            self._refiners: dict[str, SupportsPredict] = dict(refiners)
+            return
+
+        # Imported here so the module (and its pure geometry) loads in an
+        # environment without openai, e.g. vlm-claude with injected refiners.
+        from object_detection_eval.inference.vlm.astra import AstraInferencer
+
         effort = reasoning_effort if reasoning_effort is not None else base.reasoning_effort
 
         # One focused single-class refiner per class. Each is prompted for ONLY
         # its class on a zoomed crop, so it cannot relabel the crop's contents as
         # a player/referee the way the full class list might.
-        self._refiners: dict[str, AstraInferencer] = {}
+        self._refiners = {}
         for name in self.refine_classes:
             desc = _REFINE_DESC.get(name, f"the {name}")
             self._refiners[name] = AstraInferencer(

@@ -1,0 +1,28 @@
+{
+  "pipeline": "base(c_gemini_style, effort low) -> crop-refine(ball, rim; pad 1.5) -> number-crop(player anchors, pad 1.1, conf >= 0.5)",
+  "command": "run_astra_pipeline.py --crop-refine --number-crop --split {valid,test}  (writes astra_base_cropfine_numcrop_{split}.json; renamed to astra_crop_refine_numcrop_{split}.json)",
+  "rule": "Pre-registered: test runs once only if val beats astra_crop_refine val (0.5397) by > 0.005. Fusion with dinox_pro_rimtrim goes to test only if its val beats the adopted pair (0.6112) by > 0.005.",
+  "run_date": "2026-10-15",
+  "approx_billed_calls": {"valid": 1260, "valid_patch": 13, "test": 1230, "smoke": 26},
+  "valid": {
+    "unpatched_mAP_50_95": 0.5396,
+    "unpatched_note": "One image (boston-celtics-new-york-knicks-game-1-q1-05_13-05_09-0062) scored empty: its pass-1 call got HTTP 400 'something went wrong reading your request' (not retried by astra.py), which returns []. That image alone was re-run and spliced in; the baseline dumps have no empty images.",
+    "mAP_50_95": 0.5454,
+    "mAP_50": 0.8584,
+    "per_class_ap50": {"player": 0.979, "ball": 0.61, "referee": 0.899, "rim": 0.907, "number": 0.897},
+    "vs_astra_crop_refine": 0.0057,
+    "verdict": "clears the 0.005 bar narrowly -> test once"
+  },
+  "test": {
+    "mAP_50_95": 0.5869,
+    "mAP_50": 0.9014,
+    "per_class_ap50": {"player": 0.979, "ball": 0.727, "referee": 0.988, "rim": 0.952, "number": 0.86},
+    "vs_astra_crop_refine_test": -0.0009,
+    "api_failures": 0
+  },
+  "fusion_valid": {
+    "astra_crop_refine+dinox_pro_rimtrim": 0.6112,
+    "astra_crop_refine_numcrop+dinox_pro_rimtrim": 0.6072,
+    "verdict": "lower than the adopted pair -> no fusion test run"
+  }
+}

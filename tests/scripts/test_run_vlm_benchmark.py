@@ -42,33 +42,39 @@ _MANIFEST_PATH = (
 
 _EXPECTED_NAMES = [
     "gemini",
+    "astra",
     "owlv2",
     "omdet_turbo",
     "grounding_dino",
     "florence2",
     "yolo_world",
+    "yoloe",
+    "yoloe_number_crop",
+    "yoloe_ensemble_number_crop",
+    "yoloe_ensemble_number_crop_box_pad",
     "llmdet",
     "qwen3_vl",
 ]
-#: Every row now carries a target. grounding_dino, florence2, omdet_turbo and
-#: yolo_world were re-measured on CUDA (RTX A4000) on 2026-08-01 under the
-#: repaired harness and the search-selected prompts; gemini and owlv2 keep the
-#: targets they already reproduced.
+#: The published test targets, as the committed manifest states them. Kept as
+#: an explicit copy so an accidental edit to a published number fails here.
 _EXPECTED_TARGETS = {
-    "gemini": 0.265,
-    "owlv2": 0.246,
-    "omdet_turbo": 0.180,
-    "grounding_dino": 0.234,
-    "florence2": 0.108,
-    "yolo_world": 0.145,
+    "gemini": 0.250,
+    "owlv2": 0.315,
+    "omdet_turbo": 0.211,
+    "grounding_dino": 0.293,
+    "florence2": 0.238,
+    "yolo_world": 0.189,
+    "yoloe": 0.278,
+    "yoloe_number_crop": 0.311,
+    "yoloe_ensemble_number_crop": 0.332,
+    "yoloe_ensemble_number_crop_box_pad": 0.375,
 }
-#: llmdet and qwen3_vl are both new models with no prior published number
-#: (VLM-02's informational-only mode -- see the None-check in
-#: `_print_result`) -- their expected_map5095 is deliberately null, not
+#: Rows with no target (VLM-02's informational-only mode -- see the None-check
+#: in `_print_result`). Their expected_map5095 is deliberately null, not
 #: dropped. Every OTHER row losing its target would be drift worth catching,
 #: which is why this stays an explicit named set rather than being widened
 #: generically.
-_UNTARGETED: set[str] = {"llmdet", "qwen3_vl"}
+_UNTARGETED: set[str] = {"astra", "llmdet", "qwen3_vl"}
 
 
 def _load_run_vlm_benchmark_module() -> types.ModuleType:
@@ -176,8 +182,10 @@ def test_within_tolerance_just_outside() -> None:
     assert run_vlm_benchmark.within_tolerance(0.230, 0.265, 0.02) is False
 
 
-def test_rank_order_matches_published_descending_order() -> None:
-    values = [_EXPECTED_TARGETS[n] for n in _EXPECTED_NAMES if n in _EXPECTED_TARGETS]
+def test_rank_order_matches_strictly_descending_values() -> None:
+    # Synthetic: manifest order is grouped by model family, not by score, so
+    # the published targets themselves are not a descending sequence.
+    values = [0.388, 0.315, 0.293, 0.276, 0.189]
     assert run_vlm_benchmark.rank_order_matches(values)
     assert list(pairwise(values))  # sanity: more than one adjacent pair compared
 

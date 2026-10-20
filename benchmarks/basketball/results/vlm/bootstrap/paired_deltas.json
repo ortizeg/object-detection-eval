@@ -1,0 +1,66 @@
+{
+  "split": "test",
+  "unit": "image (NOT clip-clustered; see module docstring)",
+  "iterations": 1000,
+  "seed": 42,
+  "point_map5095": {
+    "llmdet": 0.3883121609687805,
+    "yolo_world": 0.18917140364646912,
+    "yoloe": 0.2777418792247772,
+    "yoloe_ensemble_number_crop": 0.33149829506874084,
+    "yoloe_ensemble_number_crop_box_pad": 0.37494954466819763,
+    "yoloe_number_crop": 0.3109133839607239
+  },
+  "pairs": [
+    {
+      "a": "yoloe",
+      "b": "yolo_world",
+      "delta": 0.0885704755783081,
+      "ci95": [
+        0.07647183947265149,
+        0.10190213210880755
+      ],
+      "p_a_not_better": 0.0
+    },
+    {
+      "a": "yoloe_number_crop",
+      "b": "yoloe",
+      "delta": 0.033171504735946655,
+      "ci95": [
+        0.02785772383213043,
+        0.03777327686548233
+      ],
+      "p_a_not_better": 0.0
+    },
+    {
+      "a": "yoloe_ensemble_number_crop",
+      "b": "yoloe",
+      "delta": 0.05375641584396362,
+      "ci95": [
+        0.04389069676399231,
+        0.06311552077531815
+      ],
+      "p_a_not_better": 0.0
+    },
+    {
+      "a": "yoloe_ensemble_number_crop_box_pad",
+      "b": "yoloe_ensemble_number_crop",
+      "delta": 0.04345124959945679,
+      "ci95": [
+        0.038664428144693376,
+        0.048143033683300016
+      ],
+      "p_a_not_better": 0.0
+    },
+    {
+      "a": "llmdet",
+      "b": "yoloe_ensemble_number_crop_box_pad",
+      "delta": 0.013362616300582886,
+      "ci95": [
+        -0.0021443851292133327,
+        0.027519280463457096
+      ],
+      "p_a_not_better": 0.053
+    }
+  ]
+}

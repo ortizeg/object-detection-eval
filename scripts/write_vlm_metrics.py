@@ -40,12 +40,23 @@ _DEFAULT_TAXONOMY_DIR = _REPO_ROOT / "benchmarks" / "basketball" / "conf" / "tax
 #: (and therefore in the rendered report tables).
 _VLM_FILES: dict[str, str] = {
     "GPT-6 Astra": "astra.json",
+    "GPT-6 Astra (default effort)": "astra_default.json",
+    "GPT-6.1 Sol": "sol.json",
+    "GPT-6.1 Sol (low effort)": "sol_low.json",
+    "Claude Opus 5.5": "claude_opus.json",
+    "DINO-X Pro": "dinox_pro.json",
     "Gemini": "gemini.json",
     "OWLv2": "owlv2.json",
     "Grounding-DINO": "grounding_dino.json",
     "OmDet-Turbo": "omdet_turbo.json",
     "Florence-2": "florence2.json",
     "YOLO-World": "yolo_world.json",
+    "YOLOE": "yoloe.json",
+    "YOLOE + number crop": "yoloe_number_crop.json",
+    "YOLOE + prompt ensemble + number crop": "yoloe_ensemble_number_crop.json",
+    "YOLOE + prompt ensemble + number crop + box calibration": (
+        "yoloe_ensemble_number_crop_box_pad.json"
+    ),
     "LLMDet-large": "llmdet.json",
     "Qwen3-VL": "qwen3_vl.json",
 }

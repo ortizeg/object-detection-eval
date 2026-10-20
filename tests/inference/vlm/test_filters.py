@@ -6,9 +6,12 @@ torch-free core suite.
 
 from __future__ import annotations
 
+import pytest
+
 from object_detection_eval.inference.vlm.filters import (
     DEFAULT_SINGLETON_TOP_K,
     area_outliers,
+    pad_boxes,
     single_best_per_class,
 )
 from object_detection_eval.schemas.detection import BoundingBox, Detection
@@ -196,3 +199,32 @@ def test_area_outliers_does_not_mutate_input() -> None:
     area_outliers(dets)
 
     assert dets == original
+
+
+# ---------------------------------------------------------------------------
+# pad_boxes
+# ---------------------------------------------------------------------------
+
+
+def _box(x: float, y: float, w: float, h: float, class_id: int = 0) -> Detection:
+    return Detection(bbox=BoundingBox(x=x, y=y, w=w, h=h), confidence=0.5, class_id=class_id)
+
+
+def test_pad_boxes_grows_about_the_centre_by_a_fraction_per_side() -> None:
+    (out,) = pad_boxes([_box(0.4, 0.4, 0.1, 0.2)], {0: 0.05})
+    assert out.bbox.x == pytest.approx(0.395)
+    assert out.bbox.y == pytest.approx(0.39)
+    assert out.bbox.w == pytest.approx(0.11)
+    assert out.bbox.h == pytest.approx(0.22)
+    assert out.confidence == 0.5
+
+
+def test_pad_boxes_leaves_unlisted_classes_alone() -> None:
+    box = _box(0.4, 0.4, 0.1, 0.2, class_id=4)
+    assert pad_boxes([box], {0: 0.05}) == [box]
+
+
+def test_pad_boxes_clamps_to_the_image() -> None:
+    (out,) = pad_boxes([_box(0.0, 0.95, 0.1, 0.05)], {0: 0.5})
+    assert out.bbox.x == 0.0
+    assert out.bbox.y + out.bbox.h == pytest.approx(1.0)

@@ -171,6 +171,138 @@ models:
       normalised coordinate system and a confidence in [0, 1].
     expected_map5095: null
 
+  # BLOG-PARITY ROWS (added 2026-10-14). The Ultralytics Platform
+  # auto-annotation benchmark (36 datasets, class-prompted, "every provider at
+  # its default reasoning effort") published GPT-6.1 Sol 0.491, Claude Opus 5.5
+  # 0.476 and GPT-6 Astra 0.470 mAP50. The rows below put the models it ranked
+  # that this table lacked onto our split, under our protocol. (Gemini 4 Argon
+  # is handled on the gemini-refresh branch.)
+  #
+  # They run at `reasoning_effort: default` (the parameter is omitted), matching
+  # that benchmark's setting (sol_low adds a matched-effort check). All reuse the Astra row's
+  # winning prompt verbatim except for the coordinate sentence: there was no
+  # per-model prompt search, so these are untuned rows and the report must say
+  # so. New models, no prior number: expected_map5095 is null.
+  #
+  # Sol is an OpenAI model on the same chat-completions + structured-output
+  # surface as Astra, so it reuses the Astra inferencer unchanged.
+  - name: sol
+    inferencer: astra
+    model_name: gpt-6.1-sol
+    classes:
+      - player
+      - ball
+      - referee
+      - rim
+      - number
+    reasoning_effort: default
+    prompt_template: >
+      Detect all basketball players, referees, the rim, the basketball, and
+      visible jersey numbers in this basketball game image.
+      Constraints:
+      - At most 10 players, 3 referees, 1 rim, and 1 ball per image.
+      - Each person gets exactly ONE bounding box with the most specific label.
+      Use EXACTLY these labels:
+      - "player" for any basketball player on the court
+      - "referee" for game officials
+      - "ball" for the basketball (only when NOT going through the rim)
+      - "rim" for the basketball hoop rim
+      - "number" for visible jersey numbers (tight box around the digits only)
+      Return each box as (x_min, y_min, x_max, y_max) integers in a 0-1000
+      normalised coordinate system and a confidence in [0, 1].
+    expected_map5095: null
+
+  # Sol at `low`: matched effort with the published `astra` row (same OpenAI
+  # effort scale), so Sol vs Astra can be read at equal effort as well as at
+  # the provider default. Identical prompt to `sol`; only the effort differs.
+  - name: sol_low
+    inferencer: astra
+    model_name: gpt-6.1-sol
+    classes:
+      - player
+      - ball
+      - referee
+      - rim
+      - number
+    reasoning_effort: low
+    prompt_template: >
+      Detect all basketball players, referees, the rim, the basketball, and
+      visible jersey numbers in this basketball game image.
+      Constraints:
+      - At most 10 players, 3 referees, 1 rim, and 1 ball per image.
+      - Each person gets exactly ONE bounding box with the most specific label.
+      Use EXACTLY these labels:
+      - "player" for any basketball player on the court
+      - "referee" for game officials
+      - "ball" for the basketball (only when NOT going through the rim)
+      - "rim" for the basketball hoop rim
+      - "number" for visible jersey numbers (tight box around the digits only)
+      Return each box as (x_min, y_min, x_max, y_max) integers in a 0-1000
+      normalised coordinate system and a confidence in [0, 1].
+    expected_map5095: null
+
+  # Astra at the provider-default effort: the blog's setting, so the three
+  # OpenAI/Anthropic rows compare like for like. A PARITY row, not a replacement:
+  # the published `astra` row stays at `low`, chosen on val (it tied medium at
+  # half the cost). Identical prompt to `astra`; only the effort differs.
+  - name: astra_default
+    inferencer: astra
+    model_name: gpt-6-astra
+    classes:
+      - player
+      - ball
+      - referee
+      - rim
+      - number
+    reasoning_effort: default
+    prompt_template: >
+      Detect all basketball players, referees, the rim, the basketball, and
+      visible jersey numbers in this basketball game image.
+      Constraints:
+      - At most 10 players, 3 referees, 1 rim, and 1 ball per image.
+      - Each person gets exactly ONE bounding box with the most specific label.
+      Use EXACTLY these labels:
+      - "player" for any basketball player on the court
+      - "referee" for game officials
+      - "ball" for the basketball (only when NOT going through the rim)
+      - "rim" for the basketball hoop rim
+      - "number" for visible jersey numbers (tight box around the digits only)
+      Return each box as (x_min, y_min, x_max, y_max) integers in a 0-1000
+      normalised coordinate system and a confidence in [0, 1].
+    expected_map5095: null
+
+  # Claude Opus 5.5 answers in the PIXEL grid of the image it receives, not a
+  # 0-1000 frame (see inference/vlm/claude.py). The inferencer downscales each
+  # frame to a 1568 px long edge itself and fills {width}/{height} below, so the
+  # coordinate sentence is the only change from the Astra/Sol prompt. No refusal
+  # fallback model is configured: every box in this row is from Opus 5.5.
+  - name: claude_opus
+    inferencer: claude
+    model_name: claude-opus-5-5
+    classes:
+      - player
+      - ball
+      - referee
+      - rim
+      - number
+    reasoning_effort: default
+    prompt_template: >
+      Detect all basketball players, referees, the rim, the basketball, and
+      visible jersey numbers in this basketball game image.
+      Constraints:
+      - At most 10 players, 3 referees, 1 rim, and 1 ball per image.
+      - Each person gets exactly ONE bounding box with the most specific label.
+      Use EXACTLY these labels:
+      - "player" for any basketball player on the court
+      - "referee" for game officials
+      - "ball" for the basketball (only when NOT going through the rim)
+      - "rim" for the basketball hoop rim
+      - "number" for visible jersey numbers (tight box around the digits only)
+      The image is {width} pixels wide and {height} pixels tall. Return each box
+      as (x_min, y_min, x_max, y_max) integer pixel coordinates in this image
+      (0,0 = top-left) and a confidence in [0, 1].
+    expected_map5095: null
+
   # ABLATION (2026-08-04). 2x2 overlapping tiles plus the full frame, and NMS
   # re-tuned INSIDE that regime. val 0.2400 -> 0.2879.
   #
@@ -389,6 +521,165 @@ models:
     imgsz: 1280
     expected_map5095: 0.189
 
+  # YOLOE-26x (added 2026-10-11, docs/plans/yoloe-zeroshot.md). YOLO-World's
+  # successor on the same ultralytics runtime, with a MobileCLIP2 text encoder
+  # and a RepRTA head. Same licence posture as yolo_world above: AGPL runtime
+  # in the optional extra, weights downloaded at runtime, never vendored.
+  #
+  # EQUAL-EFFORT ROW. Every choice below was made on val, through the same
+  # process every open-weights row got:
+  #   1. Six-candidate prompt search (results/vlm/prompt_search/yoloe.json):
+  #      c2_contrastive won at 0.2014. It is also the first real-time row to
+  #      detect referees at all (AP50 0.43 vs YOLO-World's 0.000).
+  #   2. One-knob ablation (vlm_ablation.yaml, `yoloe__*` arms): imgsz 1280
+  #      +0.0218, the only single knob above the 0.002 floor. Smaller and
+  #      older checkpoints (26l, 11l, v8l) all lose 0.036-0.050.
+  #   3. Stacked on 1280: the six candidates re-scored (c4 wins), box 0.001
+  #      +0.0082, the per-class composition (c4 + bare `number`) +0.0125,
+  #      then NMS 0.8 +0.0051. Val 0.2512.
+  #   4. Class-aware NMS (Round 6, 2026-10-12) +0.0095, all of it `player`.
+  #      `YOLOE.predict` forces class-agnostic NMS on every call; every other
+  #      row suppresses per class. Missed in Round 3 because ultralytics resets
+  #      the override inside `predict`. IoU re-swept under it: 0.8 holds.
+  #      Val 0.2607.
+  #
+  # SECOND TEST LOOK, disclosed. The row was first run on test on 2026-10-11
+  # without step 4: mAP@50:95 0.2761, mAP@50 0.3811. Step 4 was found and
+  # adopted on val only, then test was run once more for the corrected config.
+  #
+  # `rim` stays at exactly 0.000 under every arm. The hoop class lands on the
+  # backboard. In 82 of 96 val frames the box closest to the GT rim is an
+  # `orange basketball` box: YOLOE sees the orange ring as the ball. Crop-
+  # refining around hoop boxes or around ball boxes (Round 6) did not move it.
+  - name: yoloe
+    inferencer: yoloe
+    model_name: yoloe-26x-seg.pt
+    classes:
+      - basketball player in a team uniform
+      - orange basketball
+      - referee in a striped shirt
+      - basketball hoop and backboard
+      - number
+    box_threshold: 0.001
+    nms_iou_threshold: 0.8
+    agnostic_nms: false
+    imgsz: 1280
+    max_det: 300
+    # TEST (2026-10-12, MPS, second look, see above): mAP@50:95 0.2777. The
+    # +0.0095 val gain from class-aware NMS shrank to +0.0016 on test.
+    expected_map5095: 0.278
+
+  # YOLOE-26x + NUMBER CROP. DISCLOSED PIPELINE VARIANT, the open-weights
+  # analogue of Astra's per-player number crop. The `yoloe` config above, plus
+  # a second pass: crop each `player` box (conf >= 0.1, +10%), re-detect
+  # `number` inside it with a second YOLOE prompted for `number` alone at
+  # 640 px, and merge with the full-frame numbers by per-class NMS 0.5. Still
+  # one model, still zero-shot. Val 0.2805 (+0.0198 over `yoloe`), all of it
+  # `number` (AP50 0.233 -> 0.535). Prompting the refiner with `jersey number`
+  # instead gave 0.2618. A second full-frame pass at 1920 px for `number` alone
+  # (scratch, not in the ablation log) reached only 0.412 `number` AP50.
+  - name: yoloe_number_crop
+    inferencer: yoloe
+    model_name: yoloe-26x-seg.pt
+    classes:
+      - basketball player in a team uniform
+      - orange basketball
+      - referee in a striped shirt
+      - basketball hoop and backboard
+      - number
+    box_threshold: 0.001
+    nms_iou_threshold: 0.8
+    agnostic_nms: false
+    imgsz: 1280
+    max_det: 300
+    anchor_crop:
+      anchor: basketball player in a team uniform
+      target: number
+      refiner_classes: [number]
+    # TEST (2026-10-12, MPS, run once): mAP@50:95 0.3109, +0.033 over `yoloe`.
+    expected_map5095: 0.311
+
+  # YOLOE-26x + PROMPT ENSEMBLING + NUMBER CROP. DISCLOSED EXTRA EFFORT, the
+  # most work any YOLOE configuration got. `yoloe_number_crop`, plus four of
+  # the five classes prompted with the mean MobileCLIP embedding of several
+  # phrases instead of one. Some phrases come from the shared pool and some
+  # were hand-written (athlete in a jersey, leather basketball, basketball
+  # official, referee in a black and white striped shirt). The label stays the
+  # class string, so scoring is unchanged. On the class-aware stack the
+  # ensemble alone scores val 0.2779 (referee AP50 0.456 -> 0.597), and with
+  # the number crop 0.2999. The two help different classes, so they add up.
+  # Replaces the 2026-10-11 `yoloe_ensemble` row (agnostic NMS, no crop; test
+  # 0.2912), which was superseded on val before this row reached test.
+  - name: yoloe_ensemble_number_crop
+    inferencer: yoloe
+    model_name: yoloe-26x-seg.pt
+    classes:
+      - basketball player in a team uniform
+      - orange basketball
+      - referee in a striped shirt
+      - basketball hoop and backboard
+      - number
+    prompt_ensembles:
+      basketball player in a team uniform:
+        [basketball player in a team uniform, basketball player, player, athlete in a jersey]
+      orange basketball: [orange basketball, basketball, ball, sports ball, leather basketball]
+      referee in a striped shirt:
+        [referee in a striped shirt, referee, basketball official,
+         referee in a black and white striped shirt]
+      basketball hoop and backboard: [basketball hoop and backboard, basketball hoop, rim]
+    box_threshold: 0.001
+    nms_iou_threshold: 0.8
+    agnostic_nms: false
+    imgsz: 1280
+    max_det: 300
+    anchor_crop:
+      anchor: basketball player in a team uniform
+      target: number
+      refiner_classes: [number]
+    # TEST (2026-10-12, MPS, run once): mAP@50:95 0.3315, +0.054 over `yoloe`.
+    expected_map5095: 0.332
+
+  # YOLOE-26x + PROMPT ENSEMBLING + NUMBER CROP + BOX CALIBRATION. DISCLOSED,
+  # and the one row here with a correction fitted on labelled val boxes.
+  # YOLOE's boxes sit inside the annotators' on every class (median edge offset
+  # about -2 to -3.5% of the box per side for people and ball, -6 to -8% for
+  # `number`, the same at 640 px). `box_pad` grows each published box about its
+  # centre, per side: 2% for player/ball/referee/rim, 8% for `number`. Chosen
+  # on val from a 7-value grid (vlm_ablation.yaml `box_pad_on_ensemble_crop`):
+  # 0.2999 -> 0.3507. On the equal-effort stack the same values give 0.2607 ->
+  # 0.2891. No other row was offered this knob, so it says nothing about the
+  # other models' boxes.
+  - name: yoloe_ensemble_number_crop_box_pad
+    inferencer: yoloe
+    model_name: yoloe-26x-seg.pt
+    classes:
+      - basketball player in a team uniform
+      - orange basketball
+      - referee in a striped shirt
+      - basketball hoop and backboard
+      - number
+    prompt_ensembles:
+      basketball player in a team uniform:
+        [basketball player in a team uniform, basketball player, player, athlete in a jersey]
+      orange basketball: [orange basketball, basketball, ball, sports ball, leather basketball]
+      referee in a striped shirt:
+        [referee in a striped shirt, referee, basketball official,
+         referee in a black and white striped shirt]
+      basketball hoop and backboard: [basketball hoop and backboard, basketball hoop, rim]
+    box_threshold: 0.001
+    nms_iou_threshold: 0.8
+    agnostic_nms: false
+    imgsz: 1280
+    max_det: 300
+    anchor_crop:
+      anchor: basketball player in a team uniform
+      target: number
+      refiner_classes: [number]
+    box_pad: {player: 0.02, ball: 0.02, referee: 0.02, rim: 0.02, number: 0.08}
+    # TEST (2026-10-15, MPS, run once): mAP@50:95 0.3749, +0.043 over
+    # `yoloe_ensemble_number_crop` (0.3315).
+    expected_map5095: 0.375
+
   # LLMDet-large (added 2026-08-17) -- the seventh row. Architecturally
   # mm-grounding-dino: same HF calling convention as Grounding DINO
   # (AutoModelForZeroShotObjectDetection + post_process_grounded_object_detection),
@@ -464,8 +755,7 @@ models:
     text_threshold: 0.25
     nms_iou_threshold: 0.5
     tiles: [2, 2]
-    expected_map5095: null
-
+    expected_map5095: 0.439
   # Qwen3-VL-8B (added 2026-08-17). Apache-2.0. A NEW model with no prior
   # published number -- expected_map5095 is deliberately null (VLM-02
   # informational-only mode), not a target to reproduce.
@@ -581,3 +871,47 @@ models:
 # on the objects. Reporting it alongside five open-vocabulary DETECTORS invited
 # the reading that a detector had been benchmarked and failed, which is not what
 # happened. It also carried no reproduction target, so it gated nothing.
+
+  # DINO-X Pro (IDEA Research, added 2026-10-11). Plan of record and every val
+  # arm: docs/plans/dinox-pro-2026-10.md, results/vlm/prompt_search/
+  # dinox_explore.json. `DINO-X-1.0` is DINO-X Pro's id on DeepDataSpace's V2
+  # API; there are no open weights. Torch-free: inference/vlm/dinox.py speaks
+  # the REST API over httpx (the vendor SDK is avoided -- it ships the API token
+  # to a third-party Sentry host).
+  #
+  # BILLED, BUT A CLASS-VOCABULARY DETECTOR -- so unlike Gemini/Astra it is NOT
+  # exempt from the equal-effort search. It faced the same six shared
+  # candidates on val, untiled (server bbox_threshold 0.01, server NMS 0.8):
+  #   c1_domain                    0.3420  (winner)
+  #   c5_bare_canonical            0.3362
+  #   c3_small_object              0.3105
+  #   c2_contrastive               0.2902
+  #   c4_contrastive_small_object  0.2382
+  #   c0_coco_control              0.2268
+  # then the same ablation levers the open rows got:
+  #   local NMS 0.5/0.6/0.7        <= 0.3417  reverted (server NMS suffices)
+  #   2x2 tiling, merge NMS 0.5    0.4294     KEPT (+0.087; merge NMS swept
+  #                                           0.3-0.7, peak at 0.5)
+  #   downscale to 1536            0.3390     reverted
+  # Refetching the winner with the cache bypassed scored 0.3419 vs 0.3420: the
+  # API is effectively deterministic, so the 0.005 floor of the adoption rule
+  # applies.
+  #
+  # `rim` is ~0 for every vocabulary containing "basketball hoop": GT boxes the
+  # RING only, DINO-X's hoop box includes the net (median best IoU 0.41, area
+  # 2.1x GT). This is the headline row's definition mismatch, not a bug.
+  - name: dinox_pro
+    inferencer: dinox
+    model_name: DINO-X-1.0
+    classes:
+      - basketball player
+      - basketball
+      - referee
+      - basketball hoop
+      - jersey number
+    box_threshold: 0.01
+    dinox_iou_threshold: 0.8
+    nms_iou_threshold: 0.5
+    tiles: [2, 2]
+    # 0.4393 from the single 2026-10-12 test run (results/vlm/dinox_pro.json).
+    expected_map5095: 0.439

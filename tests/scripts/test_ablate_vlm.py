@@ -182,6 +182,27 @@ def test_only_the_checkpoint_re_search_pins_a_second_field(manifest: Any) -> Non
         "image_first_37",
         "no_caps_37",
         "noise_37",
+        # YOLOE's stack, built in several measured moves rather than one
+        # `combined` arm (vlm_ablation.yaml, 2026-10-11).
+        "vocabulary_on_combined",
+        "box_threshold_on_combined",
+        "vocab_on_stack",
+        "nms_on_stack",
+        "nms_on_composed",
+        "imgsz_on_composed",
+        # Disclosed Round-4 work, measured on top of the finished stack.
+        "rim_word",
+        "prompt_ensemble",
+        # Round 6 (2026-10-12): the class-aware NMS fix and the disclosed work
+        # measured on top of it.
+        "class_aware_nms",
+        "nms_on_class_aware",
+        "number_crop",
+        "prompt_ensemble_on_class_aware",
+        "number_crop_on_ensemble",
+        # Round 7 (2026-10-15): disclosed box calibration on both stacks.
+        "box_pad",
+        "box_pad_on_ensemble_crop",
     }
 
 
@@ -189,6 +210,23 @@ def test_every_model_gets_exactly_one_baseline_arm(manifest: Any) -> None:
     arms = manifest.expand()
     baselines = [a for a in arms if a.element == "baseline"]
     assert sorted(a.model for a in baselines) == sorted(m.name for m in manifest.models)
+
+
+def test_every_arm_class_resolves_in_the_eval_taxonomy(manifest: Any) -> None:
+    """An unaliased class is dropped at remap, so it scores as zero detections.
+
+    Regression: YOLOE's `rim_word` arm prompted `basketball rim` before the
+    alias existed, and its rim boxes were silently discarded.
+    """
+    from object_detection_eval.data.taxonomy import resolve_taxonomy
+
+    name_to_id, _ = resolve_taxonomy("merged5")
+    unmapped = {
+        arm.id: missing
+        for arm in manifest.expand()
+        if (missing := [c for c in arm.classes if c.lower() not in name_to_id])
+    }
+    assert unmapped == {}
 
 
 def test_expansion_skips_an_arm_that_restates_the_baseline(sut: types.ModuleType) -> None:
@@ -322,6 +360,7 @@ def test_post_processing_knobs_stay_out_of_the_signature(sut: types.ModuleType) 
         ("box_threshold", 0.05),
         ("singleton_top_k", 10),
         ("max_area_fraction", 0.02),
+        ("box_pad", {"player": 0.02}),
     ]:
         other = _arm(sut, id=field, **{"nms_iou_threshold": 0.3, field: value})
         assert other.signature() == base.signature(), field
@@ -341,8 +380,20 @@ def test_forward_pass_knobs_do_change_the_signature(sut: types.ModuleType) -> No
         ("max_det", 1000),
         ("min_pixels", 4_096_000),
         ("max_pixels", 8_192_000),
+        ("prompt_ensembles", {"referee": ["referee", "basketball official"]}),
     ]:
         assert _arm(sut, id=field, **{field: value}).signature() != base.signature(), field
+
+
+def test_an_arm_without_prompt_ensembles_keeps_its_pre_ensemble_cache_key(
+    sut: types.ModuleType,
+) -> None:
+    """Adding the ensemble knob must not re-key every cache already on disk.
+
+    fuse_vlm.py rebuilds the same key independently, so a part that is always
+    present would silently orphan every model's val cache.
+    """
+    assert "__ens" not in _arm(sut).signature()
 
 
 def test_yolo_world_arms_are_not_replayed(sut: types.ModuleType) -> None:
