@@ -111,6 +111,9 @@ class ManifestEntry(BaseModel, frozen=True):
     task: str | None = None
     caption: str | None = None
     prompt_template: str | None = None
+    #: Gemini only: see ``GeminiInferencer``'s ``box_format``/``image_first``.
+    gemini_box_format: str = "named_xyxy"
+    gemini_image_first: bool = False
     #: Billed OpenAI/Anthropic rows only: reasoning effort the row published at
     #: (low/medium/high/xhigh/max). ``default`` omits the parameter so the
     #: provider's own default runs -- the setting the Ultralytics Platform
@@ -255,6 +258,8 @@ def _gemini_factory(entry: ManifestEntry) -> BaseInferencer:
         model_name=entry.model_name,
         classes=entry.classes,
         prompt_template=entry.prompt_template,
+        box_format=entry.gemini_box_format,  # type: ignore[arg-type]
+        image_first=entry.gemini_image_first,
     )
 
 

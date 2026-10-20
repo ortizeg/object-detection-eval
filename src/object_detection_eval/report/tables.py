@@ -9,6 +9,7 @@ cell is formatted from the loaded model.
 
 from __future__ import annotations
 
+import json
 from collections.abc import Mapping, Sequence
 from itertools import pairwise
 from typing import Any
@@ -792,6 +793,26 @@ def ablation_headline_table(
     claim a change was kept when it explicitly was not.
     """
     baselines = {a.model: a for a in log.arms if a.element == "baseline"}
+
+    # Repeat draws (arms identical except `sample`) are one configuration, not
+    # several: a generative model's best single draw is the max over its own
+    # noise, so every score below is the MEAN over a configuration's draws.
+    # Deterministic models have one draw per configuration, so for them this is
+    # the arm's own score.
+    draws: dict[tuple[str, str], list[Any]] = {}
+    for arm in log.arms:
+        draws.setdefault((arm.model, _config_key(arm.config)), []).append(arm)
+
+    def score(arm: Any) -> float:
+        group = draws[(arm.model, _config_key(arm.config))]
+        return float(sum(a.map_50_95 for a in group)) / len(group)
+
+    def n_draws(arm: Any) -> int:
+        # Distinct draws, not rows: a deterministic config can appear under two
+        # elements (same config, same sample) and is still one measurement.
+        group = draws[(arm.model, _config_key(arm.config))]
+        return len({a.config.get("sample", 0) for a in group})
+
     # Seed every model at its own baseline: a model that adopted nothing from
     # the sweep must still get a row, and falling back to the baseline is
     # exactly what "nothing changed" means.
@@ -818,16 +839,16 @@ def ablation_headline_table(
             for key, value in arm.config.items()
         ):
             continue
-        if arm.map_50_95 > best[arm.model].map_50_95:
+        if score(arm) > score(best[arm.model]):
             best[arm.model] = arm
 
     header = ["Model", "Published", "Best on val", "Δ", "Changes kept"]
     rows: list[list[str]] = []
-    for model, arm in sorted(best.items(), key=lambda kv: -kv[1].map_50_95):
+    for model, arm in sorted(best.items(), key=lambda kv: -score(kv[1])):
         base = baselines.get(model)
         if base is None:  # pragma: no cover - every model has a baseline
             continue
-        delta = arm.map_50_95 - base.map_50_95
+        delta = score(arm) - score(base)
 
         # A model whose baseline beat every arm tried has adopted nothing, and
         # the row must say so. Reporting the best *alternative* with its negative
@@ -837,8 +858,8 @@ def ablation_headline_table(
             rows.append(
                 [
                     model,
-                    _fmt3(base.map_50_95),
-                    _fmt3(base.map_50_95),
+                    _fmt3(score(base)),
+                    _fmt3(score(base)),
                     "—",
                     "none — baseline beat every arm tried",
                 ]
@@ -848,18 +869,43 @@ def ablation_headline_table(
         changed = [
             _describe_change(key, value)
             for key, value in arm.config.items()
-            if base.config.get(key) != value
+            if key != "sample" and base.config.get(key) != value
         ]
+        if n_draws(arm) > 1 or n_draws(base) > 1:
+            changed.append(f"mean of {n_draws(base)} vs {n_draws(arm)} draws")
         rows.append(
             [
                 model,
-                _fmt3(base.map_50_95),
-                f"**{_fmt3(arm.map_50_95)}**",
+                _fmt3(score(base)),
+                f"**{_fmt3(score(arm))}**",
                 _fmt_delta(delta),
                 ", ".join(changed) or _EM_DASH,
             ]
         )
     return _table(header, rows)
+
+
+#: Arm fields added after older log rows were written, with the value those
+#: rows implicitly ran at. An absent key and its default are the same config;
+#: so are an absent key and ``None`` (``min_pixels``/``max_pixels`` came later).
+_LATE_ARM_DEFAULTS: dict[str, Any] = {
+    "gemini_box_format": "named_xyxy",
+    "gemini_image_first": False,
+}
+
+
+def _config_key(config: Mapping[str, Any]) -> str:
+    """A configuration's identity with the draw index removed."""
+    return json.dumps(
+        {
+            k: v
+            for k, v in config.items()
+            if k != "sample"
+            and v is not None
+            and not (k in _LATE_ARM_DEFAULTS and v == _LATE_ARM_DEFAULTS[k])
+        },
+        sort_keys=True,
+    )
 
 
 #: Human-readable names for the config fields the headline table reports.
@@ -873,6 +919,8 @@ _CHANGE_LABELS = {
     "processor_nms_threshold": "processor NMS",
     "prompt_template": "prompt",
     "sample": "repeat draw",
+    "gemini_box_format": "box format",
+    "gemini_image_first": "image first",
     "prompt_ensembles": "prompt ensembling",
     "agnostic_nms": "class-agnostic NMS",
     "anchor_crop": "number crop",

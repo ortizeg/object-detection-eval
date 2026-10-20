@@ -79,6 +79,22 @@ every alternative tried.** Details in the ablation table below; the row is
 unchanged because the search said to leave it alone, which is a different and
 more defensible statement than leaving it alone because nobody looked.
 
+**2026-10-12: a newer model did help.** Re-surveyed two months later,
+`gemini-pro-latest` still served the published `gemini-3.1-pro-preview`, but
+`gemini-3.8-flash` (what `gemini-flash-latest` now serves) beat it on every
+class. The row now runs `gemini-3.8-flash` with Google's documented native box
+format (`box_2d: [ymin, xmin, ymax, xmax]`) in place of the named `x_min..y_max`
+fields chosen in July. The instruction text is otherwise unchanged. On val,
+three draws each: **0.253 → 0.328**. Test, run once: **0.250 → 0.326**.
+
+Almost all of that comes from the model. Of the three prompt-shape changes tried
+on both 3.7- and 3.8-flash, image-before-prompt and dropping the count caps
+changed sign between the two models, which is noise. The box format added +0.008
+on mAP@50:95, which is inside the noise and **not claimed as a gain**. It was
+adopted for two effects that do separate. `number` AP@50 rose on every draw
+(0.33–0.36 against 0.26–0.30). Draw-to-draw spread fell from σ 0.011 to 0.0007.
+Full log: `docs/plans/gemini-refresh-2026-10.md`.
+
 ### What prompt engineering did *not* fix
 
 Two hypotheses this work set out to test, both refuted by measurement:
@@ -164,11 +180,11 @@ adopting a smaller "win" is fitting the val split.
 | Model | Published | Best on val | Δ | Changes kept |
 | --- | --- | --- | --- | --- |
 | llmdet | 0.359 | 0.359 | — | none — baseline beat every arm tried |
+| gemini | 0.253 | **0.328** | +0.0749 | checkpoint `gemini-3.8-flash`, prompt, box format box_2d, mean of 3 vs 3 draws |
 | owlv2 | 0.240 | **0.288** | +0.0479 | NMS IoU 0.5, tiling 2x2 |
 | grounding_dino | 0.244 | **0.278** | +0.0338 | NMS IoU 0.7, tiling 2x2 |
 | qwen3_vl | 0.265 | 0.265 | — | none — baseline beat every arm tried |
 | yoloe | 0.201 | **0.261** | +0.0594 | vocabulary, box threshold 0.001, NMS IoU 0.8, class-aware NMS, input size 1280 |
-| gemini | 0.258 | 0.258 | — | none — baseline beat every arm tried |
 | florence2 | 0.125 | **0.234** | +0.1094 | checkpoint `Florence-2-large`, NMS IoU 0.4, tiling 2x2 |
 | omdet_turbo | 0.181 | **0.216** | +0.0353 | vocabulary, tiling 2x2 |
 | yolo_world | 0.132 | **0.177** | +0.0453 | vocabulary, box threshold 0.001, NMS IoU 0.7, input size 1280 |
@@ -377,11 +393,17 @@ that carry no such spread. That is not a reason to distrust the comparison —
 and another row is not a difference, and this report previously gave no way to
 know that.
 
+The table above is the August `gemini-3.1-pro-preview` row. Its 2026-10
+replacement, `gemini-3.8-flash` with the native box format, is far steadier:
+three val draws of 0.3274 / 0.3285 / 0.3287, σ = 0.0007. On the July prompt
+format the same model swung 0.3096–0.3315 (σ = 0.011). The box format is
+adopted largely for that stability.
+
 **Still not searched**
 
 | Gap | Why it was left |
 | --- | --- |
-| **Gemini's prompt** | Hand-written with per-class definitions and count constraints; excluded from every search because it is a billed API and each arm would cost money per image. It keeps an advantage no open-weights row has, and this report says so rather than pretending otherwise. |
+| **Gemini's prompt** | Hand-written with per-class definitions and count constraints; excluded from the equal-effort search because it is a billed API and each arm would cost money per image. It keeps an advantage no open-weights row has, and this report says so rather than pretending otherwise. The 2026-10 refresh tried three disclosed shape changes (box format, content order, count caps) on the new Flash models. That is a targeted follow-up, not a vocabulary search. |
 | **Vocabulary re-search for losing checkpoints** | A checkpoint that *won* re-ran the full six-candidate vocabulary search against its own weights, so the new checkpoint received the same effort the old one did. Checkpoints that lost did not. A different vocabulary could in principle reorder them; each re-search is six more forward passes to relitigate a gap of 0.03–0.06, and that is not a good use of the budget. |
 | **`area_outliers` (5% of image)** | Validated rather than swept: **no** ground-truth box in either split exceeds 5% — the largest object in the dataset is a player at 3.3% — so this filter cannot discard a true positive, and there is nothing for a sweep to find. |
 
@@ -410,7 +432,7 @@ from the committed prediction dumps in `results/vlm/*.json` (never transcribed):
 | GPT-6.1 Sol (low effort) | 0.489 | 0.791 | 0.503 |
 | Claude Opus 5.5 | 0.438 | 0.691 | 0.465 |
 | DINO-X Pro | 0.439 | 0.564 | 0.489 |
-| Gemini | 0.250 | 0.430 | 0.252 |
+| Gemini | 0.326 | 0.508 | 0.361 |
 | OWLv2 | 0.315 | 0.476 | 0.367 |
 | Grounding-DINO | 0.293 | 0.352 | 0.318 |
 | OmDet-Turbo | 0.211 | 0.297 | 0.219 |
@@ -430,7 +452,7 @@ otherwise.
 
 **GPT-6 Astra now leads the whole table, and it is not close — but it is a
 billed API, not open weights.** Added 2026-09-25, it scores **0.501**, 0.113
-clear of the next row and more than double Gemini's 0.250. Like Gemini, and
+clear of the next row and 0.175 clear of Gemini's 0.326. Like Gemini, and
 unlike every open-weights row, it is a hosted model steered by a free-text
 instruction rather than a class vocabulary, so it is *exempt from the
 equal-effort search* for the same two reasons Gemini is (a free-text prompt, and
@@ -976,7 +998,7 @@ makes the pattern unmistakable:
 | GPT-6.1 Sol (low effort) | 0.979 | 0.669 | 0.978 | 0.465 | 0.862 |
 | Claude Opus 5.5 | 0.970 | 0.497 | 0.901 | 0.502 | 0.587 |
 | DINO-X Pro | 0.919 | 0.567 | 0.628 | 0.002 | 0.702 |
-| Gemini | 0.923 | 0.316 | 0.717 | 0.036 | 0.156 |
+| Gemini | 0.945 | 0.572 | 0.749 | 0.043 | 0.233 |
 | OWLv2 | 0.901 | 0.583 | 0.388 | 0.002 | 0.505 |
 | Grounding-DINO | 0.867 | 0.355 | 0.533 | 0.000 | 0.006 |
 | OmDet-Turbo | 0.805 | 0.187 | 0.369 | 0.000 | 0.127 |
@@ -997,7 +1019,8 @@ COCO's `person`) and collapse on the small, domain-specific classes.**
 - **The `rim` collapse — a hard ceiling for the open-weights models and Gemini,
   which GPT-6 Astra breaks.** Among the eight open-weights-and-Gemini rows, `rim`
   is the class every one fails hardest on: four score **exactly 0.000** and the
-  best of them (Gemini) manages 0.036. A rim is small, thin, often partially
+  best of them (Gemini) manages 0.043. The 2026-10 Gemini row reached
+  0.12–0.18 on val draws; that did not hold on test. A rim is small, thin, often partially
   occluded, and not a salient "object" in a general model's prior. This was
   *tested* across seven open-weights models and six vocabularies each —
   forty-two measurements — and `rim` never once cleared 0.04, whether prompted as
@@ -1011,8 +1034,8 @@ COCO's `person`) and collapse on the small, domain-specific classes.**
   and giving any model enough pixels on the rim nearly solves it.
 
 - **`referee` is where the models actually differ.** It ranges from GPT-6
-  Astra's **0.979** — with Qwen3-VL-8B (0.727) and Gemini (0.717) within a point
-  of each other well behind, and neither of those should be read as a clear
+  Astra's **0.979** — with Gemini (0.749) and Qwen3-VL-8B (0.727) about two points
+  apart well behind, and neither of those should be read as a clear
   "winner" over the other — down to YOLO-World's **0.000**, the widest spread of
   any class. Astra separates the officiating role almost perfectly; the rest do
   not. A referee is
@@ -1031,8 +1054,8 @@ COCO's `person`) and collapse on the small, domain-specific classes.**
   entirely responsible for the non-trivial overall mAP the leaders post. Strip
   `player` out and the zero-shot ceiling would be far lower still. GPT-6 Astra
   tops it at **0.980** and leads the table overall; among the rest, how little
-  separates them is the story — Qwen3-VL-8B (0.934), Gemini (0.923) and OWLv2
-  (0.901) are within three points of each other, and none of *those* is its
+  separates them is the story — Gemini (0.945), Qwen3-VL-8B (0.934) and OWLv2
+  (0.901) are within five points of each other, and none of *those* is its
   group's overall leader: LLMDet-large's 0.880 on `player` is only fifth-best,
   and it wins the open-weights ranking on the strength of the other four classes
   instead, chiefly `number` (0.571, the best of any model here except Astra).
@@ -1217,7 +1240,10 @@ six-model round, that is stated explicitly; where it didn't, that is too.
 GPT-6 Astra (added 2026-09-25) postdates this fusion work and is **not** part of
 it — every "eight" in this section is the eight open-weights-and-Gemini rows.
 Fusing a model that already scores 0.501 alone, and whose licence and per-image
-cost differ from the rest, is a separate question left for future work.*
+cost differ from the rest, is a separate question left for future work.
+Likewise, this section predates the 2026-10-12 Gemini refresh. Its Gemini member
+is the earlier `gemini-3.1-pro-preview` row (test 0.250), not the
+`gemini-3.8-flash` row (0.326) in the tables above. Fusion was not re-run.*
 
 Every number above scores one model running one forward pass. This section asks
 a different question — what happens if you run all eight and merge their

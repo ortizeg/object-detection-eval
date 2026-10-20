@@ -169,6 +169,19 @@ def test_only_the_checkpoint_re_search_pins_a_second_field(manifest: Any) -> Non
         "nms_on_combined",
         "tiles",
         "referee_word",
+        # 2026-10 Gemini refresh: every Round-2 element runs on a new Flash
+        # model rather than the published Pro row, so `model_name` is pinned;
+        # box_2d also pins the one-sentence prompt that names its coordinate
+        # order (docs/plans/gemini-refresh-2026-10.md).
+        "box2d_38",
+        "box2d_38_noise",
+        "image_first_38",
+        "no_caps_38",
+        "noise_38",
+        "box2d_37",
+        "image_first_37",
+        "no_caps_37",
+        "noise_37",
         # YOLOE's stack, built in several measured moves rather than one
         # `combined` arm (vlm_ablation.yaml, 2026-10-11).
         "vocabulary_on_combined",

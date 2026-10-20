@@ -220,5 +220,6 @@ def test_print_result_applies_tolerance_for_targeted_entry() -> None:
     manifest = run_vlm_benchmark.load_manifest(_MANIFEST_PATH)
     gemini = next(m for m in manifest.models if m.name == "gemini")
 
-    assert run_vlm_benchmark._print_result(gemini, measured=0.265, tolerance=0.02) is True
-    assert run_vlm_benchmark._print_result(gemini, measured=0.20, tolerance=0.02) is False
+    # Target 0.326 (the 2026-10 gemini-3.8-flash row).
+    assert run_vlm_benchmark._print_result(gemini, measured=0.340, tolerance=0.02) is True
+    assert run_vlm_benchmark._print_result(gemini, measured=0.300, tolerance=0.02) is False

@@ -16,11 +16,13 @@ from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pytest
+from PIL import Image
 
 pytest.importorskip("google.genai")
 
 from object_detection_eval.inference.vlm.gemini import (
     GeminiBBox,
+    GeminiBox2DDetection,
     GeminiDetection,
     GeminiInferencer,
 )
@@ -227,6 +229,77 @@ class TestGeminiInferencerPredict:
 
         assert len(dets) == 1
         assert mock_client.models.generate_content.call_count == 2
+
+
+class TestBoxFormatAndOrdering:
+    """The opt-in native ``box_2d`` schema and image-first content order."""
+
+    def test_box_2d_is_ymin_xmin_ymax_xmax(
+        self, _mock_genai, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setenv("GEMINI_API_KEY", "dummy-key")
+        _mock_genai, mock_client = _mock_genai
+
+        mock_response = MagicMock()
+        # Same box as test_predict_maps_parsed_response, in native order.
+        mock_response.parsed = [
+            GeminiBox2DDetection(box_2d=[200, 100, 400, 300], label="player", confidence=0.9)
+        ]
+        mock_client.models.generate_content.return_value = mock_response
+
+        inferencer = GeminiInferencer(
+            model_name="gemini-3.8-flash", classes=["player"], box_format="box_2d"
+        )
+        dets = inferencer.predict(np.zeros((480, 640, 3), dtype=np.uint8), 640, 480)
+
+        assert len(dets) == 1
+        assert dets[0].bbox.x == pytest.approx(0.1)
+        assert dets[0].bbox.y == pytest.approx(0.2)
+        assert dets[0].bbox.w == pytest.approx(0.2)
+        assert dets[0].bbox.h == pytest.approx(0.2)
+
+    def test_box_2d_text_fallback_drops_malformed(
+        self, _mock_genai, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setenv("GEMINI_API_KEY", "dummy-key")
+        _mock_genai, mock_client = _mock_genai
+
+        mock_response = MagicMock()
+        mock_response.parsed = None
+        mock_response.text = (
+            '[{"box_2d": [200, 100, 400, 300], "label": "player"},'
+            ' {"box_2d": [1, 2, 3], "label": "player"}]'
+        )
+        mock_client.models.generate_content.return_value = mock_response
+
+        inferencer = GeminiInferencer(
+            model_name="gemini-3.8-flash", classes=["player"], box_format="box_2d"
+        )
+        dets = inferencer.predict(np.zeros((480, 640, 3), dtype=np.uint8), 640, 480)
+
+        assert len(dets) == 1
+        assert dets[0].bbox.x == pytest.approx(0.1)
+        assert dets[0].confidence == pytest.approx(1.0)
+
+    @pytest.mark.parametrize("image_first", [False, True])
+    def test_content_order(
+        self, _mock_genai, monkeypatch: pytest.MonkeyPatch, image_first: bool
+    ) -> None:
+        monkeypatch.setenv("GEMINI_API_KEY", "dummy-key")
+        _mock_genai, mock_client = _mock_genai
+        mock_response = MagicMock()
+        mock_response.parsed = []
+        mock_response.text = None
+        mock_client.models.generate_content.return_value = mock_response
+
+        inferencer = GeminiInferencer(
+            model_name="gemini-3.8-flash", classes=["player"], image_first=image_first
+        )
+        inferencer.predict(np.zeros((480, 640, 3), dtype=np.uint8), 640, 480)
+
+        contents = mock_client.models.generate_content.call_args.kwargs["contents"]
+        assert isinstance(contents[0 if image_first else 1], Image.Image)
+        assert isinstance(contents[1 if image_first else 0], str)
 
 
 class TestResolveLabel:

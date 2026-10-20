@@ -22,6 +22,7 @@ from __future__ import annotations
 import json
 import os
 import time
+from typing import Literal
 
 import numpy as np
 import numpy.typing as npt
@@ -63,6 +64,38 @@ class GeminiDetection(BaseModel):
     confidence: float = Field(default=1.0, ge=0.0, le=1.0)
 
 
+class GeminiBox2DDetection(BaseModel):
+    """Gemini response schema in Google's documented native box format.
+
+    ``box_2d`` is ``[ymin, xmin, ymax, xmax]`` on the 0-1000 grid -- the layout
+    the Gemini image-understanding docs use for every detection example, and so
+    presumably the one the model was trained to emit. ``GeminiDetection`` above
+    renames and reorders those coordinates into ``x_min..y_max`` fields; this
+    schema exists to measure whether that costs accuracy. ``confidence`` is kept
+    so the two formats differ in coordinate layout only.
+    """
+
+    box_2d: list[int] = Field(description="[ymin, xmin, ymax, xmax], each 0-1000")
+    label: str
+    confidence: float = Field(default=1.0, ge=0.0, le=1.0)
+
+    def to_detection(self) -> GeminiDetection | None:
+        """Re-express as the named-field schema; ``None`` if not 4 coordinates."""
+        if len(self.box_2d) != 4:
+            return None
+        y_min, x_min, y_max, x_max = self.box_2d
+        return GeminiDetection(
+            bbox=GeminiBBox(x_min=x_min, y_min=y_min, x_max=x_max, y_max=y_max),
+            label=self.label,
+            confidence=self.confidence,
+        )
+
+
+#: ``named_xyxy`` is the published schema (``GeminiDetection``); ``box_2d`` is
+#: Google's native ``[ymin, xmin, ymax, xmax]`` array (``GeminiBox2DDetection``).
+BoxFormat = Literal["named_xyxy", "box_2d"]
+
+
 class GeminiInferencer(BaseInferencer):
     """Run inference on images using Google's Gemini models.
 
@@ -74,6 +107,10 @@ class GeminiInferencer(BaseInferencer):
         model_name: Name of the Gemini model to use (e.g., 'gemini-2.5-pro').
         classes: Full ordered list of class names (defines class IDs by index).
         prompt_template: Optional custom prompt template.
+        box_format: Response schema. ``named_xyxy`` (default) is the published
+            row's; ``box_2d`` is Google's native layout. The prompt should name
+            the coordinate order to match -- the schema alone does not.
+        image_first: Send the image before the prompt instead of after it.
     """
 
     _MAX_RETRIES: int = 5
@@ -97,9 +134,13 @@ class GeminiInferencer(BaseInferencer):
         model_name: str,
         classes: list[str],
         prompt_template: str | None = None,
+        box_format: BoxFormat = "named_xyxy",
+        image_first: bool = False,
     ) -> None:
         self.model_name = model_name
         self.classes = classes
+        self.box_format = box_format
+        self.image_first = image_first
 
         # Build a normalised lookup: lower-cased class name -> class index
         self._name_to_id: dict[str, int] = {name.lower(): idx for idx, name in enumerate(classes)}
@@ -118,7 +159,9 @@ class GeminiInferencer(BaseInferencer):
         self._client = genai.Client(api_key=api_key)
         self._config = GenerateContentConfig(
             response_mime_type="application/json",
-            response_schema=list[GeminiDetection],
+            response_schema=(
+                list[GeminiBox2DDetection] if box_format == "box_2d" else list[GeminiDetection]
+            ),
             http_options=HttpOptions(timeout=self._REQUEST_TIMEOUT_MS),
         )
 
@@ -157,7 +200,9 @@ class GeminiInferencer(BaseInferencer):
         backoff = self._INITIAL_BACKOFF
         for attempt in range(1, self._MAX_RETRIES + 1):
             try:
-                contents: list[str | Image.Image] = [self._prompt, rgb_image]
+                contents: list[str | Image.Image] = (
+                    [rgb_image, self._prompt] if self.image_first else [self._prompt, rgb_image]
+                )
                 response = self._client.models.generate_content(
                     model=self.model_name,
                     contents=contents,
@@ -165,7 +210,7 @@ class GeminiInferencer(BaseInferencer):
                 )
 
                 if response.parsed:
-                    parsed: list[GeminiDetection] = response.parsed
+                    parsed = self._normalise_parsed(response.parsed)
                     for det in parsed:
                         logger.debug(
                             f"Raw Gemini detection: label={det.label!r} "
@@ -183,7 +228,12 @@ class GeminiInferencer(BaseInferencer):
 
             except Exception as exc:
                 exc_str = str(exc)
-                is_retryable = any(code in exc_str for code in ("503", "429", "UNAVAILABLE"))
+                # A read timeout is transient too: on 2026-10-12 ten parallel val
+                # sweeps each lost one image to the same ~4-minute service stall,
+                # and without a retry each became a silent "no detections".
+                is_retryable = isinstance(exc, TimeoutError) or any(
+                    code in exc_str for code in ("503", "429", "UNAVAILABLE", "timed out")
+                )
                 if is_retryable and attempt < self._MAX_RETRIES:
                     logger.warning(
                         f"Attempt {attempt}/{self._MAX_RETRIES} failed "
@@ -201,6 +251,22 @@ class GeminiInferencer(BaseInferencer):
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
+
+    def _normalise_parsed(
+        self, parsed: list[GeminiDetection] | list[GeminiBox2DDetection]
+    ) -> list[GeminiDetection]:
+        """Bring either response schema to ``GeminiDetection``."""
+        out: list[GeminiDetection] = []
+        for det in parsed:
+            if isinstance(det, GeminiBox2DDetection):
+                converted = det.to_detection()
+                if converted is None:
+                    logger.debug(f"Skipping box_2d without 4 coordinates: {det.box_2d}")
+                    continue
+                out.append(converted)
+            else:
+                out.append(det)
+        return out
 
     def _resolve_label(self, raw_label: str) -> int | None:
         """Map a Gemini label string to a class index.
@@ -276,11 +342,12 @@ class GeminiInferencer(BaseInferencer):
             logger.error(f"Expected a JSON list, got {type(data).__name__}")
             return []
 
-        gemini_dets: list[GeminiDetection] = []
+        item_schema = GeminiBox2DDetection if self.box_format == "box_2d" else GeminiDetection
+        items: list[GeminiDetection] | list[GeminiBox2DDetection] = []
         for item in data:
             try:
-                gemini_dets.append(GeminiDetection.model_validate(item))
+                items.append(item_schema.model_validate(item))  # type: ignore[arg-type]
             except Exception:
                 logger.debug(f"Skipping unparseable item: {item}")
 
-        return self._map_detections(gemini_dets, image_width, image_height)
+        return self._map_detections(self._normalise_parsed(items), image_width, image_height)
