@@ -394,13 +394,21 @@ never emit, while the singleton cap *constrains* the zero-shot rows.
 
 ## The zero-shot ceiling
 
-Ten zero-shot models, plus three disclosed YOLOE variants, scored on the merged-5 test split. The table is recomputed
+Twelve zero-shot models, plus three disclosed YOLOE variants and two
+extra-effort rows (GPT-6 Astra at default effort, GPT-6.1 Sol at low; see
+[Parity with the Ultralytics Platform
+benchmark](#parity-with-the-ultralytics-platform-benchmark)), scored on the
+merged-5 test split. The table is recomputed
 from the committed prediction dumps in `results/vlm/*.json` (never transcribed):
 
 <!-- TABLE:vlm_summary START -->
 | Model | mAP@50:95 | mAP@50 | mAP@75 |
 | --- | --- | --- | --- |
 | GPT-6 Astra | 0.501 | 0.823 | 0.507 |
+| GPT-6 Astra (default effort) | 0.502 | 0.806 | 0.516 |
+| GPT-6.1 Sol | 0.481 | 0.781 | 0.481 |
+| GPT-6.1 Sol (low effort) | 0.489 | 0.791 | 0.503 |
+| Claude Opus 5.5 | 0.438 | 0.691 | 0.465 |
 | Gemini | 0.250 | 0.430 | 0.252 |
 | OWLv2 | 0.315 | 0.476 | 0.367 |
 | Grounding-DINO | 0.293 | 0.352 | 0.318 |
@@ -520,6 +528,152 @@ was smaller than this report originally claimed, and most of what has closed it
 is fairer configuration and better models — now including a frontier API whose
 grounding is strong enough that fine-tuning's remaining advantage is a
 deployment-economics question, not a capability one.
+
+### Parity with the Ultralytics Platform benchmark
+
+The Ultralytics Platform auto-annotation benchmark (26 class-prompted models, 36
+real-world datasets, every provider at its default reasoning effort) ranked
+GPT-6.1 Sol (0.491 mAP50) above Claude Opus 5.5 (0.476) above GPT-6 Astra
+(0.470). Four rows added 2026-10-15 put those models onto this split under this
+protocol. (Gemini 4 Argon, which topped that benchmark, is handled on a separate
+branch.)
+
+**Read the gaps against run-to-run noise first, not only against the CIs.** The
+CIs below are paired image-level bootstrap CIs on test (1,000 resamples, seed 0,
+94 images). They resample images, so they cannot see that a hosted API returns
+different boxes when the same request is repeated. Three single-pass test runs of each identical config
+(same model, prompt and effort) measure it directly
+(`scripts/analyze_api_repeats.py`):
+
+| Model | Run 1 (published) | Run 2 | Run 3 | Mean | SD |
+| --- | --- | --- | --- | --- | --- |
+| GPT-6 Astra (low) | 0.501 | 0.504 | 0.516 | 0.507 | 0.008 |
+| GPT-6.1 Sol (default) | 0.481 | 0.504 | 0.488 | 0.491 | 0.012 |
+| Claude Opus 5.5 (default) | 0.438 | 0.450 | 0.442 | 0.444 | 0.006 |
+
+Sol's run 2 beats its own run 1 by +0.022 with an image-level CI of [+0.010,
++0.035]: by the bootstrap alone, a model would "beat itself". So on this split,
+**a single-run gap of about 2 points or less between API rows is not evidence of
+anything**, whatever its image-level CI says. The images also come from three clips and are not
+independent, which widens the true intervals further.
+
+| Comparison (mAP@50:95) | Δ | 95% CI (images only) | Verdict |
+| --- | --- | --- | --- |
+| Astra low − Astra default | −0.000 | [−0.013, +0.014] | tie |
+| Sol low − Sol default | +0.009 | [−0.003, +0.022] | tie |
+| Astra low − Sol low (matched effort) | +0.011 | [−0.003, +0.027] | tie |
+| Astra default − Sol default (provider default) | +0.020 | [+0.009, +0.032] | within rerun noise: tie |
+| Sol default − Claude Opus 5.5 | +0.042 | [+0.027, +0.057] | Sol ahead |
+| Astra default − Claude Opus 5.5 | +0.062 | [+0.047, +0.079] | Astra ahead |
+
+- **Effort does not matter for either OpenAI model here.** Astra at default
+  effort ties the published `low` row (0.502 vs 0.501), which confirms the val
+  finding behind that row's cheaper setting. Sol at `low` (0.489) ties Sol at
+  default (0.481).
+- **Astra and Sol tie, at either effort.** Over three runs each, Astra averages
+  0.507 and Sol 0.491, but pairing any single Astra run with any single Sol run
+  gives gaps from −0.003 to +0.036. Astra may be slightly ahead; one run each
+  cannot show it. This
+  split does not reproduce the blog's Sol-over-Astra ordering, and it does not
+  reverse it either. The blog's margin is 2.1 mAP50 points averaged over 36
+  datasets, which one basketball split cannot test.
+- **Claude Opus 5.5 trails both, and that is larger than the noise.** It is
+  behind in every pairing of single runs: by 3–6 points against Sol and 5–8
+  against Astra. On players and referees it is
+  close (AP50 0.97 / 0.90). The gap is the two small classes: ball 0.50 and
+  jersey numbers 0.59, against Astra's 0.70 / 0.87 at default effort. The blog's
+  point that rankings swing by domain applies here.
+- **These rows are untuned.** All four reuse the Astra row's val-tuned prompt
+  verbatim. Claude's prompt differs only in the coordinate sentence, which asks
+  for pixel coordinates of the downscaled frame it receives instead of a 0–1000
+  grid. That prompt was tuned for Astra, which may favour Astra. No refusal
+  fallback model is configured for Claude, so every box in that row comes from
+  Opus 5.5.
+- **The metric is different.** The blog reports mAP50 averaged over datasets.
+  This table leads with mAP@50:95 on one split. On mAP50 the default-effort rows
+  read Astra 0.806, Sol 0.781 and Opus 0.691. Only the Opus gap is outside its
+  CI on that metric (Astra − Sol default: +0.026, CI [−0.011, +0.060]).
+
+Config: the `sol`, `sol_low`, `astra_default` and `claude_opus` rows in
+`vlm_zeroshot.yaml`. Dumps: `results/vlm/{sol,sol_low,astra_default,claude_opus}.json`.
+
+### Improving the API rows: fusion and rim crop-refine
+
+Two cheap levers were tried on the API rows on 2026-10-15. Both target what the
+per-class numbers say is left: player and referee are near their ceiling
+(0.90–0.99 AP50) for every API model, while rim, ball and number are not.
+
+**Fusing the three API models.** The rule was written into
+`scripts/fuse_api_vlms.py` before anything was fused, mirroring the eight-model
+round: WBF on raw confidences at cluster IoU 0.55; headline = all three models at
+their published rows; one pre-registered alternative = the top two. Fusion reads
+the committed test dumps, so it costs no API calls.
+
+| Fusion (test) | mAP@50:95 | Δ vs Astra alone (95% CI) | rim AP50 | number AP50 |
+| --- | --- | --- | --- | --- |
+| Astra alone | 0.501 | — | 0.52 | 0.86 |
+| **Astra + Sol + Opus (headline)** | **0.551** | **+0.050 [+0.041, +0.058]** | 0.62 | 0.89 |
+| Astra + Sol (pre-registered alternative) | 0.522 | +0.021 [+0.013, +0.029] | 0.55 | 0.90 |
+
+The headline gain is several times the rerun SD, and it barely moves across
+cluster IoU 0.4–0.7 (0.541–0.551). Most of it is tighter boxes rather than new
+detections: mAP@50:95 rises 5 points but mAP@50 under 3.
+
+**But model diversity is not what produces it.** Fusing three runs of *the same*
+model, with the same operator (rule fixed before the repeat runs finished), gives
+almost the same gain:
+
+| Self-ensemble, 3 runs fused (test) | mAP@50:95 | Δ vs run 1 (95% CI) |
+| --- | --- | --- |
+| Astra × 3 | **0.547** | +0.046 [+0.038, +0.054] |
+| Sol × 3 | 0.527 | +0.046 [+0.037, +0.054] |
+| Opus × 3 | 0.467 | +0.028 [+0.020, +0.036] |
+
+Astra × 3 (0.547) is level with Astra + Sol + Opus (0.551). The gain comes mostly
+from averaging several noisy samples of each box, not from different models
+making different mistakes. Calling the best model three times is as good as
+mixing in the others, and simpler. Exploration, not a result: fusing Sol and Opus with Astra's
+crop-refine output gives 0.589, no better than crop-refine alone (0.588). Fusion
+and crop-refine fix the same thing, the rim boxes, so they do not stack.
+
+**Rim-only crop-refine for Sol and Opus.** Astra's two-pass crop-refine pipeline
+(re-detect each ball and rim box on a zoomed crop) was run on val for both
+models. The script also scores its own first pass, which gives each model's
+single-pass baseline from the same run at no extra cost.
+
+| Val | Pass 1 | Crop-refine (ball + rim) | Rim-only |
+| --- | --- | --- | --- |
+| Sol | 0.476 | 0.526 | **0.529** |
+| Opus | 0.392 | 0.423 | **0.440** |
+| Astra (low) | 0.484 | 0.533 | 0.535 |
+
+Refining the ball lowered ball AP50 for every model on val (Sol 0.69 → 0.59,
+Opus 0.46 → 0.42, Astra 0.71 → 0.63) but tightens the ball boxes it keeps, so on
+mAP@50:95 rim-only and ball + rim are close. Rim-only is never worse and makes
+fewer API calls. It was selected on val for Sol and Opus, and each was then scored
+once on test. Astra's +0.002 on val is not a clear gain, so Astra rim-only was
+**not** run on test and the published crop-refine row is unchanged:
+
+| Test, one run each | Pass 1 (same run) | Rim-only crop-refine | Δ (95% CI) | rim AP50 |
+| --- | --- | --- | --- | --- |
+| Sol | 0.504 | **0.560** | +0.056 [+0.045, +0.067] | 0.56 → 0.97 |
+| Opus | 0.450 | **0.501** | +0.052 [+0.040, +0.064] | 0.63 → 0.95 |
+
+- **Crop-refine is the lever that transfers across models.** It gives Sol and
+  Opus the same +5 points it gave Astra. In every case the cause is the rim: a
+  whole 1080p frame gives each model too few pixels to place a tight box on it.
+- **With the rim fixed, Opus matches single-pass Astra** (0.501 vs 0.501).
+  Sol + rim crop-refine (0.560) is still below Astra's crop-refine (0.588,
+  −0.027, CI [−0.042, −0.013]). That gap is only slightly larger than the rerun
+  swing, so read it as "no better", not "clearly worse".
+- **None of these beat Astra crop-refine at 0.588,** which stays the best
+  zero-shot row in this report. Dropping its ball refinement was checked on val
+  (0.535 vs 0.533) and is not worth a test run.
+
+Scripts: `scripts/fuse_api_vlms.py`; `scripts/analyze_api_repeats.py`; `scripts/run_astra_crop_refine.py --model
+{sol,claude} --refine-classes rim`. Results: `results/vlm/fusion/api_fusion_test.json`,
+`results/vlm/repeats/` (repeat runs and `api_repeats_test.json`) and
+`results/vlm/{sol,claude}_effort-default_*_{valid,test}.json`.
 
 ### Two more rows: LLMDet-large and Qwen3-VL-8B
 
@@ -744,6 +898,10 @@ makes the pattern unmistakable:
 | Model | player | ball | referee | rim | number |
 | --- | --- | --- | --- | --- | --- |
 | GPT-6 Astra | 0.980 | 0.776 | 0.979 | 0.521 | 0.861 |
+| GPT-6 Astra (default effort) | 0.980 | 0.704 | 0.978 | 0.503 | 0.867 |
+| GPT-6.1 Sol | 0.979 | 0.652 | 0.990 | 0.449 | 0.837 |
+| GPT-6.1 Sol (low effort) | 0.979 | 0.669 | 0.978 | 0.465 | 0.862 |
+| Claude Opus 5.5 | 0.970 | 0.497 | 0.901 | 0.502 | 0.587 |
 | Gemini | 0.923 | 0.316 | 0.717 | 0.036 | 0.156 |
 | OWLv2 | 0.901 | 0.583 | 0.388 | 0.002 | 0.505 |
 | Grounding-DINO | 0.867 | 0.355 | 0.533 | 0.000 | 0.006 |
