@@ -15,9 +15,11 @@ no torch, no transformers -- so this module stays importable in default
 
 from __future__ import annotations
 
+from collections.abc import Mapping
+
 from loguru import logger
 
-from object_detection_eval.schemas.detection import Detection
+from object_detection_eval.schemas.detection import BoundingBox, Detection
 
 #: How many candidates to keep per singleton class, per image.
 #:
@@ -130,3 +132,36 @@ def area_outliers(
             f"exceeding {max_area_fraction:.0%} of image area"
         )
     return filtered
+
+
+def pad_boxes(
+    detections: list[Detection],
+    pad_by_class: Mapping[int, float],
+) -> list[Detection]:
+    """Grow each box about its centre by a per-class fraction of its size, per side.
+
+    A box-convention correction, not a filter: YOLOE's boxes sit inside the
+    annotators' on every class (about 2-3% of the box per side for people, more
+    for the small jersey numbers), which costs AP at the strict IoU thresholds
+    while leaving AP@50 alone. Classes absent from ``pad_by_class`` are
+    unchanged. Results are clamped to the image. Applied last, after the
+    singleton filter, so it moves geometry and nothing else. Does not mutate
+    ``detections``.
+
+    Args:
+        detections: Detections with normalised (xywh) bboxes, in eval-id space.
+        pad_by_class: Eval class id -> fraction of the box's width (and height)
+            added to each side. ``0.02`` grows a 100 px box to 104 px.
+    """
+    out: list[Detection] = []
+    for d in detections:
+        pad = pad_by_class.get(d.class_id, 0.0)
+        if pad == 0.0:
+            out.append(d)
+            continue
+        b = d.bbox
+        x1, y1 = max(b.x - pad * b.w, 0.0), max(b.y - pad * b.h, 0.0)
+        x2, y2 = min(b.x + b.w * (1 + pad), 1.0), min(b.y + b.h * (1 + pad), 1.0)
+        bbox = BoundingBox(x=x1, y=y1, w=x2 - x1, h=y2 - y1)
+        out.append(d.model_copy(update={"bbox": bbox}))
+    return out

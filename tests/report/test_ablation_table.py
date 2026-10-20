@@ -349,3 +349,102 @@ def test_headline_ignores_published_fields_the_ablation_schema_does_not_track(
     table = ablation_headline_table(log, published)
     assert "0.234" in table
     assert "none — baseline beat every arm tried" not in table
+
+
+# ---------------------------------------------------------------------------
+# Stacked elements: reported as the step they add, not the diff from the root.
+# ---------------------------------------------------------------------------
+
+
+def _stacked_log(tmp_path: Path) -> Any:
+    """Tiling adopted, then NMS re-swept under tiling. Deltas logged vs the root."""
+    root = {"tiles": None, "nms_iou_threshold": 0.3}
+    tiled = {"tiles": [2, 2], "nms_iou_threshold": 0.3}
+    return load_ablation_log(
+        _write_log(
+            tmp_path / "valid_arms.json",
+            [
+                _arm("owlv2__baseline", "owlv2", "baseline", 0.240, root),
+                _arm(
+                    "owlv2__tiles",
+                    "owlv2",
+                    "tiles",
+                    0.280,
+                    tiled,
+                    baseline="owlv2__baseline",
+                    delta=0.040,
+                ),
+                _arm(
+                    "owlv2__nms_on_tiles__0.5",
+                    "owlv2",
+                    "nms_on_tiles",
+                    0.290,
+                    {**tiled, "nms_iou_threshold": 0.5},
+                    baseline="owlv2__baseline",
+                    delta=0.050,
+                ),
+            ],
+        )
+    )
+
+
+def test_a_stacked_element_reports_its_own_step_and_delta(tmp_path: Path) -> None:
+    """Regression: these rendered as `?` / "reverted" even when they shipped."""
+    table = ablation_summary_table(
+        _stacked_log(tmp_path), {"owlv2": {"tiles": [2, 2], "nms_iou_threshold": 0.5}}
+    )
+    row = next(line for line in table.splitlines() if "NMS re-swept under tiling" in line)
+    assert "`0.5`" in row
+    assert "+0.0100" in row  # against the tiled arm, not the root
+    assert "**kept**" in row
+    assert "`?`" not in table
+
+
+def test_a_stacked_step_the_manifest_does_not_run_is_reverted(tmp_path: Path) -> None:
+    table = ablation_summary_table(
+        _stacked_log(tmp_path), {"owlv2": {"tiles": [2, 2], "nms_iou_threshold": 0.3}}
+    )
+    row = next(line for line in table.splitlines() if "NMS re-swept under tiling" in line)
+    assert row.endswith("| reverted |")
+
+
+def test_a_step_only_a_disclosed_row_runs_is_labelled_with_that_row(tmp_path: Path) -> None:
+    base = {"inferencer": "yoloe", "model_name": "m.pt", "anchor_crop": None}
+    crop = {"anchor": "player", "target": "number", "refiner_classes": ["number"], "pad": 1.1}
+    log = load_ablation_log(
+        _write_log(
+            tmp_path / "valid_arms.json",
+            [
+                _arm("y__baseline", "yoloe", "baseline", 0.25, base),
+                _arm(
+                    "y__crop",
+                    "yoloe",
+                    "number_crop",
+                    0.28,
+                    {**base, "anchor_crop": crop},
+                    baseline="y__baseline",
+                    delta=0.03,
+                ),
+            ],
+        )
+    )
+    # The manifest states the nested config without its defaults.
+    published_crop = {k: v for k, v in crop.items() if k != "pad"}
+    adopted = {
+        "yoloe": {"inferencer": "yoloe", "model_name": "m.pt"},
+        "yoloe_number_crop": {
+            "inferencer": "yoloe",
+            "model_name": "m.pt",
+            "anchor_crop": published_crop,
+        },
+    }
+    table = ablation_summary_table(log, adopted)
+    assert "disclosed row `yoloe_number_crop`" in table
+    assert "**kept**" not in table
+
+
+def test_a_large_regression_is_not_called_within_noise(tmp_path: Path) -> None:
+    log = _log_with_winner(tmp_path, winner_value=0.9, delta=-0.05)
+    table = ablation_summary_table(log, {"owlv2": {"nms_iou_threshold": 0.3}})
+    assert "within noise" not in table
+    assert "| reverted |" in table

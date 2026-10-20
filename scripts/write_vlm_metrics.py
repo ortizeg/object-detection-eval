@@ -50,6 +50,12 @@ _VLM_FILES: dict[str, str] = {
     "OmDet-Turbo": "omdet_turbo.json",
     "Florence-2": "florence2.json",
     "YOLO-World": "yolo_world.json",
+    "YOLOE": "yoloe.json",
+    "YOLOE + number crop": "yoloe_number_crop.json",
+    "YOLOE + prompt ensemble + number crop": "yoloe_ensemble_number_crop.json",
+    "YOLOE + prompt ensemble + number crop + box calibration": (
+        "yoloe_ensemble_number_crop_box_pad.json"
+    ),
     "LLMDet-large": "llmdet.json",
     "Qwen3-VL": "qwen3_vl.json",
 }

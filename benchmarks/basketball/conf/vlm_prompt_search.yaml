@@ -149,6 +149,18 @@ models:
     box_threshold: 0.01
     nms_iou_threshold: 0.5
 
+  # YOLOE (added 2026-10-11). YOLO-World's successor on the same ultralytics
+  # runtime: MobileCLIP text encoder + RepRTA head instead of CLIP. Same
+  # starting thresholds as the yolo_world row above (conf 0.01, NMS 0.5,
+  # imgsz 640), so the two real-time rows differ in the model alone. Searched
+  # on the largest, newest checkpoint; the checkpoint itself is an ablation
+  # element (vlm_ablation.yaml), exactly as YOLO-World's was.
+  - name: yoloe
+    inferencer: yoloe
+    model_name: yoloe-26x-seg.pt
+    box_threshold: 0.01
+    nms_iou_threshold: 0.5
+
   # Qwen3-VL-8B (added 2026-08-17). Generative, not a HF detection processor,
   # but its prompt is built MECHANICALLY from `classes` (see qwen3_vl.py's
   # module docstring), so it faces the same six candidates as every
