@@ -9,6 +9,7 @@ being written out in each caller.
 Pipeline order (BLOCKER-3)::
 
     remap_detections  ->  filters.area_outliers  ->  filters.single_best_per_class
+        ->  filters.pad_boxes (only when a row sets ``box_pad``)
 
 ``remap_detections`` MUST run first. ``filters.single_best_per_class``'s default
 ``single_class_ids={1, 3}`` means ball/rim ONLY in the post-remap merged5 eval-id
@@ -29,6 +30,7 @@ needs the ``[vlm]`` extra.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import TYPE_CHECKING, Protocol
 
 import supervision as sv
@@ -38,6 +40,7 @@ from object_detection_eval.data.taxonomy import remap_detections
 from object_detection_eval.inference.vlm.filters import (
     DEFAULT_SINGLETON_TOP_K,
     area_outliers,
+    pad_boxes,
     single_best_per_class,
 )
 from object_detection_eval.metrics.detection_map import detections_to_sv
@@ -77,6 +80,7 @@ def score_split(
     name_to_id: dict[str, int],
     max_area_fraction: float = 0.05,
     singleton_top_k: int = DEFAULT_SINGLETON_TOP_K,
+    box_pad: Mapping[int, float] | None = None,
 ) -> dict[str, sv.Detections]:
     """Run one inferencer over a split and return scorer-ready detections.
 
@@ -92,6 +96,9 @@ def score_split(
             and no caller in the benchmark overrides it.
         singleton_top_k: Passed to :func:`~.filters.single_best_per_class`. Same
             reason, same published default.
+        box_pad: Eval class id -> per-side growth for
+            :func:`~.filters.pad_boxes`. ``None`` (every row but the disclosed
+            YOLOE box-calibration one) leaves boxes as the model drew them.
 
     Returns:
         ``filename -> sv.Detections`` in the eval taxonomy's id space, ready to
@@ -107,6 +114,8 @@ def score_split(
         remapped = remap_detections(raw, label_map, name_to_id)
         area_filtered = area_outliers(remapped, max_area_fraction=max_area_fraction)
         final = single_best_per_class(area_filtered, top_k=singleton_top_k)
+        if box_pad:
+            final = pad_boxes(final, box_pad)
 
         pred_map[filename] = detections_to_sv(final, width, height)
     return pred_map

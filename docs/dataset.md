@@ -229,13 +229,13 @@ up front.
 | `referee in a striped shirt` | referee |
 | `orange basketball` | ball |
 | `basketball hoop and backboard` | rim |
+| `basketball rim` | rim |
 | `jersey number on a uniform` | number |
 | `official` | referee |
 | `umpire` | referee |
 | `man in a striped shirt` | referee |
 | `basketball official` | referee |
 | `black and white striped shirt` | referee |
-| `basketball rim` | rim |
 | `orange basketball rim` | rim |
 <!-- TABLE:taxonomy_aliases END -->
 

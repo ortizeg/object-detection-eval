@@ -64,6 +64,7 @@ from object_detection_eval.data.coco_gt import load_coco_gt
 from object_detection_eval.data.image import ImageLoader
 from object_detection_eval.data.taxonomy import resolve_taxonomy
 from object_detection_eval.inference.vlm.ablation import CACHE_FLOOR_THRESHOLD, replay
+from object_detection_eval.inference.vlm.anchor_crop import AnchorCropConfig
 from object_detection_eval.inference.vlm.filters import DEFAULT_SINGLETON_TOP_K
 from object_detection_eval.metrics.detection_map import compute_metrics
 from object_detection_eval.schemas.detection import BoundingBox, Detection
@@ -89,7 +90,8 @@ _FORBIDDEN_SEARCH_SPLIT = "test"
 #: Rather than approximate it, YOLO-World arms run live, one forward pass each.
 #: It is the cheapest model here, so the honest option is also the affordable
 #: one.
-_BACKEND_POSTPROCESS = frozenset({"yolo_world"})
+#: YOLOE shares YOLO-World's ultralytics post-processing, so the same applies.
+_BACKEND_POSTPROCESS = frozenset({"yolo_world", "yoloe"})
 
 
 class Arm(BaseModel, frozen=True):
@@ -137,6 +139,18 @@ class Arm(BaseModel, frozen=True):
 
     #: Ultralytics-only detection cap. Left ``None`` for everything else.
     max_det: int | None = None
+    #: YOLOE only: class -> phrases averaged into that class's text embedding.
+    #: Part of the forward-pass signature, since it changes what the model sees.
+    prompt_ensembles: dict[str, list[str]] | None = None
+    #: YOLOE only: class-agnostic NMS; ``None`` keeps the ultralytics default.
+    agnostic_nms: bool | None = None
+    #: YOLOE only: crop-and-re-detect second pass (e.g. ``number`` inside each
+    #: ``player`` box). ``None`` = one full-frame pass.
+    anchor_crop: AnchorCropConfig | None = None
+    #: Eval class name -> per-side box growth, applied after every filter (see
+    #: ``filters.pad_boxes``). Post-processing, so NOT in the signature: a sweep
+    #: over it replays one cached pass.
+    box_pad: dict[str, float] | None = None
     #: Inference resolution, where the backend exposes one (ultralytics `imgsz`).
     imgsz: int | None = None
     #: Overlapping-tile grid, e.g. ``[2, 2]``. ``None`` runs the whole image once.
@@ -199,9 +213,24 @@ class Arm(BaseModel, frozen=True):
             f"prompt{hashlib.sha256((self.prompt_template or '-').encode()).hexdigest()[:8]}",
             f"sample{self.sample}",
         ]
+        # Appended only when set, so every arm without an ensemble keeps the key
+        # its cache was written under (see fuse_vlm.py's CACHE KEY DRIFT note).
+        if self.prompt_ensembles:
+            parts.append(f"ens{_ensemble_digest(self.prompt_ensembles)}")
+        if self.agnostic_nms is not None:
+            parts.append(f"agnostic{self.agnostic_nms}")
+        if self.anchor_crop is not None:
+            blob = self.anchor_crop.model_dump_json().encode()
+            parts.append(f"crop{hashlib.sha256(blob).hexdigest()[:8]}")
         if not self.replayable:
             parts += [f"box{self.box_threshold}", f"nms{self.nms_iou_threshold}"]
         return "__".join(parts).replace("/", "_").replace(" ", "-")
+
+
+def _ensemble_digest(ensembles: dict[str, list[str]]) -> str:
+    """Short stable hash of a prompt-ensemble mapping."""
+    blob = json.dumps(ensembles, sort_keys=True).encode()
+    return hashlib.sha256(blob).hexdigest()[:8]
 
 
 class Element(BaseModel, frozen=True):
@@ -529,6 +558,19 @@ def build_inferencer(arm: Arm, *, raw_mode: bool) -> Any:
             imgsz=arm.imgsz if arm.imgsz is not None else 640,
             max_det=arm.max_det if arm.max_det is not None else 300,
         )
+    if arm.inferencer == "yoloe":
+        from object_detection_eval.inference.vlm.yoloe import YOLOEInferencer
+
+        return YOLOEInferencer(
+            model_name=arm.model_name,
+            classes=arm.classes,
+            prompt_ensembles=arm.prompt_ensembles,
+            agnostic_nms=arm.agnostic_nms if arm.agnostic_nms is not None else True,
+            box_threshold=box_threshold,
+            nms_iou_threshold=nms_iou,
+            imgsz=arm.imgsz if arm.imgsz is not None else 640,
+            max_det=arm.max_det if arm.max_det is not None else 300,
+        )
     if arm.inferencer == "gemini":
         from object_detection_eval.inference.vlm.gemini import GeminiInferencer
 
@@ -558,6 +600,32 @@ def build_inferencer(arm: Arm, *, raw_mode: bool) -> Any:
         )
     msg = f"unknown inferencer {arm.inferencer!r}"
     raise ValueError(msg)
+
+
+def _wrap_anchor_crop(inferencer: Any, arm: Arm) -> Any:
+    """Add the crop-and-re-detect second pass, if the arm asks for one.
+
+    The refiner is the arm's own model prompted for the target class alone, so
+    it is built through :func:`build_inferencer` like any other arm.
+    """
+    crop = arm.anchor_crop
+    if crop is None:
+        return inferencer
+    if arm.inferencer != "yoloe":
+        msg = f"arm {arm.id!r}: anchor_crop is only wired for yoloe"
+        raise ValueError(msg)
+    refiner_arm = arm.model_copy(
+        update={
+            "classes": crop.refiner_classes,
+            "prompt_ensembles": None,
+            "imgsz": crop.refiner_imgsz,
+            "box_threshold": crop.refiner_box_threshold,
+            "nms_iou_threshold": crop.refiner_nms_iou_threshold,
+            "tiles": None,
+            "anchor_crop": None,
+        }
+    )
+    return crop.wrap(inferencer, build_inferencer(refiner_arm, raw_mode=False), arm.classes)
 
 
 def _wrap_tiled(inferencer: Any, arm: Arm, *, raw_mode: bool = False) -> Any:
@@ -594,8 +662,9 @@ def collect_raw(
     holds that arm's finished detections and only the filters replay — which is
     still enough to make ``singleton_top_k`` free for it.
     """
-    inferencer = _wrap_tiled(
-        build_inferencer(arm, raw_mode=arm.replayable), arm, raw_mode=arm.replayable
+    inferencer = _wrap_anchor_crop(
+        _wrap_tiled(build_inferencer(arm, raw_mode=arm.replayable), arm, raw_mode=arm.replayable),
+        arm,
     )
     raw_map: dict[str, list[Detection]] = {}
     for i, filename in enumerate(filenames, start=1):
@@ -677,6 +746,17 @@ def _row(arm: Arm, metrics: dict[str, Any], substrate: str) -> dict[str, Any]:
     }
 
 
+def _box_pad_ids(arm: Arm, name_to_id: dict[str, int]) -> dict[int, float] | None:
+    """The arm's ``box_pad`` keyed by eval class id; an unknown name is an error."""
+    if not arm.box_pad:
+        return None
+    unknown = sorted(set(arm.box_pad) - set(name_to_id))
+    if unknown:
+        msg = f"arm {arm.id!r}: box_pad names classes the taxonomy does not have: {unknown}"
+        raise ValueError(msg)
+    return {name_to_id[name]: pad for name, pad in arm.box_pad.items()}
+
+
 def score_arm_from_cache(
     arm: Arm,
     raw_map: dict[str, list[Detection]],
@@ -707,6 +787,7 @@ def score_arm_from_cache(
             nms_iou_threshold=nms_iou,
             max_area_fraction=arm.max_area_fraction,
             singleton_top_k=arm.singleton_top_k,
+            box_pad=_box_pad_ids(arm, name_to_id),
         )
     return _row(arm, compute_metrics(gt_map, pred_map, id_to_name), substrate)
 
@@ -728,7 +809,9 @@ def score_arm_live(
     """
     from object_detection_eval.inference.vlm.protocol import score_split
 
-    inferencer = _wrap_tiled(build_inferencer(arm, raw_mode=False), arm, raw_mode=False)
+    inferencer = _wrap_anchor_crop(
+        _wrap_tiled(build_inferencer(arm, raw_mode=False), arm, raw_mode=False), arm
+    )
     pred_map = score_split(
         inferencer,
         image_dir=image_dir,
@@ -737,6 +820,7 @@ def score_arm_live(
         name_to_id=name_to_id,
         max_area_fraction=arm.max_area_fraction,
         singleton_top_k=arm.singleton_top_k,
+        box_pad=_box_pad_ids(arm, name_to_id),
     )
     unload = getattr(inferencer, "unload", None)
     if unload is not None:
@@ -905,6 +989,23 @@ def main() -> None:
     logger.info(f"substrate: {substrate}")
 
     name_to_id, id_to_name = resolve_taxonomy(args.taxonomy)
+
+    # Fail fast on unaliased vocabulary, as search_vlm_prompts.py does. A class
+    # with no eval mapping is dropped by remap_detections, so it scores as zero
+    # detections rather than as a bad prompt. The Round 4 `rim_word` arm
+    # `basketball rim` was scored exactly that way before this check existed.
+    unmapped = {
+        arm.id: missing
+        for arm in arms
+        if (missing := [c for c in arm.classes if c.lower() not in name_to_id])
+    }
+    if unmapped:
+        logger.error(
+            f"arms with classes that have no {args.taxonomy} mapping: {unmapped}. Add them "
+            f"to the taxonomy's `aliases` block."
+        )
+        sys.exit(2)
+
     split_dir = args.data_root / split
     gt_map = load_coco_gt(split_dir / "_annotations.coco.json", name_to_id)
     filenames = list(gt_map.keys())

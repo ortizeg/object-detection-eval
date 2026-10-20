@@ -72,7 +72,6 @@ class YOLOWorldInferencer(BaseInferencer):
         device: str = "auto",
     ) -> None:
         import torch
-        from ultralytics import YOLOWorld
 
         self.model_name = model_name
         self.classes = classes or []
@@ -91,11 +90,27 @@ class YOLOWorldInferencer(BaseInferencer):
         else:
             self._device = device
 
-        logger.info(f"Loading YOLO-World model {model_name} on {self._device}")
-        self._model = YOLOWorld(model_name)
+        logger.info(f"Loading {type(self).__name__} model {model_name} on {self._device}")
+        self._model = self._load_model()
+
+    def _load_model(self) -> Any:
+        """Load the checkpoint and encode the vocabulary into it.
+
+        The one step that differs between the ultralytics open-vocabulary
+        families; everything downstream of it (predict, NMS, conversion) is
+        shared. Subclasses override this and nothing else.
+        """
+        from ultralytics import YOLOWorld
+
+        model = YOLOWorld(self.model_name)
         if self.classes:
             # Prompt-then-detect: CLIP-encode the vocabulary ONCE, here.
-            self._model.set_classes(self.classes)
+            model.set_classes(self.classes)
+        return model
+
+    def _predict_kwargs(self) -> dict[str, Any]:
+        """Extra ``predict`` arguments a subclass needs; none for YOLO-World."""
+        return {}
 
     def predict(
         self,
@@ -121,11 +136,12 @@ class YOLOWorldInferencer(BaseInferencer):
                 max_det=self.max_det,
                 device=self._device,
                 verbose=False,
+                **self._predict_kwargs(),
             )
         except Exception:
             # Re-raise, never return []: a crashed forward pass (e.g. an op the
             # MPS backend lacks) would otherwise score as "found nothing".
-            logger.exception("YOLO-World inference failed")
+            logger.exception(f"{type(self).__name__} inference failed")
             raise
 
         if not results:
@@ -141,7 +157,7 @@ class YOLOWorldInferencer(BaseInferencer):
             torch.cuda.empty_cache()
         elif self._device == "mps":
             torch.mps.empty_cache()
-        logger.info("YOLO-World model unloaded")
+        logger.info(f"{type(self).__name__} model unloaded")
 
     def _convert_results(
         self,
