@@ -240,8 +240,8 @@ results file:
 <!-- TABLE:per_class_5c END -->
 
 The `rim` column is essentially solved by every fine-tuned model — the opposite
-of the zero-shot VLMs, which collapse on it (see
-[VLM_VS_FINETUNED.md](VLM_VS_FINETUNED.md)). The separation between models lives
+of the open-weights zero-shot VLMs, which collapse on it; only paid APIs with a
+zoomed second pass approach it (see [VLM_VS_FINETUNED.md](VLM_VS_FINETUNED.md)). The separation between models lives
 almost entirely in the hard classes: `ball` (tiny, fast) and `number` (small
 jersey text), where YOLO26m's recall leads the coarse task.
 
@@ -501,18 +501,24 @@ estimates without significance claims; do not present a fully-ordered
 leaderboard. Note also that training-seed variance is completely unmeasured here
 and is plausibly larger than the sampling uncertainty we do quantify.
 
-**7. Fine-tuning on 465 images beats the best zero-shot VLM by ~2.3×** (0.716 vs
-0.315 mAP@50:95, same protocol — see
-[VLM_VS_FINETUNED.md](VLM_VS_FINETUNED.md)). Zero-shot is a labelling bootstrap
-and a floor, not a deployment answer, when the classes are domain-specific.
+**7. Against open weights, fine-tuning on 465 images still wins by ~1.8×; against
+paid APIs, the gap has closed.** (Same protocol; see
+[VLM_VS_FINETUNED.md](VLM_VS_FINETUNED.md).) The best open-weights zero-shot row,
+LLMDet-large, scores 0.388 against YOLO26m's 0.716. The best single paid row
+(two-pass Gemini 4 Argon) scores 0.534, and a fusion of paid zero-shot pipelines
+scores 0.683. Under the clip-clustered bootstrap that fusion is level with YOLO26m
+(−0.033, CI [−0.070, +0.027]) and DEIM-M, and ahead of the bottom four rows of this
+report, at three billed APIs and about two dozen calls per image. Zero-shot open
+weights are a labelling bootstrap, not a deployment answer, when the classes are
+domain-specific. Paid zero-shot is now a real accuracy option with a per-image bill.
 
-This margin was ~2.9× until 2026-08-05, against a zero-shot ceiling of 0.250. It
-narrowed because the zero-shot side improved, not because anything here changed:
-a configuration ablation across the five open-weights VLMs — NMS thresholds,
-input tiling, checkpoints, per-class vocabularies — moved that ceiling to 0.315
-and put an open-weights model above Gemini for the first time. The direction of
-the conclusion is unchanged and the size of it is not, which is the sort of thing
-worth restating rather than leaving a stale multiple in place.
+The margin was ~2.9× until 2026-08-05, against a zero-shot ceiling of 0.250, and
+~2.3× after the open-weights configuration ablation (0.315). It narrowed because
+the zero-shot side improved, not because anything here changed: two more
+open-weights models (LLMDet-large, Qwen3-VL-8B), then billed APIs (GPT-6 Astra,
+DINO-X Pro, Gemini 4 Argon), crop-and-re-detect pipelines and fusion. The direction
+of the open-weights conclusion is unchanged and its size is not, which is the
+sort of thing worth restating rather than leaving a stale multiple in place.
 
 ## Reproducing every table in this report
 

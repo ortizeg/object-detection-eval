@@ -116,14 +116,22 @@ Clip-clustered bootstrap (all 10 clip resamples; `scripts/run_fusion_clustered_b
 
 | fusion4 minus | Δ | clustered 95% CI |
 | --- | --- | --- |
+| YOLO26m (0.716) | −0.033 | [−0.070, +0.027], a tie |
 | DEIM-M (0.686) | −0.003 | [−0.020, +0.006], a tie |
 | YOLOX-M (0.672) | +0.011 | [+0.004, +0.020] |
 | RF-DETR-M (0.646) | +0.036 | [+0.018, +0.053] |
 | RTMDet-M (0.628) | +0.055 | [+0.041, +0.065] |
+| DAMO-YOLO-M (0.619) | +0.064 | [+0.059, +0.069] |
+| RT-DETRv2-M (0.581) | +0.102 | [+0.064, +0.140] |
 | three-member line | +0.012 | [+0.007, +0.018] |
 
-Per clip, fusion4 / DEIM-M / YOLOX-M: knicks-g1 0.743 / 0.738 / 0.723; knicks-g4 0.689 /
-0.709 / 0.674; magic-g4 0.632 / 0.626 / 0.628.
+Per clip, fusion4 / YOLO26m / DEIM-M / YOLOX-M: knicks-g1 0.743 / 0.713 / 0.738 / 0.723;
+knicks-g4 0.689 / 0.737 / 0.709 / 0.674; magic-g4 0.632 / 0.702 / 0.626 / 0.628.
+
+Correction (same day): the first run of the script compared against five fine-tuned rows
+and left out YOLO26m (the top row) and DAMO-YOLO-M, and the report briefly called DEIM-M
+"the best fine-tuned detector". All seven are in now. The fusion is in the top tier, not
+above it.
 
 Note: the bootstrap scorer puts Gemini at 0.540, not 0.534. Its confidences are mostly 1.0,
 and the two scorers break ties differently. Every other line matches to 0.001.

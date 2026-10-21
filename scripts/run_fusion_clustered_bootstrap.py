@@ -33,7 +33,15 @@ from object_detection_eval.metrics.bootstrap import _score_draw, load_prediction
 _DUMPS = Path("benchmarks/basketball/results/vlm")
 _DATA = rcb._DEFAULT_DATA_ROOT
 _OUT = Path("benchmarks/basketball/results/bootstrap/bootstrap_clustered_fusion4.json")
-_FINE_TUNED = ("DEIM-M", "YOLOX-M", "RF-DETR-M", "RTMDet-M", "RT-DETRv2-M")
+_FINE_TUNED = (
+    "YOLO26m",
+    "DEIM-M",
+    "YOLOX-M",
+    "RF-DETR-M",
+    "RTMDet-M",
+    "DAMO-YOLO-M",
+    "RT-DETRv2-M",
+)
 _TRIO = "astra_crop_refine+dinox_pro_rimtrim+dinox_preview_rimtrim"
 #: line -> test dump, relative to results/vlm/.
 _ZERO_SHOT = {
@@ -84,7 +92,7 @@ def main() -> None:
     for cluster in clusters:
         s = _score_draw(np.asarray(cluster, dtype=np.intp), gt, preds, fns)
         out["per_clip"][clip_key(fns[int(cluster[0])])] = {
-            m: s[f"{m}::{_METRIC}"] for m in ("fusion4", "fusion3", "YOLOX-M", "DEIM-M")
+            m: s[f"{m}::{_METRIC}"] for m in ("fusion4", "fusion3", "YOLO26m", "DEIM-M", "YOLOX-M")
         }
 
     _OUT.write_text(json.dumps(out, indent=2, default=float) + "\n")

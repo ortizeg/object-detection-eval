@@ -23,6 +23,43 @@ zero-shot mAP and a fine-tuned mAP are directly comparable — the gap between
 them is a real capability gap, not a protocol artifact. The methodology behind
 this parity is documented in [../../../docs/methodology.md](../../../docs/methodology.md).
 
+## Where things stand (2026-10-21)
+
+Test split, mAP@50:95. Each line links to the section with its caveats.
+
+| Line | test | kind |
+| --- | --- | --- |
+| Best open-weights row: [LLMDet-large](#two-more-rows-llmdet-large-and-qwen3-vl-8b) | 0.388 | single pass, runs offline |
+| Best vocabulary-prompted row: [DINO-X Pro](#the-zero-shot-ceiling) | 0.439 | billed API; 0.520 with the rim box trim |
+| Best single-pass row: [GPT-6 Astra](#the-zero-shot-ceiling) | 0.501 | billed API |
+| Best single row: Gemini 4 Argon, two-pass | 0.534 | billed API, about 12 calls per image |
+| Astra crop-refine | 0.588 | billed API, two-pass |
+| Fusion of the [API rows](#improving-the-api-rows-fusion-and-rim-crop-refine) (Astra, Sol, Opus, Gemini) | 0.598 | four billed APIs |
+| **[Best zero-shot line](#the-zero-shot-ceiling)**: Astra crop-refine + DINO-X Pro + DINO-X preview + Gemini | **0.683** | three billed APIs, about two dozen calls per image |
+| Fine-tuned, weakest (RT-DETRv2-M) | 0.581 | 464 training images |
+| Fine-tuned, top tier (YOLO26m / DEIM-M / YOLOX-M) | 0.716 / 0.686 / 0.672 | a statistical tie among themselves |
+
+- **The best zero-shot line is in the fine-tuned top tier, not above it.** Under the
+  clip-clustered bootstrap it is level with YOLO26m (−0.033, CI [−0.070, +0.027]) and
+  DEIM-M (−0.003, CI [−0.020, +0.006]), narrowly ahead of YOLOX-M, and clearly ahead of
+  the other four fine-tuned detectors. The test set is three clips, so treat every
+  interval here as optimistic.
+- **Without a per-image bill, fine-tuning still wins clearly.** The best open-weights
+  row is 1.50× behind the *weakest* fine-tuned detector.
+- **Zooming in is the lever that transfers.** The large gains on `rim` and `number`
+  came from re-detecting on a crop, not from prompt wording. `ball` is the class
+  nothing fixed: zooming on it lowered ball AP50 for every API model, and it is the
+  weakest class of the best zero-shot line (0.79 AP50). Where the box shape was the
+  problem (DINO-X and OWLv2 box the net with the rim), trimming the box fixed it.
+- **Fusion helps when members make different mistakes.** DINO-X plus the API models
+  stacks; three different API models fused are no better than three runs of Astra
+  fused. The original eight-model fusion now scores *below* its best member (0.525 vs
+  0.534) because only Gemini finds the rim, and WBF scales that box down by 1/8.
+- **How the numbers were produced.** Every configuration was chosen on the 96-image
+  val split. Each test number was scored once per adopted configuration, under rules
+  written down before scoring (`docs/plans/`). Rows that were hand-tuned or are
+  pipeline variants are labelled as disclosed extras.
+
 ## How each model's prompt was chosen
 
 An earlier revision of this report criticised unequal tuning effort as an
@@ -537,8 +574,8 @@ inference took it from 0.188 (tied for last) to 0.318. Both rows' tuning is
 summarised in [Two more rows: LLMDet-large and
 Qwen3-VL-8B](#two-more-rows-llmdet-large-and-qwen3-vl-8b) below.
 
-**DINO-X Pro is second, at 0.439. It is also billed, but it went through the
-equal-effort search.** Added 2026-10-12. DINO-X is IDEA Research's successor to
+**DINO-X Pro, at 0.439, is the best vocabulary-prompted row. It is also billed,
+but it went through the equal-effort search.** Added 2026-10-12. DINO-X is IDEA Research's successor to
 Grounding DINO, and its Pro variant exists only as a hosted API. Unlike Gemini
 and Astra, it takes a class vocabulary rather than a free-text instruction. So
 it faced the same six shared candidates as the open-weights rows (winner:
@@ -576,7 +613,8 @@ Grounding DINO, LLMDet, Florence-2, OmDet-Turbo or YOLO-World, which never put
 a box on the ring. (Disclosed extras, 2026-10-15. The headline rows are unchanged.)
 
 **Fusing Astra crop-refine, DINO-X and Gemini gives the best zero-shot result
-in this report: 0.683, ahead of YOLOX-M and level with DEIM-M.** (Disclosed
+in this report: 0.683, statistically level with the top three fine-tuned
+detectors and clearly ahead of the other four.** (Disclosed
 extra. Started 2026-10-13, extended 2026-10-15, Gemini added 2026-10-21.) The
 fusion is weighted box fusion (IoU 0.55, equal weights, the fusion round's
 pre-committed operator) of four members: Astra crop-refine, DINO-X Pro + trim,
@@ -602,16 +640,26 @@ in this line (0.879 → 0.918).
 Against the fine-tuned rows, using the **clip-clustered** paired bootstrap (the
 honest interval for a three-clip test set; all 10 clip resamples enumerated):
 
-- YOLOX-M (0.672): the fusion is ahead, +0.011, CI [+0.004, +0.020], and ahead on
-  each of the three clips.
-- DEIM-M (0.686): a tie, −0.003, CI [−0.020, +0.006]. Per clip, the fusion is
-  ahead on two clips and behind on one.
-- RF-DETR-M (0.646) and RTMDet-M (0.628): the fusion is ahead.
-- The three-member line it replaces: +0.012, CI [+0.007, +0.018].
+| fusion minus | Δ mAP@50:95 | clustered 95% CI | clips where the fusion is ahead |
+| --- | --- | --- | --- |
+| YOLO26m (0.716) | −0.033 | [−0.070, +0.027] | 1 of 3 |
+| DEIM-M (0.686) | −0.003 | [−0.020, +0.006] | 2 of 3 |
+| YOLOX-M (0.672) | +0.011 | [+0.004, +0.020] | 3 of 3 |
+| RF-DETR-M (0.646) | +0.036 | [+0.018, +0.053] | |
+| RTMDet-M (0.628) | +0.055 | [+0.041, +0.065] | |
+| DAMO-YOLO-M (0.619) | +0.064 | [+0.059, +0.069] | |
+| RT-DETRv2-M (0.581) | +0.102 | [+0.064, +0.140] | |
+| the three-member line it replaces | +0.012 | [+0.007, +0.018] | 3 of 3 |
 
-So it sits at the top of the fine-tuned table, statistically level with the best
-fine-tuned detector. The cost is three billed APIs and roughly two dozen calls per
-image (the Gemini member alone makes about 12). Script:
+Read this the way [FINAL_COMPARISON_640.md](FINAL_COMPARISON_640.md) reads its
+own top three. YOLO26m's lead is 0.033 as a point estimate, and the interval
+spans zero; DEIM-M is a tie; the YOLOX-M interval clears zero, but by 0.004,
+with only ten distinct clip resamples behind it. **The defensible claim is that the
+fusion sits in the top accuracy tier with YOLO26m, DEIM-M and YOLOX-M, not that it beats
+fine-tuning.** It is clearly ahead of RF-DETR-M, RTMDet-M, DAMO-YOLO-M and
+RT-DETRv2-M. The cost is three billed APIs and roughly two dozen calls per
+image (the Gemini member alone makes about 12), against a fine-tuned model that runs
+in about 6 ms on a T4. Script:
 `scripts/run_fusion_clustered_bootstrap.py`; results:
 `results/bootstrap/bootstrap_clustered_fusion4.json`.
 
@@ -702,11 +750,15 @@ fine-tuning on this small in-domain dataset still buys a real margin: 1.5× over
 LLMDet-large, still the gap between "usable for bootstrapping labels" and "usable
 in production", and closing it even that far took an exhaustive configuration
 search on the original six plus two more model evaluations. But for the best
-detector you can *rent*, that margin is nearly gone (1.16×), and a zero-shot
-crop-refine pipeline on the same paid API actually reaches it. If the deployment
-constraint is "no offline weights, no per-image cost", the fine-tuned detector
-still wins clearly; if it is "best accuracy, willing to call an API", a
-general-purpose model now matches a detector fine-tuned on this exact dataset.
+detector you can *rent*, that margin is nearly gone (Astra 1.16×, two-pass Gemini
+1.09×). A zero-shot crop-refine pipeline on a paid API passes the weakest
+fine-tuned detector, and fusing four paid pipelines (0.683) reaches the top
+accuracy tier, level with YOLO26m, DEIM-M and YOLOX-M under the clustered
+bootstrap, though still 0.033 below YOLO26m as a point estimate. If the
+deployment constraint is "no offline weights, no per-image cost", the fine-tuned
+detector still wins clearly; if it is "best accuracy, willing to call several
+APIs about two dozen times per image", zero-shot now matches a detector
+fine-tuned on this exact dataset.
 
 The trend across every revision of this section points the same way: the margin
 was smaller than this report originally claimed, and most of what has closed it
@@ -820,8 +872,8 @@ making different mistakes. Calling the best model three times is as good as
 mixing in the others, and simpler. Exploration, not a result: fusing Sol and Opus with Astra's
 crop-refine output gives 0.589, no better than crop-refine alone (0.588). Fusion
 and crop-refine fix the same thing, the rim boxes, so they do not stack. Fusing DINO-X
-(trimmed) with crop-refine does stack, to 0.671, because DINO-X's errors differ
-from the API models' (see the DINO-X section above).
+(trimmed) with crop-refine does stack, to 0.671 (0.683 once Gemini joins),
+because DINO-X's errors differ from the API models' (see the DINO-X section above).
 
 **Adding Gemini as a fourth API model (2026-10-21).** The two-pass Gemini 4 Argon
 row (0.534) is now the strongest API row, so the study was re-run with the same
@@ -1285,11 +1337,13 @@ strongest open-vocabulary detectors available now are **API-only**, which puts
 them in Gemini's category rather than the open-weights one. **GPT-6 Astra**
 (added 2026-09-25) makes that concrete: it is now a row in the table above, in
 that same billed-API category, and it leads the whole comparison — the cost is a
-per-image bill and a hand-tuned prompt disclosed on the row. Others in this class
-remain uncovered: **DINO-X Pro** (59.8 AP LVIS-minival) and **Grounding DINO
-1.5/1.6 Pro** (55.7 AP) both substantially exceed the `grounding-dino-base`
-checkpoint tested here. Using any of them costs money per run and makes the row
-non-reproducible without a key.
+per-image bill and a hand-tuned prompt disclosed on the row. **DINO-X Pro**
+(59.8 AP LVIS-minival), which this section used to list as uncovered, is now a
+row too (2026-10-12), and Gemini moved to the Gemini 4 Argon release
+(2026-10-14). **Grounding DINO 1.5/1.6 Pro** (55.7 AP) remains uncovered; DINO-X
+is its successor from the same lab. Every billed row costs money per run and is
+non-reproducible without a key; the committed dumps let a reader re-score them
+for free.
 
 Three open-weights gaps this section used to flag are now closed: **YOLO-World**
 (added 2026-08-01), **LLMDet-large** and **Qwen3-VL-8B** (both 2026-08-19) are
@@ -1327,7 +1381,9 @@ detectors sit well below the fine-tuned ceiling. The GPT-6 Astra rows are the
 exception that sharpens the rule: a frontier API closes most of the gap
 (0.501 vs the weakest fine-tuned 0.581), and simply zooming in to re-detect the
 rim — the class the pattern above says should be hopeless — closes the rest
-(crop-refine 0.588). What is left is not a capability ceiling on zero-shot
+(crop-refine 0.588). Gemini 4 Argon, told that the rim is the ring alone, scores
+rim AP50 1.000 with the same zoom, and fusing the paid pipelines reaches the
+fine-tuned top tier (0.683). What is left is not a capability ceiling on zero-shot
 detection but a deployment trade: offline weights and zero per-image cost on one
 side, a per-image API bill and the best available accuracy on the other.
 
