@@ -1,0 +1,102 @@
+{
+  "method": "wbf",
+  "iou": 0.55,
+  "n_boot": 1000,
+  "seed": 0,
+  "results": {
+    "astra_alone": {
+      "mAP_50_95": 0.501,
+      "mAP_50": 0.8234,
+      "per_class_ap50": {
+        "player": 0.98,
+        "ball": 0.776,
+        "referee": 0.979,
+        "rim": 0.521,
+        "number": 0.861
+      },
+      "recall_at_p95": 0.908
+    },
+    "gemini_alone": {
+      "mAP_50_95": 0.5342,
+      "mAP_50": 0.8659,
+      "per_class_ap50": {
+        "player": 0.976,
+        "ball": 0.63,
+        "referee": 0.989,
+        "rim": 1.0,
+        "number": 0.735
+      },
+      "recall_at_p95": null
+    },
+    "headline": {
+      "kind": "pre-registered",
+      "models": [
+        "astra",
+        "sol",
+        "claude_opus",
+        "gemini"
+      ],
+      "mAP_50_95": 0.5977,
+      "mAP_50": 0.9156,
+      "per_class_ap50": {
+        "player": 0.98,
+        "ball": 0.778,
+        "referee": 0.99,
+        "rim": 0.935,
+        "number": 0.895
+      },
+      "recall_at_p95": 0.899,
+      "delta_vs_astra": {
+        "mean": 0.0967,
+        "ci95": [
+          0.0852,
+          0.1084
+        ]
+      },
+      "delta_vs_gemini": {
+        "mean": 0.0622,
+        "ci95": [
+          0.0459,
+          0.0779
+        ]
+      }
+    },
+    "alternative": {
+      "kind": "pre-registered",
+      "models": [
+        "gemini",
+        "astra"
+      ],
+      "mAP_50_95": 0.5872,
+      "mAP_50": 0.9087,
+      "per_class_ap50": {
+        "player": 0.98,
+        "ball": 0.775,
+        "referee": 0.99,
+        "rim": 0.932,
+        "number": 0.868
+      },
+      "recall_at_p95": 0.893,
+      "delta_vs_astra": {
+        "mean": 0.0862,
+        "ci95": [
+          0.0756,
+          0.0961
+        ]
+      },
+      "delta_vs_gemini": {
+        "mean": 0.0518,
+        "ci95": [
+          0.0382,
+          0.065
+        ]
+      }
+    },
+    "headline_iou_sensitivity": {
+      "0.4": 0.5804,
+      "0.5": 0.5917,
+      "0.6": 0.6004,
+      "0.7": 0.5918
+    }
+  }
+}

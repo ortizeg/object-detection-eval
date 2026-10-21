@@ -71,7 +71,7 @@ About 96 × (1 + 3 + 3 + 2) ≈ 900 calls, plus 94 for the test run.
 - [x] Rounds 0-3
 - [x] Test run
 - [x] Report updated
-- [ ] Fusion re-run with the new Gemini row (deferred until the other new methods land; see below)
+- [x] Fusion re-run with the new Gemini row: done 2026-10-21, see `fusion-refresh-2026-10.md`
 
 ## Results (val, 2026-10-12)
 

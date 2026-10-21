@@ -21,6 +21,14 @@ Usage::
     pixi run python scripts/fuse_dinox.py                    # val: every pair + members alone
     pixi run python scripts/fuse_dinox.py --final astra_crop_refine+dinox_pro_rimtrim
     pixi run python scripts/fuse_dinox.py --final astra_crop_refine+dinox_pro_rimtrim --rank
+    pixi run python scripts/fuse_dinox.py --refresh                  # 2026-10-21 round, val
+    pixi run python scripts/fuse_dinox.py --final <FUSED3>+gemini    # ... and its test look
+
+The 2026-10-21 refresh (docs/plans/fusion-refresh-2026-10.md, F3) tries the two
+new rows, Gemini 4 Argon two-pass and calibrated YOLOE, on top of ``FUSED3``.
+Neither has a val dump; their val predictions are replayed from the ablation
+cache. Gemini is stochastic and has three cached val draws: every draw is
+scored, none is picked.
 """
 
 from __future__ import annotations
@@ -68,6 +76,19 @@ THIRD = ["dinox_preview_rimtrim", "trex_fewshot"]
 #: Round 13: the Round 10 winner, and the free open-weights members tried on top of it.
 FUSED3 = [*ADOPTED, "dinox_preview_rimtrim"]
 EXTRA = ["llmdet", "owlv2_rimtrim"]
+#: The refresh's candidates: member -> (val arm ids, one per draw; test dump stem).
+NEW: dict[str, tuple[list[str], str]] = {
+    "gemini": (
+        [f"gemini__crop_number_stack_argon__{k}" for k in range(3)],
+        "gemini",
+    ),
+    "yoloe": (
+        ["yoloe__box_pad_on_ensemble_crop__--player---0.02---ball---0.02---referee-e7e3eb2c"],
+        "yoloe_ensemble_number_crop_box_pad",
+    ),
+}
+_ARMS = _DUMPS / "ablation" / "valid_arms.json"
+_CACHE = _REPO / ".cache" / "vlm_ablation"
 
 
 def _load_fuse_vlm() -> Any:
@@ -114,11 +135,54 @@ def _write_fused(pred: dict[str, list[Any]], dims: dict[str, tuple[int, int]], p
     logger.info(f"wrote {path}")
 
 
+def _replay_arm(
+    fv: Any, arm_id: str, dims: dict[str, tuple[int, int]], n2i: dict[str, int]
+) -> dict[str, list[Any]]:
+    """One ablation arm's published val detections, rebuilt from its raw cache."""
+    with open(_ARMS) as f:
+        arm = next(a for a in json.load(f)["arms"] if a["arm"] == arm_id)
+    blob = fv.resolve_cache(_CACHE, "valid", arm["model"], arm["config"])
+    if blob is None:
+        logger.error(f"{arm_id}: no val cache")
+        sys.exit(2)
+    out: dict[str, list[Any]] = fv.published_detections(arm["model"], arm, blob, dims, n2i)
+    return out
+
+
+def _refresh_val(fv: Any, dims: dict[str, tuple[int, int]], n2i: dict[str, int]) -> dict[str, Any]:
+    """F3 on val: FUSED3, each candidate alone and on top, one row per draw."""
+    stems = {m: MEMBERS[m][0] for m in FUSED3}
+    loaded = fv.load_test_dumps(_DUMPS, list(stems.values()), dims)
+    dumps = {m: loaded[stem] for m, stem in stems.items()}
+    draws = {
+        m: [_replay_arm(fv, arm_id, dims, n2i) for arm_id in arm_ids]
+        for m, (arm_ids, _) in NEW.items()
+    }
+    combos: list[tuple[str, list[dict[str, list[Any]]]]] = [
+        ("+".join(FUSED3), [dumps[m] for m in FUSED3])
+    ]
+    for m, ds in draws.items():
+        for k, d in enumerate(ds):
+            tag = f"{m}@{k}" if len(ds) > 1 else m
+            combos.append((tag, [d]))
+            combos.append(("+".join([*FUSED3, tag]), [*(dumps[x] for x in FUSED3), d]))
+    for k, g in enumerate(draws["gemini"]):
+        combos.append(
+            (
+                "+".join([*FUSED3, "yoloe", f"gemini@{k}"]),
+                [*(dumps[x] for x in FUSED3), draws["yoloe"][0], g],
+            )
+        )
+        combos.append((f"astra_crop_refine+gemini@{k}", [dumps["astra_crop_refine"], g]))
+    return {"combos": combos}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--data-root", type=Path, default=_DATA)
     parser.add_argument("--final", default=None, metavar="A+B[+C]", help="Score on test.")
     parser.add_argument("--rank", action="store_true", help="--final: rank-normalise members.")
+    parser.add_argument("--refresh", action="store_true", help="2026-10-21 round F3, val.")
     args = parser.parse_args()
 
     split = "test" if args.final else "valid"
@@ -140,6 +204,7 @@ def main() -> None:
             (len(parts) == 2 and parts[0] in ASTRA and parts[1] in DINOX)
             or (len(parts) == 3 and parts[:2] == ADOPTED and parts[2] in THIRD)
             or (parts[:3] == FUSED3 and 4 <= len(parts) <= 5 and set(parts[3:]) <= set(EXTRA))
+            or (parts[:3] == FUSED3 and 4 <= len(parts) <= 5 and set(parts[3:]) <= set(NEW))
         )
         if not known:
             logger.error(f"--final must be a val combo, e.g. {ASTRA[0]}+{DINOX[0]}")
@@ -158,8 +223,12 @@ def main() -> None:
         if len(extra) == len(EXTRA):
             combos.append(([*FUSED3, *EXTRA], False))
 
+    if args.refresh:
+        _run_refresh(fv, dims, gt, n2i, i2n)
+        return
+
     needed = sorted({m for c, _ in combos for m in c})
-    stems = {m: MEMBERS[m][col] for m in needed}
+    stems = {m: MEMBERS[m][col] if m in MEMBERS else NEW[m][1] for m in needed}
     loaded = fv.load_test_dumps(_DUMPS, list(stems.values()), dims)
     dumps = {m: loaded[stem] for m, stem in stems.items() if stem in loaded}
     missing = [m for m in needed if m not in dumps]
@@ -204,6 +273,36 @@ def main() -> None:
         rows = prior + rows
     blob[split] = rows
     _OUT.parent.mkdir(parents=True, exist_ok=True)
+    with open(_OUT, "w") as f:
+        json.dump(blob, f, indent=2)
+    logger.info(f"wrote {_OUT}")
+
+
+def _run_refresh(
+    fv: Any,
+    dims: dict[str, tuple[int, int]],
+    gt: dict[str, Any],
+    n2i: dict[str, int],
+    i2n: dict[int, str],
+) -> None:
+    """Score F3's val combos and store them under ``valid_refresh``."""
+    rows = []
+    for name, members in _refresh_val(fv, dims, n2i)["combos"]:
+        pred = {
+            fn: fv.fuse("wbf", [m.get(fn, []) for m in members], DEFAULT_FUSION_IOU, 1)
+            if len(members) > 1
+            else members[0].get(fn, [])
+            for fn in gt
+        }
+        row = _summary(name, fv.score(pred, dims, gt, i2n))
+        rows.append(row)
+        logger.info(
+            f"[valid] {row['combo']:<70} mAP@50:95={row['mAP_50_95']:.4f} "
+            f"recall@95={row['recall_at_p95']} AP50={row['per_class_ap50']}"
+        )
+    with open(_OUT) as f:
+        blob = json.load(f)
+    blob["valid_refresh"] = rows
     with open(_OUT, "w") as f:
         json.dump(blob, f, indent=2)
     logger.info(f"wrote {_OUT}")

@@ -72,10 +72,66 @@ equal weights. Not re-litigated.
   suppresses inside the backend, as for YOLO-World). `--verify` reproduces Gemini (0.5248)
   and YOLOE (0.3507) val exactly.
 
+## Results (2026-10-21, 0 API calls)
+
+### F1. The eight, test re-scored once
+
+| | test mAP@50:95 | Δ vs best single | recall @ 95% P |
+| --- | --- | --- | --- |
+| 2026-08 (Gemini 3.1 pro preview, 0.250) | 0.437 | +0.049 (LLMDet) | 0.582 |
+| **2026-10-21 (Gemini Argon two-pass, 0.534)** | **0.525** | **−0.009** (Gemini) | 0.624 |
+
+The ensemble now loses to its best member. Rim: Gemini alone 1.00 AP50, every other member
+≤ 0.005, fused 0.445. WBF scales a cluster by contributors / n_models, so a Gemini-only rim
+box keeps 1/8 of its score. Val tables not re-run (see rule F1).
+
+### F2. API models
+
+| test | mAP@50:95 | Δ vs Gemini (95% CI) | Δ vs Astra (95% CI) | recall @ 95% P |
+| --- | --- | --- | --- | --- |
+| Gemini alone | 0.534 | — | | never |
+| Astra alone | 0.501 | | — | 0.908 |
+| **all four (headline)** | **0.598** | +0.062 [+0.046, +0.078] | +0.097 [+0.085, +0.108] | 0.899 |
+| Gemini + Astra (alternative) | 0.587 | +0.052 [+0.038, +0.065] | +0.086 [+0.076, +0.096] | 0.893 |
+
+Image-level paired bootstrap, 1,000 resamples, seed 0. `results/vlm/fusion/api_fusion_gemini_test.json`.
+
+### F3. Best zero-shot line (val)
+
+| val | draw 0 | draw 1 | draw 2 |
+| --- | --- | --- | --- |
+| base trio | 0.6239 | | |
+| + gemini | 0.6491 (+0.025) | 0.6545 (+0.031) | 0.6469 (+0.023) |
+| + yoloe | 0.6220 (−0.002) | | |
+| + yoloe + gemini | 0.6498 | 0.6546 | 0.6470 |
+
+Gemini clears +0.005 on every draw: **adopted**. YOLOE loses on its own and adds ≤ +0.0007 on
+top of Gemini: **not adopted**. Exploration: Astra crop-refine + Gemini pair 0.603-0.609.
+
+**Test, once:** `astra_crop_refine+dinox_pro_rimtrim+dinox_preview_rimtrim+gemini`
+= **0.6829** (trio 0.6707), recall @ 95% P 0.918 (trio 0.879). AP50: player 0.978, ball 0.789,
+referee 1.000, rim 0.981, number 0.913.
+
+Clip-clustered bootstrap (all 10 clip resamples; `scripts/run_fusion_clustered_bootstrap.py`):
+
+| fusion4 minus | Δ | clustered 95% CI |
+| --- | --- | --- |
+| DEIM-M (0.686) | −0.003 | [−0.020, +0.006], a tie |
+| YOLOX-M (0.672) | +0.011 | [+0.004, +0.020] |
+| RF-DETR-M (0.646) | +0.036 | [+0.018, +0.053] |
+| RTMDet-M (0.628) | +0.055 | [+0.041, +0.065] |
+| three-member line | +0.012 | [+0.007, +0.018] |
+
+Per clip, fusion4 / DEIM-M / YOLOX-M: knicks-g1 0.743 / 0.738 / 0.723; knicks-g4 0.689 /
+0.709 / 0.674; magic-g4 0.632 / 0.626 / 0.628.
+
+Note: the bootstrap scorer puts Gemini at 0.540, not 0.534. Its confidences are mostly 1.0,
+and the two scorers break ties differently. Every other line matches to 0.001.
+
 ## Status
 
 - [x] Rules written (this doc)
-- [ ] F1 test re-score
-- [ ] F2 test fusion + bootstrap
-- [ ] F3 val selection; test once if adopted
-- [ ] Report sections updated; xfail on the fusion/per-model consistency test removed
+- [x] F1 test re-score
+- [x] F2 test fusion + bootstrap
+- [x] F3 val selection; test once (Gemini adopted)
+- [x] Report sections updated; xfail on the fusion/per-model consistency test removed
