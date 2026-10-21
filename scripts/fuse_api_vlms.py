@@ -25,7 +25,13 @@ Runs LOCALLY on ``results/vlm/*.json``: no API, no GPU, reproducible with no key
 Reuses fuse_vlm.py's loader, operators and scorer so it cannot drift from the
 published fusion.
 
-Usage:  pixi run python scripts/fuse_api_vlms.py [--data-root PATH]
+THE 2026-10-21 REFRESH (``--with-gemini``, docs/plans/fusion-refresh-2026-10.md).
+Gemini 4 Argon two-pass (0.534) is now the strongest API row. Same operator; the
+headline becomes all four API rows, the alternative the top two published test
+rows (``gemini`` + ``astra``). Each is bootstrapped against Astra alone and
+against Gemini alone. Written to its own file so the three-model record stays.
+
+Usage:  pixi run python scripts/fuse_api_vlms.py [--data-root PATH] [--with-gemini]
 """
 
 from __future__ import annotations
@@ -58,6 +64,8 @@ _EXPLORATION = (
     ("astra_crop_refine_test", "sol", "claude_opus"),
     ("astra_crop_refine_test", "sol"),
 )
+_HEADLINE_G = ("astra", "sol", "claude_opus", "gemini")
+_ALTERNATIVE_G = ("gemini", "astra")
 _IOU_SENSITIVITY = (0.4, 0.5, 0.6, 0.7)
 _N_BOOT = 1000
 _SEED = 0
@@ -97,8 +105,17 @@ def _to_dump(pred: dict[str, list[Any]], dims: dict[str, tuple[int, int]]) -> di
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data-root", type=Path, default=_DATA)
-    parser.add_argument("--out", type=Path, default=_DUMPS / "fusion" / "api_fusion_test.json")
+    parser.add_argument("--out", type=Path, default=None)
+    parser.add_argument("--with-gemini", action="store_true", help="The 2026-10-21 refresh.")
     args = parser.parse_args()
+    headline, alternative = (
+        (_HEADLINE_G, _ALTERNATIVE_G) if args.with_gemini else (_HEADLINE, _ALTERNATIVE)
+    )
+    exploration = () if args.with_gemini else _EXPLORATION
+    singles = ("astra", "gemini") if args.with_gemini else ("astra",)
+    if args.out is None:
+        stem = "api_fusion_gemini_test" if args.with_gemini else "api_fusion_test"
+        args.out = _DUMPS / "fusion" / f"{stem}.json"
 
     fv = _load_fuse_vlm()
     n2i, i2n = resolve_taxonomy("merged5")
@@ -109,7 +126,7 @@ def main() -> None:
     dims = {img["file_name"]: (img["width"], img["height"]) for img in coco["images"]}
     dims = {fn: dims[fn] for fn in gt}
 
-    models = sorted({m for combo in (_HEADLINE, _ALTERNATIVE, *_EXPLORATION) for m in combo})
+    models = sorted({m for combo in (headline, alternative, *exploration) for m in combo})
     dumps = fv.load_test_dumps(_DUMPS, models, dims)
     missing = [m for m in models if m not in dumps]
     if missing:
@@ -128,11 +145,13 @@ def main() -> None:
         }
 
     configs: dict[str, tuple[str, tuple[str, ...]]] = {
-        "headline": ("pre-registered", _HEADLINE),
-        "alternative": ("pre-registered", _ALTERNATIVE),
-        **{"+".join(c): ("exploration", c) for c in _EXPLORATION},
+        "headline": ("pre-registered", headline),
+        "alternative": ("pre-registered", alternative),
+        **{"+".join(c): ("exploration", c) for c in exploration},
     }
-    results: dict[str, Any] = {"astra_alone": summary(fv.score(dumps["astra"], dims, gt, i2n))}
+    results: dict[str, Any] = {
+        f"{m}_alone": summary(fv.score(dumps[m], dims, gt, i2n)) for m in singles
+    }
     fused_preds: dict[str, dict[str, list[Any]]] = {}
     for name, (kind, combo) in configs.items():
         fused_preds[name] = fuse(combo, DEFAULT_FUSION_IOU)
@@ -144,13 +163,13 @@ def main() -> None:
         logger.info(f"{name:<40} ({kind}) mAP@50:95={results[name]['mAP_50_95']:.4f}")
 
     results["headline_iou_sensitivity"] = {
-        str(iou): summary(fv.score(fuse(_HEADLINE, iou), dims, gt, i2n))["mAP_50_95"]
+        str(iou): summary(fv.score(fuse(headline, iou), dims, gt, i2n))["mAP_50_95"]
         for iou in _IOU_SENSITIVITY
     }
 
-    # Paired bootstrap of every configuration against Astra alone.
+    # Paired bootstrap of every configuration against each single row.
     with tempfile.TemporaryDirectory() as tmp:
-        pred_maps = {"astra_alone": load_predictions(_DUMPS / "astra.json")}
+        pred_maps = {f"{m}_alone": load_predictions(_DUMPS / f"{m}.json") for m in singles}
         for name, pred in fused_preds.items():
             path = Path(tmp) / f"{name}.json"
             with open(path, "w") as f:
@@ -158,13 +177,14 @@ def main() -> None:
             pred_maps[name] = load_predictions(path)
         boot = run_bootstrap(gt, pred_maps, n_boot=_N_BOOT, seed=_SEED)
     for name in fused_preds:
-        diff = boot[f"{name}::mAP_50_95"] - boot["astra_alone::mAP_50_95"]
-        lo, hi = np.percentile(diff, [2.5, 97.5])
-        results[name]["delta_vs_astra"] = {
-            "mean": round(float(diff.mean()), 4),
-            "ci95": [round(float(lo), 4), round(float(hi), 4)],
-        }
-        logger.info(f"{name:<40} Δ vs astra {diff.mean():+.4f}  95% CI [{lo:+.4f}, {hi:+.4f}]")
+        for m in singles:
+            diff = boot[f"{name}::mAP_50_95"] - boot[f"{m}_alone::mAP_50_95"]
+            lo, hi = np.percentile(diff, [2.5, 97.5])
+            results[name][f"delta_vs_{m}"] = {
+                "mean": round(float(diff.mean()), 4),
+                "ci95": [round(float(lo), 4), round(float(hi), 4)],
+            }
+            logger.info(f"{name:<40} Δ vs {m} {diff.mean():+.4f}  95% CI [{lo:+.4f}, {hi:+.4f}]")
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
     with open(args.out, "w") as f:

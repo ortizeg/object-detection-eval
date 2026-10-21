@@ -46,6 +46,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.util
 import itertools
 import json
 import sys
@@ -85,7 +86,7 @@ _MAX_CACHE_STEM = 180
 
 #: Models whose NMS runs inside their own backend, so their cache is already
 #: thresholded and suppressed and their signature carries a box/nms suffix.
-_NON_REPLAYABLE = {"yolo_world"}
+_NON_REPLAYABLE = {"yolo_world", "yoloe"}
 
 #: Fusion IoU values reported as *sensitivity* around the pre-committed default.
 #: Their argmax is never adopted -- see the adoption rule in
@@ -108,6 +109,21 @@ _VERIFY_TOLERANCE = 1e-6
 #: All six models, no subset chosen; raw confidences, because rank normalisation
 #: lost on val; the WBF paper's default IoU, never tuned.
 _FINAL_METHOD = "wbf"
+#: The study's roster. Fixed here rather than read off ``valid_arms.json``, which
+#: now also holds rows tested for this study and not added (YOLOE: +0.0015 on
+#: val, inside the floor; docs/plans/fusion-refresh-2026-10.md).
+_FINAL_MODELS = frozenset(
+    {
+        "florence2",
+        "gemini",
+        "grounding_dino",
+        "llmdet",
+        "omdet_turbo",
+        "owlv2",
+        "qwen3_vl",
+        "yolo_world",
+    }
+)
 _FINAL_NORMALIZE = False
 
 #: Per-model published detections on the test split, written by
@@ -157,12 +173,44 @@ def cache_path(cache_dir: Path, split: str, sig: str) -> Path:
     return cache_dir / split / f"{stem}.json"
 
 
+def _ablate_vlm() -> Any:
+    """``scripts/ablate_vlm.py``, loaded once, for its ``Arm.signature()``."""
+    if "ablate_vlm" in sys.modules:
+        return sys.modules["ablate_vlm"]
+    spec = importlib.util.spec_from_file_location(
+        "ablate_vlm", Path(__file__).resolve().parent / "ablate_vlm.py"
+    )
+    if spec is None or spec.loader is None:  # pragma: no cover
+        raise ImportError("cannot load ablate_vlm.py")
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules["ablate_vlm"] = mod
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def arm_signature(cfg: dict[str, Any], model: str) -> str:
+    """The key ``ablate_vlm.py`` itself writes the cache under.
+
+    Built from the real ``Arm`` rather than :func:`signature`'s copy, which
+    drifted twice (see the module docstring) and a third time when Gemini's
+    ``fmt``/``think``/``pipe`` and YOLOE's ``ens``/``crop`` parts were added.
+    """
+    arm = _ablate_vlm().Arm(id="fusion", model=model, element="fusion", **cfg)
+    return str(arm.signature())
+
+
 def resolve_cache(
     cache_dir: Path, split: str, model: str, cfg: dict[str, Any]
 ) -> dict[str, list[list[float]]] | None:
-    # Newest format first: (with_minpx, legacy). ``with_minpx=True, legacy=True``
-    # is skipped -- Phase 0 postdates PR #19, so no cache was ever written under
-    # that combination.
+    # Today's key first, then the older formats :func:`signature` reproduces:
+    # (with_minpx, legacy). ``with_minpx=True, legacy=True`` is skipped --
+    # Phase 0 postdates PR #19, so no cache was ever written under that
+    # combination.
+    current = cache_path(cache_dir, split, arm_signature(cfg, model))
+    if current.exists():
+        with open(current) as f:
+            hit: dict[str, list[list[float]]] = json.load(f)
+        return hit
     for with_minpx, legacy in ((True, False), (False, False), (False, True)):
         path = cache_path(
             cache_dir, split, signature(cfg, model, legacy=legacy, with_minpx=with_minpx)
@@ -465,7 +513,7 @@ def main() -> int:
     name_to_id, id_to_name = resolve_taxonomy(args.taxonomy)
     gt_map = load_coco_gt(split_dir / "_annotations.coco.json", name_to_id)
 
-    arms = best_arms(args.arms)
+    arms = {m: a for m, a in best_arms(args.arms).items() if m in _FINAL_MODELS}
     logger.info("adopted arms:")
     for model, arm in sorted(arms.items()):
         logger.info(f"  {model:16s} {arm['arm']}  (val mAP {arm['mAP_50_95']:.4f})")

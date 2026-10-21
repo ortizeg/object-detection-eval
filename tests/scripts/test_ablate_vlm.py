@@ -414,6 +414,31 @@ def test_an_arm_without_prompt_ensembles_keeps_its_pre_ensemble_cache_key(
     assert "__ens" not in _arm(sut).signature()
 
 
+def test_fuse_vlm_resolves_the_key_ablate_vlm_wrote(sut: types.ModuleType) -> None:
+    """fuse_vlm.py must find every cache, including keys with off-default parts.
+
+    Its own copy of the key format missed Gemini's think/pipe/fmt parts and
+    YOLOE's ens part, and logged those models as "no cache -- excluded".
+    """
+    spec = importlib.util.spec_from_file_location(
+        "fuse_vlm", _REPO_ROOT / "scripts" / "fuse_vlm.py"
+    )
+    assert spec is not None and spec.loader is not None
+    fuse_vlm = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(fuse_vlm)
+    arm = _arm(
+        sut,
+        model="gemini",
+        inferencer="gemini",
+        gemini_box_format="box_2d",
+        gemini_thinking_level="high",
+        gemini_pipeline="crop_refine+number_crop",
+        prompt_ensembles={"player": ["player", "athlete"]},
+    )
+    config = arm.model_dump(exclude={"id", "model", "element", "baseline"})
+    assert fuse_vlm.arm_signature(config, "gemini") == arm.signature()
+
+
 def test_yolo_world_arms_are_not_replayed(sut: types.ModuleType) -> None:
     """ultralytics suppresses in pixel space; a normalised replay would differ."""
     assert not _arm(sut, inferencer="yolo_world").replayable

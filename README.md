@@ -32,8 +32,11 @@ and drift-checked in CI, so nothing below is hand-typed:
   — 7 fine-tuned medium detectors @640, with paired-bootstrap 95% CIs (5 of 6
   adjacent pairs significant; RTMDet-M vs DAMO-YOLO-M a tie) and to-boxes latency.
 - **[benchmarks/basketball/reports/VLM_VS_FINETUNED.md](benchmarks/basketball/reports/VLM_VS_FINETUNED.md)**
-  — 5 zero-shot VLMs against the same protocol, with the per-class failure
-  analysis (the `rim` collapse; zero-AP `ball`/`referee` for the weaker methods).
+  — 13 zero-shot models (8 open-weights, 5 billed APIs) against the same protocol,
+  with the per-class failure analysis and the fusion studies. The best zero-shot
+  line (0.683, a fusion of paid pipelines) is level with the fine-tuned top tier;
+  the best open-weights row (0.388) is still well below the weakest fine-tuned
+  detector (0.581).
 
 The methodology behind the protocol — train-matched preprocessing, detector/VLM
 parity, the single de-transform, and the 94-image statistical limitation — is in

@@ -303,11 +303,6 @@ def test_fusion_test_table_shows_the_delta_over_the_best_single(tmp_path: Path) 
 
 
 @pytest.mark.skipif(not _COMMITTED_TEST.exists(), reason="test scoring not yet committed")
-@pytest.mark.xfail(
-    strict=True,
-    reason="Gemini row refreshed to gemini-3.8-flash (0.326); fusion still uses the "
-    "prior 0.250 row until re-run. See docs/plans/gemini-refresh-2026-10.md.",
-)
 def test_committed_test_log_matches_the_published_per_model_numbers() -> None:
     """The fusion plumbing must not have altered detections on their way past.
 

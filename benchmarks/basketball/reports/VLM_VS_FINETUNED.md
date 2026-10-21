@@ -23,6 +23,43 @@ zero-shot mAP and a fine-tuned mAP are directly comparable — the gap between
 them is a real capability gap, not a protocol artifact. The methodology behind
 this parity is documented in [../../../docs/methodology.md](../../../docs/methodology.md).
 
+## Where things stand (2026-10-21)
+
+Test split, mAP@50:95. Each line links to the section with its caveats.
+
+| Line | test | kind |
+| --- | --- | --- |
+| Best open-weights row: [LLMDet-large](#two-more-rows-llmdet-large-and-qwen3-vl-8b) | 0.388 | single pass, runs offline |
+| Best vocabulary-prompted row: [DINO-X Pro](#the-zero-shot-ceiling) | 0.439 | billed API; 0.520 with the rim box trim |
+| Best single-pass row: [GPT-6 Astra](#the-zero-shot-ceiling) | 0.501 | billed API |
+| Best single row: Gemini 4 Argon, two-pass | 0.534 | billed API, about 12 calls per image |
+| Astra crop-refine | 0.588 | billed API, two-pass |
+| Fusion of the [API rows](#improving-the-api-rows-fusion-and-rim-crop-refine) (Astra, Sol, Opus, Gemini) | 0.598 | four billed APIs |
+| **[Best zero-shot line](#the-zero-shot-ceiling)**: Astra crop-refine + DINO-X Pro + DINO-X preview + Gemini | **0.683** | three billed APIs, about two dozen calls per image |
+| Fine-tuned, weakest (RT-DETRv2-M) | 0.581 | 464 training images |
+| Fine-tuned, top tier (YOLO26m / DEIM-M / YOLOX-M) | 0.716 / 0.686 / 0.672 | a statistical tie among themselves |
+
+- **The best zero-shot line is in the fine-tuned top tier, not above it.** Under the
+  clip-clustered bootstrap it is level with YOLO26m (−0.033, CI [−0.070, +0.027]) and
+  DEIM-M (−0.003, CI [−0.020, +0.006]), narrowly ahead of YOLOX-M, and clearly ahead of
+  the other four fine-tuned detectors. The test set is three clips, so treat every
+  interval here as optimistic.
+- **Without a per-image bill, fine-tuning still wins clearly.** The best open-weights
+  row is 1.50× behind the *weakest* fine-tuned detector.
+- **Zooming in is the lever that transfers.** The large gains on `rim` and `number`
+  came from re-detecting on a crop, not from prompt wording. `ball` is the class
+  nothing fixed: zooming on it lowered ball AP50 for every API model, and it is the
+  weakest class of the best zero-shot line (0.79 AP50). Where the box shape was the
+  problem (DINO-X and OWLv2 box the net with the rim), trimming the box fixed it.
+- **Fusion helps when members make different mistakes.** DINO-X plus the API models
+  stacks; three different API models fused are no better than three runs of Astra
+  fused. The original eight-model fusion now scores *below* its best member (0.525 vs
+  0.534) because only Gemini finds the rim, and WBF scales that box down by 1/8.
+- **How the numbers were produced.** Every configuration was chosen on the 96-image
+  val split. Each test number was scored once per adopted configuration, under rules
+  written down before scoring (`docs/plans/`). Rows that were hand-tuned or are
+  pipeline variants are labelled as disclosed extras.
+
 ## How each model's prompt was chosen
 
 An earlier revision of this report criticised unequal tuning effort as an
@@ -537,8 +574,8 @@ inference took it from 0.188 (tied for last) to 0.318. Both rows' tuning is
 summarised in [Two more rows: LLMDet-large and
 Qwen3-VL-8B](#two-more-rows-llmdet-large-and-qwen3-vl-8b) below.
 
-**DINO-X Pro is second, at 0.439. It is also billed, but it went through the
-equal-effort search.** Added 2026-10-12. DINO-X is IDEA Research's successor to
+**DINO-X Pro, at 0.439, is the best vocabulary-prompted row. It is also billed,
+but it went through the equal-effort search.** Added 2026-10-12. DINO-X is IDEA Research's successor to
 Grounding DINO, and its Pro variant exists only as a hosted API. Unlike Gemini
 and Astra, it takes a class vocabulary rather than a free-text instruction. So
 it faced the same six shared candidates as the open-weights rows (winner:
@@ -575,37 +612,71 @@ fraction 0.3 set on val) and **OWLv2** (0.315 → **0.394**, rim AP@50 0.002 →
 Grounding DINO, LLMDet, Florence-2, OmDet-Turbo or YOLO-World, which never put
 a box on the ring. (Disclosed extras, 2026-10-15. The headline rows are unchanged.)
 
-**Fusing DINO-X with Astra's crop-refine gives the best zero-shot result in
-this report: 0.671, level with YOLOX-M.** (Disclosed extra, 2026-10-13, extended
-2026-10-15.) The fusion is weighted box fusion (IoU 0.55, equal weights, the
-fusion round's pre-committed operator) of three members: Astra crop-refine,
-DINO-X Pro + trim and DINO-X preview + trim. It scores **0.671** test
-mAP@50:95, against 0.588 for Astra crop-refine alone and 0.651 for the first,
-two-member version. Every member and operator was chosen on val, unlike the
-earlier Astra greedy fusion. Test was run once per adopted configuration.
+**Fusing Astra crop-refine, DINO-X and Gemini gives the best zero-shot result
+in this report: 0.683, statistically level with the top three fine-tuned
+detectors and clearly ahead of the other four.** (Disclosed
+extra. Started 2026-10-13, extended 2026-10-15, Gemini added 2026-10-21.) The
+fusion is weighted box fusion (IoU 0.55, equal weights, the fusion round's
+pre-committed operator) of four members: Astra crop-refine, DINO-X Pro + trim,
+DINO-X preview + trim and the two-pass Gemini 4 Argon row. Every member and the
+operator were chosen on val, unlike the earlier Astra greedy fusion, and test
+was run once per adopted configuration.
+
+| fused line (test) | mAP@50:95 | recall @ 95% precision | members chosen |
+| --- | --- | --- | --- |
+| Astra crop-refine alone | 0.588 | 0.882 | |
+| + DINO-X Pro trim | 0.651 | 0.873 | 2026-10-13 |
+| + DINO-X preview trim | 0.671 | 0.879 | 2026-10-15 |
+| **+ Gemini Argon two-pass** | **0.683** | **0.918** | 2026-10-21 |
+
+Gemini joined under a rule fixed before it was scored: it had to lift the
+three-member line by more than 0.005 on val on every one of its three cached val
+draws. It did so by +0.023, +0.031 and +0.023 (0.624 → 0.647-0.655). Calibrated
+YOLOE, the other new candidate, lowered val (−0.002) and added nothing on top of
+Gemini either, so it stayed out. Gemini brings rim (0.89 → 0.98 AP50) and
+referee (0.98 → 1.00), and it lifts recall at 95% precision for the first time
+in this line (0.879 → 0.918).
+
 Against the fine-tuned rows, using the **clip-clustered** paired bootstrap (the
-honest interval for a three-clip test set):
+honest interval for a three-clip test set; all 10 clip resamples enumerated):
 
-- YOLOX-M (0.672): a tie, CI [−0.014, +0.008].
-- RF-DETR-M (0.646) and RTMDet-M (0.628): the fusion is ahead.
-- DEIM-M (0.686): the fusion is behind, CI [−0.027, −0.008].
+| fusion minus | Δ mAP@50:95 | clustered 95% CI | clips where the fusion is ahead |
+| --- | --- | --- | --- |
+| YOLO26m (0.716) | −0.033 | [−0.070, +0.027] | 1 of 3 |
+| DEIM-M (0.686) | −0.003 | [−0.020, +0.006] | 2 of 3 |
+| YOLOX-M (0.672) | +0.011 | [+0.004, +0.020] | 3 of 3 |
+| RF-DETR-M (0.646) | +0.036 | [+0.018, +0.053] | |
+| RTMDet-M (0.628) | +0.055 | [+0.041, +0.065] | |
+| DAMO-YOLO-M (0.619) | +0.064 | [+0.059, +0.069] | |
+| RT-DETRv2-M (0.581) | +0.102 | [+0.064, +0.140] | |
+| the three-member line it replaces | +0.012 | [+0.007, +0.018] | 3 of 3 |
 
-So it sits in the middle of the fine-tuned table. DINO-X adds ball
-(0.69 → 0.78) and number (0.85 → 0.91). Recall at 95% precision does not
-improve (0.879 vs 0.882). It takes two billed APIs and about 12 calls per image.
+Read this the way [FINAL_COMPARISON_640.md](FINAL_COMPARISON_640.md) reads its
+own top three. YOLO26m's lead is 0.033 as a point estimate, and the interval
+spans zero; DEIM-M is a tie; the YOLOX-M interval clears zero, but by 0.004,
+with only ten distinct clip resamples behind it. **The defensible claim is that the
+fusion sits in the top accuracy tier with YOLO26m, DEIM-M and YOLOX-M, not that it beats
+fine-tuning.** It is clearly ahead of RF-DETR-M, RTMDet-M, DAMO-YOLO-M and
+RT-DETRv2-M. The cost is three billed APIs and roughly two dozen calls per
+image (the Gemini member alone makes about 12), against a fine-tuned model that runs
+in about 6 ms on a T4. Script:
+`scripts/run_fusion_clustered_bootstrap.py`; results:
+`results/bootstrap/bootstrap_clustered_fusion4.json`.
 
 Several attempts to push past it failed on val:
 
 - Rank-normalised fusion: 0.575 against 0.611.
 - LLMDet or OWLv2 + trim as an extra member: 0.618-0.621 against 0.624.
+- Calibrated YOLOE as an extra member: 0.622 against 0.624 (2026-10-21).
 - Swapping in Astra crop-refine + number crop run end to end, which is
   0.587 on test by itself, level with crop-refine alone.
 - Rewording the ball prompt: no gain across five wordings.
 - T-Rex-2.0 detecting from train-frame example boxes (few-shot): 0.14 val,
   because the API floors scores at 0.30.
 
-Plan, every arm and all amendments:
-[docs/plans/dinox-pro-2026-10.md](../../../docs/plans/dinox-pro-2026-10.md).
+Plans, every arm and all amendments:
+[docs/plans/dinox-pro-2026-10.md](../../../docs/plans/dinox-pro-2026-10.md) and
+[docs/plans/fusion-refresh-2026-10.md](../../../docs/plans/fusion-refresh-2026-10.md).
 
 **"Below half the worst fine-tuned detector" now depends entirely on whether you
 count the paid API.** Against the lowest-ranked fine-tuned detector's **0.581**
@@ -679,11 +750,15 @@ fine-tuning on this small in-domain dataset still buys a real margin: 1.5× over
 LLMDet-large, still the gap between "usable for bootstrapping labels" and "usable
 in production", and closing it even that far took an exhaustive configuration
 search on the original six plus two more model evaluations. But for the best
-detector you can *rent*, that margin is nearly gone (1.16×), and a zero-shot
-crop-refine pipeline on the same paid API actually reaches it. If the deployment
-constraint is "no offline weights, no per-image cost", the fine-tuned detector
-still wins clearly; if it is "best accuracy, willing to call an API", a
-general-purpose model now matches a detector fine-tuned on this exact dataset.
+detector you can *rent*, that margin is nearly gone (Astra 1.16×, two-pass Gemini
+1.09×). A zero-shot crop-refine pipeline on a paid API passes the weakest
+fine-tuned detector, and fusing four paid pipelines (0.683) reaches the top
+accuracy tier, level with YOLO26m, DEIM-M and YOLOX-M under the clustered
+bootstrap, though still 0.033 below YOLO26m as a point estimate. If the
+deployment constraint is "no offline weights, no per-image cost", the fine-tuned
+detector still wins clearly; if it is "best accuracy, willing to call several
+APIs about two dozen times per image", zero-shot now matches a detector
+fine-tuned on this exact dataset.
 
 The trend across every revision of this section points the same way: the margin
 was smaller than this report originally claimed, and most of what has closed it
@@ -797,8 +872,27 @@ making different mistakes. Calling the best model three times is as good as
 mixing in the others, and simpler. Exploration, not a result: fusing Sol and Opus with Astra's
 crop-refine output gives 0.589, no better than crop-refine alone (0.588). Fusion
 and crop-refine fix the same thing, the rim boxes, so they do not stack. Fusing DINO-X
-(trimmed) with crop-refine does stack, to 0.671, because DINO-X's errors differ
-from the API models' (see the DINO-X section above).
+(trimmed) with crop-refine does stack, to 0.671 (0.683 once Gemini joins),
+because DINO-X's errors differ from the API models' (see the DINO-X section above).
+
+**Adding Gemini as a fourth API model (2026-10-21).** The two-pass Gemini 4 Argon
+row (0.534) is now the strongest API row, so the study was re-run with the same
+operator and the rule extended before scoring: headline = all four API rows at
+their published configs; alternative = the top two published test rows, Gemini +
+Astra (`fuse_api_vlms.py --with-gemini`).
+
+| Fusion (test) | mAP@50:95 | Δ vs Gemini alone (95% CI) | Δ vs Astra alone (95% CI) | ball AP50 | rim AP50 | number AP50 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Gemini alone (two-pass) | 0.534 | — | | 0.63 | 1.00 | 0.74 |
+| Astra alone | 0.501 | | — | 0.78 | 0.52 | 0.86 |
+| **Astra + Sol + Opus + Gemini (headline)** | **0.598** | **+0.062 [+0.046, +0.078]** | +0.097 [+0.085, +0.108] | 0.78 | 0.94 | 0.90 |
+| Gemini + Astra (pre-registered alternative) | 0.587 | +0.052 [+0.038, +0.065] | +0.086 [+0.076, +0.096] | 0.78 | 0.93 | 0.87 |
+
+Unlike Sol and Opus on top of Astra crop-refine, this one stacks: Gemini's
+pipeline brings the rim (1.00) and Astra brings the ball and number Gemini
+misses (0.63 → 0.78 ball, 0.74 → 0.87-0.90 number). These intervals resample
+images, like the rest of this subsection. The Gemini member is two-pass (about 12
+calls per image), so the headline is no longer four single calls.
 
 **Rim-only crop-refine for Sol and Opus.** Astra's two-pass crop-refine pipeline
 (re-detect each ball and rim box on a zoomed crop) was run on val for both
@@ -836,7 +930,7 @@ once on test. Astra's +0.002 on val is not a clear gain, so Astra rim-only was
 
 Scripts: `scripts/fuse_api_vlms.py`; `scripts/analyze_api_repeats.py`; `scripts/run_astra_crop_refine.py --model
 {sol,claude} --refine-classes rim`. Results: `results/vlm/fusion/api_fusion_test.json`,
-`results/vlm/repeats/` (repeat runs and `api_repeats_test.json`) and
+`results/vlm/fusion/api_fusion_gemini_test.json`, `results/vlm/repeats/` (repeat runs and `api_repeats_test.json`) and
 `results/vlm/{sol,claude}_effort-default_*_{valid,test}.json`.
 
 ### Two more rows: LLMDet-large and Qwen3-VL-8B
@@ -1049,7 +1143,8 @@ to 0.4042 under the published WBF operator. Adding YOLOE's equal-effort output
 gives 0.4057 (+0.0015, inside the 0.002 floor), and recall at 95% precision
 drops (0.556 → 0.547). LLMDet's, Qwen3-VL's and YOLO-World's val caches live on
 the GPU box and were not re-run for this check. YOLOE stays out of the
-eight-model fusion, whose test number is unchanged.
+eight-model fusion. Its roster is unchanged; its test number moved on
+2026-10-21 only because the Gemini member was refreshed.
 
 ## Per-class failure analysis: where zero-shot breaks
 
@@ -1242,11 +1337,13 @@ strongest open-vocabulary detectors available now are **API-only**, which puts
 them in Gemini's category rather than the open-weights one. **GPT-6 Astra**
 (added 2026-09-25) makes that concrete: it is now a row in the table above, in
 that same billed-API category, and it leads the whole comparison — the cost is a
-per-image bill and a hand-tuned prompt disclosed on the row. Others in this class
-remain uncovered: **DINO-X Pro** (59.8 AP LVIS-minival) and **Grounding DINO
-1.5/1.6 Pro** (55.7 AP) both substantially exceed the `grounding-dino-base`
-checkpoint tested here. Using any of them costs money per run and makes the row
-non-reproducible without a key.
+per-image bill and a hand-tuned prompt disclosed on the row. **DINO-X Pro**
+(59.8 AP LVIS-minival), which this section used to list as uncovered, is now a
+row too (2026-10-12), and Gemini moved to the Gemini 4 Argon release
+(2026-10-14). **Grounding DINO 1.5/1.6 Pro** (55.7 AP) remains uncovered; DINO-X
+is its successor from the same lab. Every billed row costs money per run and is
+non-reproducible without a key; the committed dumps let a reader re-score them
+for free.
 
 Three open-weights gaps this section used to flag are now closed: **YOLO-World**
 (added 2026-08-01), **LLMDet-large** and **Qwen3-VL-8B** (both 2026-08-19) are
@@ -1284,7 +1381,9 @@ detectors sit well below the fine-tuned ceiling. The GPT-6 Astra rows are the
 exception that sharpens the rule: a frontier API closes most of the gap
 (0.501 vs the weakest fine-tuned 0.581), and simply zooming in to re-detect the
 rim — the class the pattern above says should be hopeless — closes the rest
-(crop-refine 0.588). What is left is not a capability ceiling on zero-shot
+(crop-refine 0.588). Gemini 4 Argon, told that the rim is the ring alone, scores
+rim AP50 1.000 with the same zoom, and fusing the paid pipelines reaches the
+fine-tuned top tier (0.683). What is left is not a capability ceiling on zero-shot
 detection but a deployment trade: offline weights and zero per-image cost on one
 side, a per-image API bill and the best available accuracy on the other.
 
@@ -1311,10 +1410,14 @@ GPT-6 Astra (added 2026-09-25) postdates this fusion work and is **not** part of
 it — every "eight" in this section is the eight open-weights-and-Gemini rows.
 Fusing a model that already scores 0.501 alone, and whose licence and per-image
 cost differ from the rest, is a separate question left for future work.
-Likewise, this section predates the 2026-10 Gemini refreshes. Its Gemini member
-is the earlier `gemini-3.1-pro-preview` row (test 0.250), not the
-`gemini-4-argon` row (0.534) in the tables above. Fusion was not re-run; it will be
-re-run once the other new methods land.*
+**Refreshed 2026-10-21** (`docs/plans/fusion-refresh-2026-10.md`): the Gemini
+member is now the published `gemini-4-argon` two-pass row (test 0.534), and the
+test split was re-scored once under the unchanged all-eight rule — see
+[On the test split, scored once](#on-the-test-split-scored-once). The **val**
+tables below were not re-run: Qwen3-VL's and YOLO-World's val caches for their
+published configs lived on the retired GPU box. They remain the 2026-08 record,
+with the earlier `gemini-3.1-pro-preview` row (val 0.258, test 0.250) as the
+Gemini member.*
 
 Every number above scores one model running one forward pass. This section asks
 a different question — what happens if you run all eight and merge their
@@ -1590,41 +1693,55 @@ key.**
 <!-- TABLE:vlm_fusion_test START -->
 | Model | mAP@50:95 | Boxes/img | Recall @ 95% precision |
 | --- | --- | --- | --- |
+| gemini | 0.534 | 25 | never reaches 95% |
 | llmdet | 0.388 | 33 | 0.264 |
 | qwen3_vl | 0.318 | 26 | never reaches 95% |
 | owlv2 | 0.315 | 580 | 0.013 |
 | grounding_dino | 0.293 | 22 | 0.180 |
-| gemini | 0.250 | 18 | never reaches 95% |
 | florence2 | 0.238 | 17 | never reaches 95% |
 | omdet_turbo | 0.211 | 1013 | 0.059 |
 | yolo_world | 0.189 | 299 | never reaches 95% |
-| **All 8 fused** | **0.437** (+0.0490) | 1523 | **0.582** |
+| **All 8 fused** | **0.525** (-0.0090) | 1524 | **0.624** |
 <!-- TABLE:vlm_fusion_test END -->
 
-**The val configuration transferred, even more tightly than the six-model
+**2026-10-21: with today's Gemini row, the ensemble falls below its best member.**
+The table above is the re-scoring with the refreshed Gemini member (two-pass
+`gemini-4-argon`, 0.534). Same eight models, same operator, no subset chosen. The
+ensemble reaches **0.525**, up from 0.437, but **0.009 below Gemini alone**. The
+cause is the rim. Only Gemini finds it (AP50 1.00; every other member is at
+0.005 or below), and WBF scales a cluster's score by the share of models that
+voted for it. A rim box only Gemini voted for keeps one eighth of its score and
+ranks below false rim boxes that more members voted for. Fused rim AP50 drops to
+0.45. Box averaging still helps elsewhere (player, referee, number), but not by
+enough to offset it. When one member is far ahead of the rest, "fuse everything"
+punishes it for being alone. Recall at 95% precision rises to 0.624 (from 0.582),
+which a flat-confidence Gemini row cannot reach on its own.
+
+The 2026-08 scoring, with the earlier Gemini row, is kept below for the record
+(`git log -- benchmarks/basketball/results/vlm/fusion/test_fusion.json`):
+
+| 2026-08 (Gemini 3.1 pro preview, 0.250) | val | test | recall @ 95% precision (test) |
+| --- | --- | --- | --- |
+| All 8 fused | 0.4366 | 0.4374 (+0.049 over LLMDet-large) | 0.582 |
+
+**That val configuration transferred, even more tightly than the six-model
 round's.** Val 0.4366 against test 0.4374 — a gap of 0.0008, about a third of
 the six-model round's own 0.0024 gap, and both are well inside the noise
 floor. Recall at 95% precision moved 0.625 to 0.582, a bigger drop than the
-six-model round's 0.552 → 0.546 — worth stating plainly rather than
-smoothing over: mAP transferred almost perfectly, the labeling-quality
-metric did not transfer quite as cleanly, though it still landed well above
-any single model's test-split number. Nothing was re-tuned between the two.
-
-The delta over the best single model is smaller on test (+0.049) than on val
-(+0.078) for the same reason the six-model round gave: LLMDet-large is simply
-*better* on test (0.388 vs 0.359 val), so the ensemble is clearing a higher
-bar, not degrading. The absolute ensemble number is the one that transferred
-essentially unchanged.
+six-model round's 0.552 → 0.546: mAP transferred almost perfectly, the
+labeling-quality metric less cleanly. Nothing was re-tuned between the two. The
+delta over the best single model was smaller on test (+0.049) than on val
+(+0.078) because LLMDet-large is simply *better* on test (0.388 vs 0.359 val).
 
 Against the fine-tuned detectors in
-[FINAL_COMPARISON_640.md](FINAL_COMPARISON_640.md), the ensemble narrows the gap
+[FINAL_COMPARISON_640.md](FINAL_COMPARISON_640.md), that ensemble narrowed the gap
 to the lowest-ranked row (RT-DETRv2-M, 0.581) from the six-model round's
 **1.43×** to **1.33×**. That was the closest zero-shot had come in this project
-*when this section was written*, and it cost eight forward passes to get there.
+*when it was written*, and it cost eight forward passes to get there.
 
 > **Superseded 2026-09-25 by a single model.** GPT-6 Astra alone scores **0.501**
 > on this same test split — **+0.064 over the entire eight-model fusion's
-> 0.437**, in *one* forward pass rather than eight, and without the ensemble's
+> 0.437** (its 2026-08 score), in *one* forward pass rather than eight, and without the ensemble's
 > ~1,500-box speculative tail. Its zero-shot crop-refine variant reaches
 > **0.588**, +0.151 over the fusion and fractionally past RT-DETRv2-M (0.581),
 > so the "closest zero-shot has come" and "rim is effectively zero across all
@@ -1679,10 +1796,11 @@ of them being wrong.
 
 ### What this does not do
 
-- **It does not touch `rim`.** Every model sits between 0.000 and 0.012, and
-  fusing eight failures gives a failure. A fifth of the taxonomy is untouched
-  — LLMDet-large and Qwen3-VL-8B changed nothing about this despite being
-  searched independently after the six-model round already established it.
+- **It does not fix `rim`; it now damages it.** In the 2026-08 roster every
+  model sat between 0.000 and 0.036, and fusing eight failures gave a failure.
+  Since 2026-10-21 one member (Gemini, two-pass) scores 1.00 on rim alone, and
+  the all-eight vote dilutes it to 0.45 (see above). The fusions that do fix rim
+  are the val-selected API and DINO-X lines earlier in this report.
 - **It costs eight forward passes per image.** That is why this is a section
   rather than an eighth row in the comparison table above — those rows are
   one-model, one-pass, and quietly adding an 8x-compute row would change what
@@ -1692,7 +1810,7 @@ of them being wrong.
   dumps needs one. LLMDet-large and Qwen3-VL-8B are both open-weights and add
   no *new* reproduction cost, but they don't remove Gemini's existing one
   either.
-- **1,523 boxes per image is not a label set.** The mAP number is achieved by a
+- **1,524 boxes per image is not a label set.** The mAP number is achieved by a
   long speculative tail. The recall-at-95%-precision column is the one to read
   if the output is going to a human.
 

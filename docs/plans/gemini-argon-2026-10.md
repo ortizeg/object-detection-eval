@@ -71,7 +71,7 @@ Each arm is 96 calls, 768 in total.
 - [x] Test (run once, 2026-10-14)
 - [x] Report
 - [x] Round 3 (class definitions, settings, crop pipelines), val + one test run
-- [ ] Fusion re-run (deferred with the 3.8 refresh's, until the other new methods land)
+- [x] Fusion re-run: done 2026-10-21, see `fusion-refresh-2026-10.md`
 
 ## Round 1 results (val, 2026-10-14)
 
