@@ -30,10 +30,14 @@ needs the ``[vlm]`` extra.
 
 from __future__ import annotations
 
+import json
+import threading
 from collections.abc import Mapping
+from concurrent.futures import ThreadPoolExecutor
 from typing import TYPE_CHECKING, Protocol
 
 import supervision as sv
+from loguru import logger
 
 from object_detection_eval.data.image import ImageLoader
 from object_detection_eval.data.taxonomy import remap_detections
@@ -44,14 +48,13 @@ from object_detection_eval.inference.vlm.filters import (
     single_best_per_class,
 )
 from object_detection_eval.metrics.detection_map import detections_to_sv
+from object_detection_eval.schemas.detection import Detection
 
 if TYPE_CHECKING:
     from pathlib import Path
 
     import numpy as np
     import numpy.typing as npt
-
-    from object_detection_eval.schemas.detection import Detection
 
 
 class SupportsPredict(Protocol):
@@ -81,6 +84,9 @@ def score_split(
     max_area_fraction: float = 0.05,
     singleton_top_k: int = DEFAULT_SINGLETON_TOP_K,
     box_pad: Mapping[int, float] | None = None,
+    *,
+    checkpoint: Path | None = None,
+    workers: int = 1,
 ) -> dict[str, sv.Detections]:
     """Run one inferencer over a split and return scorer-ready detections.
 
@@ -99,19 +105,46 @@ def score_split(
         box_pad: Eval class id -> per-side growth for
             :func:`~.filters.pad_boxes`. ``None`` (every row but the disclosed
             YOLOE box-calibration one) leaves boxes as the model drew them.
+        checkpoint: Optional JSONL file of raw per-image predictions. Each image
+            is appended as soon as it is predicted, and images already in the
+            file are not re-queried, so a billed run that stops (credits, host
+            sleep, crash) resumes instead of starting over. An empty prediction
+            is never checkpointed: it is indistinguishable from a failed call,
+            so it is re-queried on resume. The caller keys the file by config.
+        workers: Images predicted concurrently. Only for inferencers that are
+            remote API clients; a local model shares one device and stays at 1.
 
     Returns:
         ``filename -> sv.Detections`` in the eval taxonomy's id space, ready to
         hand to :func:`~object_detection_eval.metrics.detection_map.compute_metrics`.
     """
+    raw_map = _load_checkpoint(checkpoint, set(filenames)) if checkpoint else {}
+    if raw_map:
+        logger.info(f"checkpoint: {len(raw_map)}/{len(filenames)} images already predicted")
+    todo = [f for f in filenames if f not in raw_map]
+    lock = threading.Lock()
+
+    def predict_one(filename: str) -> None:
+        loader = ImageLoader(image_dir / filename)
+        image = loader.read()
+        raw = inferencer.predict(image, image_width=loader.width, image_height=loader.height)
+        with lock:
+            raw_map[filename] = raw
+            if checkpoint is not None and raw:
+                _append_checkpoint(checkpoint, filename, raw)
+
+    if workers > 1:
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            list(pool.map(predict_one, todo))
+    else:
+        for filename in todo:
+            predict_one(filename)
+
     pred_map: dict[str, sv.Detections] = {}
     for filename in filenames:
         loader = ImageLoader(image_dir / filename)
-        image = loader.read()
         width, height = loader.width, loader.height
-
-        raw = inferencer.predict(image, image_width=width, image_height=height)
-        remapped = remap_detections(raw, label_map, name_to_id)
+        remapped = remap_detections(raw_map[filename], label_map, name_to_id)
         area_filtered = area_outliers(remapped, max_area_fraction=max_area_fraction)
         final = single_best_per_class(area_filtered, top_k=singleton_top_k)
         if box_pad:
@@ -119,3 +152,27 @@ def score_split(
 
         pred_map[filename] = detections_to_sv(final, width, height)
     return pred_map
+
+
+def _append_checkpoint(path: Path, filename: str, raw: list[Detection]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    line = json.dumps({"file": filename, "dets": [d.model_dump() for d in raw]})
+    with open(path, "a") as f:
+        f.write(line + "\n")
+        f.flush()
+
+
+def _load_checkpoint(path: Path, wanted: set[str]) -> dict[str, list[Detection]]:
+    if not path.exists():
+        return {}
+    out: dict[str, list[Detection]] = {}
+    for line in path.read_text().splitlines():
+        if not line.strip():
+            continue
+        try:
+            row = json.loads(line)
+        except json.JSONDecodeError:  # a line cut off by the stop that forced the resume
+            continue
+        if row["file"] in wanted:
+            out[row["file"]] = [Detection.model_validate(d) for d in row["dets"]]
+    return out

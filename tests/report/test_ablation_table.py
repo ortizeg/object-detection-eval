@@ -497,3 +497,42 @@ def test_headline_averages_repeat_draws_instead_of_taking_the_best(tmp_path: Pat
     assert "0.330" not in row
     assert "repeat draw" not in row
     assert "mean of 2 vs 3 draws" in row
+
+
+def test_headline_ignores_transport_settings(tmp_path: Path) -> None:
+    """A request timeout changes nothing the model computes.
+
+    Draws that differ only in `gemini_request_timeout_s` are one configuration,
+    and the timeout is never listed as a kept change.
+    """
+    new_cfg = {"model_name": "argon", "gemini_request_timeout_s": 300.0}
+    log = load_ablation_log(
+        _write_log(
+            tmp_path / "valid_arms.json",
+            [
+                _arm("gemini__baseline", "gemini", "baseline", 0.250, {"model_name": "pro"}),
+                _arm(
+                    "gemini__argon__0",
+                    "gemini",
+                    "argon",
+                    0.400,
+                    {**new_cfg, "sample": 0},
+                    baseline="gemini__baseline",
+                    delta=0.150,
+                ),
+                _arm(
+                    "gemini__argon__1",
+                    "gemini",
+                    "argon",
+                    0.420,
+                    {"model_name": "argon", "sample": 1},
+                    baseline="gemini__baseline",
+                    delta=0.170,
+                ),
+            ],
+        )
+    )
+    table = ablation_headline_table(log, {"gemini": new_cfg})
+    row = next(line for line in table.splitlines() if line.startswith("| gemini"))
+    assert "**0.410**" in row  # both draws are one configuration
+    assert "timeout" not in row

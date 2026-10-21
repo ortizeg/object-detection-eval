@@ -21,6 +21,7 @@ crop-refine's ~2/frame -- measure on val before test. No torch.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import Any
 
 import numpy as np
@@ -50,6 +51,8 @@ class AstraNumberCropInferencer:
         astra: The Astra client whose model and effort the `number` refiner
             copies. Defaults to ``base``; pass it when ``base`` is a wrapper
             (e.g. crop-refine) rather than a bare ``AstraInferencer``.
+        refiner_factory: ``(target_class) -> inferencer`` for the per-player
+            pass. ``None`` builds the Astra refiner below.
     """
 
     def __init__(
@@ -62,13 +65,16 @@ class AstraNumberCropInferencer:
         conf_threshold: float = 0.5,
         reasoning_effort: str | None = None,
         astra: AstraInferencer | None = None,
+        refiner_factory: Callable[[str], Any] | None = None,
     ) -> None:
         source = astra if astra is not None else base
         self.base = base
         self.classes = classes
         self.model_name = source.model_name
         self.reasoning_effort = (
-            reasoning_effort if reasoning_effort is not None else source.reasoning_effort
+            reasoning_effort
+            if reasoning_effort is not None
+            else getattr(source, "reasoning_effort", None)
         )
         self.anchor_class = anchor_class
         self.target_class = target_class
@@ -76,6 +82,9 @@ class AstraNumberCropInferencer:
         self.conf_threshold = conf_threshold
         self._target_id = classes.index(target_class)
 
+        if refiner_factory is not None:
+            self._refiner: Any = refiner_factory(target_class)
+            return
         self._refiner = AstraInferencer(
             model_name=self.model_name,
             classes=[target_class],

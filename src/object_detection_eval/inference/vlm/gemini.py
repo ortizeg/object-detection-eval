@@ -22,12 +22,19 @@ from __future__ import annotations
 import json
 import os
 import time
-from typing import Literal
+from typing import Any, Literal
 
+import httpx
 import numpy as np
 import numpy.typing as npt
 from google import genai
-from google.genai.types import GenerateContentConfig, HttpOptions
+from google.genai import errors as genai_errors
+from google.genai.types import (
+    GenerateContentConfig,
+    HttpOptions,
+    ThinkingConfig,
+    ThinkingLevel,
+)
 from loguru import logger
 from PIL import Image
 from pydantic import BaseModel, Field
@@ -111,6 +118,12 @@ class GeminiInferencer(BaseInferencer):
             row's; ``box_2d`` is Google's native layout. The prompt should name
             the coordinate order to match -- the schema alone does not.
         image_first: Send the image before the prompt instead of after it.
+        request_timeout_s: Per-request ceiling; defaults to
+            ``_REQUEST_TIMEOUT_MS``. Raise it for slow models -- Gemini 4 Argon
+            took 136s on one val image on 2026-10-14.
+        thinking_level: ``"low"``/``"medium"``/``"high"``, or ``None`` for the
+            model default (no thinking tokens on Argon, 2026-10-15 probe).
+        temperature: Sampling temperature, or ``None`` for the model default.
     """
 
     _MAX_RETRIES: int = 5
@@ -136,11 +149,17 @@ class GeminiInferencer(BaseInferencer):
         prompt_template: str | None = None,
         box_format: BoxFormat = "named_xyxy",
         image_first: bool = False,
+        request_timeout_s: float | None = None,
+        thinking_level: str | None = None,
+        temperature: float | None = None,
     ) -> None:
         self.model_name = model_name
         self.classes = classes
         self.box_format = box_format
         self.image_first = image_first
+        self.request_timeout_s = request_timeout_s
+        self.thinking_level = thinking_level
+        self.temperature = temperature
 
         # Build a normalised lookup: lower-cased class name -> class index
         self._name_to_id: dict[str, int] = {name.lower(): idx for idx, name in enumerate(classes)}
@@ -162,7 +181,19 @@ class GeminiInferencer(BaseInferencer):
             response_schema=(
                 list[GeminiBox2DDetection] if box_format == "box_2d" else list[GeminiDetection]
             ),
-            http_options=HttpOptions(timeout=self._REQUEST_TIMEOUT_MS),
+            thinking_config=(
+                ThinkingConfig(thinking_level=ThinkingLevel(thinking_level.upper()))
+                if thinking_level is not None
+                else None
+            ),
+            temperature=temperature,
+            http_options=HttpOptions(
+                timeout=(
+                    int(request_timeout_s * 1000)
+                    if request_timeout_s is not None
+                    else self._REQUEST_TIMEOUT_MS
+                )
+            ),
         )
 
         self._prompt = prompt_template or (
@@ -231,8 +262,25 @@ class GeminiInferencer(BaseInferencer):
                 # A read timeout is transient too: on 2026-10-12 ten parallel val
                 # sweeps each lost one image to the same ~4-minute service stall,
                 # and without a retry each became a silent "no detections".
-                is_retryable = isinstance(exc, TimeoutError) or any(
-                    code in exc_str for code in ("503", "429", "UNAVAILABLE", "timed out")
+                # Every 5xx is the server's fault, not the request's: a 2026-10-14
+                # sweep lost one image each to a 502 and a 504 DEADLINE_EXCEEDED
+                # that were not in the list below and so were never retried.
+                # A dropped connection is transient as well: on 2026-10-16 the host
+                # slept mid-sweep and 139 calls failed to connect on the first try.
+                is_retryable = isinstance(
+                    exc, (TimeoutError, genai_errors.ServerError, httpx.TransportError)
+                ) or any(
+                    code in exc_str
+                    for code in (
+                        "500",
+                        "502",
+                        "503",
+                        "504",
+                        "429",
+                        "UNAVAILABLE",
+                        "DEADLINE_EXCEEDED",
+                        "timed out",
+                    )
                 )
                 if is_retryable and attempt < self._MAX_RETRIES:
                     logger.warning(
@@ -351,3 +399,76 @@ class GeminiInferencer(BaseInferencer):
                 logger.debug(f"Skipping unparseable item: {item}")
 
         return self._map_detections(self._normalise_parsed(items), image_width, image_height)
+
+
+#: Two-pass pipelines a Gemini row can run (see ``build_crop_pipeline``).
+GeminiPipeline = Literal["crop_refine", "number_crop", "crop_refine+number_crop"]
+
+#: Focused descriptions for the zoomed pass. The rim line is the Argon lesson
+#: (2026-10-14): unqualified, Argon boxes hoop + net; this dataset labels the ring.
+_GEMINI_REFINE_DESC: dict[str, str] = {
+    "ball": "the basketball",
+    "rim": "the metal hoop ring only (exclude the net and the backboard)",
+}
+
+
+def build_crop_pipeline(base: GeminiInferencer, pipeline: GeminiPipeline, _wrap: Any = None) -> Any:
+    """Wrap ``base`` in a zoom-and-re-detect pass built from Gemini refiners.
+
+    ``crop_refine`` re-detects each ball/rim inside a padded crop around its
+    pass-1 box and replaces the box; ``number_crop`` crops each player and adds
+    the jersey numbers found inside (union + NMS with pass 1). Both pipelines
+    were written for GPT-6 Astra; only the pass-2 refiner is model-specific.
+    ``crop_refine+number_crop`` stacks the two: numbers are added first, then
+    ball/rim boxes are refined (the pipelines touch disjoint classes).
+    The refiners inherit ``base``'s model, box format and generation settings.
+    """
+    from object_detection_eval.inference.vlm.astra_crop_refine import CropRefineInferencer
+    from object_detection_eval.inference.vlm.astra_number_crop import AstraNumberCropInferencer
+
+    def refiner(name: str, instruction: str) -> GeminiInferencer:
+        return GeminiInferencer(
+            model_name=base.model_name,
+            classes=[name],
+            prompt_template=(
+                f"{instruction} Return each box as box_2d [ymin, xmin, ymax, xmax] "
+                f'normalized to 0-1000, with the label "{name}". If none is '
+                "visible, return an empty list."
+            ),
+            box_format="box_2d",
+            request_timeout_s=base.request_timeout_s,
+            thinking_level=base.thinking_level,
+            temperature=base.temperature,
+        )
+
+    if pipeline == "crop_refine+number_crop":
+        return build_crop_pipeline(
+            base, "crop_refine", _wrap=build_crop_pipeline(base, "number_crop")
+        )
+    if pipeline == "crop_refine":
+        return CropRefineInferencer(
+            base=_wrap if _wrap is not None else base,
+            classes=base.classes,
+            refiners={
+                name: refiner(
+                    name,
+                    "This is a zoomed-in crop from a basketball broadcast frame. Find "
+                    f"{_GEMINI_REFINE_DESC.get(name, 'the ' + name)} if it is visible, "
+                    "with one tight box.",
+                )
+                for name in ("ball", "rim")
+            },
+        )
+    if pipeline == "number_crop":
+        return AstraNumberCropInferencer(
+            base=base,
+            classes=base.classes,
+            refiner_factory=lambda name: refiner(
+                name,
+                "This is a zoomed-in crop of ONE basketball player. Find the jersey "
+                "number on the uniform if it is visible: a tight box around the "
+                "digits only, not the whole jersey.",
+            ),
+        )
+    msg = f"unknown Gemini pipeline {pipeline!r}"
+    raise ValueError(msg)

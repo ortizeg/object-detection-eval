@@ -835,7 +835,9 @@ def ablation_headline_table(
         # matched the equal-effort `yoloe` row, which states no ensembles at all.
         base_arm = baselines.get(arm.model)
         if base_arm is not None and any(
-            key not in published and value != base_arm.config.get(key)
+            key not in published
+            and key not in _NOT_CONFIG  # a draw index or a timeout is not a knob
+            and value != base_arm.config.get(key)
             for key, value in arm.config.items()
         ):
             continue
@@ -869,7 +871,7 @@ def ablation_headline_table(
         changed = [
             _describe_change(key, value)
             for key, value in arm.config.items()
-            if key != "sample" and base.config.get(key) != value
+            if key not in _NOT_CONFIG and base.config.get(key) != value
         ]
         if n_draws(arm) > 1 or n_draws(base) > 1:
             changed.append(f"mean of {n_draws(base)} vs {n_draws(arm)} draws")
@@ -888,6 +890,10 @@ def ablation_headline_table(
 #: Arm fields added after older log rows were written, with the value those
 #: rows implicitly ran at. An absent key and its default are the same config;
 #: so are an absent key and ``None`` (``min_pixels``/``max_pixels`` came later).
+#: Logged arm fields that are not part of the configuration being compared: the
+#: draw index, and transport settings that change nothing the model computes.
+_NOT_CONFIG = frozenset({"sample", "gemini_request_timeout_s"})
+
 _LATE_ARM_DEFAULTS: dict[str, Any] = {
     "gemini_box_format": "named_xyxy",
     "gemini_image_first": False,
@@ -900,7 +906,7 @@ def _config_key(config: Mapping[str, Any]) -> str:
         {
             k: v
             for k, v in config.items()
-            if k != "sample"
+            if k not in _NOT_CONFIG
             and v is not None
             and not (k in _LATE_ARM_DEFAULTS and v == _LATE_ARM_DEFAULTS[k])
         },
@@ -925,6 +931,9 @@ _CHANGE_LABELS = {
     "agnostic_nms": "class-agnostic NMS",
     "anchor_crop": "number crop",
     "box_pad": "box calibration",
+    "gemini_thinking_level": "thinking",
+    "gemini_temperature": "temperature",
+    "gemini_pipeline": "pipeline",
 }
 
 

@@ -95,6 +95,65 @@ adopted for two effects that do separate. `number` AP@50 rose on every draw
 (0.33–0.36 against 0.26–0.30). Draw-to-draw spread fell from σ 0.011 to 0.0007.
 Full log: `docs/plans/gemini-refresh-2026-10.md`.
 
+**2026-10-14: Gemini 4 Argon, and one prompt line it needed.** Argon reached the
+API key two days later and was given the same exploration, arm for arm, with
+three draws per adopted change. The row now runs `gemini-4-argon`. On val, as
+three-draw means:
+
+| step | val mAP@50:95 |
+| --- | --- |
+| 3.8-flash + box_2d | 0.328 |
+| Argon + box_2d | 0.380 |
+| Argon + box_2d + rim line | **0.414** |
+
+Test, run once: **0.326 → 0.431**.
+
+The box format matters far more on Argon: +0.032, with every box_2d draw above every
+named-field draw. The other change is a one-line rim definition. Argon put a rim in
+every val image but boxed the hoop *and net*, with a median box height of 0.059 of
+the frame against a labelled 0.021. This dataset labels the ring only, so the line
+now reads "the metal hoop ring only … exclude the net and the backboard". That took
+Argon's val `rim` AP@50 from 0.01–0.04 to 0.68–0.72.
+
+The same line on 3.8-flash is a null (0.320 vs 0.328, `rim` unchanged at about
+0.15), so the gap between the two rows is the model, not the prompt. It is a
+dataset-specific labelling instruction, chosen on val, and stated here as such.
+Dropping the count caps (+0.005) and image-first ordering (−0.007) were not adopted.
+Full log: `docs/plans/gemini-argon-2026-10.md`.
+
+**2026-10-21: a wider search, and the row becomes two-pass.** Round 3 searched
+what Rounds 1–2 had not: class definitions, generation settings, and GPT-6
+Astra's two zoom pipelines with Gemini doing the zoomed pass. Each step was
+stacked on the previous winner, with three val draws each:
+
+| step | val mAP@50:95 |
+| --- | --- |
+| rim line (above) | 0.414 |
+| + `number` line: "every visible jersey number, including small or partly hidden ones" | 0.415 |
+| + thinking HIGH | 0.441 |
+| + crop-refine (ball and rim re-detected in a zoomed crop) | 0.512 |
+| + number crop (each player cropped, number re-detected) | **0.520** |
+
+Test, run once: **0.431 → 0.534** (mAP@50 0.866). `rim` AP@50 is 1.000 and
+`number` 0.735.
+
+- **Thinking.** It is off by default on Argon. HIGH raised every class. LOW and
+  temperature 0 did not separate from the noise.
+- **The `number` line** was adopted because `number` AP@50 rose on every draw
+  while the mean held.
+- **Not adopted:** a ball line that also boxes balls going through the rim.
+  `merged5` labels those as `ball` (9 in val), but even when told to, Argon found
+  0–1 of the 9. Astra's prompt excludes them the same way.
+
+**This row now runs two passes, about 12 calls per image, where every other
+headline row runs one.** Compare it like for like:
+
+- **Two-pass:** Astra with the same two pipelines scores **0.587** on test.
+- **Single-pass:** Argon's best single-pass val mean is 0.441, against Astra's
+  0.501 on test.
+
+Argon still trails Astra on `ball` and `number`. It leads on `rim` and `referee`.
+
 ### What prompt engineering did *not* fix
 
 Two hypotheses this work set out to test, both refuted by measurement:
@@ -179,8 +238,8 @@ adopting a smaller "win" is fitting the val split.
 <!-- TABLE:vlm_ablation_headline START -->
 | Model | Published | Best on val | Δ | Changes kept |
 | --- | --- | --- | --- | --- |
+| gemini | 0.253 | **0.519** | +0.2662 | checkpoint `gemini-4-argon`, prompt, box format box_2d, thinking high, pipeline crop_refine+number_crop, mean of 3 vs 3 draws |
 | llmdet | 0.359 | 0.359 | — | none — baseline beat every arm tried |
-| gemini | 0.253 | **0.328** | +0.0749 | checkpoint `gemini-3.8-flash`, prompt, box format box_2d, mean of 3 vs 3 draws |
 | owlv2 | 0.240 | **0.288** | +0.0479 | NMS IoU 0.5, tiling 2x2 |
 | grounding_dino | 0.244 | **0.278** | +0.0338 | NMS IoU 0.7, tiling 2x2 |
 | qwen3_vl | 0.265 | 0.265 | — | none — baseline beat every arm tried |
@@ -397,7 +456,9 @@ The table above is the August `gemini-3.1-pro-preview` row. Its 2026-10
 replacement, `gemini-3.8-flash` with the native box format, is far steadier:
 three val draws of 0.3274 / 0.3285 / 0.3287, σ = 0.0007. On the July prompt
 format the same model swung 0.3096–0.3315 (σ = 0.011). The box format is
-adopted largely for that stability.
+adopted largely for that stability. The 2026-10-14 Argon row sits in between:
+0.4070 / 0.4210 / 0.4139, σ = 0.007. The 2026-10-21 two-pass row is
+0.5110 / 0.5248 / 0.5227, σ = 0.007.
 
 **Still not searched**
 
@@ -432,7 +493,7 @@ from the committed prediction dumps in `results/vlm/*.json` (never transcribed):
 | GPT-6.1 Sol (low effort) | 0.489 | 0.791 | 0.503 |
 | Claude Opus 5.5 | 0.438 | 0.691 | 0.465 |
 | DINO-X Pro | 0.439 | 0.564 | 0.489 |
-| Gemini | 0.326 | 0.508 | 0.361 |
+| Gemini | 0.534 | 0.866 | 0.564 |
 | OWLv2 | 0.315 | 0.476 | 0.367 |
 | Grounding-DINO | 0.293 | 0.352 | 0.318 |
 | OmDet-Turbo | 0.211 | 0.297 | 0.219 |
@@ -450,9 +511,16 @@ This table has changed twice since the 2026-08-05 ablation, and both changes
 are worth stating plainly because earlier revisions of this report said
 otherwise.
 
-**GPT-6 Astra now leads the whole table, and it is not close — but it is a
+**GPT-6 Astra leads every single-pass row, and it is not close — but it is a
 billed API, not open weights.** Added 2026-09-25, it scores **0.501**, 0.113
-clear of the next row and 0.175 clear of Gemini's 0.326. Like Gemini, and
+clear of the best open-weights row.
+
+The Gemini row (0.534 since 2026-10-21) now scores above it, but it is not the
+same kind of row: it runs two zoom passes, about 12 calls per image. Like for
+like, Astra with the same two pipelines scores 0.587. Astra still leads on
+`ball` and `number`; Argon leads on `rim` (1.000 two-pass) and `referee`.
+
+Like Gemini, and
 unlike every open-weights row, it is a hosted model steered by a free-text
 instruction rather than a class vocabulary, so it is *exempt from the
 equal-effort search* for the same two reasons Gemini is (a free-text prompt, and
@@ -544,8 +612,9 @@ count the paid API.** Against the lowest-ranked fine-tuned detector's **0.581**
 (RT-DETRv2-M — see [FINAL_COMPARISON_640.md](FINAL_COMPARISON_640.md)): the best
 *open-weights* zero-shot row, LLMDet-large at 0.388, is still **1.50×** behind,
 the same order-of-magnitude gap this report has narrated shrinking (Gemini 2.5×,
-OWLv2 1.85×). But the best zero-shot row you can *rent*, Astra at 0.501, is only
-**1.16×** behind — the gap to a fine-tuned detector has all but closed for the
+OWLv2 1.85×). But the best zero-shot rows you can *rent* are much closer: Astra at 0.501 is
+only **1.16×** behind, and the two-pass Gemini (Argon) row at 0.534 only
+**1.09×** — the gap to a fine-tuned detector has all but closed for the
 strongest off-the-shelf option, provided you are willing to pay per image for a
 proprietary model with no weights to run offline.
 
@@ -628,8 +697,8 @@ The Ultralytics Platform auto-annotation benchmark (26 class-prompted models, 36
 real-world datasets, every provider at its default reasoning effort) ranked
 GPT-6.1 Sol (0.491 mAP50) above Claude Opus 5.5 (0.476) above GPT-6 Astra
 (0.470). Four rows added 2026-10-15 put those models onto this split under this
-protocol. (Gemini 4 Argon, which topped that benchmark, is handled on a separate
-branch.)
+protocol. (Gemini 4 Argon, which topped that benchmark, is the Gemini row; see
+the 2026-10-14 and 2026-10-21 paragraphs above.)
 
 **Read the gaps against run-to-run noise first, not only against the CIs.** The
 CIs below are paired image-level bootstrap CIs on test (1,000 resamples, seed 0,
@@ -998,7 +1067,7 @@ makes the pattern unmistakable:
 | GPT-6.1 Sol (low effort) | 0.979 | 0.669 | 0.978 | 0.465 | 0.862 |
 | Claude Opus 5.5 | 0.970 | 0.497 | 0.901 | 0.502 | 0.587 |
 | DINO-X Pro | 0.919 | 0.567 | 0.628 | 0.002 | 0.702 |
-| Gemini | 0.945 | 0.572 | 0.749 | 0.043 | 0.233 |
+| Gemini | 0.976 | 0.630 | 0.989 | 1.000 | 0.735 |
 | OWLv2 | 0.901 | 0.583 | 0.388 | 0.002 | 0.505 |
 | Grounding-DINO | 0.867 | 0.355 | 0.533 | 0.000 | 0.006 |
 | OmDet-Turbo | 0.805 | 0.187 | 0.369 | 0.000 | 0.127 |
@@ -1016,34 +1085,35 @@ Read down the columns and one story emerges: **open-vocabulary VLMs recognise
 the class they already know from web-scale pre-training (`player`, essentially
 COCO's `person`) and collapse on the small, domain-specific classes.**
 
-- **The `rim` collapse — a hard ceiling for the open-weights models and Gemini,
-  which GPT-6 Astra breaks.** Among the eight open-weights-and-Gemini rows, `rim`
-  is the class every one fails hardest on: four score **exactly 0.000** and the
-  best of them (Gemini) manages 0.043. The 2026-10 Gemini row reached
-  0.12–0.18 on val draws; that did not hold on test. A rim is small, thin, often partially
+- **The `rim` collapse — a hard ceiling for the open-weights models, which both
+  hosted models now break.** Among the seven open-weights rows, `rim` is the class
+  every one fails hardest on: four score **exactly 0.000** and the best manages
+  0.005. Gemini sat in that group too, at 0.043 on test, until the 2026-10-14 Argon
+  row reached **0.706** in a single pass (**1.000** with the 2026-10-21 two-pass
+  row). That needed a prompt line defining the rim as the ring
+  only: Argon found every rim but boxed the net with it (see the 2026-10-14
+  paragraph above). A rim is small, thin, often partially
   occluded, and not a salient "object" in a general model's prior. This was
   *tested* across seven open-weights models and six vocabularies each —
   forty-two measurements — and `rim` never once cleared 0.04, whether prompted as
   "basketball hoop", "basketball hoop and backboard", "rim", or "hoop"; vocabulary
-  cannot close it for those models. **GPT-6 Astra is the first to break it**,
-  scoring **0.521** — over 14× the previous best — and the two-pass crop-refine
-  pipeline, which simply zooms in and re-detects, takes rim to **0.95**. So the
+  cannot close it for those models. **GPT-6 Astra was the first to break it**,
+  scoring **0.521**, over 14× the then-best. Argon's single pass is higher still.
+  Astra's two-pass crop-refine pipeline, which simply zooms in and re-detects, takes rim to **0.95**. So the
   rim collapse is a capability-and-resolution gap for the models that were
   available when this report was first written, not an absolute limit of
   zero-shot detection: a frontier model with enough grounding ability clears it,
   and giving any model enough pixels on the rim nearly solves it.
 
 - **`referee` is where the models actually differ.** It ranges from GPT-6
-  Astra's **0.979** — with Gemini (0.749) and Qwen3-VL-8B (0.727) about two points
-  apart well behind, and neither of those should be read as a clear
-  "winner" over the other — down to YOLO-World's **0.000**, the widest spread of
-  any class. Astra separates the officiating role almost perfectly; the rest do
-  not. A referee is
+  Gemini's **0.989** (the 2026-10-21 Argon row; 0.749 before Argon) and GPT-6
+  Astra's **0.979**
+  down to YOLO-World's **0.000**, the widest spread of any class. The two hosted
+  models separate the officiating role almost perfectly. Behind them, Qwen3-VL-8B
+  (0.727) leads the open-weights rows. A referee is
   visually a `player` under any of these vocabularies (a person on a court), so
   separating the officiating role is a genuine semantic discrimination rather
-  than a detection problem. LLMDet-large (0.673) is close behind both; Gemini's
-  strength here — despite its hand-tuned-prompt advantage — is no longer unique
-  to it. Describing the clothing explicitly was tried and made things *worse*,
+  than a detection problem. LLMDet-large (0.673) is close behind Qwen3-VL-8B. Describing the clothing explicitly was tried and made things *worse*,
   not better (see above). YOLOE is the exception: the clothing phrase *is* its
   best referee prompt (0.516 test). YOLO-World's 0.000 has a different and more
   specific cause — see [Does the COCO `person` alias manufacture false
@@ -1054,11 +1124,11 @@ COCO's `person`) and collapse on the small, domain-specific classes.**
   entirely responsible for the non-trivial overall mAP the leaders post. Strip
   `player` out and the zero-shot ceiling would be far lower still. GPT-6 Astra
   tops it at **0.980** and leads the table overall; among the rest, how little
-  separates them is the story — Gemini (0.945), Qwen3-VL-8B (0.934) and OWLv2
-  (0.901) are within five points of each other, and none of *those* is its
+  separates them is the story — Gemini (0.976), Qwen3-VL-8B (0.934) and OWLv2
+  (0.901) are within seven points of each other, and none of *those* is its
   group's overall leader: LLMDet-large's 0.880 on `player` is only fifth-best,
   and it wins the open-weights ranking on the strength of the other four classes
-  instead, chiefly `number` (0.571, the best of any model here except Astra).
+  instead, chiefly `number` (0.571, the best of any open-weights row).
 
 - **Florence-2 is the weakest detector here on `player`**, at 0.749 against a
   field that otherwise clears 0.80. This bullet previously quoted 0.335 — stale
@@ -1241,9 +1311,10 @@ GPT-6 Astra (added 2026-09-25) postdates this fusion work and is **not** part of
 it — every "eight" in this section is the eight open-weights-and-Gemini rows.
 Fusing a model that already scores 0.501 alone, and whose licence and per-image
 cost differ from the rest, is a separate question left for future work.
-Likewise, this section predates the 2026-10-12 Gemini refresh. Its Gemini member
+Likewise, this section predates the 2026-10 Gemini refreshes. Its Gemini member
 is the earlier `gemini-3.1-pro-preview` row (test 0.250), not the
-`gemini-3.8-flash` row (0.326) in the tables above. Fusion was not re-run.*
+`gemini-4-argon` row (0.534) in the tables above. Fusion was not re-run; it will be
+re-run once the other new methods land.*
 
 Every number above scores one model running one forward pass. This section asks
 a different question — what happens if you run all eight and merge their
