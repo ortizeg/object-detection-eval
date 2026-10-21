@@ -70,6 +70,7 @@ Each arm is 96 calls, 768 in total.
 - [x] Decision against the rule: Argon + box_2d + rim line adopted
 - [x] Test (run once, 2026-10-14)
 - [x] Report
+- [x] Round 3 (class definitions, settings, crop pipelines), val + one test run
 - [ ] Fusion re-run (deferred with the 3.8 refresh's, until the other new methods land)
 
 ## Round 1 results (val, 2026-10-14)
@@ -318,3 +319,36 @@ later sleeps without a failure.
 
 Every Round 3 cache that is scored has 96 of 96 images non-empty, and no call in
 it failed all of its retries.
+
+## Round 3 test (run once, 2026-10-21)
+
+The config is Argon + box_2d + rim line + `number` line + thinking HIGH +
+`crop_refine+number_crop`. The manifest row equals the `crop_number_stack_argon`
+val arm in prompt, model, format, thinking, temperature, image order and
+pipeline (checked programmatically).
+
+| test | Argon (10-14) | **Argon Round 3 (10-21)** | GPT-6 Astra | Astra crop-refine + number crop |
+| --- | --- | --- | --- | --- |
+| mAP@50:95 | 0.431 | **0.534** | 0.501 | 0.587 |
+| mAP@50 | 0.747 | **0.866** | 0.823 | n/a |
+| player | 0.964 | 0.976 | 0.980 | n/a |
+| ball | 0.541 | 0.630 | 0.776 | n/a |
+| referee | 0.956 | 0.989 | 0.979 | n/a |
+| rim | 0.706 | **1.000** | 0.521 | n/a |
+| number | 0.567 | 0.735 | 0.861 | n/a |
+
+Val held on test: 0.520 on val, 0.534 on test. `expected_map5095` is now 0.534.
+
+**Against Astra.** The row is two-pass, about 12 calls per image.
+
+- **Like for like** (both models with the same pipelines): Astra 0.587 against
+  Argon 0.534. Astra still leads.
+- **Against Astra's single-pass row** (0.501): Argon is ahead, but only by spending
+  roughly 12 times the calls.
+- **Per class:** Argon leads on `rim` and `referee`. `ball` and `number` remain the
+  gap.
+
+**Operational.** The first attempt reached 88 of 94 images before the credits ran out
+again. No score had been computed, and the run was repeated from scratch.
+`run_vlm_benchmark.py` now checkpoints each image to `.cache/vlm_test/` and
+resumes. With `--workers 3`, the repeat took 95 minutes, with 0 failed calls.
