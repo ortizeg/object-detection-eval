@@ -194,3 +194,127 @@ The val gains held on test:
 On this dataset, the public-benchmark claim that Argon beats Astra does not carry over
 to detection. `ball` (0.541 vs 0.776) and `number` (0.567 vs 0.861) are the gap.
 `expected_map5095` is now 0.431.
+
+## Round 3: a wider search (requested 2026-10-15)
+
+The question: "did we try full search?" No. Rounds 1-2 were one change at a time on
+the prompt. Round 3 covers what was left, on the current winner, with 3 draws per arm
+on val.
+
+**3a: class definitions (diagnosed from cached boxes, at no API cost).** Matching
+every val GT box to Argon's best same-class box gives:
+
+| class | recall at IoU 0.5 | recall at IoU 0.75 | median width ratio | median height ratio |
+| --- | --- | --- | --- | --- |
+| ball | 0.62-0.66 | 0.37-0.43 | 1.00 | 1.00 |
+| number | 0.65-0.66 | 0.29-0.30 | 0.96 | 0.93 |
+| rim (rim line) | 0.81-0.82 | 0.11-0.18 | 1.08-1.11 | 1.08-1.13 |
+
+The width and height ratios are pred/GT, so `ball` and `number` match GT shape. Unlike
+the rim, there is no box-convention error. Their problem is recall, plus loose
+`number` boxes.
+
+There is one prompt bug. `merged5` folds `ball-in-basket` into `ball`, but every
+Gemini prompt since July says "only when NOT going through the rim". Argon found 0
+of the 9 such val balls. GPT-6 Astra's base prompt carries the same clause.
+
+- `ball_fix_argon`: "the basketball, including when it is going through the rim".
+- `number_all_argon`: "every visible jersey number, including small or partly hidden
+  ones".
+
+**3b: generation settings.** A probe on 2026-10-15 found:
+
+- `media_resolution=HIGH` uses the same 1,100 image tokens as the default, so the
+  input is already at maximum resolution. Only LOW (264) differs, and resolution is
+  not searched further. Zooming is done by 3c instead.
+- Thinking is off by default (no thinking tokens). HIGH works (174 thinking tokens on
+  the probe image), and MINIMAL is rejected.
+
+The arms are thinking LOW, thinking HIGH, and temperature 0.
+
+**3c: two-pass zoom pipelines.** These are GPT-6 Astra's zero-shot pipelines, with
+Gemini pass-2 refiners. The pipeline code is model-agnostic.
+
+- `crop_refine` re-detects each ball and rim in a zoomed crop around its pass-1 box,
+  which tightens localisation. That is where `rim` R@0.75 (0.11-0.18) is weak.
+- `number_crop` crops each player and finds that player's number, adding it to
+  pass 1. This costs about 10 calls per image.
+
+**Adoption rule (written before any Round 3 result).**
+
+1. An arm is adopted if its 3-draw mean beats the current winner's mean by more than
+   the larger of the two draw spreads (sd).
+2. A class-targeted arm (`ball_fix`, `number_all`, `crop_refine`, `number_crop`) is
+   also adopted if its target class's AP50 beats the winner's on every draw and the
+   mean mAP@50:95 does not fall.
+3. Adopted changes stack in order: 3a, then 3b on the 3a winner, then 3c on the 3b
+   winner. If both 3a arms are adopted, their combination gets its own 3 draws before
+   3b.
+4. Test is run once, after 3c, on the final stack.
+
+## Round 3 results (val, 2026-10-15)
+
+### 3a: class definitions
+
+| arm | draws | mean | target class AP50 | decision |
+| --- | --- | --- | --- | --- |
+| winner (rim line) | 0.4070 / 0.4210 / 0.4139 | 0.4140 | ball 0.58-0.61, number max 0.538 | n/a |
+| `ball_fix` | 0.4106 / 0.4180 / 0.4160 | 0.4149 | ball 0.607 / 0.602 / 0.565 | Not adopted. Ball is not up on every draw |
+| **`number_all`** | 0.4178 / 0.4164 / 0.4093 | 0.4145 (sd 0.0046) | number 0.595 / 0.575 / 0.566 | **Adopted** under rule 2 |
+
+Even when told explicitly, Argon finds 0-1 of the 9 in-basket balls. That is a capability
+limit, not a prompt bug.
+
+### 3b: generation settings (on `number_all`)
+
+| arm | draws | mean | sd | decision |
+| --- | --- | --- | --- | --- |
+| thinking LOW | 0.4090 / 0.4045 / 0.4186 | 0.4107 | 0.0072 | Not adopted |
+| **thinking HIGH** | 0.4463 / 0.4367 / 0.4399 | **0.4410** | 0.0049 | **Adopted** (+0.027, about 5 sd) |
+| temperature 0 | 0.4180 / 0.4224 / 0.4193 | 0.4199 | 0.0023 | Clears rule 1 only just (+0.0054 against sd 0.0046) |
+| thinking HIGH + temperature 0 | 0.4445 / 0.4348 / 0.4430 | 0.4408 | 0.0052 | Ties thinking HIGH, so dropped |
+
+Thinking HIGH raises every class's AP50:
+
+- `rim`: 0.67-0.74 to 0.79-0.85
+- `number`: 0.57-0.59 to 0.62
+- `referee`: about 0.90 to about 0.93
+- `player`: 0.98-0.99
+
+Once thinking is on, temperature 0 adds nothing. The 3b winner is thinking HIGH alone.
+All 12 caches have 96 of 96 images non-empty, with one 504 that recovered on retry.
+
+### 3c: crop pipelines (on thinking HIGH)
+
+| arm | draws | mean | sd | target class AP50 | decision |
+| --- | --- | --- | --- | --- | --- |
+| thinking HIGH (3b winner) | 0.4463 / 0.4367 / 0.4399 | 0.4410 | 0.0049 | rim 0.79-0.85, number 0.615-0.623 | n/a |
+| **`crop_refine`** | 0.5167 / 0.5042 / 0.5135 | **0.5115** | 0.0065 | rim **0.94-0.96** | **Adopted** (+0.071) |
+| **`number_crop`** | 0.4525 / 0.4432 / 0.4556 | 0.4505 | 0.0065 | number **0.70-0.74** | **Adopted** (both rules) |
+| **both stacked** | 0.5110 / 0.5248 / 0.5227 | **0.5195** | 0.0074 | number 0.73-0.75, rim 0.94-0.95 | **Adopted** over `crop_refine` (number up on every draw, mean up) |
+
+The two pipelines touch disjoint classes, and their gains add. `crop_refine`
+tightens rim boxes: rim R@0.75 was the weak spot, at 0.11-0.18 in 3a. `number_crop`
+recovers numbers that the full-frame pass misses. Ball does not move in either
+pipeline (0.61-0.66).
+
+Cost goes from 1 call per image to about 12 (pass 1, about 10 player crops, and 1-2
+ball/rim crops), with thinking on for every call.
+
+### Operational: two more silent-failure paths
+
+- **Billing.** The key's prepaid credits ran out at 19:40 on 2026-10-15. A `402
+  RESOURCE_EXHAUSTED` is not retryable, so every call after that became an empty
+  image. The poisoned caches and rows were moved out, and the user topped up. Later
+  runs used a watchdog that kills the sweep on the first billing/auth error, or on
+  any call that fails all of its retries.
+- **Host sleep.** On 2026-10-16 the laptop slept mid-sweep. 139 calls failed to
+  connect (`httpx.ConnectError`), which was not on the retry list.
+  `GeminiInferencer` now retries `httpx.TransportError`, and there is a test for
+  it. `number_crop` draws 1-2 were quarantined and re-run.
+
+`caffeinate` does not prevent lid-closed sleep, but the retry ladder rode out
+later sleeps without a failure.
+
+Every Round 3 cache that is scored has 96 of 96 images non-empty, and no call in
+it failed all of its retries.

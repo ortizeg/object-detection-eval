@@ -42,6 +42,7 @@ Usage::
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from collections.abc import Callable
@@ -116,6 +117,10 @@ class ManifestEntry(BaseModel, frozen=True):
     gemini_image_first: bool = False
     #: Gemini only: per-request timeout in seconds (``None`` = inferencer default).
     gemini_request_timeout_s: float | None = None
+    gemini_thinking_level: str | None = None
+    gemini_temperature: float | None = None
+    #: Gemini only: two-pass zoom pipeline (``crop_refine`` / ``number_crop``).
+    gemini_pipeline: str | None = None
     #: Billed OpenAI/Anthropic rows only: reasoning effort the row published at
     #: (low/medium/high/xhigh/max). ``default`` omits the parameter so the
     #: provider's own default runs -- the setting the Ultralytics Platform
@@ -254,16 +259,21 @@ def _yoloe_factory(entry: ManifestEntry) -> BaseInferencer:
 
 
 def _gemini_factory(entry: ManifestEntry) -> BaseInferencer:
-    from object_detection_eval.inference.vlm.gemini import GeminiInferencer
+    from object_detection_eval.inference.vlm.gemini import GeminiInferencer, build_crop_pipeline
 
-    return GeminiInferencer(
+    gemini = GeminiInferencer(
         model_name=entry.model_name,
         classes=entry.classes,
         prompt_template=entry.prompt_template,
         box_format=entry.gemini_box_format,  # type: ignore[arg-type]
         image_first=entry.gemini_image_first,
         request_timeout_s=entry.gemini_request_timeout_s,
+        thinking_level=entry.gemini_thinking_level,
+        temperature=entry.gemini_temperature,
     )
+    if entry.gemini_pipeline is not None:
+        return build_crop_pipeline(gemini, entry.gemini_pipeline)  # type: ignore[arg-type,no-any-return]
+    return gemini
 
 
 def _astra_factory(entry: ManifestEntry) -> BaseInferencer:
@@ -423,6 +433,21 @@ def _box_pad_ids(
     return {name_to_id[name]: pad for name, pad in box_pad.items()}
 
 
+#: Remote API clients whose requests can overlap. Local models share one device.
+_CONCURRENT_INFERENCERS = frozenset({"gemini"})
+
+
+def _checkpoint_path(entry: ManifestEntry, checkpoint_dir: Path) -> Path:
+    """Per-image raw predictions for this exact row config, for resume.
+
+    Keyed by a digest of the whole manifest row, so any change to the row
+    (model, prompt, pipeline, settings) starts a fresh file. The target value
+    is excluded: changing what a run is compared against changes no request.
+    """
+    blob = entry.model_dump_json(exclude={"expected_map5095"}).encode()
+    return checkpoint_dir / f"{entry.name}__{hashlib.sha256(blob).hexdigest()[:12]}.jsonl"
+
+
 def _score_entry(
     entry: ManifestEntry,
     args: argparse.Namespace,
@@ -447,6 +472,8 @@ def _score_entry(
         label_map=label_map,
         name_to_id=name_to_id,
         box_pad=_box_pad_ids(entry.box_pad, name_to_id),
+        checkpoint=_checkpoint_path(entry, args.checkpoint_dir),
+        workers=args.workers if entry.inferencer in _CONCURRENT_INFERENCERS else 1,
     )
 
     if hasattr(inferencer, "unload"):
@@ -522,6 +549,18 @@ def parse_args() -> argparse.Namespace:
         type=float,
         default=None,
         help="Override the manifest's tolerance.",
+    )
+    parser.add_argument(
+        "--checkpoint-dir",
+        type=Path,
+        default=Path(".cache/vlm_test"),
+        help="Per-image raw predictions; a stopped run resumes from here.",
+    )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=1,
+        help="Concurrent images for remote API rows (gemini); capped at 3 in practice.",
     )
     parser.add_argument(
         "--only",

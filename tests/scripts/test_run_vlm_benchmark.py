@@ -220,6 +220,6 @@ def test_print_result_applies_tolerance_for_targeted_entry() -> None:
     manifest = run_vlm_benchmark.load_manifest(_MANIFEST_PATH)
     gemini = next(m for m in manifest.models if m.name == "gemini")
 
-    # Target 0.431 (the 2026-10-14 gemini-4-argon row).
-    assert run_vlm_benchmark._print_result(gemini, measured=0.445, tolerance=0.02) is True
-    assert run_vlm_benchmark._print_result(gemini, measured=0.400, tolerance=0.02) is False
+    # Target 0.534 (the 2026-10-21 gemini-4-argon + thinking + crop pipelines row).
+    assert run_vlm_benchmark._print_result(gemini, measured=0.548, tolerance=0.02) is True
+    assert run_vlm_benchmark._print_result(gemini, measured=0.510, tolerance=0.02) is False

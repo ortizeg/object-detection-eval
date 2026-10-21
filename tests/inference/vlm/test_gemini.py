@@ -26,7 +26,7 @@ from object_detection_eval.inference.vlm.gemini import (
     GeminiDetection,
     GeminiInferencer,
 )
-from object_detection_eval.schemas.detection import Detection
+from object_detection_eval.schemas.detection import BoundingBox, Detection
 
 pytestmark = [pytest.mark.vlm, pytest.mark.external]
 
@@ -260,6 +260,34 @@ class TestGeminiInferencerPredict:
         assert len(dets) == 1
         assert mock_client.models.generate_content.call_count == 2
 
+    def test_predict_retries_a_dropped_connection(
+        self, _mock_genai, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A failed connect (host asleep, network down) must not become an empty image."""
+        import httpx
+
+        monkeypatch.setenv("GEMINI_API_KEY", "dummy-key")
+        _mock_genai, mock_client = _mock_genai
+        success_response = MagicMock()
+        success_response.parsed = [
+            GeminiDetection(
+                bbox=GeminiBBox(x_min=0, y_min=0, x_max=500, y_max=500),
+                label="player",
+                confidence=1.0,
+            )
+        ]
+        mock_client.models.generate_content.side_effect = [
+            httpx.ConnectError("[Errno 8] nodename nor servname provided"),
+            success_response,
+        ]
+
+        inferencer = GeminiInferencer(model_name="gemini-2.5-pro", classes=["player"])
+        with patch("object_detection_eval.inference.vlm.gemini.time.sleep"):
+            dets = inferencer.predict(np.zeros((480, 640, 3), dtype=np.uint8), 640, 480)
+
+        assert len(dets) == 1
+        assert mock_client.models.generate_content.call_count == 2
+
 
 class TestBoxFormatAndOrdering:
     """The opt-in native ``box_2d`` schema and image-first content order."""
@@ -345,3 +373,118 @@ class TestResolveLabel:
         monkeypatch.setenv("GEMINI_API_KEY", "dummy-key")
         inferencer = GeminiInferencer(model_name="gemini-2.5-pro", classes=["player", "ball"])
         assert inferencer._resolve_label("basketball") == 1
+
+
+class TestGenerationKnobs:
+    """Thinking level and temperature reach the request config only when set."""
+
+    def test_unset_knobs_leave_model_defaults(
+        self, _mock_genai, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setenv("GEMINI_API_KEY", "dummy-key")
+        with patch("object_detection_eval.inference.vlm.gemini.GenerateContentConfig") as cfg:
+            GeminiInferencer(model_name="gemini-4-argon", classes=["player"])
+        kwargs = cfg.call_args.kwargs
+        assert kwargs["thinking_config"] is None
+        assert kwargs["temperature"] is None
+
+    def test_thinking_level_and_temperature_are_passed(
+        self, _mock_genai, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from google.genai.types import ThinkingLevel
+
+        monkeypatch.setenv("GEMINI_API_KEY", "dummy-key")
+        with patch("object_detection_eval.inference.vlm.gemini.GenerateContentConfig") as cfg:
+            GeminiInferencer(
+                model_name="gemini-4-argon",
+                classes=["player"],
+                thinking_level="high",
+                temperature=0.0,
+            )
+        kwargs = cfg.call_args.kwargs
+        assert kwargs["thinking_config"].thinking_level == ThinkingLevel.HIGH
+        assert kwargs["temperature"] == 0.0
+
+
+class TestCropPipelines:
+    """The Astra zoom pipelines run on Gemini refiners that inherit the base config."""
+
+    def test_refiners_inherit_model_format_and_generation_settings(
+        self, _mock_genai, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from object_detection_eval.inference.vlm.gemini import build_crop_pipeline
+
+        monkeypatch.setenv("GEMINI_API_KEY", "dummy-key")
+        base = GeminiInferencer(
+            model_name="gemini-4-argon",
+            classes=["ball", "number", "player", "referee", "rim"],
+            box_format="box_2d",
+            request_timeout_s=300,
+            thinking_level="high",
+            temperature=0.0,
+        )
+        crop = build_crop_pipeline(base, "crop_refine")
+        rim = crop._refiners["rim"]
+        assert rim.model_name == "gemini-4-argon"
+        assert rim.classes == ["rim"]
+        assert rim.box_format == "box_2d"
+        assert (rim.request_timeout_s, rim.thinking_level, rim.temperature) == (300, "high", 0.0)
+        assert "ring only" in rim._prompt
+        number = build_crop_pipeline(base, "number_crop")._refiner
+        assert number.classes == ["number"]
+        assert "digits only" in number._prompt
+
+    def test_crop_refine_replaces_the_ball_box_with_the_zoomed_one(
+        self, _mock_genai, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from object_detection_eval.inference.vlm.gemini import build_crop_pipeline
+
+        monkeypatch.setenv("GEMINI_API_KEY", "dummy-key")
+        classes = ["ball", "number", "player", "referee", "rim"]
+        base = GeminiInferencer(model_name="m", classes=classes, box_format="box_2d")
+        loose = Detection(bbox=BoundingBox(x=0.4, y=0.4, w=0.2, h=0.2), confidence=1.0, class_id=0)
+        player = Detection(bbox=BoundingBox(x=0.0, y=0.0, w=0.1, h=0.3), confidence=1.0, class_id=2)
+        monkeypatch.setattr(base, "predict", lambda *a, **k: [loose, player])
+        pipe = build_crop_pipeline(base, "crop_refine")
+        tight = Detection(
+            bbox=BoundingBox(x=0.25, y=0.25, w=0.5, h=0.5), confidence=1.0, class_id=0
+        )
+        monkeypatch.setattr(pipe._refiners["ball"], "predict", lambda *a, **k: [tight])
+        monkeypatch.setattr(pipe._refiners["rim"], "predict", lambda *a, **k: [])
+
+        out = pipe.predict(np.zeros((1000, 1000, 3), dtype=np.uint8))
+
+        assert player in out  # non-refined classes pass through untouched
+        ball = next(d for d in out if d.class_id == 0)
+        assert ball != loose
+        assert ball.bbox.w < loose.bbox.w  # the zoomed box is the tighter one
+
+    def test_stacked_pipeline_refines_on_top_of_the_number_pass(
+        self, _mock_genai, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from object_detection_eval.inference.vlm.astra_number_crop import (
+            AstraNumberCropInferencer,
+        )
+        from object_detection_eval.inference.vlm.gemini import build_crop_pipeline
+
+        monkeypatch.setenv("GEMINI_API_KEY", "dummy-key")
+        base = GeminiInferencer(
+            model_name="gemini-4-argon",
+            classes=["ball", "number", "player", "referee", "rim"],
+            box_format="box_2d",
+            thinking_level="high",
+        )
+        pipe = build_crop_pipeline(base, "crop_refine+number_crop")
+        assert isinstance(pipe.base, AstraNumberCropInferencer)
+        assert pipe.base.base is base
+        assert pipe._refiners["rim"].thinking_level == "high"
+
+    def test_unknown_pipeline_is_refused(
+        self, _mock_genai, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        from object_detection_eval.inference.vlm.gemini import build_crop_pipeline
+
+        monkeypatch.setenv("GEMINI_API_KEY", "dummy-key")
+        base = GeminiInferencer(model_name="m", classes=["ball"])
+        with pytest.raises(ValueError, match="unknown Gemini pipeline"):
+            build_crop_pipeline(base, "tiles")  # type: ignore[arg-type]

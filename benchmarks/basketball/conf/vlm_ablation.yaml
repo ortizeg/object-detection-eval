@@ -803,6 +803,133 @@ elements:
         Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - "player" for any basketball player on the court - "referee" for game officials - "ball" for the basketball (only when NOT going through the rim) - "rim" for the basketball hoop rim - "number" for visible jersey numbers (tight box around the digits only) Return each box as box_2d [ymin, xmin, ymax, xmax] normalized to 0-1000.
     values: [0, 1, 2]
 
+  # ARGON ROUND 3a (2026-10-15) -- on the rim-line winner, 3 draws each.
+  # ball_fix: merged5 folds `ball-in-basket` into `ball`, but the prompt since July
+  # says "only when NOT going through the rim" -- Argon found 0/9 of those on val.
+  # number_all: number boxes match GT shape (w x0.96, h x0.93); recall is the gap
+  # (0.66 at IoU 0.5), so the line asks for every visible number.
+  - name: ball_fix_argon
+    knob: sample
+    applies_to: [gemini]
+    fixed:
+      model_name: gemini-4-argon
+      gemini_request_timeout_s: 300
+      gemini_box_format: box_2d
+      prompt_template: |
+        Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - At most 10 players, 3 referees, 1 rim, and 1 ball per image. - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - "player" for any basketball player on the court - "referee" for game officials - "ball" for the basketball, including when it is going through the rim - "rim" for the metal hoop ring only (a thin, wide box around the ring; exclude the net and the backboard) - "number" for visible jersey numbers (tight box around the digits only) Return each box as box_2d [ymin, xmin, ymax, xmax] normalized to 0-1000.
+    values: [0, 1, 2]
+
+  - name: number_all_argon
+    knob: sample
+    applies_to: [gemini]
+    fixed:
+      model_name: gemini-4-argon
+      gemini_request_timeout_s: 300
+      gemini_box_format: box_2d
+      prompt_template: |
+        Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - At most 10 players, 3 referees, 1 rim, and 1 ball per image. - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - "player" for any basketball player on the court - "referee" for game officials - "ball" for the basketball (only when NOT going through the rim) - "rim" for the metal hoop ring only (a thin, wide box around the ring; exclude the net and the backboard) - "number" for every visible jersey number, including small or partly hidden ones (tight box around the digits only) Return each box as box_2d [ymin, xmin, ymax, xmax] normalized to 0-1000.
+    values: [0, 1, 2]
+
+  # ARGON ROUND 3b (2026-10-15) -- generation settings on the 3a winner
+  # (number_all: number AP50 separated on every draw, mean held). ball_fix was not
+  # adopted: even told to, Argon found 0-1 of the 9 in-basket balls.
+  # media_resolution is not swept: HIGH == default (1100 image tokens).
+  # Thinking is off by default on Argon; MINIMAL is rejected by the API.
+  - name: think_low_argon
+    knob: sample
+    applies_to: [gemini]
+    fixed:
+      model_name: gemini-4-argon
+      gemini_request_timeout_s: 300
+      gemini_box_format: box_2d
+      prompt_template: |
+        Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - At most 10 players, 3 referees, 1 rim, and 1 ball per image. - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - "player" for any basketball player on the court - "referee" for game officials - "ball" for the basketball (only when NOT going through the rim) - "rim" for the metal hoop ring only (a thin, wide box around the ring; exclude the net and the backboard) - "number" for every visible jersey number, including small or partly hidden ones (tight box around the digits only) Return each box as box_2d [ymin, xmin, ymax, xmax] normalized to 0-1000.
+      gemini_thinking_level: low
+    values: [0, 1, 2]
+
+  - name: think_high_argon
+    knob: sample
+    applies_to: [gemini]
+    fixed:
+      model_name: gemini-4-argon
+      gemini_request_timeout_s: 300
+      gemini_box_format: box_2d
+      prompt_template: |
+        Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - At most 10 players, 3 referees, 1 rim, and 1 ball per image. - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - "player" for any basketball player on the court - "referee" for game officials - "ball" for the basketball (only when NOT going through the rim) - "rim" for the metal hoop ring only (a thin, wide box around the ring; exclude the net and the backboard) - "number" for every visible jersey number, including small or partly hidden ones (tight box around the digits only) Return each box as box_2d [ymin, xmin, ymax, xmax] normalized to 0-1000.
+      gemini_thinking_level: high
+    values: [0, 1, 2]
+
+  - name: temp0_argon
+    knob: sample
+    applies_to: [gemini]
+    fixed:
+      model_name: gemini-4-argon
+      gemini_request_timeout_s: 300
+      gemini_box_format: box_2d
+      prompt_template: |
+        Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - At most 10 players, 3 referees, 1 rim, and 1 ball per image. - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - "player" for any basketball player on the court - "referee" for game officials - "ball" for the basketball (only when NOT going through the rim) - "rim" for the metal hoop ring only (a thin, wide box around the ring; exclude the net and the backboard) - "number" for every visible jersey number, including small or partly hidden ones (tight box around the digits only) Return each box as box_2d [ymin, xmin, ymax, xmax] normalized to 0-1000.
+      gemini_temperature: 0.0
+    values: [0, 1, 2]
+
+  # Both 3b arms cleared rule 1 (think_high +0.027, temp0 +0.005 vs sd 0.0046), so
+  # their combination gets its own 3 draws before 3c (rule 3).
+  - name: think_high_temp0_argon
+    knob: sample
+    applies_to: [gemini]
+    fixed:
+      model_name: gemini-4-argon
+      gemini_request_timeout_s: 300
+      gemini_box_format: box_2d
+      prompt_template: |
+        Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - At most 10 players, 3 referees, 1 rim, and 1 ball per image. - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - "player" for any basketball player on the court - "referee" for game officials - "ball" for the basketball (only when NOT going through the rim) - "rim" for the metal hoop ring only (a thin, wide box around the ring; exclude the net and the backboard) - "number" for every visible jersey number, including small or partly hidden ones (tight box around the digits only) Return each box as box_2d [ymin, xmin, ymax, xmax] normalized to 0-1000.
+      gemini_thinking_level: high
+      gemini_temperature: 0.0
+    values: [0, 1, 2]
+
+  # ARGON ROUND 3c (2026-10-15) -- GPT-6 Astra's two-pass zoom pipelines with
+  # Gemini refiners, on the 3b winner (thinking HIGH; temp0 added nothing on top:
+  # 0.4408 vs 0.4410). Refiners inherit model, box_2d, thinking and timeout.
+  - name: crop_refine_argon
+    knob: sample
+    applies_to: [gemini]
+    fixed:
+      model_name: gemini-4-argon
+      gemini_request_timeout_s: 300
+      gemini_box_format: box_2d
+      prompt_template: |
+        Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - At most 10 players, 3 referees, 1 rim, and 1 ball per image. - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - "player" for any basketball player on the court - "referee" for game officials - "ball" for the basketball (only when NOT going through the rim) - "rim" for the metal hoop ring only (a thin, wide box around the ring; exclude the net and the backboard) - "number" for every visible jersey number, including small or partly hidden ones (tight box around the digits only) Return each box as box_2d [ymin, xmin, ymax, xmax] normalized to 0-1000.
+      gemini_thinking_level: high
+      gemini_pipeline: crop_refine
+    values: [0, 1, 2]
+
+  - name: number_crop_argon
+    knob: sample
+    applies_to: [gemini]
+    fixed:
+      model_name: gemini-4-argon
+      gemini_request_timeout_s: 300
+      gemini_box_format: box_2d
+      prompt_template: |
+        Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - At most 10 players, 3 referees, 1 rim, and 1 ball per image. - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - "player" for any basketball player on the court - "referee" for game officials - "ball" for the basketball (only when NOT going through the rim) - "rim" for the metal hoop ring only (a thin, wide box around the ring; exclude the net and the backboard) - "number" for every visible jersey number, including small or partly hidden ones (tight box around the digits only) Return each box as box_2d [ymin, xmin, ymax, xmax] normalized to 0-1000.
+      gemini_thinking_level: high
+      gemini_pipeline: number_crop
+    values: [0, 1, 2]
+
+  # Both 3c pipelines adopted -> their stack gets its own 3 draws (rule 3).
+  # number_crop adds numbers first, then crop_refine tightens ball/rim.
+  - name: crop_number_stack_argon
+    knob: sample
+    applies_to: [gemini]
+    fixed:
+      model_name: gemini-4-argon
+      gemini_request_timeout_s: 300
+      gemini_box_format: box_2d
+      prompt_template: |
+        Detect all basketball players, referees, the rim, the basketball, and visible jersey numbers in this basketball game image. Constraints: - At most 10 players, 3 referees, 1 rim, and 1 ball per image. - Each person gets exactly ONE bounding box with the most specific label. Use EXACTLY these labels: - "player" for any basketball player on the court - "referee" for game officials - "ball" for the basketball (only when NOT going through the rim) - "rim" for the metal hoop ring only (a thin, wide box around the ring; exclude the net and the backboard) - "number" for every visible jersey number, including small or partly hidden ones (tight box around the digits only) Return each box as box_2d [ymin, xmin, ymax, xmax] normalized to 0-1000.
+      gemini_thinking_level: high
+      gemini_pipeline: crop_refine+number_crop
+    values: [0, 1, 2]
+
   # ROUND 2 -- 2x2 overlapping tiles plus the full frame.
   #
   # The biggest lever for every open-weights model that took it (+0.026 to

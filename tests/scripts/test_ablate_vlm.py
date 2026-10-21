@@ -212,6 +212,15 @@ def test_only_the_checkpoint_re_search_pins_a_second_field(manifest: Any) -> Non
         "rim_def_argon",
         "no_caps_box2d_argon",
         "rim_def_38",
+        "ball_fix_argon",
+        "number_all_argon",
+        "think_low_argon",
+        "think_high_argon",
+        "temp0_argon",
+        "think_high_temp0_argon",
+        "crop_refine_argon",
+        "number_crop_argon",
+        "crop_number_stack_argon",
     }
 
 
@@ -598,3 +607,22 @@ def test_workers_refused_for_local_models(tmp_path: Path) -> None:
     )
     with pytest.raises(ValueError, match="--workers"):
         collect_raw(arm, tmp_path, ["a.jpg"], workers=4)
+
+
+def test_thinking_and_temperature_are_signature_only_when_set() -> None:
+    """Unset keeps every older cache's key; set must not share a cache with unset."""
+    from ablate_vlm import Arm
+
+    base = Arm(
+        id="g",
+        model="gemini",
+        element="baseline",
+        inferencer="gemini",
+        model_name="gemini-4-argon",
+        classes=["player"],
+    )
+    think = base.model_copy(update={"gemini_thinking_level": "high"})
+    temp = base.model_copy(update={"gemini_temperature": 0.0})
+    assert base.signature().endswith("sample0")
+    assert think.signature() == base.signature() + "__thinkhigh"
+    assert temp.signature() == base.signature() + "__temp0.0"

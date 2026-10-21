@@ -129,6 +129,13 @@ class Arm(BaseModel, frozen=True):
     #: Gemini only: per-request timeout. Transport, not model input, so it is
     #: deliberately NOT in the signature -- raising it must not orphan a cache.
     gemini_request_timeout_s: float | None = None
+    #: Gemini only: thinking level and sampling temperature. Both change what the
+    #: model computes, so both are signature (appended only when set).
+    gemini_thinking_level: str | None = None
+    gemini_temperature: float | None = None
+    #: Gemini only: a two-pass zoom pipeline (``crop_refine`` for ball/rim,
+    #: ``number_crop`` per player) on top of the pass-1 config. Signature.
+    gemini_pipeline: str | None = None
     #: Which independent draw this arm is. Changes nothing about the
     #: configuration and everything about the cache key, so a generative model
     #: can be run twice under identical settings to measure its own
@@ -239,6 +246,12 @@ class Arm(BaseModel, frozen=True):
         if self.anchor_crop is not None:
             blob = self.anchor_crop.model_dump_json().encode()
             parts.append(f"crop{hashlib.sha256(blob).hexdigest()[:8]}")
+        if self.gemini_thinking_level is not None:
+            parts.append(f"think{self.gemini_thinking_level}")
+        if self.gemini_temperature is not None:
+            parts.append(f"temp{self.gemini_temperature}")
+        if self.gemini_pipeline is not None:
+            parts.append(f"pipe{self.gemini_pipeline}")
         if not self.replayable:
             parts += [f"box{self.box_threshold}", f"nms{self.nms_iou_threshold}"]
         return "__".join(parts).replace("/", "_").replace(" ", "-")
@@ -589,20 +602,28 @@ def build_inferencer(arm: Arm, *, raw_mode: bool) -> Any:
             max_det=arm.max_det if arm.max_det is not None else 300,
         )
     if arm.inferencer == "gemini":
-        from object_detection_eval.inference.vlm.gemini import GeminiInferencer
+        from object_detection_eval.inference.vlm.gemini import (
+            GeminiInferencer,
+            build_crop_pipeline,
+        )
 
         # No raw_mode branch: Gemini applies neither a score threshold nor NMS
         # of its own, so its output is already the un-suppressed set the replay
         # wants. The knobs it does have — prompt, model, tiling — are all part
         # of the forward-pass signature.
-        return GeminiInferencer(
+        gemini = GeminiInferencer(
             model_name=arm.model_name,
             classes=arm.classes,
             prompt_template=arm.prompt_template,
             box_format=arm.gemini_box_format,  # type: ignore[arg-type]
             image_first=arm.gemini_image_first,
             request_timeout_s=arm.gemini_request_timeout_s,
+            thinking_level=arm.gemini_thinking_level,
+            temperature=arm.gemini_temperature,
         )
+        if arm.gemini_pipeline is not None:
+            return build_crop_pipeline(gemini, arm.gemini_pipeline)  # type: ignore[arg-type]
+        return gemini
     if arm.inferencer == "qwen3_vl":
         from object_detection_eval.inference.vlm.qwen3_vl import Qwen3VLInferencer
 

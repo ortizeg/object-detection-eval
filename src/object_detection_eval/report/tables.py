@@ -835,7 +835,9 @@ def ablation_headline_table(
         # matched the equal-effort `yoloe` row, which states no ensembles at all.
         base_arm = baselines.get(arm.model)
         if base_arm is not None and any(
-            key not in published and value != base_arm.config.get(key)
+            key not in published
+            and key not in _NOT_CONFIG  # a draw index or a timeout is not a knob
+            and value != base_arm.config.get(key)
             for key, value in arm.config.items()
         ):
             continue
@@ -929,6 +931,9 @@ _CHANGE_LABELS = {
     "agnostic_nms": "class-agnostic NMS",
     "anchor_crop": "number crop",
     "box_pad": "box calibration",
+    "gemini_thinking_level": "thinking",
+    "gemini_temperature": "temperature",
+    "gemini_pipeline": "pipeline",
 }
 
 
