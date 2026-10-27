@@ -34,6 +34,7 @@ import numpy.typing as npt
 from loguru import logger
 
 from object_detection_eval.inference.vlm.crop_geometry import crop_window, remap_crop_detection
+from object_detection_eval.inference.vlm.usage import call_context
 from object_detection_eval.schemas.detection import Detection
 
 __all__ = ["CropRefineInferencer", "crop_window", "remap_crop_detection"]
@@ -139,7 +140,8 @@ class CropRefineInferencer:
                 out.append(det)
                 continue
 
-            refined = refiner.predict(crop)
+            with call_context(pass_index=2, stage=f"crop_refine:{name}"):
+                refined = refiner.predict(crop)
             if not refined:
                 out.append(det)  # nothing tighter found; keep the pass-1 box
                 continue

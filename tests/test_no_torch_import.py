@@ -43,6 +43,9 @@ def test_core_import_graph_is_torch_free() -> None:
     # property is the whole reason it can be imported by both the benchmark
     # runner and the prompt-search harness.
     import object_detection_eval.inference.vlm.protocol
+
+    # Per-call usage logging for the hosted API inferencers: duck-typed, SDK-free.
+    import object_detection_eval.inference.vlm.usage
     import object_detection_eval.metrics.bootstrap
     import object_detection_eval.metrics.curves
     import object_detection_eval.metrics.detection_map

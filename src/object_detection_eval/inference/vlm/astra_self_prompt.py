@@ -28,6 +28,7 @@ from loguru import logger
 
 from object_detection_eval.inference.vlm.astra import AstraInferencer, render_example_image
 from object_detection_eval.inference.vlm.nms import per_class_nms
+from object_detection_eval.inference.vlm.usage import call_context
 from object_detection_eval.schemas.detection import Detection
 
 #: Multi-instance classes worth a recall pass. Ball and rim are deliberately
@@ -110,7 +111,8 @@ class AstraSelfPromptInferencer:
             return dets  # nothing to seed the recall pass with
 
         annotated = render_example_image(image, confirmed, self.classes)
-        recovered = self._second.predict(annotated)
+        with call_context(pass_index=2, stage="self_prompt"):
+            recovered = self._second.predict(annotated)
         recovered = [self._to_full_id(d) for d in recovered if d is not None]
 
         # Keep pass-1's non-recall classes (ball/rim/number handled elsewhere);

@@ -17,6 +17,7 @@ pytest.importorskip("anthropic")
 
 import httpx2 as httpx
 from anthropic import APIConnectionError, BadRequestError
+from anthropic.types import OutputTokensDetails, Usage
 
 from object_detection_eval.inference.vlm.claude import (
     ClaudeBBox,
@@ -24,6 +25,7 @@ from object_detection_eval.inference.vlm.claude import (
     ClaudeInferencer,
     ClaudeResponse,
 )
+from object_detection_eval.inference.vlm.usage import read_usage, usage_sink
 from object_detection_eval.schemas.detection import Detection
 
 pytestmark = [pytest.mark.vlm, pytest.mark.external]
@@ -191,3 +193,62 @@ def test_bad_request_not_retried(client) -> None:
     client.messages.parse.side_effect = BadRequestError("bad", response=response, body=None)
     assert ClaudeInferencer(classes=["player"]).predict(np.zeros((10, 10, 3), np.uint8)) == []
     assert client.messages.parse.call_count == 1
+
+
+def _usage() -> Usage:
+    return Usage(
+        input_tokens=1500,
+        cache_creation_input_tokens=0,
+        cache_read_input_tokens=0,
+        output_tokens=400,
+        output_tokens_details=OutputTokensDetails(thinking_tokens=300),
+        service_tier="standard",
+    )
+
+
+def test_usage_record_uses_the_real_sdk_field_names(client, tmp_path) -> None:
+    message = _message(_one(0, 0, 5, 5))
+    message.usage = _usage()
+    message._request_id = "req_claude_1"
+    message.model = "claude-opus-5-5"
+    client.messages.parse.return_value = message
+    sink = tmp_path / "u.jsonl"
+    with usage_sink(sink):
+        dets = ClaudeInferencer(classes=["player"]).predict(np.zeros((10, 10, 3), np.uint8))
+    assert len(dets) == 1
+    (rec,) = read_usage(sink)
+    assert (rec.provider, rec.model, rec.request_id) == (
+        "anthropic",
+        "claude-opus-5-5",
+        "req_claude_1",
+    )
+    assert (rec.input_tokens, rec.output_tokens, rec.reasoning_tokens) == (1500, 400, 300)
+    assert rec.reasoning_included_in_output is True
+    assert rec.total_tokens == 1900
+    assert rec.provider_extra == {"service_tier": "standard"}
+    assert rec.outcome == "ok"
+
+
+def test_usage_retry_refusal_and_failure_outcomes(client, monkeypatch, tmp_path) -> None:
+    monkeypatch.setattr("object_detection_eval.inference.vlm.claude.time.sleep", lambda _s: None)
+    request = httpx.Request("POST", "https://api.anthropic.com/v1/messages")
+    ok = _message(_one(0, 0, 5, 5))
+    ok.usage = _usage()
+    refused = _message(None, stop_reason="refusal")
+    refused.usage = _usage()
+    sink = tmp_path / "u.jsonl"
+    image = np.zeros((10, 10, 3), np.uint8)
+    with usage_sink(sink):
+        client.messages.parse.side_effect = [APIConnectionError(request=request), ok]
+        logged = ClaudeInferencer(classes=["player"]).predict(image)
+        client.messages.parse.side_effect = [refused]
+        assert ClaudeInferencer(classes=["player"]).predict(image) == []
+        response = httpx.Response(400, request=request)
+        client.messages.parse.side_effect = BadRequestError("bad", response=response, body=None)
+        assert ClaudeInferencer(classes=["player"]).predict(image) == []
+    client.messages.parse.side_effect = [ok]
+    assert ClaudeInferencer(classes=["player"]).predict(image) == logged  # logging off
+    retried, refusal, failed = read_usage(sink)
+    assert (retried.retries, retried.outcome) == (1, "ok")
+    assert refusal.outcome == "refusal"
+    assert (failed.outcome, failed.http_status) == ("error", 400)

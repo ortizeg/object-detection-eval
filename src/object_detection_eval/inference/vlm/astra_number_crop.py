@@ -31,6 +31,7 @@ from loguru import logger
 from object_detection_eval.inference.vlm.astra import AstraInferencer
 from object_detection_eval.inference.vlm.astra_crop_refine import crop_window, remap_crop_detection
 from object_detection_eval.inference.vlm.nms import per_class_nms
+from object_detection_eval.inference.vlm.usage import call_context
 from object_detection_eval.schemas.detection import Detection
 
 
@@ -116,7 +117,9 @@ class AstraNumberCropInferencer:
             crop, ox, oy, cw, ch = crop_window(image, d.bbox, w, h, self.pad, min_crop_frac=0.0)
             if cw < 2 or ch < 2:
                 continue
-            for n in self._refiner.predict(crop):
+            with call_context(pass_index=2, stage="number_crop"):
+                found = self._refiner.predict(crop)
+            for n in found:
                 recovered.append(remap_crop_detection(n, self._target_id, ox, oy, cw, ch, w, h))
 
         kept = [d for d in dets if self.classes[d.class_id] != self.target_class]

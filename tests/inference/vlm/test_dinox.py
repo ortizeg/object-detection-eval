@@ -23,6 +23,8 @@ from object_detection_eval.inference.vlm.dinox import (
     build_prompt,
     response_cache_key,
 )
+from object_detection_eval.inference.vlm.trex import Exemplar, TRexInferencer
+from object_detection_eval.inference.vlm.usage import read_usage, usage_sink
 
 _CLASSES = ["player", "ball", "referee", "rim", "number"]
 
@@ -211,3 +213,116 @@ def test_failed_task_retries_under_new_key_then_raises(make_inferencer) -> None:
     keys = [h["Idempotency-Key"] for h in api.trigger_headers]
     assert len(keys) == 2
     assert keys[0] != keys[1]
+
+
+# --------------------------------------------------------------------- usage logging
+#
+# Golden values captured at commit 4aa03ab, BEFORE per-call usage logging was
+# added: the request bodies and response-cache keys must not move, or every
+# response cache on disk (and every published DINO-X row's provenance) would be
+# silently invalidated.
+
+_GOLDEN_IMAGE = (np.arange(8 * 8 * 3, dtype=np.uint8) * 3).reshape(8, 8, 3).astype(np.uint8)
+
+_GOLDEN_PRO_BODY = {
+    "bbox_threshold": 0.05,
+    "iou_threshold": 0.8,
+    "model": "DINO-X-1.0",
+    "prompt": {"text": "player.ball.referee.rim.number", "type": "text"},
+    "targets": ["bbox"],
+}
+_GOLDEN_PRO_KEY = "ef7ad1a22716792305edaf1291efad925e001253be9d5db67654212255bfd66f"
+
+_GOLDEN_PREVIEW_BODY = {
+    "bbox_threshold": 0.1,
+    "iou_threshold": 0.5,
+    "model": "DINO-X-PREVIEW-1.0",
+    "prompt": {"text": "player.ball.referee.rim.number", "type": "text"},
+    "targets": ["bbox"],
+}
+_GOLDEN_PREVIEW_KEY = "c663c4efab8b09a23677e94db2933ab1a008bc508a45add305e33d0eee501445"
+
+_GOLDEN_TREX_BODY = {
+    "bbox_threshold": 0.05,
+    "iou_threshold": 0.8,
+    "model": "T-Rex-2.0",
+    "prompt": {
+        "exemplar_sha256": "c15232e58185fd2b1ba6b75257b19e9d1caa05c680ad34ed73a1e067158d81dc",
+        "type": "visual_images",
+    },
+    "targets": ["bbox"],
+}
+_GOLDEN_TREX_KEY = "1fb9e53209e981793edb03dd415fb77bb16a87f1fc6af8165af0184ab5da49f4"
+
+
+def test_request_bodies_and_cache_keys_match_pre_logging_golden_values(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("DINOX_KEY", "test-token")
+    pro = DinoXInferencer(model_name="DINO-X-1.0", classes=_CLASSES, cache_dir=None)
+    preview = DinoXInferencer(
+        model_name="DINO-X-PREVIEW-1.0",
+        classes=_CLASSES,
+        bbox_threshold=0.1,
+        iou_threshold=0.5,
+        cache_dir=None,
+    )
+    ref = Exemplar(np.full((50, 60, 3), 0, np.uint8), [(1, 1.0, 2.0, 11.0, 12.0)])
+    trex = TRexInferencer([ref], _CLASSES, cache_dir=None)
+
+    for inf, body, key in (
+        (pro, _GOLDEN_PRO_BODY, _GOLDEN_PRO_KEY),
+        (preview, _GOLDEN_PREVIEW_BODY, _GOLDEN_PREVIEW_KEY),
+        (trex, _GOLDEN_TREX_BODY, _GOLDEN_TREX_KEY),
+    ):
+        assert inf._request_body() == body
+        assert response_cache_key(inf._request_body(), _GOLDEN_IMAGE) == key
+
+
+def test_one_record_per_billed_call_and_none_on_cache_hit(make_inferencer, tmp_path: Path) -> None:
+    sink = tmp_path / "usage.jsonl"
+    objects = [{"bbox": [0, 0, 50, 50], "category": "player", "score": 0.9}]
+    with usage_sink(sink):
+        inf, _ = make_inferencer(_FakeAPI([_success(objects)]))
+        inf.predict(_image())
+        again, api2 = make_inferencer(_FakeAPI([]))  # same cache dir: a hit
+        again.predict(_image())
+    assert api2.trigger_bodies == []
+    (rec,) = read_usage(sink)
+    assert rec.provider == "deepdataspace"
+    assert rec.request_id == "t-1"
+    assert rec.retries == 0
+    assert rec.http_status == 200
+
+
+def test_rate_limited_then_ok_is_one_record_with_a_retry(make_inferencer, tmp_path: Path) -> None:
+    sink = tmp_path / "usage.jsonl"
+    api = _FakeAPI(
+        [_success([])],
+        trigger_replies=[httpx.Response(429, json={"code": 429000, "msg": "slow down"})],
+    )
+    with usage_sink(sink):
+        inf, _ = make_inferencer(api)
+        inf.predict(_image())
+    (rec,) = read_usage(sink)
+    assert rec.retries == 1
+    assert rec.outcome == "ok"
+    assert rec.http_status == 200
+
+
+def test_out_of_quota_logs_one_error_record_and_still_raises(
+    make_inferencer, tmp_path: Path
+) -> None:
+    sink = tmp_path / "usage.jsonl"
+    api = _FakeAPI(
+        [],
+        trigger_replies=[httpx.Response(429, json={"code": 429001, "msg": "Token out of Quota"})],
+    )
+    with usage_sink(sink):
+        inf, _ = make_inferencer(api)
+        with pytest.raises(DinoXAPIError, match="out of quota"):
+            inf.predict(_image())
+    (rec,) = read_usage(sink)
+    assert rec.outcome == "error"
+    assert rec.http_status == 429
+    assert rec.retries == 0

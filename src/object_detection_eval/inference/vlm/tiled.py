@@ -44,6 +44,7 @@ import numpy as np
 from loguru import logger
 
 from object_detection_eval.inference.vlm.nms import per_class_nms
+from object_detection_eval.inference.vlm.usage import call_context
 from object_detection_eval.schemas.detection import BoundingBox, Detection
 
 if TYPE_CHECKING:
@@ -153,14 +154,17 @@ class TiledInferencer:
 
         detections: list[Detection] = []
         if self.include_full_image:
-            detections.extend(self.inner.predict(image, image_width=width, image_height=height))
+            with call_context(stage="full"):
+                full = self.inner.predict(image, image_width=width, image_height=height)
+            detections.extend(full)
 
         for x0, y0, x1, y1 in tile_bounds(width, height, self.rows, self.cols, self.overlap):
             tile = np.ascontiguousarray(image[y0:y1, x0:x1])
             tile_w, tile_h = x1 - x0, y1 - y0
             if tile_w <= 0 or tile_h <= 0:  # pragma: no cover - defensive
                 continue
-            raw = self.inner.predict(tile, image_width=tile_w, image_height=tile_h)
+            with call_context(stage="tile"):
+                raw = self.inner.predict(tile, image_width=tile_w, image_height=tile_h)
             detections.extend(_to_full_image(raw, x0, y0, tile_w, tile_h, width, height))
 
         if self.merge_nms_iou_threshold is None:

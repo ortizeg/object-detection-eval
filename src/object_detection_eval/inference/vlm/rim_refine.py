@@ -22,6 +22,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Literal, Protocol
 
 from object_detection_eval.inference.vlm.crop_geometry import crop_window, remap_crop_detection
+from object_detection_eval.inference.vlm.usage import call_context
 from object_detection_eval.schemas.detection import BoundingBox, Detection
 
 if TYPE_CHECKING:
@@ -131,7 +132,9 @@ class CropRefine:
             if cw < 2 or ch < 2:
                 out.append(det)
                 continue
-            found = [d for d in self.refiner.predict(crop) if d.class_id == self.refiner_class_id]
+            with call_context(pass_index=2, stage="rim_refine"):
+                refined_dets = self.refiner.predict(crop)
+            found = [d for d in refined_dets if d.class_id == self.refiner_class_id]
             if not found:
                 out.append(det)
                 continue

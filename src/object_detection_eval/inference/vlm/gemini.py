@@ -40,6 +40,12 @@ from PIL import Image
 from pydantic import BaseModel, Field
 
 from object_detection_eval.inference.base import BaseInferencer
+from object_detection_eval.inference.vlm.usage import (
+    CallTracker,
+    gemini_usage,
+    status_of,
+    track_call,
+)
 from object_detection_eval.schemas.detection import BoundingBox, Detection
 
 
@@ -228,16 +234,30 @@ class GeminiInferencer(BaseInferencer):
         # Convert BGR -> RGB for PIL
         rgb_image = Image.fromarray(image[..., ::-1])
 
+        # One usage record per logical request (retries included); see usage.py.
+        with track_call("google", self.model_name) as tracker:
+            return self._predict_with_retries(rgb_image, w, h, tracker)
+
+    def _predict_with_retries(
+        self, rgb_image: Image.Image, w: int, h: int, tracker: CallTracker
+    ) -> list[Detection]:
+        """The retry loop behind :meth:`predict`; ``tracker`` only observes."""
         backoff = self._INITIAL_BACKOFF
         for attempt in range(1, self._MAX_RETRIES + 1):
             try:
                 contents: list[str | Image.Image] = (
                     [rgb_image, self._prompt] if self.image_first else [self._prompt, rgb_image]
                 )
+                tracker.attempt()
                 response = self._client.models.generate_content(
                     model=self.model_name,
                     contents=contents,
                     config=self._config,
+                )
+                tracker.succeeded(
+                    usage=gemini_usage(getattr(response, "usage_metadata", None)),
+                    request_id=getattr(response, "response_id", None),
+                    response_model=getattr(response, "model_version", None),
                 )
 
                 if response.parsed:
@@ -254,6 +274,7 @@ class GeminiInferencer(BaseInferencer):
                     logger.debug(f"Gemini text fallback: {response.text[:500]}")
                     return self._parse_text_fallback(response.text, w, h)
 
+                tracker.set_outcome("empty")
                 logger.warning("Gemini returned an empty response.")
                 return []
 
@@ -291,6 +312,7 @@ class GeminiInferencer(BaseInferencer):
                     backoff *= 2  # exponential backoff
                     continue
 
+                tracker.failed(status_of(exc))
                 logger.exception(f"Gemini inference failed after {attempt} attempts")
                 return []
 
