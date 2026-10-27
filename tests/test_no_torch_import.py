@@ -21,7 +21,9 @@ def test_core_import_graph_is_torch_free() -> None:
     """Import every core submodule, then assert torch never entered sys.modules."""
     import object_detection_eval
     import object_detection_eval.cost.compute  # cost-per-frame aggregation: torch-free
+    import object_detection_eval.cost.frames
     import object_detection_eval.cost.report
+    import object_detection_eval.cost.rerun
     import object_detection_eval.cost.schemas
     import object_detection_eval.data.coco_gt
     import object_detection_eval.data.image

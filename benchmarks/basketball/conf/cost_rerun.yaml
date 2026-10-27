@@ -1,0 +1,165 @@
+# The cost-per-frame study's rerun plan (quick task 261027-q49; plan of record:
+# docs/plans/cost-per-frame-2026-10.md). Read by scripts/cost_rerun.py.
+#
+# Eight pipelines, each at its PUBLISHED config and its PUBLISHED --workers, rerun twice
+# on the committed 20 validation frames (conf/cost_val_frames.json) with every response
+# cache and checkpoint bypassed. The `source` of a pipeline points at the code or manifest
+# that produced its published row: the driver builds the pipeline from there, so no
+# configuration is re-typed in this file. `expect` pins what the plan of record says that
+# source resolves to, so a later edit to the source fails `check-config` instead of
+# silently changing what is measured.
+#
+# workers_citation is the evidence for the concurrency. Two values are not recorded in any
+# document and are labelled INFERRED / ASSUMED rather than presented as fact.
+split: valid
+frames_file: benchmarks/basketball/conf/cost_val_frames.json
+runs: 2
+budget_usd: 40
+projection_frames: 3
+
+pipelines:
+  - id: astra
+    label: GPT-6 Astra (single pass)
+    pixi_env: vlm-astra
+    workers: 1
+    workers_citation: >-
+      vlm_zeroshot.yaml row `astra`; run_vlm_benchmark.py had no --workers at 0ed62dd, and at HEAD
+      _CONCURRENT_INFERENCERS = {"gemini"}, so astra rows are scored serially.
+    source:
+      kind: manifest_row
+      manifest: benchmarks/basketball/conf/vlm_zeroshot.yaml
+      row: astra
+      expect: {inferencer: astra, model_name: gpt-6-astra, reasoning_effort: low}
+
+  - id: astra_crop_refine
+    label: Astra crop-refine (ball + rim)
+    pixi_env: vlm-astra
+    workers: 1
+    workers_citation: >-
+      scripts/run_astra_crop_refine.py `--model astra` defaults (_BASE_PROMPT, effort low, pad 1.5,
+      refine ball,rim); the script has no --workers and score_split defaults to workers=1 (909bcb1
+      and HEAD).
+    source:
+      kind: astra_crop_refine
+      model: astra
+      pad: 1.5
+      refine_classes: [ball, rim]
+
+  - id: sol
+    label: GPT-6.1 Sol (single pass)
+    pixi_env: vlm-astra
+    workers: 1
+    workers_citation: >-
+      vlm_zeroshot.yaml row `sol` (effort default); run_vlm_benchmark.py had no --workers at 909bcb1.
+    source:
+      kind: manifest_row
+      manifest: benchmarks/basketball/conf/vlm_zeroshot.yaml
+      row: sol
+      expect: {inferencer: astra, model_name: gpt-6.1-sol, reasoning_effort: default}
+
+  - id: claude_opus
+    label: Claude Opus 5.5 (single pass)
+    pixi_env: vlm-claude
+    workers: 1
+    workers_citation: >-
+      vlm_zeroshot.yaml row `claude_opus` (effort default); run_vlm_benchmark.py had no --workers
+      at 909bcb1.
+    source:
+      kind: manifest_row
+      manifest: benchmarks/basketball/conf/vlm_zeroshot.yaml
+      row: claude_opus
+      expect: {inferencer: claude, model_name: claude-opus-5-5, reasoning_effort: default}
+
+  - id: gemini_argon_single
+    label: Gemini 4 Argon (single pass, rim line)
+    pixi_env: vlm
+    workers: 1
+    workers_citation: >-
+      INFERRED, not recorded. The Oct-14 test row is byte-identical to the vlm_ablation.yaml arm
+      `rim_def_argon` (docs/plans/gemini-argon-2026-10.md "Test (run once)"), and
+      run_vlm_benchmark.py had no --workers until 9c46399 (2026-10-21), so that test run was serial.
+      The val arms used `ablate_vlm.py --workers N` with N unrecorded (capped at 3).
+    source:
+      kind: ablation_arm
+      manifest: benchmarks/basketball/conf/vlm_ablation.yaml
+      arm: gemini__rim_def_argon__0
+      expect:
+        inferencer: gemini
+        model_name: gemini-4-argon
+        gemini_box_format: box_2d
+        gemini_image_first: false
+        gemini_thinking_level: null
+        gemini_temperature: null
+        gemini_pipeline: null
+        gemini_request_timeout_s: 300.0
+        tiles: null
+        anchor_crop: null
+        classes: [ball, number, player, referee, rim]
+        prompt_contains:
+          - metal hoop ring only
+          - box_2d [ymin, xmin, ymax, xmax]
+
+  - id: gemini_argon_two_pass
+    label: "Gemini 4 Argon (two-pass: crop-refine + number-crop)"
+    pixi_env: vlm
+    workers: 3
+    workers_citation: >-
+      docs/plans/gemini-argon-2026-10.md "Round 3 test": "With `--workers 3`, the repeat took 95
+      minutes".
+    source:
+      kind: manifest_row
+      manifest: benchmarks/basketball/conf/vlm_zeroshot.yaml
+      row: gemini
+      expect:
+        inferencer: gemini
+        model_name: gemini-4-argon
+        gemini_box_format: box_2d
+        gemini_thinking_level: high
+        gemini_pipeline: crop_refine+number_crop
+        gemini_request_timeout_s: 300.0
+
+  - id: dinox_pro_rimtrim
+    label: DINO-X Pro + rim trim (2x2 tiles + full frame)
+    pixi_env: default
+    workers: 8
+    workers_citation: >-
+      ASSUMED default. scripts/explore_dinox.py `--workers` defaults to 8 at ff353c8 and the docs
+      record no override. Arm r6_trim0.35_headline: DINO-X-1.0, 2x2 tiles + full frame, merge NMS 0.5,
+      rim trim 0.35.
+    source:
+      kind: dinox_explore_arm
+      config: benchmarks/basketball/conf/dinox_explore.yaml
+      arm: r6_trim0.35_headline
+      expect:
+        model_name: DINO-X-1.0
+        tiles: [2, 2]
+        nms_iou_threshold: 0.5
+        rim_trim: 0.35
+
+  - id: dinox_preview_rimtrim
+    label: DINO-X preview + rim trim (2x2 tiles + full frame)
+    pixi_env: default
+    workers: 8
+    workers_citation: >-
+      ASSUMED default. scripts/explore_dinox.py `--workers` defaults to 8 at ff353c8 and the docs
+      record no override. Arm r9_trim0.3_preview: DINO-X-PREVIEW-1.0, same tiling, rim trim 0.3.
+    source:
+      kind: dinox_explore_arm
+      config: benchmarks/basketball/conf/dinox_explore.yaml
+      arm: r9_trim0.3_preview
+      expect:
+        model_name: DINO-X-PREVIEW-1.0
+        tiles: [2, 2]
+        nms_iou_threshold: 0.5
+        rim_trim: 0.3
+
+# Fused lines have no calls of their own: WBF is free, so each is the sum of its members.
+derived:
+  - id: fusion4
+    label: Best zero-shot line (Astra crop-refine + DINO-X Pro + DINO-X preview + Gemini two-pass)
+    members: [astra_crop_refine, dinox_pro_rimtrim, dinox_preview_rimtrim, gemini_argon_two_pass]
+    note: WBF IoU 0.55, no API calls of its own
+  - id: api_fusion4
+    label: API-rows fusion (Astra + Sol + Opus + Gemini two-pass)
+    members: [astra, sol, claude_opus, gemini_argon_two_pass]
+    note: WBF IoU 0.55, no API calls of its own
