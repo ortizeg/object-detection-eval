@@ -184,8 +184,11 @@ def _workers_table(report: CostReport) -> list[str]:
 # ---------------------------------------------------------------------------- markdown
 
 
-def render_markdown(report: CostReport) -> str:
-    """The COST.md text. Deterministic: the same report always yields the same bytes."""
+def render_markdown(report: CostReport, figure_href: str = "cost_vs_accuracy.png") -> str:
+    """The COST.md text. Deterministic: the same report always yields the same bytes.
+
+    ``figure_href`` is the PNG's path relative to COST.md.
+    """
     n_frames = sorted({n for s in report.pipelines.values() for n in s.n_frames_per_run})
     frames_txt = "/".join(str(n) for n in n_frames)
     n_runs = max(len(s.runs) for s in report.pipelines.values())
@@ -259,7 +262,7 @@ def render_markdown(report: CostReport) -> str:
         lines += ["", f"Calls with no price yet (not in that total): {parts}."]
     lines += [
         "",
-        "![USD per frame against published accuracy](cost_vs_accuracy.png)",
+        f"![USD per frame against published accuracy]({figure_href})",
         "",
         "## Prices",
         "",

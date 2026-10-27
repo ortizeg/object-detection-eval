@@ -151,8 +151,9 @@ def test_script_writes_json_md_png_and_check_gates_drift(
 
     out_json = tmp_path / "results" / "cost_per_frame.json"
     md = tmp_path / "reports" / "COST.md"
-    png = tmp_path / "reports" / "cost_vs_accuracy.png"
+    png = tmp_path / "results" / "cost_vs_accuracy.png"
     assert out_json.is_file() and md.is_file() and png.stat().st_size > 0
+    assert "(../results/cost_vs_accuracy.png)" in md.read_text()
     data = json.loads(out_json.read_text())
     assert "generated" not in json.dumps(data).lower()  # no wall-clock field: reproducible
     assert set(data["pipelines"]) == {
@@ -169,7 +170,9 @@ def test_script_writes_json_md_png_and_check_gates_drift(
     }
     assert all(len(i["sha256"]) == 64 for i in data["inputs"])
     # Markdown comes from the JSON alone
-    assert md.read_text() == render_markdown(CostReport.model_validate_json(out_json.read_text()))
+    assert md.read_text() == render_markdown(
+        CostReport.model_validate_json(out_json.read_text()), "../results/cost_vs_accuracy.png"
+    )
 
     assert script.main(_args(tmp_path, "--check")) == 0
     md.write_text(md.read_text() + "\nhand edit\n")

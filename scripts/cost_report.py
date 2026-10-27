@@ -9,7 +9,7 @@ Reads, under ``benchmarks/basketball/results/cost/``:
 and the two committed configs ``conf/cost_prices.yaml`` (prices with effective dates and
 source URLs) and ``conf/cost_published_accuracy.yaml`` (accuracy copied from the
 reports, each value with its citation). Writes ``cost_per_frame.json`` (the only input
-of the two renderers), ``reports/COST.md`` and ``reports/cost_vs_accuracy.png``.
+of the two renderers), ``reports/COST.md`` and ``results/cost/cost_vs_accuracy.png``.
 
 ``--check`` recomputes the JSON and the Markdown in memory from the committed inputs and
 exits 1 on any byte difference (the PNG is excluded). It also re-verifies that every
@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import os
 import sys
 from pathlib import Path
 
@@ -112,8 +113,10 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     json_text = serialize(report)
-    md_text = render_markdown(CostReport.model_validate_json(json_text))
     json_path = args.results_dir / JSON_NAME
+    png_path = args.results_dir / PNG_NAME
+    figure_href = Path(os.path.relpath(png_path, args.report.parent)).as_posix()
+    md_text = render_markdown(CostReport.model_validate_json(json_text), figure_href)
 
     if args.check:
         drifted = False
@@ -133,10 +136,10 @@ def main(argv: list[str] | None = None) -> int:
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(md_text, encoding="utf-8")
     # The Markdown and the PNG are both rendered from the parsed JSON, never from raw logs.
-    skipped = render_png(CostReport.model_validate_json(json_text), args.report.parent / PNG_NAME)
+    skipped = render_png(CostReport.model_validate_json(json_text), png_path)
     for line in skipped:
         logger.warning("plot: {}", line)
-    logger.info("Wrote {}, {} and {}", json_path, args.report, args.report.parent / PNG_NAME)
+    logger.info("Wrote {}, {} and {}", json_path, args.report, png_path)
     return 0
 
 
