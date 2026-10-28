@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "pipeline": "dinox_preview_rimtrim",
+  "run": "1",
+  "split": "valid",
+  "workers": 8,
+  "workers_citation": "ASSUMED default. scripts/explore_dinox.py `--workers` defaults to 8 at ff353c8 and the docs record no override. Arm r9_trim0.3_preview: DINO-X-PREVIEW-1.0, same tiling, rim trim 0.3.",
+  "frames": [
+    "boston-celtics-new-york-knicks-game-1-q1-05_13-05_09-0030_png.rf.a04c53820df74ff13af910662caa3dff.jpg",
+    "boston-celtics-new-york-knicks-game-4-q1-05_58-05_53-0000_png.rf.750939b55cf36b9a18c255b922e5bf53.jpg",
+    "boston-celtics-orlando-magic-game-4-q1-01_33-01_25-0030_png.rf.7da90ecd47d182fe55fa56350321f2c0.jpg",
+    "boston-celtics-new-york-knicks-game-1-q1-05_13-05_09-0056_png.rf.09c26c8fbb6a0bfb6dd70f7a37160fc6.jpg",
+    "boston-celtics-new-york-knicks-game-4-q1-05_58-05_53-0080_png.rf.15d608e4c9a660ebc81fb1dab618eb8b.jpg",
+    "boston-celtics-orlando-magic-game-4-q1-01_33-01_25-0060_png.rf.8d1aef90ac7b22cffeebbf4628e27f27.jpg",
+    "boston-celtics-new-york-knicks-game-1-q1-05_13-05_09-0062_png.rf.08ec2c412f5c8343dcdb04a80d4d274b.jpg",
+    "boston-celtics-new-york-knicks-game-4-q1-05_58-05_53-0092_png.rf.5a36b8a908cc3952c813503187c9c398.jpg",
+    "boston-celtics-orlando-magic-game-4-q1-01_33-01_25-0210_png.rf.3458a5751dde89ab698a307a61802c50.jpg",
+    "boston-celtics-new-york-knicks-game-1-q1-05_13-05_09-0100_png.rf.080ae6246a8312ff58c878fcd3f4fdbe.jpg",
+    "boston-celtics-new-york-knicks-game-4-q1-05_58-05_53-0107_png.rf.e4dedf0f290f1b07fbea86fcc5f6b8f8.jpg",
+    "boston-celtics-orlando-magic-game-4-q1-01_33-01_25-0223_png.rf.0875141ed88b06da6cea364d2520189a.jpg",
+    "boston-celtics-new-york-knicks-game-1-q1-05_13-05_09-0109_png.rf.ec69b669b5f171f7084ef8698ac18dc0.jpg",
+    "boston-celtics-new-york-knicks-game-4-q1-05_58-05_53-0110_png.rf.a5b5c7b6fbf762946b17e83b4c1b9b38.jpg",
+    "boston-celtics-orlando-magic-game-4-q1-01_33-01_25-0228_png.rf.b12a398f679991684668856f9b8bb0f9.jpg",
+    "boston-celtics-new-york-knicks-game-1-q1-05_13-05_09-0116_png.rf.041fdb1313ec8151a06c15ba0858e5a1.jpg",
+    "boston-celtics-new-york-knicks-game-4-q1-05_58-05_53-0116_png.rf.60ccce6bf2d7588be15afd05d4bbf951.jpg",
+    "boston-celtics-orlando-magic-game-4-q1-01_33-01_25-0234_png.rf.038dc5760a5e0c74f643f503d9bbf7b4.jpg",
+    "boston-celtics-new-york-knicks-game-4-q1-05_58-05_53-0140_png.rf.181a7244146b5cf8b4d2a212363ad62f.jpg",
+    "boston-celtics-orlando-magic-game-4-q1-01_33-01_25-0235_png.rf.0ba33d3013751c85c81a909b3afe1e7c.jpg"
+  ],
+  "n_frames": 20,
+  "started": "2026-10-28T04:08:28.961459Z",
+  "ended": "2026-10-28T04:09:53.630177Z",
+  "wall_s": 84.668142,
+  "status": "complete",
+  "abort_reason": null,
+  "empty_frames": [],
+  "frame_timings": [
+    {
+      "image_id": "boston-celtics-new-york-knicks-game-1-q1-05_13-05_09-0030_png.rf.a04c53820df74ff13af910662caa3dff.jpg",
+      "wall_s": 51.452348,
+      "n_detections": 1176,
+      "n_calls": 5
+    },
+    {
+      "image_id": "boston-celtics-new-york-knicks-game-4-q1-05_58-05_53-0000_png.rf.750939b55cf36b9a18c255b922e5bf53.jpg",
+      "wall_s": 51.93276,
+      "n_detections": 1395,
+      "n_calls": 5
+    },
+    {
+      "image_id": "boston-celtics-orlando-magic-game-4-q1-01_33-01_25-0030_png.rf.7da90ecd47d182fe55fa56350321f2c0.jpg",
+      "wall_s": 53.160595,
+      "n_detections": 1225,
+      "n_calls": 5
+    },
+    {
+      "image_id": "boston-celtics-new-york-knicks-game-1-q1-05_13-05_09-0056_png.rf.09c26c8fbb6a0bfb6dd70f7a37160fc6.jpg",
+      "wall_s": 55.627552,
+      "n_detections": 1240,
+      "n_calls": 5
+    },
+    {
+      "image_id": "boston-celtics-new-york-knicks-game-4-q1-05_58-05_53-0080_png.rf.15d608e4c9a660ebc81fb1dab618eb8b.jpg",
+      "wall_s": 54.629181,
+      "n_detections": 1291,
+      "n_calls": 5
+    },
+    {
+      "image_id": "boston-celtics-orlando-magic-game-4-q1-01_33-01_25-0060_png.rf.8d1aef90ac7b22cffeebbf4628e27f27.jpg",
+      "wall_s": 56.777196,
+      "n_detections": 1340,
+      "n_calls": 5
+    },
+    {
+      "image_id": "boston-celtics-new-york-knicks-game-1-q1-05_13-05_09-0062_png.rf.08ec2c412f5c8343dcdb04a80d4d274b.jpg",
+      "wall_s": 50.197351,
+      "n_detections": 1239,
+      "n_calls": 5
+    },
+    {
+      "image_id": "boston-celtics-new-york-knicks-game-4-q1-05_58-05_53-0092_png.rf.5a36b8a908cc3952c813503187c9c398.jpg",
+      "wall_s": 48.909445,
+      "n_detections": 1361,
+      "n_calls": 5
+    },
+    {
+      "image_id": "boston-celtics-orlando-magic-game-4-q1-01_33-01_25-0210_png.rf.3458a5751dde89ab698a307a61802c50.jpg",
+      "wall_s": 13.895916,
+      "n_detections": 1192,
+      "n_calls": 5
+    },
+    {
+      "image_id": "boston-celtics-new-york-knicks-game-1-q1-05_13-05_09-0100_png.rf.080ae6246a8312ff58c878fcd3f4fdbe.jpg",
+      "wall_s": 17.723187,
+      "n_detections": 1294,
+      "n_calls": 5
+    },
+    {
+      "image_id": "boston-celtics-new-york-knicks-game-4-q1-05_58-05_53-0107_png.rf.e4dedf0f290f1b07fbea86fcc5f6b8f8.jpg",
+      "wall_s": 26.583005,
+      "n_detections": 1350,
+      "n_calls": 5
+    },
+    {
+      "image_id": "boston-celtics-orlando-magic-game-4-q1-01_33-01_25-0223_png.rf.0875141ed88b06da6cea364d2520189a.jpg",
+      "wall_s": 27.40568,
+      "n_detections": 1134,
+      "n_calls": 5
+    },
+    {
+      "image_id": "boston-celtics-new-york-knicks-game-1-q1-05_13-05_09-0109_png.rf.ec69b669b5f171f7084ef8698ac18dc0.jpg",
+      "wall_s": 13.774633,
+      "n_detections": 1272,
+      "n_calls": 5
+    },
+    {
+      "image_id": "boston-celtics-new-york-knicks-game-4-q1-05_58-05_53-0110_png.rf.a5b5c7b6fbf762946b17e83b4c1b9b38.jpg",
+      "wall_s": 27.960054,
+      "n_detections": 1352,
+      "n_calls": 5
+    },
+    {
+      "image_id": "boston-celtics-orlando-magic-game-4-q1-01_33-01_25-0228_png.rf.b12a398f679991684668856f9b8bb0f9.jpg",
+      "wall_s": 13.207963,
+      "n_detections": 1066,
+      "n_calls": 5
+    },
+    {
+      "image_id": "boston-celtics-new-york-knicks-game-1-q1-05_13-05_09-0116_png.rf.041fdb1313ec8151a06c15ba0858e5a1.jpg",
+      "wall_s": 16.938212,
+      "n_detections": 1159,
+      "n_calls": 5
+    },
+    {
+      "image_id": "boston-celtics-new-york-knicks-game-4-q1-05_58-05_53-0116_png.rf.60ccce6bf2d7588be15afd05d4bbf951.jpg",
+      "wall_s": 21.843066,
+      "n_detections": 1293,
+      "n_calls": 5
+    },
+    {
+      "image_id": "boston-celtics-orlando-magic-game-4-q1-01_33-01_25-0234_png.rf.038dc5760a5e0c74f643f503d9bbf7b4.jpg",
+      "wall_s": 16.757467,
+      "n_detections": 1027,
+      "n_calls": 5
+    },
+    {
+      "image_id": "boston-celtics-new-york-knicks-game-4-q1-05_58-05_53-0140_png.rf.181a7244146b5cf8b4d2a212363ad62f.jpg",
+      "wall_s": 13.616682,
+      "n_detections": 1288,
+      "n_calls": 5
+    },
+    {
+      "image_id": "boston-celtics-orlando-magic-game-4-q1-01_33-01_25-0235_png.rf.0ba33d3013751c85c81a909b3afe1e7c.jpg",
+      "wall_s": 14.332251,
+      "n_detections": 1078,
+      "n_calls": 5
+    }
+  ],
+  "git_sha": "b66a8d1d1f8e8aed433700b7ebc7c9cd6b0247d0",
+  "pixi_env": "default",
+  "sdk_versions": {
+    "httpx": "0.28.1"
+  },
+  "frames_file_sha256": "e18fcc782539ea40c1c7954d443976dae707e81ffbc4126d4a7b769f822aafe8"
+}

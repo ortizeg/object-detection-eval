@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "pipeline": "dinox_preview_rimtrim",
+  "run": "proj",
+  "split": "valid",
+  "workers": 8,
+  "workers_citation": "ASSUMED default. scripts/explore_dinox.py `--workers` defaults to 8 at ff353c8 and the docs record no override. Arm r9_trim0.3_preview: DINO-X-PREVIEW-1.0, same tiling, rim trim 0.3.",
+  "frames": [
+    "boston-celtics-new-york-knicks-game-1-q1-05_13-05_09-0030_png.rf.a04c53820df74ff13af910662caa3dff.jpg",
+    "boston-celtics-new-york-knicks-game-4-q1-05_58-05_53-0000_png.rf.750939b55cf36b9a18c255b922e5bf53.jpg",
+    "boston-celtics-orlando-magic-game-4-q1-01_33-01_25-0030_png.rf.7da90ecd47d182fe55fa56350321f2c0.jpg"
+  ],
+  "n_frames": 3,
+  "started": "2026-10-27T23:41:51.354945Z",
+  "ended": "2026-10-27T23:42:59.862464Z",
+  "wall_s": 68.507545,
+  "status": "complete",
+  "abort_reason": null,
+  "empty_frames": [],
+  "frame_timings": [
+    {
+      "image_id": "boston-celtics-new-york-knicks-game-1-q1-05_13-05_09-0030_png.rf.a04c53820df74ff13af910662caa3dff.jpg",
+      "wall_s": 68.501757,
+      "n_detections": 1167,
+      "n_calls": 5
+    },
+    {
+      "image_id": "boston-celtics-new-york-knicks-game-4-q1-05_58-05_53-0000_png.rf.750939b55cf36b9a18c255b922e5bf53.jpg",
+      "wall_s": 67.465485,
+      "n_detections": 1423,
+      "n_calls": 5
+    },
+    {
+      "image_id": "boston-celtics-orlando-magic-game-4-q1-01_33-01_25-0030_png.rf.7da90ecd47d182fe55fa56350321f2c0.jpg",
+      "wall_s": 67.442385,
+      "n_detections": 1223,
+      "n_calls": 5
+    }
+  ],
+  "git_sha": "b66a8d1d1f8e8aed433700b7ebc7c9cd6b0247d0",
+  "pixi_env": "default",
+  "sdk_versions": {
+    "httpx": "0.28.1"
+  },
+  "frames_file_sha256": "e18fcc782539ea40c1c7954d443976dae707e81ffbc4126d4a7b769f822aafe8"
+}
