@@ -1,0 +1,109 @@
+{
+  "taxonomy": "merged5",
+  "clips": {
+    "team-a-game-1-q1|01_00-00_55": 2,
+    "team-b-game-2-q2|02_00-01_55": 3
+  },
+  "models": {
+    "YOLOX-M published": {
+      "arch": "YOLOX-M",
+      "arm": "published",
+      "seed": null,
+      "onnx_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "mAP_50_95": 0.668,
+      "mAP_50": 0.918,
+      "mAP_75": 0.768,
+      "per_class_ap50": {
+        "player": 0.9,
+        "ball": 0.8,
+        "referee": 0.95,
+        "rim": 1.0,
+        "number": 0.85
+      },
+      "per_clip_map_50_95": {
+        "team-a-game-1-q1|01_00-00_55": 0.66,
+        "team-b-game-2-q2|02_00-01_55": 0.67
+      }
+    },
+    "YOLOX-M 10c seed 0": {
+      "arch": "YOLOX-M",
+      "arm": "10c",
+      "seed": 0,
+      "onnx_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "mAP_50_95": 0.66,
+      "mAP_50": 0.91,
+      "mAP_75": 0.76,
+      "per_class_ap50": {
+        "player": 0.9,
+        "ball": 0.8,
+        "referee": 0.95,
+        "rim": 1.0,
+        "number": 0.85
+      },
+      "per_clip_map_50_95": {
+        "team-a-game-1-q1|01_00-00_55": 0.65,
+        "team-b-game-2-q2|02_00-01_55": 0.67
+      }
+    },
+    "YOLOX-M 10c seed 1": {
+      "arch": "YOLOX-M",
+      "arm": "10c",
+      "seed": 1,
+      "onnx_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "mAP_50_95": 0.64,
+      "mAP_50": 0.89,
+      "mAP_75": 0.74,
+      "per_class_ap50": {
+        "player": 0.9,
+        "ball": 0.7,
+        "referee": 0.95,
+        "rim": 1.0,
+        "number": 0.85
+      },
+      "per_clip_map_50_95": {
+        "team-a-game-1-q1|01_00-00_55": 0.63,
+        "team-b-game-2-q2|02_00-01_55": 0.65
+      }
+    },
+    "YOLOX-M 5c seed 1": {
+      "arch": "YOLOX-M",
+      "arm": "5c",
+      "seed": 1,
+      "onnx_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "mAP_50_95": 0.68,
+      "mAP_50": 0.93,
+      "mAP_75": 0.78,
+      "per_class_ap50": {
+        "player": 0.9,
+        "ball": 0.9,
+        "referee": 0.95,
+        "rim": 1.0,
+        "number": 0.85
+      },
+      "per_clip_map_50_95": {
+        "team-a-game-1-q1|01_00-00_55": 0.66,
+        "team-b-game-2-q2|02_00-01_55": 0.7
+      }
+    },
+    "YOLOX-M 5c seed 0": {
+      "arch": "YOLOX-M",
+      "arm": "5c",
+      "seed": 0,
+      "onnx_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "mAP_50_95": 0.66,
+      "mAP_50": 0.91,
+      "mAP_75": 0.76,
+      "per_class_ap50": {
+        "player": 0.9,
+        "ball": 0.8,
+        "referee": 0.95,
+        "rim": 1.0,
+        "number": 0.85
+      },
+      "per_clip_map_50_95": {
+        "team-a-game-1-q1|01_00-00_55": 0.64,
+        "team-b-game-2-q2|02_00-01_55": 0.68
+      }
+    }
+  }
+}

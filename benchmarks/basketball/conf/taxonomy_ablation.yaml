@@ -1,0 +1,143 @@
+# taxonomy_ablation.yaml -- 10-class vs merged-5-class TRAINING ablation.
+#
+# Does training on the merged5 taxonomy change merged5 test accuracy versus
+# training on the 10 raw classes? YOLOX-M and YOLO26m were each retrained 3x
+# per arm (seeds 0/1/2) with only the taxonomy changed; training, export and
+# provenance are documented in the YOLOX repo,
+# training_results/taxonomy_ablation/RESULTS.md (ortizeg/YOLOX PR #5).
+#
+# Scored by scripts/run_taxonomy_ablation.py through run_benchmark's end2end
+# path (same preprocessing, remap, merged5 dedupe and scorer as the published
+# @640 table). The two `published` entries are the exact artifacts pinned in
+# reproduction_640.yaml, re-scored in the same run as a harness anchor.
+#
+# arch: matches the model's key in results/accuracy/reproduction_640_merged5.json.
+# arm: 10c | 5c | published.  seed: training seed (null for published).
+# root: "source_repo" / "yolox" as in reproduction_640.yaml.
+
+models:
+  - name: YOLOX-M published
+    arch: YOLOX-M
+    arm: published
+    seed: null
+    detector: yolox
+    root: yolox
+    onnx: basketball_m/yolox_m_basketball_640.onnx
+    labels: basketball_m/labels_mapping.json
+
+  - name: YOLO26m published
+    arch: YOLO26m
+    arm: published
+    seed: null
+    detector: yolo26
+    root: source_repo
+    onnx: reuse_onnx/yolo26m/model.onnx
+    labels: reuse_onnx/yolo26m/labels_mapping.json
+
+  - name: YOLOX-M 10c seed 0
+    arch: YOLOX-M
+    arm: 10c
+    seed: 0
+    detector: yolox
+    root: yolox
+    onnx: taxonomy_ablation/10c_seed0/yolox_m_basketball_10c_seed0_640.onnx
+    labels: taxonomy_ablation/10c_seed0/labels_mapping.json
+
+  - name: YOLOX-M 10c seed 1
+    arch: YOLOX-M
+    arm: 10c
+    seed: 1
+    detector: yolox
+    root: yolox
+    onnx: taxonomy_ablation/10c_seed1/yolox_m_basketball_10c_seed1_640.onnx
+    labels: taxonomy_ablation/10c_seed1/labels_mapping.json
+
+  - name: YOLOX-M 10c seed 2
+    arch: YOLOX-M
+    arm: 10c
+    seed: 2
+    detector: yolox
+    root: yolox
+    onnx: taxonomy_ablation/10c_seed2/yolox_m_basketball_10c_seed2_640.onnx
+    labels: taxonomy_ablation/10c_seed2/labels_mapping.json
+
+  - name: YOLOX-M 5c seed 0
+    arch: YOLOX-M
+    arm: 5c
+    seed: 0
+    detector: yolox
+    root: yolox
+    onnx: taxonomy_ablation/5c_seed0/yolox_m_basketball_5c_seed0_640.onnx
+    labels: taxonomy_ablation/5c_seed0/labels_mapping.json
+
+  - name: YOLOX-M 5c seed 1
+    arch: YOLOX-M
+    arm: 5c
+    seed: 1
+    detector: yolox
+    root: yolox
+    onnx: taxonomy_ablation/5c_seed1/yolox_m_basketball_5c_seed1_640.onnx
+    labels: taxonomy_ablation/5c_seed1/labels_mapping.json
+
+  - name: YOLOX-M 5c seed 2
+    arch: YOLOX-M
+    arm: 5c
+    seed: 2
+    detector: yolox
+    root: yolox
+    onnx: taxonomy_ablation/5c_seed2/yolox_m_basketball_5c_seed2_640.onnx
+    labels: taxonomy_ablation/5c_seed2/labels_mapping.json
+
+  - name: YOLO26m 10c seed 0
+    arch: YOLO26m
+    arm: 10c
+    seed: 0
+    detector: yolo26
+    root: yolox
+    onnx: taxonomy_ablation/yolo26m/10c_seed0/yolo26m_basketball_10c_seed0_640.onnx
+    labels: taxonomy_ablation/yolo26m/10c_seed0/labels_mapping.json
+
+  - name: YOLO26m 10c seed 1
+    arch: YOLO26m
+    arm: 10c
+    seed: 1
+    detector: yolo26
+    root: yolox
+    onnx: taxonomy_ablation/yolo26m/10c_seed1/yolo26m_basketball_10c_seed1_640.onnx
+    labels: taxonomy_ablation/yolo26m/10c_seed1/labels_mapping.json
+
+  - name: YOLO26m 10c seed 2
+    arch: YOLO26m
+    arm: 10c
+    seed: 2
+    detector: yolo26
+    root: yolox
+    onnx: taxonomy_ablation/yolo26m/10c_seed2/yolo26m_basketball_10c_seed2_640.onnx
+    labels: taxonomy_ablation/yolo26m/10c_seed2/labels_mapping.json
+
+  - name: YOLO26m 5c seed 0
+    arch: YOLO26m
+    arm: 5c
+    seed: 0
+    detector: yolo26
+    root: yolox
+    onnx: taxonomy_ablation/yolo26m/5c_seed0/yolo26m_basketball_5c_seed0_640.onnx
+    labels: taxonomy_ablation/yolo26m/5c_seed0/labels_mapping.json
+
+  - name: YOLO26m 5c seed 1
+    arch: YOLO26m
+    arm: 5c
+    seed: 1
+    detector: yolo26
+    root: yolox
+    onnx: taxonomy_ablation/yolo26m/5c_seed1/yolo26m_basketball_5c_seed1_640.onnx
+    labels: taxonomy_ablation/yolo26m/5c_seed1/labels_mapping.json
+
+  - name: YOLO26m 5c seed 2
+    arch: YOLO26m
+    arm: 5c
+    seed: 2
+    detector: yolo26
+    root: yolox
+    onnx: taxonomy_ablation/yolo26m/5c_seed2/yolo26m_basketball_5c_seed2_640.onnx
+    labels: taxonomy_ablation/yolo26m/5c_seed2/labels_mapping.json

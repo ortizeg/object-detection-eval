@@ -57,6 +57,7 @@ nav:
   - Reports:
       - Fine-tuned comparison (@640): reports/FINAL_COMPARISON_640.md
       - Zero-shot VLM vs fine-tuned: reports/VLM_VS_FINETUNED.md
+      - 10-class vs 5-class training: reports/TAXONOMY_ABLATION.md
   - Methodology: methodology.md
   - Provenance:
       - Training runs: provenance/training-runs.md

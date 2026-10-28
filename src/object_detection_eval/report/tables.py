@@ -10,6 +10,7 @@ cell is formatted from the loaded model.
 from __future__ import annotations
 
 import json
+import statistics
 from collections.abc import Mapping, Sequence
 from itertools import pairwise
 from typing import Any
@@ -21,6 +22,8 @@ from object_detection_eval.report.loaders import (
     CpuLatencyResult,
     DatasetStats,
     LatencyResult,
+    TaxonomyAblationModel,
+    TaxonomyAblationResult,
 )
 from object_detection_eval.schemas.taxonomy import TaxonomySpec
 
@@ -1175,4 +1178,150 @@ def fusion_test_table(log: Any) -> str:
             f"**{at95.recall:.3f}**" if at95 else "never reaches 95%",
         ]
     )
+    return _table(header, rows)
+
+
+# --------------------------------------------------------------------------- #
+# Taxonomy ablation (10-class vs merged5 training)
+# --------------------------------------------------------------------------- #
+
+_TAXONOMY_ARMS = ("10c", "5c")
+
+
+def _fmt_signed3(value: float) -> str:
+    """Signed three-decimal difference; a difference that rounds to zero prints +0.000."""
+    return f"{round(value, 3) + 0.0:+.3f}"
+
+
+def _taxonomy_archs(result: TaxonomyAblationResult) -> list[str]:
+    """Architectures in first-appearance order of the results file."""
+    return list(dict.fromkeys(entry.arch for entry in result.models.values()))
+
+
+def _taxonomy_arm(
+    result: TaxonomyAblationResult, arch: str, arm: str
+) -> list[TaxonomyAblationModel]:
+    """The seeded runs of one arch/arm, in seed order; at least two are required."""
+    runs = sorted(
+        (e for e in result.models.values() if e.arch == arch and e.arm == arm),
+        key=lambda e: e.seed if e.seed is not None else -1,
+    )
+    if len(runs) < 2:
+        msg = f"taxonomy ablation: {arch} {arm} needs at least 2 seeded runs, got {len(runs)}"
+        raise ValueError(msg)
+    return runs
+
+
+def _fmt_mean_sd(values: Sequence[float]) -> str:
+    return f"{statistics.mean(values):.3f} ± {statistics.stdev(values):.3f}"
+
+
+def taxonomy_ablation_table(result: TaxonomyAblationResult) -> str:
+    """Per-seed scores, mean ± sd per arm, and the 5c - 10c difference of means.
+
+    One row per architecture and metric. The sd is the sample sd across seeds:
+    training noise only, not test-set sampling noise.
+    """
+    header = [
+        "Model",
+        "Metric",
+        "10c by seed",
+        "5c by seed",
+        "10c mean ± sd",
+        "5c mean ± sd",
+        "Δ (5c - 10c)",
+    ]
+    rows = []
+    for arch in _taxonomy_archs(result):
+        arms = {arm: _taxonomy_arm(result, arch, arm) for arm in _TAXONOMY_ARMS}
+        for attr, metric in (
+            ("map_50_95", "mAP_50_95"),
+            ("map_50", "mAP_50"),
+            ("map_75", "mAP_75"),
+        ):
+            values = {arm: [getattr(e, attr) for e in runs] for arm, runs in arms.items()}
+            delta = statistics.mean(values["5c"]) - statistics.mean(values["10c"])
+            rows.append(
+                [
+                    arch,
+                    _metric_label(metric),
+                    " / ".join(_fmt3(v) for v in values["10c"]),
+                    " / ".join(_fmt3(v) for v in values["5c"]),
+                    _fmt_mean_sd(values["10c"]),
+                    _fmt_mean_sd(values["5c"]),
+                    _fmt_signed3(delta),
+                ]
+            )
+    return _table(header, rows)
+
+
+def taxonomy_ablation_anchor_table(
+    result: TaxonomyAblationResult, reproduction: AccuracyResult
+) -> str:
+    """The published artifacts as scored in this run vs the committed @640 table."""
+    header = ["Published model", "Scored in this run", "reproduction_640_merged5.json", "Δ"]
+    rows = []
+    for entry in result.models.values():
+        if entry.arm != "published":
+            continue
+        reference = reproduction.models[entry.arch].map_50_95
+        rows.append(
+            [
+                entry.arch,
+                _fmt3(entry.map_50_95),
+                _fmt3(reference),
+                _fmt_signed3(entry.map_50_95 - reference),
+            ]
+        )
+    return _table(header, rows)
+
+
+def taxonomy_ablation_per_class_table(
+    result: TaxonomyAblationResult, taxonomy: TaxonomySpec
+) -> str:
+    """Mean AP@50 per class for each arm, and the 5c - 10c difference."""
+    header = ["Model", "Arm", *taxonomy.classes]
+    rows = []
+    for arch in _taxonomy_archs(result):
+        means: dict[str, dict[str, float]] = {}
+        for arm in _TAXONOMY_ARMS:
+            runs = _taxonomy_arm(result, arch, arm)
+            means[arm] = {
+                cls: statistics.mean(e.per_class_ap50[cls] for e in runs)
+                for cls in taxonomy.classes
+            }
+            rows.append([arch, arm, *(_fmt3(means[arm][cls]) for cls in taxonomy.classes)])
+        rows.append(
+            [
+                arch,
+                "Δ",
+                *(_fmt_signed3(means["5c"][cls] - means["10c"][cls]) for cls in taxonomy.classes),
+            ]
+        )
+    return _table(header, rows)
+
+
+def taxonomy_ablation_per_clip_table(result: TaxonomyAblationResult) -> str:
+    """Mean mAP@50:95 per test clip for each arm, and the 5c - 10c difference."""
+    archs = _taxonomy_archs(result)
+    header = ["Clip (frames)"]
+    for arch in archs:
+        header += [f"{arch} 10c", f"{arch} 5c", f"{arch} Δ"]
+    rows = []
+    for clip, frames in result.clips.items():
+        # Clip keys are "<game>-<quarter>|<span>"; a bare "|" would split the cell.
+        row = [f"`{clip.replace('|', ' ')}` ({frames})"]
+        for arch in archs:
+            arm_means = {
+                arm: statistics.mean(
+                    e.per_clip_map_50_95[clip] for e in _taxonomy_arm(result, arch, arm)
+                )
+                for arm in _TAXONOMY_ARMS
+            }
+            row += [
+                _fmt3(arm_means["10c"]),
+                _fmt3(arm_means["5c"]),
+                _fmt_signed3(arm_means["5c"] - arm_means["10c"]),
+            ]
+        rows.append(row)
     return _table(header, rows)

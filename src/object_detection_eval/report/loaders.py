@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, ValidationError
 
@@ -659,3 +659,53 @@ def load_zeroshot_config(path: Path | str) -> dict[str, dict[str, Any]]:
         config = {k: v for k, v in entry.items() if k not in {"name", "expected_map5095"}}
         out[str(entry["name"])] = config
     return out
+
+
+# --------------------------------------------------------------------------- #
+# Taxonomy ablation: results/accuracy/taxonomy_ablation_merged5.json
+# (scripts/run_taxonomy_ablation.py)
+# --------------------------------------------------------------------------- #
+
+
+class TaxonomyAblationModel(BaseModel):
+    """One scored model of the 10c-vs-5c training ablation (or a published anchor)."""
+
+    model_config = _STRICT
+
+    arch: str
+    arm: Literal["10c", "5c", "published"]
+    seed: int | None
+    onnx_sha256: str
+    map_50_95: float = Field(alias="mAP_50_95")
+    map_50: float = Field(alias="mAP_50")
+    map_75: float = Field(alias="mAP_75")
+    per_class_ap50: dict[str, float]
+    per_clip_map_50_95: dict[str, float]
+
+
+class TaxonomyAblationResult(BaseModel):
+    """The ``{taxonomy, clips, models}`` payload: clips maps clip key -> frame count."""
+
+    model_config = _STRICT
+
+    taxonomy: str
+    clips: dict[str, int]
+    models: dict[str, TaxonomyAblationModel]
+
+
+def load_taxonomy_ablation(path: Path | str) -> TaxonomyAblationResult:
+    """Load and validate the taxonomy-ablation results JSON.
+
+    Raises:
+        ReportLoadError: schema violation, or a model whose per-clip scores do
+            not cover exactly the file's clips.
+    """
+    try:
+        result = TaxonomyAblationResult.model_validate(_read_json(path))
+    except ValidationError as exc:
+        raise ReportLoadError(f"{path}: {exc}") from exc
+    for name, entry in result.models.items():
+        if set(entry.per_clip_map_50_95) != set(result.clips):
+            msg = f"{path}: {name} per-clip scores do not match the file's clips"
+            raise ReportLoadError(msg)
+    return result

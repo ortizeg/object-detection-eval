@@ -37,6 +37,10 @@ and drift-checked in CI, so nothing below is hand-typed:
   line (0.683, a fusion of paid pipelines) is level with the fine-tuned top tier;
   the best open-weights row (0.388) is still well below the weakest fine-tuned
   detector (0.581).
+- **[benchmarks/basketball/reports/TAXONOMY_ABLATION.md](benchmarks/basketball/reports/TAXONOMY_ABLATION.md)**
+  — does training on the merged 5 classes instead of the raw 10 change merged5
+  test mAP? No: YOLOX-M and YOLO26m, retrained with 3 seeds per arm, land within
+  seed noise of each other (+0.008 and +0.002 mAP@50:95).
 
 The methodology behind the protocol — train-matched preprocessing, detector/VLM
 parity, the single de-transform, and the 94-image statistical limitation — is in

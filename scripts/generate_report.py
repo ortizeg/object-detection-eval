@@ -59,11 +59,16 @@ from object_detection_eval.report import (
     load_fusion_log,
     load_fusion_test_log,
     load_latency_results,
+    load_taxonomy_ablation,
     load_vlm_metrics,
     load_zeroshot_config,
     per_class_table,
     primary_7model_table,
     split_overlap_table,
+    taxonomy_ablation_anchor_table,
+    taxonomy_ablation_per_class_table,
+    taxonomy_ablation_per_clip_table,
+    taxonomy_ablation_table,
     taxonomy_alias_table,
     taxonomy_merge_table,
     vlm_per_class_table,
@@ -196,6 +201,7 @@ def build_registry(
     fusion_path = results_dir / "vlm" / "fusion" / "valid_fusion.json"
     fusion_test_path = results_dir / "vlm" / "fusion" / "test_fusion.json"
     zeroshot_conf = conf_dir / "vlm_zeroshot.yaml"
+    taxonomy_ablation_path = results_dir / "accuracy" / "taxonomy_ablation_merged5.json"
 
     # Load the precomputed VLM metrics once per render and share them across the
     # summary + per-class slots. Lazy: only evaluated if the VLM report is
@@ -320,7 +326,39 @@ def build_registry(
         ],
     )
 
-    return [final_comparison, vlm_vs_finetuned, dataset]
+    # The anchor slot also reads the @640 table's accuracy file: the published
+    # artifacts re-scored in the ablation run are compared against it.
+    taxonomy_ablation = ReportSpec(
+        report_id="taxonomy_ablation",
+        md_path=report_dir / "TAXONOMY_ABLATION.md",
+        slots=[
+            Slot(
+                "taxonomy_ablation_anchor",
+                lambda: taxonomy_ablation_anchor_table(
+                    load_taxonomy_ablation(taxonomy_ablation_path),
+                    load_accuracy_results(acc_merged5),
+                ),
+            ),
+            Slot(
+                "taxonomy_ablation_summary",
+                lambda: taxonomy_ablation_table(load_taxonomy_ablation(taxonomy_ablation_path)),
+            ),
+            Slot(
+                "taxonomy_ablation_per_class",
+                lambda: taxonomy_ablation_per_class_table(
+                    load_taxonomy_ablation(taxonomy_ablation_path), merged5()
+                ),
+            ),
+            Slot(
+                "taxonomy_ablation_per_clip",
+                lambda: taxonomy_ablation_per_clip_table(
+                    load_taxonomy_ablation(taxonomy_ablation_path)
+                ),
+            ),
+        ],
+    )
+
+    return [final_comparison, vlm_vs_finetuned, dataset, taxonomy_ablation]
 
 
 def _run(specs: list[ReportSpec], *, check: bool, write: bool) -> int:
