@@ -60,6 +60,20 @@ Test split, mAP@50:95. Each line links to the section with its caveats.
   written down before scoring (`docs/plans/`). Rows that were hand-tuned or are
   pipeline variants are labelled as disclosed extras.
 
+**What each accuracy level costs.** We reran every zero-shot pipeline on 20 validation
+frames, twice, with response caches bypassed and every API call's token usage logged
+([COST.md](COST.md)). At list prices on 2026-10-27, one call per frame costs $0.011 with
+Gemini 4 Argon (0.431 test mAP@50:95), $0.017 with Sol (0.481), $0.030 with Opus 5.5
+(0.438) and $0.068 with Astra (0.501). Astra crop-refine, the strongest single API
+pipeline at 0.588, costs $0.088 per frame, about $88 per 1,000 frames, and takes 15.5 s
+per frame. Argon two-pass reaches 0.534 for $0.123 per frame, which doubles to $0.245
+when Gemini prices change on 2026-12-01, and makes about 13 calls per frame. Fusing the
+four API models gives 0.598 for $0.238 per frame. Only the best zero-shot fusion (0.683)
+scores above YOLOX-M (0.672). It makes about 25 calls and takes over 3 minutes of serial
+API time per frame, and costs at least $0.21 per frame before DINO-X's per-call fee.
+Costs are measured on validation frames and accuracy on test, and with only two runs
+the cost spread is indicative, not a confidence interval.
+
 ## How each model's prompt was chosen
 
 An earlier revision of this report criticised unequal tuning effort as an
