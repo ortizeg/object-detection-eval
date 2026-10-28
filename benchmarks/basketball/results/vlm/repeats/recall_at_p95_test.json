@@ -1,0 +1,408 @@
+{
+  "metric": "recall_at_p95 (fuse_vlm.score: micro, IoU 0.5, thresholds 0:0.98:0.02)",
+  "split": "test",
+  "n_boot": 1000,
+  "seed": 0,
+  "models": {
+    "astra": {
+      "published_row_recall_at_p95": 0.9081,
+      "runs": [
+        {
+          "dump": "astra.json",
+          "mAP_50_95": 0.501,
+          "recall_at_p95": 0.9081,
+          "threshold": 0.88,
+          "precision": 0.9503,
+          "bootstrap_share_reaching_95": 0.993
+        },
+        {
+          "dump": "repeats/run2/astra.json",
+          "mAP_50_95": 0.5043,
+          "recall_at_p95": 0.8606,
+          "threshold": 0.94,
+          "precision": 0.9509,
+          "bootstrap_share_reaching_95": 0.816
+        },
+        {
+          "dump": "repeats/run3/astra.json",
+          "mAP_50_95": 0.5159,
+          "recall_at_p95": 0.8596,
+          "threshold": 0.94,
+          "precision": 0.9508,
+          "bootstrap_share_reaching_95": 0.97
+        }
+      ],
+      "runs_reaching_95": 3,
+      "mean": 0.8761,
+      "sd": 0.0277
+    },
+    "sol": {
+      "published_row_recall_at_p95": 0.7414,
+      "runs": [
+        {
+          "dump": "sol.json",
+          "mAP_50_95": 0.4806,
+          "recall_at_p95": 0.7414,
+          "threshold": 0.98,
+          "precision": 0.952,
+          "bootstrap_share_reaching_95": 0.668
+        },
+        {
+          "dump": "sol_effort-default_refine-rim_pass1_test.json",
+          "mAP_50_95": 0.5038,
+          "recall_at_p95": 0.897,
+          "threshold": 0.9,
+          "precision": 0.9533,
+          "bootstrap_share_reaching_95": 1.0
+        },
+        {
+          "dump": "repeats/run3/sol.json",
+          "mAP_50_95": 0.4882,
+          "recall_at_p95": 0.8212,
+          "threshold": 0.96,
+          "precision": 0.9525,
+          "bootstrap_share_reaching_95": 0.985
+        }
+      ],
+      "runs_reaching_95": 3,
+      "mean": 0.8199,
+      "sd": 0.0778
+    },
+    "claude_opus": {
+      "published_row_recall_at_p95": 0.6838,
+      "runs": [
+        {
+          "dump": "claude_opus.json",
+          "mAP_50_95": 0.4382,
+          "recall_at_p95": 0.6838,
+          "threshold": 0.76,
+          "precision": 0.9515,
+          "bootstrap_share_reaching_95": 1.0
+        },
+        {
+          "dump": "claude_effort-default_refine-rim_pass1_test.json",
+          "mAP_50_95": 0.4503,
+          "recall_at_p95": 0.6823,
+          "threshold": 0.76,
+          "precision": 0.9541,
+          "bootstrap_share_reaching_95": 1.0
+        },
+        {
+          "dump": "repeats/run3/claude_opus.json",
+          "mAP_50_95": 0.4424,
+          "recall_at_p95": 0.6197,
+          "threshold": 0.82,
+          "precision": 0.9578,
+          "bootstrap_share_reaching_95": 1.0
+        }
+      ],
+      "runs_reaching_95": 3,
+      "mean": 0.662,
+      "sd": 0.0366
+    }
+  },
+  "cross_model_run_pairs": {
+    "astra-sol": {
+      "r1-r1": {
+        "mean": 0.1312,
+        "ci95": [
+          0.0067,
+          0.1904
+        ],
+        "resamples_used": 667
+      },
+      "r1-r2": {
+        "mean": -0.0096,
+        "ci95": [
+          -0.1598,
+          0.0606
+        ],
+        "resamples_used": 993
+      },
+      "r1-r3": {
+        "mean": 0.0677,
+        "ci95": [
+          -0.0333,
+          0.1845
+        ],
+        "resamples_used": 978
+      },
+      "r2-r1": {
+        "mean": 0.088,
+        "ci95": [
+          -0.0209,
+          0.1754
+        ],
+        "resamples_used": 596
+      },
+      "r2-r2": {
+        "mean": -0.0532,
+        "ci95": [
+          -0.19,
+          0.029
+        ],
+        "resamples_used": 816
+      },
+      "r2-r3": {
+        "mean": 0.0213,
+        "ci95": [
+          -0.151,
+          0.1578
+        ],
+        "resamples_used": 807
+      },
+      "r3-r1": {
+        "mean": 0.0751,
+        "ci95": [
+          -0.049,
+          0.1648
+        ],
+        "resamples_used": 660
+      },
+      "r3-r2": {
+        "mean": -0.0636,
+        "ci95": [
+          -0.1893,
+          0.0265
+        ],
+        "resamples_used": 970
+      },
+      "r3-r3": {
+        "mean": 0.0132,
+        "ci95": [
+          -0.1452,
+          0.1439
+        ],
+        "resamples_used": 955
+      }
+    },
+    "astra-claude_opus": {
+      "r1-r1": {
+        "mean": 0.2207,
+        "ci95": [
+          0.083,
+          0.2924
+        ],
+        "resamples_used": 993
+      },
+      "r1-r2": {
+        "mean": 0.2049,
+        "ci95": [
+          0.0674,
+          0.2809
+        ],
+        "resamples_used": 993
+      },
+      "r1-r3": {
+        "mean": 0.2545,
+        "ci95": [
+          0.1043,
+          0.3336
+        ],
+        "resamples_used": 993
+      },
+      "r2-r1": {
+        "mean": 0.1777,
+        "ci95": [
+          0.0391,
+          0.2788
+        ],
+        "resamples_used": 816
+      },
+      "r2-r2": {
+        "mean": 0.1617,
+        "ci95": [
+          0.031,
+          0.2604
+        ],
+        "resamples_used": 816
+      },
+      "r2-r3": {
+        "mean": 0.2126,
+        "ci95": [
+          0.0956,
+          0.3054
+        ],
+        "resamples_used": 816
+      },
+      "r3-r1": {
+        "mean": 0.1669,
+        "ci95": [
+          0.035,
+          0.2704
+        ],
+        "resamples_used": 970
+      },
+      "r3-r2": {
+        "mean": 0.1508,
+        "ci95": [
+          0.0316,
+          0.2435
+        ],
+        "resamples_used": 970
+      },
+      "r3-r3": {
+        "mean": 0.2005,
+        "ci95": [
+          0.0513,
+          0.3026
+        ],
+        "resamples_used": 970
+      }
+    },
+    "sol-claude_opus": {
+      "r1-r1": {
+        "mean": 0.0928,
+        "ci95": [
+          -0.0032,
+          0.1952
+        ],
+        "resamples_used": 668
+      },
+      "r1-r2": {
+        "mean": 0.0795,
+        "ci95": [
+          -0.0163,
+          0.1903
+        ],
+        "resamples_used": 668
+      },
+      "r1-r3": {
+        "mean": 0.1268,
+        "ci95": [
+          0.0482,
+          0.239
+        ],
+        "resamples_used": 668
+      },
+      "r2-r1": {
+        "mean": 0.2301,
+        "ci95": [
+          0.1391,
+          0.3047
+        ],
+        "resamples_used": 1000
+      },
+      "r2-r2": {
+        "mean": 0.2144,
+        "ci95": [
+          0.1177,
+          0.2883
+        ],
+        "resamples_used": 1000
+      },
+      "r2-r3": {
+        "mean": 0.2641,
+        "ci95": [
+          0.1891,
+          0.3499
+        ],
+        "resamples_used": 1000
+      },
+      "r3-r1": {
+        "mean": 0.1536,
+        "ci95": [
+          0.0375,
+          0.265
+        ],
+        "resamples_used": 985
+      },
+      "r3-r2": {
+        "mean": 0.138,
+        "ci95": [
+          -0.0011,
+          0.2516
+        ],
+        "resamples_used": 985
+      },
+      "r3-r3": {
+        "mean": 0.1877,
+        "ci95": [
+          0.0462,
+          0.2906
+        ],
+        "resamples_used": 985
+      }
+    }
+  },
+  "within_model_run_pairs": {
+    "astra": {
+      "r1-r2": {
+        "mean": 0.0467,
+        "ci95": [
+          -0.0432,
+          0.1861
+        ],
+        "resamples_used": 814
+      },
+      "r1-r3": {
+        "mean": 0.0542,
+        "ci95": [
+          -0.0633,
+          0.1913
+        ],
+        "resamples_used": 966
+      },
+      "r2-r3": {
+        "mean": 0.008,
+        "ci95": [
+          -0.1362,
+          0.1546
+        ],
+        "resamples_used": 803
+      }
+    },
+    "sol": {
+      "r1-r2": {
+        "mean": -0.1396,
+        "ci95": [
+          -0.1967,
+          -0.0462
+        ],
+        "resamples_used": 668
+      },
+      "r1-r3": {
+        "mean": -0.0649,
+        "ci95": [
+          -0.154,
+          0.0501
+        ],
+        "resamples_used": 662
+      },
+      "r2-r3": {
+        "mean": 0.0769,
+        "ci95": [
+          0.001,
+          0.1834
+        ],
+        "resamples_used": 985
+      }
+    },
+    "claude_opus": {
+      "r1-r2": {
+        "mean": -0.0158,
+        "ci95": [
+          -0.0885,
+          0.0602
+        ],
+        "resamples_used": 1000
+      },
+      "r1-r3": {
+        "mean": 0.0339,
+        "ci95": [
+          -0.052,
+          0.1212
+        ],
+        "resamples_used": 1000
+      },
+      "r2-r3": {
+        "mean": 0.0497,
+        "ci95": [
+          -0.0117,
+          0.1459
+        ],
+        "resamples_used": 1000
+      }
+    }
+  }
+}

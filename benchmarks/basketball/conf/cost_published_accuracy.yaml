@@ -58,10 +58,11 @@ pipelines:
         section: The zero-shot ceiling (vlm_summary table)
         quote: "| GPT-6.1 Sol | 0.481 | 0.781 | 0.481 |"
     recall_at_p95:
-      value: null
-      reason: not published
+      value: 0.741
       source:
-        note: no report or results file carries recall at 95% precision for this row
+        file: benchmarks/basketball/results/vlm/repeats/recall_at_p95_test.json
+        section: "run 1 = the published row; three-run mean 0.820 +/- 0.078 (scripts/recall_at_p95_api_rows.py)"
+        json_path: models.sol.published_row_recall_at_p95
 
   claude_opus:
     label: "Claude Opus 5.5 (single pass)"
@@ -73,10 +74,11 @@ pipelines:
         section: The zero-shot ceiling (vlm_summary table)
         quote: "| Claude Opus 5.5 | 0.438 | 0.691 | 0.465 |"
     recall_at_p95:
-      value: null
-      reason: not published
+      value: 0.684
       source:
-        note: no report or results file carries recall at 95% precision for this row
+        file: benchmarks/basketball/results/vlm/repeats/recall_at_p95_test.json
+        section: "run 1 = the published row; three-run mean 0.662 +/- 0.037 (scripts/recall_at_p95_api_rows.py)"
+        json_path: models.claude_opus.published_row_recall_at_p95
 
   gemini_argon_single:
     label: "Gemini 4 Argon (single pass, rim line)"
