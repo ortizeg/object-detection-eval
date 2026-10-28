@@ -9,7 +9,7 @@ Read the numbers with these limits in mind:
 - With 2 runs the run-to-run SD is a rough indication, not a confidence interval.
 - Latency depends on provider load and the time of day; it is one afternoon's measurement, not a service-level figure.
 - The Gemini 4 Argon price doubles on 2026-12-01 (input $2 to $4, output $10 to $20 per 1M tokens). Both prices are shown.
-- DINO-X is billed per call from a console balance. Until a per-call price is supplied it is shown unpriced, and any fused line containing it carries a lower bound that leaves it out.
+- DINO-X is billed per call, in CNY, from a console balance. Its price is an approximate per-call figure converted to USD at a dated exchange rate (see the note in `conf/cost_prices.yaml`). A model with no price is shown unpriced, and any fused line containing it carries a lower bound that leaves it out.
 - Single-run accuracy gaps of about 2 points between the API rows are within the published run-to-run noise (VLM_VS_FINETUNED.md, "Parity with the Ultralytics Platform benchmark"). Do not read a ranking into small differences in the accuracy columns.
 
 ## Headline
@@ -21,11 +21,11 @@ Read the numbers with these limits in mind:
 | Claude Opus 5.5 (single pass) | 0.438 | n/a (not published) | 1.0 (1) | $0.0303 ± $0.0001 | $30.34 | $0.0303 ± $0.0001 | $30.34 | 8.2 ± 0.1 | 8.2 ± 0.1 (1) |
 | GPT-6 Astra (single pass) | 0.501 | 0.908 | 1.0 (1) | $0.0681 ± $0.0002 | $68.08 | $0.0681 ± $0.0002 | $68.08 | 10.1 ± 0.2 | 10.1 ± 0.2 (1) |
 | Astra crop-refine (ball + rim) | 0.588 | 0.882 | 2.8 (3) | $0.0878 ± $0.0010 | $87.81 | $0.0878 ± $0.0010 | $87.81 | 15.5 ± 1.3 | 15.5 ± 1.3 (1) |
+| DINO-X preview + rim trim (2x2 tiles + full frame) | 0.517 | 0.328 | 5.0 (5) | $0.1125 ± $0.0000 | $112.50 | $0.1125 ± $0.0000 | $112.50 | 31.6 ± 1.0 | 4.2 ± 0.1 (8) |
+| DINO-X Pro + rim trim (2x2 tiles + full frame) | 0.520 | 0.302 | 5.0 (5) | $0.1125 ± $0.0000 | $112.50 | $0.1125 ± $0.0000 | $112.50 | 21.0 ± 2.9 | 3.2 ± 0.8 (8) |
 | Gemini 4 Argon (two-pass: crop-refine + number-crop) | 0.534 | n/a (never reaches 95% precision) | 12.6 (13) | $0.1227 ± $0.0019 | $122.68 | $0.2454 ± $0.0037 | $245.36 | 149.7 ± 0.3 | 53.0 ± 0.2 (3) |
 | API-rows fusion (Astra + Sol + Opus + Gemini two-pass, WBF) | 0.598 | 0.899 | 15.6 (16)* | $0.2383 ± $0.0026 | $238.27 | $0.3609 ± $0.0044 | $360.95 | 189.2 ± 0.6 | 92.5 ± 1.1† |
-| DINO-X preview + rim trim (2x2 tiles + full frame) | 0.517 | 0.328 | 5.0 (5) | n/a (unpriced) | n/a | n/a (unpriced) | n/a | 31.6 ± 1.0 | 4.2 ± 0.1 (8) |
-| DINO-X Pro + rim trim (2x2 tiles + full frame) | 0.520 | 0.302 | 5.0 (5) | n/a (unpriced) | n/a | n/a (unpriced) | n/a | 21.0 ± 2.9 | 3.2 ± 0.8 (8) |
-| Best zero-shot line (Astra crop-refine + DINO-X Pro + DINO-X preview + Gemini two-pass, WBF) | 0.683 | 0.918 | 25.4 (26)* | n/a (unpriced) (lower bound $0.2105) | n/a | n/a (unpriced) | n/a | 217.8 ± 2.9 | 75.9 ± 0.6† |
+| Best zero-shot line (Astra crop-refine + DINO-X Pro + DINO-X preview + Gemini two-pass, WBF) | 0.683 | 0.918 | 25.4 (26)* | $0.4355 ± $0.0009 | $435.49 | $0.5582 ± $0.0027 | $558.17 | 217.8 ± 2.9 | 75.9 ± 0.6† |
 
 `calls/frame` counts every billed request for a frame, including second-pass crop calls and tile calls; the figure in brackets is the largest count for any single frame. USD is mean ± SD over the runs. `s/frame serial` is the mean of each frame's own wall time; `s/frame at published workers` is run wall time divided by frames, which is what the published concurrency delivers.
 
@@ -45,19 +45,17 @@ Read the numbers with these limits in mind:
 | Claude Opus 5.5 (single pass) | 1.0 | 0.0 | 2,950 (n/a / n/a / 0) | 927 | 0 | 0 | 0 |
 | GPT-6 Astra (single pass) | 1.0 | 0.0 | 3,086 (n/a / n/a / 128) | 744 | 60 | 0 | 0 |
 | Astra crop-refine (ball + rim) | 1.0 | 1.8 | 4,134 (n/a / n/a / 1,024) | 929 | 153 | 0 | 0 |
-| Gemini 4 Argon (two-pass: crop-refine + number-crop) | 1.0 | 11.6 | 20,244 (6,557 / 13,687 / n/a) | 8,219 | 6,903 | 0 | 0 |
-| API-rows fusion (Astra + Sol + Opus + Gemini two-pass, WBF) | 4.0 | 11.6 | 29,366 (6,557 / 13,687 / 1,216) | 10,990 | 7,365 | 0 | 0 |
 | DINO-X preview + rim trim (2x2 tiles + full frame) | 5.0 | 0.0 | n/a (n/a / n/a / n/a) | n/a | n/a | 0 | 0 |
 | DINO-X Pro + rim trim (2x2 tiles + full frame) | 5.0 | 0.0 | n/a (n/a / n/a / n/a) | n/a | n/a | 0 | 0 |
+| Gemini 4 Argon (two-pass: crop-refine + number-crop) | 1.0 | 11.6 | 20,244 (6,557 / 13,687 / n/a) | 8,219 | 6,903 | 0 | 0 |
+| API-rows fusion (Astra + Sol + Opus + Gemini two-pass, WBF) | 4.0 | 11.6 | 29,366 (6,557 / 13,687 / 1,216) | 10,990 | 7,365 | 0 | 0 |
 | Best zero-shot line (Astra crop-refine + DINO-X Pro + DINO-X preview + Gemini two-pass, WBF) | 12.0 | 13.4 | 24,378 (6,557 / 13,687 / 1,024) | 9,149 | 7,056 | 0 | 0 |
 
 Cached input tokens were reported for at least one pipeline and are billed at the full input rate here; the cost model has no cache discount.
 
 ## Spend
 
-The whole study cost **$14.46** at the prices in force on each call's date, counting projection runs and any aborted run.
-
-Calls with no price yet (not in that total): DINO-X-1.0: 215, DINO-X-PREVIEW-1.0: 215.
+The whole study cost **$24.13** at the prices in force on each call's date, counting projection runs and any aborted run.
 
 ![USD per frame against published accuracy](../results/cost/cost_vs_accuracy.png)
 
@@ -65,8 +63,8 @@ Calls with no price yet (not in that total): DINO-X-1.0: 215, DINO-X-PREVIEW-1.0
 
 | Model id | Provider | Period | Price | Source |
 | --- | --- | --- | --- | --- |
-| DINO-X-1.0 | deepdataspace | ... to ... | per-call price not yet supplied | https://cloud.deepdataspace.com/dashboard/usage |
-| DINO-X-PREVIEW-1.0 | deepdataspace | ... to ... | per-call price not yet supplied | https://cloud.deepdataspace.com/dashboard/usage |
+| DINO-X-1.0 | deepdataspace | ... to ... | $0.0225 per call | https://cloud.deepdataspace.com/dashboard/usage |
+| DINO-X-PREVIEW-1.0 | deepdataspace | ... to ... | $0.0225 per call | https://cloud.deepdataspace.com/dashboard/usage |
 | T-Rex-2.0 | deepdataspace | ... to ... | per-call price not yet supplied | https://cloud.deepdataspace.com/dashboard/usage |
 | claude-opus-5-5 | anthropic | ... to ... | $4 in / $20 out per 1M tokens | https://claude.com/pricing |
 | gemini-4-argon | google | ... to 2026-11-30 | $2 in / $10 out per 1M tokens | https://ai.google.dev/gemini-api/docs/pricing |

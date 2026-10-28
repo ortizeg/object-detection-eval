@@ -13,7 +13,14 @@ import pytest
 from object_detection_eval.cost.compute import build_report, load_accuracy, load_prices, load_runs
 from object_detection_eval.cost.report import plot_points, render_markdown, render_png
 from object_detection_eval.cost.schemas import CostReport
-from tests.cost._synth import accuracy_config, astra_call, gemini_call, write_run, write_study
+from tests.cost._synth import (
+    accuracy_config,
+    astra_call,
+    gemini_call,
+    unpriced_per_call_prices,
+    write_run,
+    write_study,
+)
 
 REPO = Path(__file__).resolve().parents[2]
 CONF = REPO / "benchmarks" / "basketball" / "conf"
@@ -24,7 +31,7 @@ def report(tmp_path: Path) -> CostReport:
     write_study(tmp_path)
     return build_report(
         load_runs(tmp_path),
-        load_prices(CONF / "cost_prices.yaml"),
+        unpriced_per_call_prices(),
         accuracy_config(),
         price_path="p.yaml",
         accuracy_path="a.yaml",
@@ -80,7 +87,7 @@ def test_png_renders_even_with_nothing_priced(tmp_path: Path) -> None:
     write_run(tmp_path, "dinox_pro_rimtrim", "2", {"a.jpg": [_dinox()]})
     rep = build_report(
         load_runs(tmp_path),
-        load_prices(CONF / "cost_prices.yaml"),
+        unpriced_per_call_prices(),
         accuracy_config(),
         price_path="p",
         accuracy_path="a",

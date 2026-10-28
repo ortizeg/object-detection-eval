@@ -32,6 +32,7 @@ from tests.cost._synth import (
     astra_call,
     dinox_call,
     gemini_call,
+    unpriced_per_call_prices,
     write_run,
     write_study,
 )
@@ -44,6 +45,12 @@ ACCURACY_YAML = REPO / "benchmarks" / "basketball" / "conf" / "cost_published_ac
 @pytest.fixture(scope="module")
 def prices() -> PriceBook:
     return load_prices(PRICES_YAML)
+
+
+@pytest.fixture(scope="module")
+def unpriced() -> PriceBook:
+    """Committed prices with the per-call (DINO-X) prices nulled: the unpriced path."""
+    return unpriced_per_call_prices()
 
 
 def _build(results_dir: Path, prices: PriceBook, accuracy: PublishedAccuracy | None = None):
@@ -82,8 +89,9 @@ def test_committed_prices_are_the_users_values(prices: PriceBook) -> None:
     for model, (in_rate, out_rate) in expect.items():
         period = prices.price_at(model, date(2026, 10, 27))
         assert (period.input_per_1m, period.output_per_1m) == (in_rate, out_rate)
-    for model in ("DINO-X-1.0", "DINO-X-PREVIEW-1.0", "T-Rex-2.0"):
-        assert prices.price_at(model, date(2026, 10, 27)).per_call_usd is None
+    for model in ("DINO-X-1.0", "DINO-X-PREVIEW-1.0"):  # CNY 0.15 at 6.6684 CNY/USD
+        assert prices.price_at(model, date(2026, 10, 27)).per_call_usd == 0.0225
+    assert prices.price_at("T-Rex-2.0", date(2026, 10, 27)).per_call_usd is None
 
 
 def test_unknown_model_and_uncovered_date_are_errors(prices: PriceBook) -> None:
@@ -157,9 +165,9 @@ def test_scenarios_price_a_record_at_its_own_date_or_a_fixed_date(prices: PriceB
     assert record_cost(december, prices, None) == pytest.approx(0.018)
 
 
-def test_null_price_is_unpriced_not_free(prices: PriceBook) -> None:
+def test_null_price_is_unpriced_not_free(unpriced: PriceBook) -> None:
     rec = _rec(provider="deepdataspace", model="DINO-X-1.0")
-    assert record_cost(rec, prices, None) is None
+    assert record_cost(rec, unpriced, None) is None
 
 
 def test_missing_tokens_raise_unless_the_call_failed(prices: PriceBook) -> None:
@@ -218,9 +226,9 @@ def test_gemini_both_price_scenarios_and_image_split(tmp_path: Path, prices: Pri
     assert gem.tokens_per_frame_mean["billable_output"] == pytest.approx(500.0)
 
 
-def test_unpriced_pipeline_is_none_not_zero(tmp_path: Path, prices: PriceBook) -> None:
+def test_unpriced_pipeline_is_none_not_zero(tmp_path: Path, unpriced: PriceBook) -> None:
     write_study(tmp_path)
-    dinox = _build(tmp_path, prices).pipelines["dinox_pro_rimtrim"]
+    dinox = _build(tmp_path, unpriced).pipelines["dinox_pro_rimtrim"]
     assert dinox.usd["current"].mean is None
     assert dinox.usd["current"].per_1000_frames is None
     assert "DINO-X-1.0" in (dinox.usd["current"].unpriced_reason or "")
@@ -247,10 +255,10 @@ def test_fused_line_is_the_sum_of_its_members_run_by_run(tmp_path: Path, prices:
 
 
 def test_fused_line_with_an_unpriced_member_reports_null_and_a_lower_bound(
-    tmp_path: Path, prices: PriceBook
+    tmp_path: Path, unpriced: PriceBook
 ) -> None:
     write_study(tmp_path)
-    fused = _build(tmp_path, prices).pipelines["fuse_ad"]
+    fused = _build(tmp_path, unpriced).pipelines["fuse_ad"]
     usd = fused.usd["current"]
     assert usd.mean is None
     assert usd.lower_bound_mean == pytest.approx(0.025)  # astra alone
@@ -268,11 +276,13 @@ def test_derived_line_not_computed_when_a_member_has_no_runs(
     assert any("fuse_ag not computed" in n for n in report.notes)
 
 
-def test_study_spend_counts_projection_and_aborted_runs(tmp_path: Path, prices: PriceBook) -> None:
+def test_study_spend_counts_projection_and_aborted_runs(
+    tmp_path: Path, unpriced: PriceBook
+) -> None:
     write_study(tmp_path)
     write_run(tmp_path, "astra", "proj", {"a.jpg": [astra_call()], "b.jpg": [astra_call()]})
     write_run(tmp_path, "gemini_argon_two_pass", "3", {"a.jpg": [gemini_call()]}, status="aborted")
-    report = _build(tmp_path, prices)
+    report = _build(tmp_path, unpriced)
     # astra: 0.04 + 0.06 + 0.04 (proj); gemini: 4 x 0.009 + 0.009 (aborted run "3")
     assert report.study_spend_usd == pytest.approx(0.14 + 0.045)
     assert report.study_spend_by_file["usage/astra__proj.jsonl"] == pytest.approx(0.04)
@@ -329,11 +339,11 @@ def _proj(tmp_path: Path) -> dict[str, LoadedRun]:
     return {r.pipeline: r for r in load_runs(tmp_path)}
 
 
-def test_projection_under_the_cap(tmp_path: Path, prices: PriceBook) -> None:
+def test_projection_under_the_cap(tmp_path: Path, unpriced: PriceBook) -> None:
     proj = project(
         _proj(tmp_path),
         {"astra": "Astra"},
-        prices,
+        unpriced,
         budget_usd=40.0,
         frames_per_run=20,
         runs=2,

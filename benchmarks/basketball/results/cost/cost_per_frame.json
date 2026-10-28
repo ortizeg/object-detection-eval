@@ -124,7 +124,7 @@
     },
     {
       "path": "benchmarks/basketball/conf/cost_prices.yaml",
-      "sha256": "a812fceed8e75bc74f008fda6b523b23790278424cab1f2cf16a80c60e3d79f8",
+      "sha256": "78b4ac11162e36f18bdc6ca0247954783174a929c1d06f4816a740fd7a8c1ac0",
       "records": null
     },
     {
@@ -2900,9 +2900,9 @@
             "effective_to": null,
             "input_per_1m": null,
             "output_per_1m": null,
-            "per_call_usd": null,
+            "per_call_usd": 0.0225,
             "source_url": "https://cloud.deepdataspace.com/dashboard/usage",
-            "note": "per-call price to be supplied by the user from the DeepDataSpace console; see docs/cost/dinox-console-checklist.md"
+            "note": "about CNY 0.15 per direct model API call, as supplied by the user on 2026-10-28 (approximate; the console bills in CNY). Converted at 1 USD = 6.6684 CNY on 2026-10-27 (https://www.valutafx.com/history/usd-cny-2026-10-27): 0.15 / 6.6684 = 0.0225 USD."
           }
         ]
       },
@@ -2916,9 +2916,9 @@
             "effective_to": null,
             "input_per_1m": null,
             "output_per_1m": null,
-            "per_call_usd": null,
+            "per_call_usd": 0.0225,
             "source_url": "https://cloud.deepdataspace.com/dashboard/usage",
-            "note": "per-call price to be supplied by the user from the DeepDataSpace console; see docs/cost/dinox-console-checklist.md"
+            "note": "about CNY 0.15 per direct model API call, as supplied by the user on 2026-10-28 (approximate; the console bills in CNY). Converted at 1 USD = 6.6684 CNY on 2026-10-27 (https://www.valutafx.com/history/usd-cny-2026-10-27): 0.15 / 6.6684 = 0.0225 USD."
           }
         ]
       },
@@ -3773,25 +3773,25 @@
       "usd": {
         "current": {
           "per_run": [
-            null,
-            null
+            0.1125,
+            0.1125
           ],
-          "mean": null,
-          "sd": null,
-          "per_1000_frames": null,
-          "unpriced_reason": "no per-call price yet for DINO-X-1.0 (see docs/cost/dinox-console-checklist.md)",
+          "mean": 0.1125,
+          "sd": 0.0,
+          "per_1000_frames": 112.5,
+          "unpriced_reason": null,
           "lower_bound_mean": null,
           "excluded_members": []
         },
         "post_2026_12_01": {
           "per_run": [
-            null,
-            null
+            0.1125,
+            0.1125
           ],
-          "mean": null,
-          "sd": null,
-          "per_1000_frames": null,
-          "unpriced_reason": "no per-call price yet for DINO-X-1.0 (see docs/cost/dinox-console-checklist.md)",
+          "mean": 0.1125,
+          "sd": 0.0,
+          "per_1000_frames": 112.5,
+          "unpriced_reason": null,
           "lower_bound_mean": null,
           "excluded_members": []
         }
@@ -3852,25 +3852,25 @@
       "usd": {
         "current": {
           "per_run": [
-            null,
-            null
+            0.1125,
+            0.1125
           ],
-          "mean": null,
-          "sd": null,
-          "per_1000_frames": null,
-          "unpriced_reason": "no per-call price yet for DINO-X-PREVIEW-1.0 (see docs/cost/dinox-console-checklist.md)",
+          "mean": 0.1125,
+          "sd": 0.0,
+          "per_1000_frames": 112.5,
+          "unpriced_reason": null,
           "lower_bound_mean": null,
           "excluded_members": []
         },
         "post_2026_12_01": {
           "per_run": [
-            null,
-            null
+            0.1125,
+            0.1125
           ],
-          "mean": null,
-          "sd": null,
-          "per_1000_frames": null,
-          "unpriced_reason": "no per-call price yet for DINO-X-PREVIEW-1.0 (see docs/cost/dinox-console-checklist.md)",
+          "mean": 0.1125,
+          "sd": 0.0,
+          "per_1000_frames": 112.5,
+          "unpriced_reason": null,
           "lower_bound_mean": null,
           "excluded_members": []
         }
@@ -3940,33 +3940,27 @@
       "usd": {
         "current": {
           "per_run": [
-            null,
-            null
+            0.4348835,
+            0.4360978
           ],
-          "mean": null,
-          "sd": null,
-          "per_1000_frames": null,
-          "unpriced_reason": "a member is unpriced: dinox_pro_rimtrim, dinox_preview_rimtrim",
-          "lower_bound_mean": 0.21049065,
-          "excluded_members": [
-            "dinox_pro_rimtrim",
-            "dinox_preview_rimtrim"
-          ]
+          "mean": 0.43549065,
+          "sd": 0.00085864,
+          "per_1000_frames": 435.49065,
+          "unpriced_reason": null,
+          "lower_bound_mean": null,
+          "excluded_members": []
         },
         "post_2026_12_01": {
           "per_run": [
-            null,
-            null
+            0.5562465,
+            0.5600931
           ],
-          "mean": null,
-          "sd": null,
-          "per_1000_frames": null,
-          "unpriced_reason": "a member is unpriced: dinox_pro_rimtrim, dinox_preview_rimtrim",
-          "lower_bound_mean": 0.3331698,
-          "excluded_members": [
-            "dinox_pro_rimtrim",
-            "dinox_preview_rimtrim"
-          ]
+          "mean": 0.5581698,
+          "sd": 0.00271996,
+          "per_1000_frames": 558.1698,
+          "unpriced_reason": null,
+          "lower_bound_mean": null,
+          "excluded_members": []
         }
       },
       "serial_s_per_frame": {
@@ -4076,7 +4070,7 @@
       "parallel_lower_bound_s_per_frame": 149.720842
     }
   },
-  "study_spend_usd": 14.455128,
+  "study_spend_usd": 24.130128,
   "study_spend_by_file": {
     "usage/astra__1.jsonl": 1.35885,
     "usage/astra__2.jsonl": 1.36455,
@@ -4087,12 +4081,12 @@
     "usage/claude_opus__1.jsonl": 0.60534,
     "usage/claude_opus__2.jsonl": 0.60846,
     "usage/claude_opus__proj.jsonl": 0.09202,
-    "usage/dinox_preview_rimtrim__1.jsonl": 0.0,
-    "usage/dinox_preview_rimtrim__2.jsonl": 0.0,
-    "usage/dinox_preview_rimtrim__proj.jsonl": 0.0,
-    "usage/dinox_pro_rimtrim__1.jsonl": 0.0,
-    "usage/dinox_pro_rimtrim__2.jsonl": 0.0,
-    "usage/dinox_pro_rimtrim__proj.jsonl": 0.0,
+    "usage/dinox_preview_rimtrim__1.jsonl": 2.25,
+    "usage/dinox_preview_rimtrim__2.jsonl": 2.25,
+    "usage/dinox_preview_rimtrim__proj.jsonl": 0.3375,
+    "usage/dinox_pro_rimtrim__1.jsonl": 2.25,
+    "usage/dinox_pro_rimtrim__2.jsonl": 2.25,
+    "usage/dinox_pro_rimtrim__proj.jsonl": 0.3375,
     "usage/gemini_argon_single__1.jsonl": 0.21013,
     "usage/gemini_argon_single__2.jsonl": 0.21284,
     "usage/gemini_argon_single__proj.jsonl": 0.031692,
@@ -4103,9 +4097,6 @@
     "usage/sol__2.jsonl": 0.34866,
     "usage/sol__proj.jsonl": 0.050466
   },
-  "study_unpriced_calls": {
-    "DINO-X-1.0": 215,
-    "DINO-X-PREVIEW-1.0": 215
-  },
+  "study_unpriced_calls": {},
   "notes": []
 }

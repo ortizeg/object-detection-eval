@@ -18,13 +18,18 @@ count but no cost. That is why the numbers below have to come from the console.
 
 ## 1. Per-call price (the blocking item)
 
+**Filled in 2026-10-28.** The user supplied about CNY 0.15 per direct model API call,
+applied to both DINO-X models and converted at 1 USD = 6.6684 CNY (2026-10-27,
+<https://www.valutafx.com/history/usd-cny-2026-10-27>). It is approximate and was not
+cross-checked against the console balance; sections 2–4 remain open for that.
+
 Copy, for each model, the price of one API call, and the unit the console uses
 (per call, per image, or per token package):
 
 | Model id | Used by | Per-call price (USD) |
 | --- | --- | --- |
-| `DINO-X-1.0` | `dinox_pro_rimtrim` (full frame + 4 tiles = 5 calls per frame) | |
-| `DINO-X-PREVIEW-1.0` | `dinox_preview_rimtrim` (5 calls per frame) | |
+| `DINO-X-1.0` | `dinox_pro_rimtrim` (full frame + 4 tiles = 5 calls per frame) | 0.0225 (about CNY 0.15) |
+| `DINO-X-PREVIEW-1.0` | `dinox_preview_rimtrim` (5 calls per frame) | 0.0225 (about CNY 0.15) |
 | `T-Rex-2.0` | few-shot only; not in this study, listed for completeness | |
 
 If the console sells call packages, divide the package price by the number of calls it

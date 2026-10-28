@@ -212,9 +212,10 @@ def render_markdown(report: CostReport, figure_href: str = "cost_vs_accuracy.png
         "measurement, not a service-level figure.",
         "- The Gemini 4 Argon price doubles on 2026-12-01 (input $2 to $4, output $10 to $20 "
         "per 1M tokens). Both prices are shown.",
-        "- DINO-X is billed per call from a console balance. Until a per-call price is supplied "
-        "it is shown unpriced, and any fused line containing it carries a lower bound that "
-        "leaves it out.",
+        "- DINO-X is billed per call, in CNY, from a console balance. Its price is an "
+        "approximate per-call figure converted to USD at a dated exchange rate (see the note "
+        "in `conf/cost_prices.yaml`). A model with no price is shown unpriced, and any fused "
+        "line containing it carries a lower bound that leaves it out.",
         "- Single-run accuracy gaps of about 2 points between the API rows are within the "
         'published run-to-run noise (VLM_VS_FINETUNED.md, "Parity with the Ultralytics Platform '
         'benchmark"). Do not read a ranking into small differences in the accuracy columns.',
@@ -354,6 +355,16 @@ _SHORT_LABELS: dict[str, str] = {
     "fusion4": "Best zero-shot fusion",
 }
 
+#: Per-panel label offsets (points) and alignment where the default would collide or
+#: clip: DINO-X Pro and preview share a cost and swap order between the panels; the
+#: dearest point sits on the right edge.
+_LABEL_PLACEMENT: dict[tuple[str, str], tuple[float, float, str]] = {
+    ("map_y", "dinox_preview_rimtrim"): (5, -11, "left"),
+    ("recall_y", "dinox_pro_rimtrim"): (5, -11, "left"),
+    ("map_y", "fusion4"): (-5, 4, "right"),
+    ("recall_y", "fusion4"): (-5, 4, "right"),
+}
+
 
 def render_png(report: CostReport, path: Path) -> list[str]:
     """Write the two-panel figure; return the footnote lines (points left out and why)."""
@@ -385,7 +396,15 @@ def render_png(report: CostReport, path: Path) -> list[str]:
                 xerr = [[lower], [p.x_sd]]
             ax.errorbar(p.x, y, xerr=xerr, fmt="o", capsize=3, markersize=6, color=colors[p.id])
             label = _SHORT_LABELS.get(p.id, p.id)
-            ax.annotate(label, (p.x, y), textcoords="offset points", xytext=(5, 4), fontsize=8)
+            dx, dy, ha = _LABEL_PLACEMENT.get((field, p.id), (5, 4, "left"))
+            ax.annotate(
+                label,
+                (p.x, y),
+                textcoords="offset points",
+                xytext=(dx, dy),
+                ha=ha,
+                fontsize=8,
+            )
     for ref in report.accuracy.reference_lines:
         if ref.test_map5095.value is not None:
             ax_map.axhline(ref.test_map5095.value, linestyle="--", color="gray", linewidth=1)
