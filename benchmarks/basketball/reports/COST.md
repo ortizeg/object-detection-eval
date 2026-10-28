@@ -17,8 +17,8 @@ Read the numbers with these limits in mind:
 | Pipeline | test mAP@50:95 | recall@95%P | calls/frame mean (max) | USD/frame now | USD per 1,000 frames now | USD/frame from 2026-12-01 | USD per 1,000 from 2026-12-01 | s/frame serial | s/frame at published workers (N) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Gemini 4 Argon (single pass, rim line) | 0.431 | n/a (not published) | 1.0 (1) | $0.0106 ± $0.0001 | $10.57 | $0.0211 ± $0.0002 | $21.15 | 11.0 ± 1.6 | 11.0 ± 1.6 (1) |
-| GPT-6.1 Sol (single pass) | 0.481 | n/a (not published) | 1.0 (1) | $0.0172 ± $0.0004 | $17.16 | $0.0172 ± $0.0004 | $17.16 | 21.2 ± 0.8 | 21.2 ± 0.8 (1) |
-| Claude Opus 5.5 (single pass) | 0.438 | n/a (not published) | 1.0 (1) | $0.0303 ± $0.0001 | $30.34 | $0.0303 ± $0.0001 | $30.34 | 8.2 ± 0.1 | 8.2 ± 0.1 (1) |
+| GPT-6.1 Sol (single pass) | 0.481 | 0.741 | 1.0 (1) | $0.0172 ± $0.0004 | $17.16 | $0.0172 ± $0.0004 | $17.16 | 21.2 ± 0.8 | 21.2 ± 0.8 (1) |
+| Claude Opus 5.5 (single pass) | 0.438 | 0.684 | 1.0 (1) | $0.0303 ± $0.0001 | $30.34 | $0.0303 ± $0.0001 | $30.34 | 8.2 ± 0.1 | 8.2 ± 0.1 (1) |
 | GPT-6 Astra (single pass) | 0.501 | 0.908 | 1.0 (1) | $0.0681 ± $0.0002 | $68.08 | $0.0681 ± $0.0002 | $68.08 | 10.1 ± 0.2 | 10.1 ± 0.2 (1) |
 | Astra crop-refine (ball + rim) | 0.588 | 0.882 | 2.8 (3) | $0.0878 ± $0.0010 | $87.81 | $0.0878 ± $0.0010 | $87.81 | 15.5 ± 1.3 | 15.5 ± 1.3 (1) |
 | DINO-X preview + rim trim (2x2 tiles + full frame) | 0.517 | 0.328 | 5.0 (5) | $0.1125 ± $0.0000 | $112.50 | $0.1125 ± $0.0000 | $112.50 | 31.6 ± 1.0 | 4.2 ± 0.1 (8) |
@@ -83,9 +83,9 @@ Reasoning and thinking tokens are billed at the output rate by all three token-p
 | astra_crop_refine | test mAP@50:95 | 0.588 | `benchmarks/basketball/reports/VLM_VS_FINETUNED.md` (The zero-shot ceiling (fused-line table, row "Astra crop-refine alone")) |
 | astra_crop_refine | recall@95%P | 0.882 | `benchmarks/basketball/reports/VLM_VS_FINETUNED.md` (The zero-shot ceiling (fused-line table, row "Astra crop-refine alone")) |
 | sol | test mAP@50:95 | 0.481 | `benchmarks/basketball/reports/VLM_VS_FINETUNED.md` (The zero-shot ceiling (vlm_summary table)) |
-| sol | recall@95%P | n/a (not published) | no report or results file carries recall at 95% precision for this row |
+| sol | recall@95%P | 0.741 | `benchmarks/basketball/results/vlm/repeats/recall_at_p95_test.json` (run 1 = the published row; three-run mean 0.820 +/- 0.078 (scripts/recall_at_p95_api_rows.py)) |
 | claude_opus | test mAP@50:95 | 0.438 | `benchmarks/basketball/reports/VLM_VS_FINETUNED.md` (The zero-shot ceiling (vlm_summary table)) |
-| claude_opus | recall@95%P | n/a (not published) | no report or results file carries recall at 95% precision for this row |
+| claude_opus | recall@95%P | 0.684 | `benchmarks/basketball/results/vlm/repeats/recall_at_p95_test.json` (run 1 = the published row; three-run mean 0.662 +/- 0.037 (scripts/recall_at_p95_api_rows.py)) |
 | gemini_argon_single | test mAP@50:95 | 0.431 | `benchmarks/basketball/reports/VLM_VS_FINETUNED.md` (The zero-shot ceiling ("Test, run once"; also docs/plans/gemini-argon-2026-10.md "Test (run once)")) |
 | gemini_argon_single | recall@95%P | n/a (not published) | no report or results file carries recall at 95% precision for this row |
 | gemini_argon_two_pass | test mAP@50:95 | 0.534 | `benchmarks/basketball/reports/VLM_VS_FINETUNED.md` (The zero-shot ceiling (vlm_summary table)) |

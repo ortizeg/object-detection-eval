@@ -129,7 +129,7 @@
     },
     {
       "path": "benchmarks/basketball/conf/cost_published_accuracy.yaml",
-      "sha256": "f3b4bcca900e5bde1eae848e22d3cfd1909bd4b7fe1dbb085217312f32428636",
+      "sha256": "68ff8558ef2c69ba852bf796af94484c8a0897face579bdff66f6108672b783d",
       "records": null
     }
   ],
@@ -3014,14 +3014,14 @@
           }
         },
         "recall_at_p95": {
-          "value": null,
-          "reason": "not published",
+          "value": 0.741,
+          "reason": null,
           "source": {
-            "file": null,
-            "section": null,
+            "file": "benchmarks/basketball/results/vlm/repeats/recall_at_p95_test.json",
+            "section": "run 1 = the published row; three-run mean 0.820 +/- 0.078 (scripts/recall_at_p95_api_rows.py)",
             "quote": null,
-            "json_path": null,
-            "note": "no report or results file carries recall at 95% precision for this row"
+            "json_path": "models.sol.published_row_recall_at_p95",
+            "note": null
           }
         }
       },
@@ -3041,14 +3041,14 @@
           }
         },
         "recall_at_p95": {
-          "value": null,
-          "reason": "not published",
+          "value": 0.684,
+          "reason": null,
           "source": {
-            "file": null,
-            "section": null,
+            "file": "benchmarks/basketball/results/vlm/repeats/recall_at_p95_test.json",
+            "section": "run 1 = the published row; three-run mean 0.662 +/- 0.037 (scripts/recall_at_p95_api_rows.py)",
             "quote": null,
-            "json_path": null,
-            "note": "no report or results file carries recall at 95% precision for this row"
+            "json_path": "models.claude_opus.published_row_recall_at_p95",
+            "note": null
           }
         }
       },
