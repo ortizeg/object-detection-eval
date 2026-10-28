@@ -21,6 +21,8 @@ import pytest
 pytest.importorskip("openai")
 
 from openai import APIConnectionError, BadRequestError, RateLimitError
+from openai.types import CompletionUsage
+from openai.types.completion_usage import CompletionTokensDetails, PromptTokensDetails
 
 from object_detection_eval.inference.vlm.astra import (
     AstraAPIError,
@@ -31,6 +33,7 @@ from object_detection_eval.inference.vlm.astra import (
     FewShotExample,
     render_example_image,
 )
+from object_detection_eval.inference.vlm.usage import read_usage, usage_sink
 from object_detection_eval.schemas.detection import BoundingBox, Detection
 
 pytestmark = [pytest.mark.vlm, pytest.mark.external]
@@ -432,3 +435,109 @@ class TestResolveLabel:
         monkeypatch.setenv("OPENAI_KEY", "dummy-key")
         inferencer = AstraInferencer(classes=["player", "ball"])
         assert inferencer._resolve_label("basketball") == 1
+
+
+class TestUsageLogging:
+    """One usage record per predict, built from the REAL openai usage types."""
+
+    @staticmethod
+    def _usage() -> CompletionUsage:
+        return CompletionUsage(
+            prompt_tokens=1200,
+            completion_tokens=300,
+            total_tokens=1500,
+            prompt_tokens_details=PromptTokensDetails(
+                cached_tokens=100, image_tokens=1000, text_tokens=200
+            ),
+            completion_tokens_details=CompletionTokensDetails(reasoning_tokens=250),
+        )
+
+    def _ok(self) -> MagicMock:
+        completion = _completion(
+            parsed=AstraResponse(
+                detections=[
+                    AstraDetection(
+                        bbox=AstraBBox(x_min=0, y_min=0, x_max=500, y_max=500),
+                        label="player",
+                        confidence=1.0,
+                    )
+                ]
+            )
+        )
+        completion.usage = self._usage()
+        completion._request_id = "req_abc"
+        completion.model = "gpt-6-astra-2026-10-01"
+        return completion
+
+    def test_record_carries_the_documented_token_split(
+        self, _mock_openai, monkeypatch: pytest.MonkeyPatch, tmp_path
+    ) -> None:
+        monkeypatch.setenv("OPENAI_KEY", "dummy-key")
+        _, mock_client = _mock_openai
+        _parse(mock_client).return_value = self._ok()
+        sink = tmp_path / "u.jsonl"
+        with usage_sink(sink):
+            AstraInferencer(classes=["player"]).predict(np.zeros((10, 10, 3), dtype=np.uint8))
+        (rec,) = read_usage(sink)
+        assert (rec.provider, rec.model) == ("openai", "gpt-6-astra")
+        assert rec.response_model == "gpt-6-astra-2026-10-01"
+        assert rec.request_id == "req_abc"
+        assert (rec.input_tokens, rec.input_image_tokens, rec.input_text_tokens) == (
+            1200,
+            1000,
+            200,
+        )
+        assert rec.cached_input_tokens == 100
+        assert (rec.output_tokens, rec.reasoning_tokens) == (300, 250)
+        assert rec.reasoning_included_in_output is True
+        assert rec.total_tokens == 1500
+        assert rec.retries == 0
+        assert rec.outcome == "ok"
+        assert rec.provider_extra is None  # mock service_tier is not a str
+
+    def test_retry_is_counted_and_detections_do_not_change(
+        self, _mock_openai, monkeypatch: pytest.MonkeyPatch, tmp_path
+    ) -> None:
+        monkeypatch.setenv("OPENAI_KEY", "dummy-key")
+        _, mock_client = _mock_openai
+        request = httpx.Request("POST", "https://api.openai.com/v1/chat/completions")
+        image = np.zeros((10, 10, 3), dtype=np.uint8)
+
+        def run(sink) -> list[Detection]:
+            _parse(mock_client).side_effect = [APIConnectionError(request=request), self._ok()]
+            inferencer = AstraInferencer(classes=["player"])
+            inferencer._INITIAL_BACKOFF = 0.0
+            with patch("object_detection_eval.inference.vlm.astra.time.sleep"):
+                if sink is None:
+                    return inferencer.predict(image)
+                with usage_sink(sink):
+                    return inferencer.predict(image)
+
+        sink = tmp_path / "u.jsonl"
+        logged = run(sink)
+        unlogged = run(None)  # ODE_API_USAGE_LOG=off via the autouse fixture
+        assert logged == unlogged
+        (rec,) = read_usage(sink)
+        assert rec.retries == 1
+
+    def test_refusal_and_exhausted_retries_are_recorded(
+        self, _mock_openai, monkeypatch: pytest.MonkeyPatch, tmp_path
+    ) -> None:
+        monkeypatch.setenv("OPENAI_KEY", "dummy-key")
+        _, mock_client = _mock_openai
+        refusal = _completion(refusal="no")
+        refusal.usage = self._usage()
+        _parse(mock_client).return_value = refusal
+        sink = tmp_path / "u.jsonl"
+        with usage_sink(sink):
+            assert (
+                AstraInferencer(classes=["player"]).predict(np.zeros((10, 10, 3), dtype=np.uint8))
+                == []
+            )
+            _parse(mock_client).side_effect = _bad_request("Invalid value for 'model'.")
+            with pytest.raises(AstraAPIError):
+                AstraInferencer(classes=["player"]).predict(np.zeros((10, 10, 3), dtype=np.uint8))
+        first, second = read_usage(sink)
+        assert first.outcome == "refusal"
+        assert first.output_tokens == 300
+        assert (second.outcome, second.http_status) == ("error", 400)

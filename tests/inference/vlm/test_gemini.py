@@ -20,12 +20,15 @@ from PIL import Image
 
 pytest.importorskip("google.genai")
 
+from google.genai import types as genai_types
+
 from object_detection_eval.inference.vlm.gemini import (
     GeminiBBox,
     GeminiBox2DDetection,
     GeminiDetection,
     GeminiInferencer,
 )
+from object_detection_eval.inference.vlm.usage import read_usage, usage_sink
 from object_detection_eval.schemas.detection import BoundingBox, Detection
 
 pytestmark = [pytest.mark.vlm, pytest.mark.external]
@@ -488,3 +491,130 @@ class TestCropPipelines:
         base = GeminiInferencer(model_name="m", classes=["ball"])
         with pytest.raises(ValueError, match="unknown Gemini pipeline"):
             build_crop_pipeline(base, "tiles")  # type: ignore[arg-type]
+
+
+class TestUsageLogging:
+    """One record per predict, from the REAL google-genai usage types."""
+
+    @staticmethod
+    def _usage_metadata() -> genai_types.GenerateContentResponseUsageMetadata:
+        return genai_types.GenerateContentResponseUsageMetadata(
+            prompt_token_count=1300,
+            candidates_token_count=200,
+            thoughts_token_count=500,
+            total_token_count=2000,
+            prompt_tokens_details=[
+                genai_types.ModalityTokenCount(
+                    modality=genai_types.MediaModality.TEXT, token_count=40
+                ),
+                genai_types.ModalityTokenCount(
+                    modality=genai_types.MediaModality.IMAGE, token_count=1260
+                ),
+            ],
+        )
+
+    def _response(self, label: str = "player") -> MagicMock:
+        response = MagicMock()
+        response.parsed = [
+            GeminiDetection(
+                bbox=GeminiBBox(x_min=0, y_min=0, x_max=500, y_max=500), label=label, confidence=1.0
+            )
+        ]
+        response.usage_metadata = self._usage_metadata()
+        response.response_id = "resp_1"
+        response.model_version = "gemini-4-argon-001"
+        return response
+
+    def test_record_splits_modalities_and_keeps_thoughts_separate(
+        self, _mock_genai, monkeypatch: pytest.MonkeyPatch, tmp_path
+    ) -> None:
+        monkeypatch.setenv("GEMINI_API_KEY", "dummy-key")
+        _, mock_client = _mock_genai
+        mock_client.models.generate_content.return_value = self._response()
+        sink = tmp_path / "u.jsonl"
+        with usage_sink(sink):
+            dets = GeminiInferencer(model_name="gemini-4-argon", classes=["player"]).predict(
+                np.zeros((480, 640, 3), dtype=np.uint8)
+            )
+        assert len(dets) == 1
+        (rec,) = read_usage(sink)
+        assert (rec.provider, rec.model) == ("google", "gemini-4-argon")
+        assert (rec.request_id, rec.response_model) == ("resp_1", "gemini-4-argon-001")
+        assert (rec.input_tokens, rec.input_text_tokens, rec.input_image_tokens) == (1300, 40, 1260)
+        assert (rec.output_tokens, rec.reasoning_tokens, rec.total_tokens) == (200, 500, 2000)
+        assert rec.reasoning_included_in_output is False
+
+    def test_retry_counted_and_detections_unchanged(
+        self, _mock_genai, monkeypatch: pytest.MonkeyPatch, tmp_path
+    ) -> None:
+        monkeypatch.setenv("GEMINI_API_KEY", "dummy-key")
+        _, mock_client = _mock_genai
+        image = np.zeros((480, 640, 3), dtype=np.uint8)
+
+        def run(sink) -> list[Detection]:
+            mock_client.models.generate_content.side_effect = [
+                RuntimeError("429 rate limited"),
+                self._response(),
+            ]
+            inferencer = GeminiInferencer(model_name="gemini-4-argon", classes=["player"])
+            with patch("object_detection_eval.inference.vlm.gemini.time.sleep"):
+                if sink is None:
+                    return inferencer.predict(image)
+                with usage_sink(sink):
+                    return inferencer.predict(image)
+
+        sink = tmp_path / "u.jsonl"
+        assert run(sink) == run(None)
+        (rec,) = read_usage(sink)
+        assert rec.retries == 1
+
+    def test_swallowed_failure_is_an_error_record(
+        self, _mock_genai, monkeypatch: pytest.MonkeyPatch, tmp_path
+    ) -> None:
+        monkeypatch.setenv("GEMINI_API_KEY", "dummy-key")
+        _, mock_client = _mock_genai
+        err = RuntimeError("400 INVALID_ARGUMENT")
+        err.code = 400  # type: ignore[attr-defined]
+        mock_client.models.generate_content.side_effect = err
+        sink = tmp_path / "u.jsonl"
+        with usage_sink(sink):
+            out = GeminiInferencer(model_name="m", classes=["player"]).predict(
+                np.zeros((10, 10, 3), dtype=np.uint8)
+            )
+        assert out == []
+        (rec,) = read_usage(sink)
+        assert (rec.outcome, rec.http_status) == ("error", 400)
+
+    def test_crop_pipeline_tags_pass_one_and_pass_two(
+        self, _mock_genai, monkeypatch: pytest.MonkeyPatch, tmp_path
+    ) -> None:
+        from object_detection_eval.inference.vlm.gemini import build_crop_pipeline
+
+        monkeypatch.setenv("GEMINI_API_KEY", "dummy-key")
+        _, mock_client = _mock_genai
+        classes = ["ball", "number", "player", "referee", "rim"]
+
+        def generate(model, contents, config):
+            refining = any(isinstance(c, str) and "zoomed-in crop" in c for c in contents)
+            response = MagicMock()
+            box = [250, 250, 750, 750] if refining else [400, 400, 600, 600]
+            response.parsed = [GeminiBox2DDetection(box_2d=box, label="ball", confidence=1.0)]
+            response.usage_metadata = self._usage_metadata()
+            response.response_id = "resp_2" if refining else "resp_1"
+            response.model_version = "gemini-4-argon-001"
+            return response
+
+        mock_client.models.generate_content.side_effect = generate
+        base = GeminiInferencer(model_name="gemini-4-argon", classes=classes, box_format="box_2d")
+        pipe = build_crop_pipeline(base, "crop_refine")
+        sink = tmp_path / "u.jsonl"
+        from object_detection_eval.inference.vlm.usage import call_context
+
+        with usage_sink(sink), call_context(pipeline="g", run="1", image_id="f.jpg"):
+            pipe.predict(np.zeros((1000, 1000, 3), dtype=np.uint8))
+        records = read_usage(sink)
+        by_pass = {(r.pass_index, r.stage) for r in records}
+        # One full-frame call (pass 1, no stage) and one ball refinement (pass 2).
+        assert by_pass == {(1, None), (2, "crop_refine:ball")}
+        assert [r.request_id for r in records if r.pass_index == 2] == ["resp_2"]
+        assert all((r.pipeline, r.run, r.image_id) == ("g", "1", "f.jpg") for r in records)

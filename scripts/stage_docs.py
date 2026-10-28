@@ -53,7 +53,15 @@ _PLAN: list[_Copy] = [
     (
         REPORTS / "VLM_VS_FINETUNED.md",
         "reports/VLM_VS_FINETUNED.md",
-        [("../../../docs/methodology.md", "../methodology.md")],
+        [
+            ("../../../docs/methodology.md", "../methodology.md"),
+            # COST.md is not staged on the site; link to it on GitHub.
+            (
+                "(COST.md)",
+                "(https://github.com/ortizeg/object-detection-eval/blob/main/"
+                "benchmarks/basketball/reports/COST.md)",
+            ),
+        ],
     ),
     (
         DOCS / "methodology.md",

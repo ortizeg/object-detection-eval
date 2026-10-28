@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "budget_usd": 40.0,
+  "frames_per_run": 20,
+  "runs": 2,
+  "spent_usd": 0.988932,
+  "projected_remaining_usd": 13.18576,
+  "projected_study_spend_usd": 14.174692,
+  "over_cap": false,
+  "rows": [
+    {
+      "pipeline": "astra",
+      "label": "GPT-6 Astra (single pass)",
+      "n_calls": 3,
+      "n_frames": 3,
+      "spent_usd": 0.20488,
+      "usd_per_frame_mean": 0.06829333,
+      "projected_remaining_usd": 2.73173333,
+      "calls_per_frame_mean": 1.0,
+      "projected_remaining_calls": 40,
+      "unpriced": false,
+      "unpriced_reason": null
+    },
+    {
+      "pipeline": "astra_crop_refine",
+      "label": "Astra crop-refine (ball + rim)",
+      "n_calls": 8,
+      "n_frames": 3,
+      "spent_usd": 0.2563,
+      "usd_per_frame_mean": 0.08543333,
+      "projected_remaining_usd": 3.41733333,
+      "calls_per_frame_mean": 2.666667,
+      "projected_remaining_calls": 107,
+      "unpriced": false,
+      "unpriced_reason": null
+    },
+    {
+      "pipeline": "claude_opus",
+      "label": "Claude Opus 5.5 (single pass)",
+      "n_calls": 3,
+      "n_frames": 3,
+      "spent_usd": 0.09202,
+      "usd_per_frame_mean": 0.03067333,
+      "projected_remaining_usd": 1.22693333,
+      "calls_per_frame_mean": 1.0,
+      "projected_remaining_calls": 40,
+      "unpriced": false,
+      "unpriced_reason": null
+    },
+    {
+      "pipeline": "dinox_preview_rimtrim",
+      "label": "DINO-X preview + rim trim (2x2 tiles + full frame)",
+      "n_calls": 15,
+      "n_frames": 3,
+      "spent_usd": null,
+      "usd_per_frame_mean": null,
+      "projected_remaining_usd": null,
+      "calls_per_frame_mean": 5.0,
+      "projected_remaining_calls": 200,
+      "unpriced": true,
+      "unpriced_reason": "no per-call price yet for DINO-X-PREVIEW-1.0 (see docs/cost/dinox-console-checklist.md)"
+    },
+    {
+      "pipeline": "dinox_pro_rimtrim",
+      "label": "DINO-X Pro + rim trim (2x2 tiles + full frame)",
+      "n_calls": 15,
+      "n_frames": 3,
+      "spent_usd": null,
+      "usd_per_frame_mean": null,
+      "projected_remaining_usd": null,
+      "calls_per_frame_mean": 5.0,
+      "projected_remaining_calls": 200,
+      "unpriced": true,
+      "unpriced_reason": "no per-call price yet for DINO-X-1.0 (see docs/cost/dinox-console-checklist.md)"
+    },
+    {
+      "pipeline": "gemini_argon_single",
+      "label": "Gemini 4 Argon (single pass, rim line)",
+      "n_calls": 3,
+      "n_frames": 3,
+      "spent_usd": 0.031692,
+      "usd_per_frame_mean": 0.010564,
+      "projected_remaining_usd": 0.42256,
+      "calls_per_frame_mean": 1.0,
+      "projected_remaining_calls": 40,
+      "unpriced": false,
+      "unpriced_reason": null
+    },
+    {
+      "pipeline": "gemini_argon_two_pass",
+      "label": "Gemini 4 Argon (two-pass: crop-refine + number-crop)",
+      "n_calls": 38,
+      "n_frames": 3,
+      "spent_usd": 0.353574,
+      "usd_per_frame_mean": 0.117858,
+      "projected_remaining_usd": 4.71432,
+      "calls_per_frame_mean": 12.666667,
+      "projected_remaining_calls": 507,
+      "unpriced": false,
+      "unpriced_reason": null
+    },
+    {
+      "pipeline": "sol",
+      "label": "GPT-6.1 Sol (single pass)",
+      "n_calls": 3,
+      "n_frames": 3,
+      "spent_usd": 0.050466,
+      "usd_per_frame_mean": 0.016822,
+      "projected_remaining_usd": 0.67288,
+      "calls_per_frame_mean": 1.0,
+      "projected_remaining_calls": 40,
+      "unpriced": false,
+      "unpriced_reason": null
+    }
+  ],
+  "unpriced_pipelines": [
+    "dinox_preview_rimtrim",
+    "dinox_pro_rimtrim"
+  ]
+}

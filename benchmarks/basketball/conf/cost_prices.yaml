@@ -1,0 +1,121 @@
+# Per-model API prices for the cost-per-frame study (quick task 261027-q49).
+#
+# Keyed by the REQUESTED model id (the `model` field of every usage record), so a
+# price lookup never depends on a provider's dated response id. Values are the
+# user's, copied verbatim on 2026-10-27 and cross-checked on that date against the
+# provider pages named in `source_url`; no discrepancy was found.
+#
+# Periods are inclusive on both ends; null means open. Overlapping periods and
+# unknown model ids are validation errors (cost.schemas.PriceBook).
+#
+# Reasoning/thinking tokens: billed at the OUTPUT rate by all three token-priced
+# providers, per their docs (see `reasoning_billing`). Whether a record's
+# `output_tokens` already contains them is recorded per record
+# (`reasoning_included_in_output`): true for OpenAI and Anthropic, false for Gemini.
+#
+# DINO-X is billed per call from a DeepDataSpace console balance, not per token. The
+# per-call price is a console fact the repo cannot read, so it is null until the user
+# supplies it; a null price makes a pipeline UNPRICED, never free.
+schema_version: 1
+retrieved: 2026-10-27
+
+scenarios:
+  # Each record is priced at the price in force on the date of its own timestamp.
+  current:
+    description: price in force on each record's own date
+    as_of: null
+  # Every record is priced as of 2026-12-01. Only Gemini differs: its price doubles.
+  post_2026_12_01:
+    description: every call priced as of 2026-12-01 (the Gemini 4 Argon price step)
+    as_of: 2026-12-01
+
+models:
+  gpt-6-astra:
+    provider: openai
+    unit: per_1m_tokens
+    reasoning_billing:
+      note: Reasoning tokens are billed as output tokens.
+      source_url: https://developers.openai.com/api/docs/guides/reasoning
+    periods:
+      - effective_from: null
+        effective_to: null
+        input_per_1m: 10.0
+        output_per_1m: 50.0
+        source_url: https://developers.openai.com/api/docs/pricing
+
+  gpt-6.1-sol:
+    provider: openai
+    unit: per_1m_tokens
+    reasoning_billing:
+      note: Reasoning tokens are billed as output tokens.
+      source_url: https://developers.openai.com/api/docs/guides/reasoning
+    periods:
+      - effective_from: null
+        effective_to: null
+        input_per_1m: 2.0
+        output_per_1m: 10.0
+        source_url: https://developers.openai.com/api/docs/pricing
+
+  claude-opus-5-5:
+    provider: anthropic
+    unit: per_1m_tokens
+    reasoning_billing:
+      note: Thinking tokens are billed output tokens (usage.output_tokens_details.thinking_tokens is a subset of output_tokens).
+      source_url: https://docs.claude.com/en/docs/build-with-claude/extended-thinking
+    periods:
+      - effective_from: null
+        effective_to: null
+        input_per_1m: 4.0
+        output_per_1m: 20.0
+        source_url: https://claude.com/pricing
+
+  gemini-4-argon:
+    provider: google
+    unit: per_1m_tokens
+    reasoning_billing:
+      note: 'Output price includes thinking tokens; thoughts_token_count is reported separately from candidates_token_count.'
+      source_url: https://ai.google.dev/gemini-api/docs/pricing
+    periods:
+      - effective_from: null
+        effective_to: 2026-11-30
+        input_per_1m: 2.0
+        output_per_1m: 10.0
+        source_url: https://ai.google.dev/gemini-api/docs/pricing
+      - effective_from: 2026-12-01
+        effective_to: null
+        input_per_1m: 4.0
+        output_per_1m: 20.0
+        source_url: https://ai.google.dev/gemini-api/docs/pricing
+
+  DINO-X-1.0:
+    provider: deepdataspace
+    unit: per_call
+    reasoning_billing: null
+    periods:
+      - effective_from: null
+        effective_to: null
+        per_call_usd: null
+        source_url: https://cloud.deepdataspace.com/dashboard/usage
+        note: per-call price to be supplied by the user from the DeepDataSpace console; see docs/cost/dinox-console-checklist.md
+
+  DINO-X-PREVIEW-1.0:
+    provider: deepdataspace
+    unit: per_call
+    reasoning_billing: null
+    periods:
+      - effective_from: null
+        effective_to: null
+        per_call_usd: null
+        source_url: https://cloud.deepdataspace.com/dashboard/usage
+        note: per-call price to be supplied by the user from the DeepDataSpace console; see docs/cost/dinox-console-checklist.md
+
+  T-Rex-2.0:
+    provider: deepdataspace
+    unit: per_call
+    reasoning_billing: null
+    periods:
+      - effective_from: null
+        effective_to: null
+        per_call_usd: null
+        source_url: https://cloud.deepdataspace.com/dashboard/usage
+        note: per-call price to be supplied by the user from the DeepDataSpace console; see docs/cost/dinox-console-checklist.md

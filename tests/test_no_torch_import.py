@@ -20,6 +20,11 @@ import sys
 def test_core_import_graph_is_torch_free() -> None:
     """Import every core submodule, then assert torch never entered sys.modules."""
     import object_detection_eval
+    import object_detection_eval.cost.compute  # cost-per-frame aggregation: torch-free
+    import object_detection_eval.cost.frames
+    import object_detection_eval.cost.report
+    import object_detection_eval.cost.rerun
+    import object_detection_eval.cost.schemas
     import object_detection_eval.data.coco_gt
     import object_detection_eval.data.image
     import object_detection_eval.data.taxonomy
@@ -43,6 +48,9 @@ def test_core_import_graph_is_torch_free() -> None:
     # property is the whole reason it can be imported by both the benchmark
     # runner and the prompt-search harness.
     import object_detection_eval.inference.vlm.protocol
+
+    # Per-call usage logging for the hosted API inferencers: duck-typed, SDK-free.
+    import object_detection_eval.inference.vlm.usage
     import object_detection_eval.metrics.bootstrap
     import object_detection_eval.metrics.curves
     import object_detection_eval.metrics.detection_map

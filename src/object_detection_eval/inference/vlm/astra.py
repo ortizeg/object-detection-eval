@@ -51,6 +51,7 @@ from PIL import Image
 from pydantic import BaseModel, Field
 
 from object_detection_eval.inference.base import BaseInferencer
+from object_detection_eval.inference.vlm.usage import CallTracker, openai_usage, track_call
 from object_detection_eval.schemas.detection import BoundingBox, Detection
 
 #: A 400 the server raises for its own fault, not the request's. Observed once on
@@ -66,6 +67,16 @@ class AstraAPIError(RuntimeError):
     Raised instead of returning ``[]``: an outage, an exhausted balance or a
     rejected request must never be scored as "the model found nothing".
     """
+
+
+def _openai_extra(completion: object) -> dict[str, str] | None:
+    """Whitelisted scalar response metadata for the usage log (str values only)."""
+    out = {
+        key: value
+        for key in ("service_tier", "system_fingerprint")
+        if isinstance(value := getattr(completion, key, None), str) and value
+    }
+    return out or None
 
 
 #: Per-class BGR colours for rendering few-shot example boxes. Distinct, saturated
@@ -323,13 +334,19 @@ class AstraInferencer(BaseInferencer):
         paid calls; the run must be restarted.
         """
         data_url = self._encode_image(image)
+        # One usage record per logical request (retries included); see usage.py.
+        with track_call("openai", self.model_name) as tracker:
+            return self._predict_with_retries(data_url, tracker)
 
+    def _predict_with_retries(self, data_url: str, tracker: CallTracker) -> list[Detection]:
+        """The retry loop behind :meth:`predict`; ``tracker`` only observes."""
         # Omit reasoning_effort entirely when None (rather than passing null).
         effort_kwargs = {"reasoning_effort": self.reasoning_effort} if self.reasoning_effort else {}
 
         backoff = self._INITIAL_BACKOFF
         for attempt in range(1, self._MAX_RETRIES + 1):
             try:
+                tracker.attempt()
                 completion = self._client.beta.chat.completions.parse(
                     model=self.model_name,
                     messages=[
@@ -348,8 +365,15 @@ class AstraInferencer(BaseInferencer):
                     **effort_kwargs,
                 )
 
+                tracker.succeeded(
+                    usage=openai_usage(getattr(completion, "usage", None)),
+                    request_id=getattr(completion, "_request_id", None),
+                    response_model=getattr(completion, "model", None),
+                    extra=_openai_extra(completion),
+                )
                 message = completion.choices[0].message
                 if message.refusal:
+                    tracker.set_outcome("refusal")
                     logger.warning(f"Astra refused the request: {message.refusal[:200]}")
                     return []
 
@@ -363,6 +387,7 @@ class AstraInferencer(BaseInferencer):
                     logger.debug(f"Astra text fallback: {message.content[:500]}")
                     return self._parse_text_fallback(message.content)
 
+                tracker.set_outcome("empty")
                 logger.warning("Astra returned an empty response.")
                 return []
 

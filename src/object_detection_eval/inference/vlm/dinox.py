@@ -60,6 +60,7 @@ from loguru import logger
 
 from object_detection_eval.inference.base import BaseInferencer
 from object_detection_eval.inference.vlm.nms import per_class_nms
+from object_detection_eval.inference.vlm.usage import current_tracker, dinox_metadata, track_call
 from object_detection_eval.schemas.detection import BoundingBox, Detection
 from object_detection_eval.utils.boxes import pixel_xyxy_to_normalized_xywh
 
@@ -281,7 +282,9 @@ class DinoXInferencer(BaseInferencer):
         body.update(self._upload_extras())
         body["image"] = "data:image/jpeg;base64," + base64.b64encode(buf.tobytes()).decode()
 
-        result = self._run_task(body)
+        # A cache hit returns above and logs nothing: only a billed call is recorded.
+        with track_call("deepdataspace", self.model_name):
+            result = self._run_task(body)
         self.api_calls += 1
         objects = list(result.get("objects", []))
 
@@ -302,7 +305,10 @@ class DinoXInferencer(BaseInferencer):
         # itself reports as failed gets a fresh key, or the retry would just
         # be handed the same failed task back.
         idempotency_key = uuid.uuid4().hex
+        tracker = current_tracker()
         for attempt in range(1, self.max_retries + 1):
+            if tracker is not None:
+                tracker.attempt()
             try:
                 return self._trigger_and_poll(body, idempotency_key)
             except (httpx.TransportError, _TransientError) as exc:
@@ -321,9 +327,12 @@ class DinoXInferencer(BaseInferencer):
         raise DinoXAPIError(msg)
 
     def _trigger_and_poll(self, body: dict[str, Any], idempotency_key: str) -> dict[str, Any]:
+        tracker = current_tracker()
         rsp = self._client.post(
             self._detection_path, json=body, headers={"Idempotency-Key": idempotency_key}
         )
+        if tracker is not None:
+            tracker.note_status(rsp.status_code)
         payload = _json_or_raise(rsp)
         code = payload.get("code")
         if code == _DDS_RETRY_CODE:
@@ -336,13 +345,24 @@ class DinoXInferencer(BaseInferencer):
         task_uuid = payload["data"]["task_uuid"]
 
         deadline = time.monotonic() + self._MAX_POLL_S
+        polls = 0
         while time.monotonic() < deadline:
-            status_rsp = _json_or_raise(self._client.get(f"/v2/task_status/{task_uuid}"))
+            status_http = self._client.get(f"/v2/task_status/{task_uuid}")
+            polls += 1
+            if tracker is not None:
+                tracker.note_status(status_http.status_code)
+            status_rsp = _json_or_raise(status_http)
             if status_rsp.get("code") != 0:
                 raise _TransientError(f"status check failed: {status_rsp.get('msg')}")
             data = status_rsp["data"]
             status = data.get("status")
             if status == "success":
+                if tracker is not None:
+                    tracker.succeeded(
+                        request_id=task_uuid,
+                        extra=dinox_metadata(task_uuid, polls, data),
+                        http_status=status_http.status_code,
+                    )
                 return dict(data.get("result") or {})
             if status == "failed":
                 raise _TaskFailedError(f"task {task_uuid} failed: {data.get('error')}")

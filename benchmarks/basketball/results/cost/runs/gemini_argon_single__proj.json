@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "pipeline": "gemini_argon_single",
+  "run": "proj",
+  "split": "valid",
+  "workers": 1,
+  "workers_citation": "INFERRED, not recorded. The Oct-14 test row is byte-identical to the vlm_ablation.yaml arm `rim_def_argon` (docs/plans/gemini-argon-2026-10.md \"Test (run once)\"), and run_vlm_benchmark.py had no --workers until 9c46399 (2026-10-21), so that test run was serial. The val arms used `ablate_vlm.py --workers N` with N unrecorded (capped at 3).",
+  "frames": [
+    "boston-celtics-new-york-knicks-game-1-q1-05_13-05_09-0030_png.rf.a04c53820df74ff13af910662caa3dff.jpg",
+    "boston-celtics-new-york-knicks-game-4-q1-05_58-05_53-0000_png.rf.750939b55cf36b9a18c255b922e5bf53.jpg",
+    "boston-celtics-orlando-magic-game-4-q1-01_33-01_25-0030_png.rf.7da90ecd47d182fe55fa56350321f2c0.jpg"
+  ],
+  "n_frames": 3,
+  "started": "2026-10-27T23:38:29.951163Z",
+  "ended": "2026-10-27T23:39:01.047659Z",
+  "wall_s": 31.096433,
+  "status": "complete",
+  "abort_reason": null,
+  "empty_frames": [],
+  "frame_timings": [
+    {
+      "image_id": "boston-celtics-new-york-knicks-game-1-q1-05_13-05_09-0030_png.rf.a04c53820df74ff13af910662caa3dff.jpg",
+      "wall_s": 9.435308,
+      "n_detections": 17,
+      "n_calls": 1
+    },
+    {
+      "image_id": "boston-celtics-new-york-knicks-game-4-q1-05_58-05_53-0000_png.rf.750939b55cf36b9a18c255b922e5bf53.jpg",
+      "wall_s": 11.082577,
+      "n_detections": 19,
+      "n_calls": 1
+    },
+    {
+      "image_id": "boston-celtics-orlando-magic-game-4-q1-01_33-01_25-0030_png.rf.7da90ecd47d182fe55fa56350321f2c0.jpg",
+      "wall_s": 10.557559,
+      "n_detections": 18,
+      "n_calls": 1
+    }
+  ],
+  "git_sha": "b66a8d1d1f8e8aed433700b7ebc7c9cd6b0247d0",
+  "pixi_env": "vlm",
+  "sdk_versions": {
+    "openai": "3.19.2",
+    "google-genai": "1.75.0",
+    "httpx": "0.28.1"
+  },
+  "frames_file_sha256": "e18fcc782539ea40c1c7954d443976dae707e81ffbc4126d4a7b769f822aafe8"
+}

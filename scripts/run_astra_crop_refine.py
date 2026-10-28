@@ -179,33 +179,46 @@ def _claude_pipeline(
     return CropRefineInferencer(base=base, classes=_CLASSES, pad=pad, refiners=refiners)
 
 
+def build_crop_refine_pipeline(
+    model: str, effort_arg: str | None, pad: float, refine_classes: set[str]
+) -> Any:
+    """Build the published crop-refine pipeline for ``--model`` (no network, no scoring).
+
+    ``effort_arg`` ``None`` means the model's published effort; ``"default"`` omits the
+    parameter. Factored out of :func:`main` unchanged so ``scripts/cost_rerun.py`` builds
+    exactly the pipeline this script publishes, instead of re-typing its configuration.
+    """
+    model_name, published_effort = _MODELS[model]
+    effort_name = effort_arg if effort_arg is not None else published_effort
+    effort = None if effort_name == "default" else effort_name
+
+    if model == "claude":
+        return _claude_pipeline(model_name, effort, pad, refine_classes)
+
+    from object_detection_eval.inference.vlm.astra import AstraInferencer
+    from object_detection_eval.inference.vlm.astra_crop_refine import CropRefineInferencer
+
+    base = AstraInferencer(
+        model_name=model_name,
+        classes=_CLASSES,
+        prompt_template=_BASE_PROMPT,
+        reasoning_effort=effort,
+    )
+    return CropRefineInferencer(base=base, classes=_CLASSES, refine_classes=refine_classes, pad=pad)
+
+
 def main() -> None:
     args = parse_args()
     name_to_id, id_to_name = resolve_taxonomy(args.taxonomy)
 
-    model_name, published_effort = _MODELS[args.model]
+    _, published_effort = _MODELS[args.model]
     effort_arg = args.effort if args.effort is not None else published_effort
-    effort = None if effort_arg == "default" else effort_arg
 
     refine_classes = {c.strip() for c in args.refine_classes.split(",") if c.strip()}
     if not refine_classes or not refine_classes <= {"ball", "rim"}:
         raise SystemExit(f"--refine-classes must be a subset of ball,rim: {args.refine_classes}")
 
-    if args.model == "claude":
-        inferencer = _claude_pipeline(model_name, effort, args.pad, refine_classes)
-    else:
-        from object_detection_eval.inference.vlm.astra import AstraInferencer
-        from object_detection_eval.inference.vlm.astra_crop_refine import CropRefineInferencer
-
-        base = AstraInferencer(
-            model_name=model_name,
-            classes=_CLASSES,
-            prompt_template=_BASE_PROMPT,
-            reasoning_effort=effort,
-        )
-        inferencer = CropRefineInferencer(
-            base=base, classes=_CLASSES, refine_classes=refine_classes, pad=args.pad
-        )
+    inferencer = build_crop_refine_pipeline(args.model, args.effort, args.pad, refine_classes)
 
     split_dir = args.data_root / args.split
     gt_map = load_coco_gt(split_dir / "_annotations.coco.json", name_to_id)

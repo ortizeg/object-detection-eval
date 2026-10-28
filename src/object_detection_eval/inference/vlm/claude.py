@@ -63,9 +63,21 @@ from PIL import Image
 from pydantic import BaseModel, Field
 
 from object_detection_eval.inference.base import BaseInferencer
+from object_detection_eval.inference.vlm.usage import (
+    CallTracker,
+    anthropic_usage,
+    status_of,
+    track_call,
+)
 from object_detection_eval.schemas.detection import BoundingBox, Detection
 
 Effort = Literal["low", "medium", "high", "xhigh", "max"]
+
+
+def _anthropic_extra(response: object) -> dict[str, str] | None:
+    """Whitelisted scalar response metadata for the usage log (str values only)."""
+    tier = getattr(getattr(response, "usage", None), "service_tier", None)
+    return {"service_tier": tier} if isinstance(tier, str) and tier else None
 
 
 class ClaudeBBox(BaseModel):
@@ -178,7 +190,14 @@ class ClaudeInferencer(BaseInferencer):
         prompt = self._prompt_template.replace("{width}", str(sent_w)).replace(
             "{height}", str(sent_h)
         )
+        # One usage record per logical request (retries included); see usage.py.
+        with track_call("anthropic", self.model_name) as tracker:
+            return self._predict_with_retries(encoded, prompt, sent_w, sent_h, tracker)
 
+    def _predict_with_retries(
+        self, encoded: str, prompt: str, sent_w: int, sent_h: int, tracker: CallTracker
+    ) -> list[Detection]:
+        """The retry loop behind :meth:`predict`; ``tracker`` only observes."""
         # None omits output_config entirely, so the provider default effort runs.
         output_config: OutputConfigParam | Omit = (
             {"effort": self.effort} if self.effort is not None else omit
@@ -187,6 +206,7 @@ class ClaudeInferencer(BaseInferencer):
         backoff = self._INITIAL_BACKOFF
         for attempt in range(1, self._MAX_RETRIES + 1):
             try:
+                tracker.attempt()
                 response = self._client.messages.parse(
                     model=self.model_name,
                     max_tokens=self._MAX_TOKENS,
@@ -210,7 +230,14 @@ class ClaudeInferencer(BaseInferencer):
                     output_config=output_config,
                 )
 
+                tracker.succeeded(
+                    usage=anthropic_usage(getattr(response, "usage", None)),
+                    request_id=getattr(response, "_request_id", None),
+                    response_model=getattr(response, "model", None),
+                    extra=_anthropic_extra(response),
+                )
                 if response.stop_reason == "refusal":
+                    tracker.set_outcome("refusal")
                     category = getattr(response.stop_details, "category", None)
                     logger.warning(
                         f"Claude refused the request (category={category}, "
@@ -218,6 +245,7 @@ class ClaudeInferencer(BaseInferencer):
                     )
                     return []
                 if response.stop_reason == "max_tokens":
+                    tracker.set_outcome("empty")
                     logger.warning(
                         f"Claude hit max_tokens={self._MAX_TOKENS} "
                         f"(request_id={response._request_id}); no detections parsed."
@@ -226,6 +254,7 @@ class ClaudeInferencer(BaseInferencer):
 
                 parsed = response.parsed_output
                 if parsed is None:
+                    tracker.set_outcome("empty")
                     logger.warning("Claude returned no parseable detections.")
                     return []
                 return self._map_detections(parsed.detections, sent_w, sent_h)
@@ -240,6 +269,7 @@ class ClaudeInferencer(BaseInferencer):
                     time.sleep(wait)
                     backoff = min(backoff * 2, self._MAX_BACKOFF)
                     continue
+                tracker.failed(status_of(exc))
                 logger.exception(f"Claude inference failed after {attempt} attempts")
                 return []
 
@@ -255,11 +285,13 @@ class ClaudeInferencer(BaseInferencer):
                     time.sleep(wait)
                     backoff = min(backoff * 2, self._MAX_BACKOFF)
                     continue
+                tracker.failed(status_of(exc))
                 logger.exception(f"Claude inference failed (HTTP {exc.status_code})")
                 return []
 
-            except Exception:
+            except Exception as exc:
                 # Same safety net as astra.py: one bad image must not end the sweep.
+                tracker.failed(status_of(exc))
                 logger.exception("Claude inference failed (unexpected error)")
                 return []
 

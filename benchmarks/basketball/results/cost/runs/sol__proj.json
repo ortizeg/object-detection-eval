@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "pipeline": "sol",
+  "run": "proj",
+  "split": "valid",
+  "workers": 1,
+  "workers_citation": "vlm_zeroshot.yaml row `sol` (effort default); run_vlm_benchmark.py had no --workers at 909bcb1.",
+  "frames": [
+    "boston-celtics-new-york-knicks-game-1-q1-05_13-05_09-0030_png.rf.a04c53820df74ff13af910662caa3dff.jpg",
+    "boston-celtics-new-york-knicks-game-4-q1-05_58-05_53-0000_png.rf.750939b55cf36b9a18c255b922e5bf53.jpg",
+    "boston-celtics-orlando-magic-game-4-q1-01_33-01_25-0030_png.rf.7da90ecd47d182fe55fa56350321f2c0.jpg"
+  ],
+  "n_frames": 3,
+  "started": "2026-10-28T03:26:08.230141Z",
+  "ended": "2026-10-28T03:27:07.306209Z",
+  "wall_s": 59.075416,
+  "status": "complete",
+  "abort_reason": null,
+  "empty_frames": [],
+  "frame_timings": [
+    {
+      "image_id": "boston-celtics-new-york-knicks-game-1-q1-05_13-05_09-0030_png.rf.a04c53820df74ff13af910662caa3dff.jpg",
+      "wall_s": 18.461248,
+      "n_detections": 20,
+      "n_calls": 1
+    },
+    {
+      "image_id": "boston-celtics-new-york-knicks-game-4-q1-05_58-05_53-0000_png.rf.750939b55cf36b9a18c255b922e5bf53.jpg",
+      "wall_s": 23.538871,
+      "n_detections": 21,
+      "n_calls": 1
+    },
+    {
+      "image_id": "boston-celtics-orlando-magic-game-4-q1-01_33-01_25-0030_png.rf.7da90ecd47d182fe55fa56350321f2c0.jpg",
+      "wall_s": 17.053046,
+      "n_detections": 20,
+      "n_calls": 1
+    }
+  ],
+  "git_sha": "b66a8d1d1f8e8aed433700b7ebc7c9cd6b0247d0",
+  "pixi_env": "vlm-astra",
+  "sdk_versions": {
+    "openai": "3.19.2",
+    "httpx": "0.28.1"
+  },
+  "frames_file_sha256": "e18fcc782539ea40c1c7954d443976dae707e81ffbc4126d4a7b769f822aafe8"
+}
