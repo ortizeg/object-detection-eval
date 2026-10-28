@@ -94,9 +94,9 @@ models:
     periods:
       - effective_from: null
         effective_to: null
-        per_call_usd: null
+        per_call_usd: 0.0225
         source_url: https://cloud.deepdataspace.com/dashboard/usage
-        note: per-call price to be supplied by the user from the DeepDataSpace console; see docs/cost/dinox-console-checklist.md
+        note: "about CNY 0.15 per direct model API call, as supplied by the user on 2026-10-28 (approximate; the console bills in CNY). Converted at 1 USD = 6.6684 CNY on 2026-10-27 (https://www.valutafx.com/history/usd-cny-2026-10-27): 0.15 / 6.6684 = 0.0225 USD."
 
   DINO-X-PREVIEW-1.0:
     provider: deepdataspace
@@ -105,9 +105,9 @@ models:
     periods:
       - effective_from: null
         effective_to: null
-        per_call_usd: null
+        per_call_usd: 0.0225
         source_url: https://cloud.deepdataspace.com/dashboard/usage
-        note: per-call price to be supplied by the user from the DeepDataSpace console; see docs/cost/dinox-console-checklist.md
+        note: "about CNY 0.15 per direct model API call, as supplied by the user on 2026-10-28 (approximate; the console bills in CNY). Converted at 1 USD = 6.6684 CNY on 2026-10-27 (https://www.valutafx.com/history/usd-cny-2026-10-27): 0.15 / 6.6684 = 0.0225 USD."
 
   T-Rex-2.0:
     provider: deepdataspace

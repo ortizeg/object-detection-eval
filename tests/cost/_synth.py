@@ -12,7 +12,14 @@ from datetime import UTC, datetime
 from pathlib import Path
 from unittest.mock import patch
 
-from object_detection_eval.cost.schemas import FrameTiming, PublishedAccuracy, RunManifest
+import yaml
+
+from object_detection_eval.cost.schemas import (
+    FrameTiming,
+    PriceBook,
+    PublishedAccuracy,
+    RunManifest,
+)
 from object_detection_eval.inference.vlm import usage
 from object_detection_eval.inference.vlm.usage import (
     TokenUsage,
@@ -22,6 +29,22 @@ from object_detection_eval.inference.vlm.usage import (
 )
 
 DAY = datetime(2026, 10, 27, 12, 0, 0, tzinfo=UTC)
+
+PRICES_YAML = Path(__file__).resolve().parents[2] / "benchmarks/basketball/conf/cost_prices.yaml"
+
+
+def unpriced_per_call_prices() -> PriceBook:
+    """The committed price book with every per-call (DeepDataSpace) price set to null.
+
+    The unpriced path (null price -> unpriced, never free; fused lines get a lower
+    bound) must stay tested now that the committed DINO-X price is filled in.
+    """
+    raw = yaml.safe_load(PRICES_YAML.read_text())
+    for entry in raw["models"].values():
+        if entry["unit"] == "per_call":
+            for period in entry["periods"]:
+                period["per_call_usd"] = None
+    return PriceBook.model_validate(raw)
 
 
 @dataclass(frozen=True)

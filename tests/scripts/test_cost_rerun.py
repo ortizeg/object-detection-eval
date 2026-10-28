@@ -251,14 +251,12 @@ def test_project_exit_0_under_the_cap_and_writes_projection_json(mod) -> None:
     projection = json.loads((mod._RESULTS / "projection.json").read_text())
     assert projection["over_cap"] is False
     assert projection["budget_usd"] == 40.0
-    assert sorted(projection["unpriced_pipelines"]) == [
-        "dinox_preview_rimtrim",
-        "dinox_pro_rimtrim",
-    ]
+    assert projection["unpriced_pipelines"] == []  # DINO-X is priced in the committed config
     assert projection["frames_per_run"] == 20 and projection["runs"] == 2
-    # 6 priced pipelines x $0.02/frame x 20 frames x 2 runs = $4.80 remaining, $0.36 spent
-    assert projection["projected_remaining_usd"] == pytest.approx(6 * 0.02 * 20 * 2)
-    assert projection["spent_usd"] == pytest.approx(6 * 0.02 * 3)
+    # 6 token-priced pipelines at $0.02/frame plus 2 DINO-X at one $0.0225 call per frame
+    per_frame = 6 * 0.02 + 2 * 0.0225
+    assert projection["projected_remaining_usd"] == pytest.approx(per_frame * 20 * 2)
+    assert projection["spent_usd"] == pytest.approx(per_frame * 3)
 
 
 def test_project_exit_3_above_the_cap(mod) -> None:

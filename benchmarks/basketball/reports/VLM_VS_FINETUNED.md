@@ -70,7 +70,8 @@ per frame. Argon two-pass reaches 0.534 for $0.123 per frame, which doubles to $
 when Gemini prices change on 2026-12-01, and makes about 13 calls per frame. Fusing the
 four API models gives 0.598 for $0.238 per frame. Only the best zero-shot fusion (0.683)
 scores above YOLOX-M (0.672). It makes about 25 calls and takes over 3 minutes of serial
-API time per frame, and costs at least $0.21 per frame before DINO-X's per-call fee.
+API time per frame, and costs $0.435 per frame ($0.558 from 2026-12-01), of which
+$0.225 is its ten DINO-X calls at about ¥0.15 each.
 Costs are measured on validation frames and accuracy on test, and with only two runs
 the cost spread is indicative, not a confidence interval.
 
