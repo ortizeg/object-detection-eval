@@ -340,6 +340,21 @@ def plot_points(report: CostReport) -> tuple[list[PlotPoint], list[str]]:
     return points, skipped
 
 
+#: Point labels for the figure; the full labels are too long to sit next to a marker.
+_SHORT_LABELS: dict[str, str] = {
+    "astra": "Astra",
+    "astra_crop_refine": "Astra crop-refine",
+    "sol": "Sol",
+    "claude_opus": "Opus 5.5",
+    "gemini_argon_single": "Argon single pass",
+    "gemini_argon_two_pass": "Argon two-pass",
+    "dinox_pro_rimtrim": "DINO-X Pro",
+    "dinox_preview_rimtrim": "DINO-X preview",
+    "api_fusion4": "API-rows fusion",
+    "fusion4": "Best zero-shot fusion",
+}
+
+
 def render_png(report: CostReport, path: Path) -> list[str]:
     """Write the two-panel figure; return the footnote lines (points left out and why)."""
     import matplotlib
@@ -349,6 +364,8 @@ def render_png(report: CostReport, path: Path) -> list[str]:
 
     points, skipped = plot_points(report)
     fig, (ax_map, ax_rec) = plt.subplots(1, 2, figsize=(14, 6.5), sharex=True)
+    # One colour per pipeline, the same in both panels.
+    colors = {p.id: plt.get_cmap("tab10")(i % 10) for i, p in enumerate(points)}
     for ax, field, title in (
         (ax_map, "map_y", "Test mAP@50:95"),
         (ax_rec, "recall_y", "Test recall at 95% precision"),
@@ -366,8 +383,9 @@ def render_png(report: CostReport, path: Path) -> list[str]:
             if p.x_sd is not None:
                 lower = min(p.x_sd, p.x * 0.95)  # keep the lower bar positive on a log axis
                 xerr = [[lower], [p.x_sd]]
-            ax.errorbar(p.x, y, xerr=xerr, fmt="o", capsize=3, markersize=6)
-            ax.annotate(p.id, (p.x, y), textcoords="offset points", xytext=(5, 4), fontsize=8)
+            ax.errorbar(p.x, y, xerr=xerr, fmt="o", capsize=3, markersize=6, color=colors[p.id])
+            label = _SHORT_LABELS.get(p.id, p.id)
+            ax.annotate(label, (p.x, y), textcoords="offset points", xytext=(5, 4), fontsize=8)
     for ref in report.accuracy.reference_lines:
         if ref.test_map5095.value is not None:
             ax_map.axhline(ref.test_map5095.value, linestyle="--", color="gray", linewidth=1)
