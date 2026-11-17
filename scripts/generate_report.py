@@ -74,6 +74,28 @@ from object_detection_eval.report import (
     vlm_per_class_table,
     vlm_summary_table,
 )
+from object_detection_eval.report.finetune import (
+    FinetuneBootstrap,
+    FinetuneResults,
+    caveat_summary,
+    clip_table,
+    contrast_table,
+    cost_table,
+    latency_anchor_table,
+    latency_pytorch_table,
+    latency_trt_table,
+    licence_table,
+    load_finetune_bootstrap,
+    load_finetune_results,
+    main_table,
+    peft_vs_full_table,
+    pending_list,
+    resolution_table,
+    seed_table,
+)
+from object_detection_eval.report.finetune import (
+    per_class_table as finetune_per_class_table,
+)
 from object_detection_eval.schemas.taxonomy import TaxonomySpec, load_taxonomy_spec
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -358,7 +380,52 @@ def build_registry(
         ],
     )
 
-    return [final_comparison, vlm_vs_finetuned, dataset, taxonomy_ablation]
+    # The fine-tuning study. Rows come from finetune_metrics_merged5.json
+    # (write_finetune_results.py); the deltas from the two bootstrap files
+    # (run_finetune_bootstrap.py). Either bootstrap file may be absent while runs
+    # land: the slots then render a fixed notice, never a number.
+    finetune_path = results_dir / "finetune" / "finetune_metrics_merged5.json"
+    ft_clustered_path = results_dir / "bootstrap" / "bootstrap_clustered_finetune.json"
+    ft_image_path = results_dir / "bootstrap" / "bootstrap_finetune.json"
+    ft_cache: dict[str, object] = {}
+
+    def ft() -> FinetuneResults:
+        if "results" not in ft_cache:
+            ft_cache["results"] = load_finetune_results(finetune_path)
+        return ft_cache["results"]  # type: ignore[return-value]
+
+    def ft_clustered() -> FinetuneBootstrap | None:
+        if "clustered" not in ft_cache:
+            ft_cache["clustered"] = load_finetune_bootstrap(ft_clustered_path)
+        return ft_cache["clustered"]  # type: ignore[return-value]
+
+    def ft_image() -> FinetuneBootstrap | None:
+        if "image" not in ft_cache:
+            ft_cache["image"] = load_finetune_bootstrap(ft_image_path)
+        return ft_cache["image"]  # type: ignore[return-value]
+
+    foundation_finetune = ReportSpec(
+        report_id="foundation_finetune",
+        md_path=report_dir / "FOUNDATION_FINETUNE.md",
+        slots=[
+            Slot("ft_caveat", lambda: caveat_summary(ft(), ft_clustered(), ft_image())),
+            Slot("ft_main", lambda: main_table(ft(), ft_clustered())),
+            Slot("ft_per_clip", lambda: clip_table(ft(), ft_clustered())),
+            Slot("ft_contrast", lambda: contrast_table(ft(), ft_clustered(), ft_image())),
+            Slot("ft_seeds", lambda: seed_table(ft())),
+            Slot("ft_peft_vs_full", lambda: peft_vs_full_table(ft())),
+            Slot("ft_resolution", lambda: resolution_table(ft(), ft_clustered())),
+            Slot("ft_per_class", lambda: finetune_per_class_table(ft())),
+            Slot("ft_latency_anchor", lambda: latency_anchor_table(ft())),
+            Slot("ft_latency_trt", lambda: latency_trt_table(ft())),
+            Slot("ft_latency_pytorch", lambda: latency_pytorch_table(ft())),
+            Slot("ft_cost", lambda: cost_table(ft())),
+            Slot("ft_licence", lambda: licence_table(ft())),
+            Slot("ft_pending", lambda: pending_list(ft())),
+        ],
+    )
+
+    return [final_comparison, vlm_vs_finetuned, dataset, taxonomy_ablation, foundation_finetune]
 
 
 def _run(specs: list[ReportSpec], *, check: bool, write: bool) -> int:

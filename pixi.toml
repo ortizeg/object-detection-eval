@@ -18,6 +18,8 @@ quality = { depends-on = ["lint", "format-check", "typecheck", "test"] }
 docs-stage = "python scripts/stage_docs.py"
 docs = { cmd = "mkdocs serve", depends-on = ["docs-stage"] }
 docs-build = { cmd = "mkdocs build", depends-on = ["docs-stage"] }
+# Foundation-model fine-tuning report: import runs, bootstrap, render (FOUNDATION_FINETUNE.md).
+finetune-report = "python scripts/write_finetune_results.py && python scripts/run_finetune_bootstrap.py && python scripts/generate_report.py --write --report foundation_finetune"
 
 # Core: no torch, no lightning. Must stay importable without a deep-learning stack.
 [dependencies]

@@ -1,0 +1,2522 @@
+{
+  "taxonomy": "merged5",
+  "source": "foundation-finetune sibling repo, results/<slug>/<arm>/",
+  "scorer": "scripts/write_vlm_metrics.py::score_vlm_metrics",
+  "references": [
+    "YOLO26m",
+    "DEIM-M"
+  ],
+  "rows": [
+    {
+      "row_id": "llmdet/peft",
+      "model_key": "llmdet",
+      "model": "LLMDet-large",
+      "family": "open-vocab detector",
+      "slug": "llmdet",
+      "arm": "peft",
+      "role": "peft",
+      "base_arm": "peft",
+      "label": "peft",
+      "seed": 0,
+      "image_size": "train_short_side=480,512,544,576,608,640,672,704,736,768,800, test_short_side=800, long_cap=1333",
+      "model_id": "iSEE-Laboratory/llmdet_large",
+      "selected_epoch": 13,
+      "meta_note": null,
+      "trainable_params": 38959779,
+      "total_params": 343052631,
+      "trainable_fraction": 0.1135679352944534,
+      "train_gpu_hours": 1.513,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 1.35,
+      "train_cost_key": "cost_usd_train_compute",
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/llmdet_peft_valid.json.gz",
+          "sha256_json": "24d953dceced44c6eb37d18d1b05766b364b37216ad0bb4e38f696831932e2e4"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/llmdet_peft_test.json.gz",
+          "sha256_json": "e82e15bef2526e401adb71412650253e8d5903634db925978719d0c57b3acf7e"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7392569184303284,
+        "mAP_50": 0.9750285148620605,
+        "mAP_75": 0.8644375801086426,
+        "per_class_ap50": {
+          "player": 0.9861681461334229,
+          "ball": 0.9275397658348083,
+          "referee": 0.9859094619750977,
+          "rim": 1.0,
+          "number": 0.9755252599716187
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7756092548370361,
+        "mAP_50": 0.9713358283042908,
+        "mAP_75": 0.910834550857544,
+        "per_class_ap50": {
+          "player": 0.9761805534362793,
+          "ball": 0.9266223907470703,
+          "referee": 0.988229513168335,
+          "rim": 0.9979861974716187,
+          "number": 0.9676605463027954
+        }
+      },
+      "sibling_test_map_50_95": 0.7756092548370361
+    },
+    {
+      "row_id": "llmdet/peft_s1",
+      "model_key": "llmdet",
+      "model": "LLMDet-large",
+      "family": "open-vocab detector",
+      "slug": "llmdet",
+      "arm": "peft_s1",
+      "role": "seed",
+      "base_arm": "peft",
+      "label": "peft seed",
+      "seed": 1,
+      "image_size": "train_short_side=480,512,544,576,608,640,672,704,736,768,800, test_short_side=800, long_cap=1333",
+      "model_id": "iSEE-Laboratory/llmdet_large",
+      "selected_epoch": 18,
+      "meta_note": null,
+      "trainable_params": 38959779,
+      "total_params": 343052631,
+      "trainable_fraction": 0.1135679352944534,
+      "train_gpu_hours": 0.951,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.85,
+      "train_cost_key": "cost_usd_train_compute",
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/llmdet_peft_s1_valid.json.gz",
+          "sha256_json": "6f11acec184383d8ab0b82de62fe4eb729ba24a6ddd36c3e7ce80ea53d0d985f"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/llmdet_peft_s1_test.json.gz",
+          "sha256_json": "fbc5e528dbbd27d9c66f654e78bca25e7bdcc95e3cd3f8c215cd969670ed5368"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.730559229850769,
+        "mAP_50": 0.9758898615837097,
+        "mAP_75": 0.8557001352310181,
+        "per_class_ap50": {
+          "player": 0.9840955138206482,
+          "ball": 0.9374521374702454,
+          "referee": 0.9911195635795593,
+          "rim": 0.9990864396095276,
+          "number": 0.9676957130432129
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7695209980010986,
+        "mAP_50": 0.9706177115440369,
+        "mAP_75": 0.8930760622024536,
+        "per_class_ap50": {
+          "player": 0.9779629707336426,
+          "ball": 0.9248933792114258,
+          "referee": 0.993803083896637,
+          "rim": 0.9997893571853638,
+          "number": 0.9566397070884705
+        }
+      },
+      "sibling_test_map_50_95": 0.7695209980010986
+    },
+    {
+      "row_id": "llmdet/peft_s2",
+      "model_key": "llmdet",
+      "model": "LLMDet-large",
+      "family": "open-vocab detector",
+      "slug": "llmdet",
+      "arm": "peft_s2",
+      "role": "seed",
+      "base_arm": "peft",
+      "label": "peft seed",
+      "seed": 2,
+      "image_size": "train_short_side=480,512,544,576,608,640,672,704,736,768,800, test_short_side=800, long_cap=1333",
+      "model_id": "iSEE-Laboratory/llmdet_large",
+      "selected_epoch": 20,
+      "meta_note": null,
+      "trainable_params": 38959779,
+      "total_params": 343052631,
+      "trainable_fraction": 0.1135679352944534,
+      "train_gpu_hours": 0.787,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.7,
+      "train_cost_key": "cost_usd_train_compute",
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/llmdet_peft_s2_valid.json.gz",
+          "sha256_json": "234906f2c9129836d26c96ae397664d0283a80686492dac8fdb1a2d02afacb29"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/llmdet_peft_s2_test.json.gz",
+          "sha256_json": "8923bb541266167b1f7f70de59d070574d789a543fa73ffb28596ce2517b2b53"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7344557046890259,
+        "mAP_50": 0.9673172831535339,
+        "mAP_75": 0.8588643670082092,
+        "per_class_ap50": {
+          "player": 0.9863590598106384,
+          "ball": 0.909095823764801,
+          "referee": 0.9970741271972656,
+          "rim": 0.9801980257034302,
+          "number": 0.9638593792915344
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7855727672576904,
+        "mAP_50": 0.9695059061050415,
+        "mAP_75": 0.9202315807342529,
+        "per_class_ap50": {
+          "player": 0.9841662645339966,
+          "ball": 0.9130344390869141,
+          "referee": 0.9915878772735596,
+          "rim": 0.9991573691368103,
+          "number": 0.9595835208892822
+        }
+      },
+      "sibling_test_map_50_95": 0.7855727672576904
+    },
+    {
+      "row_id": "llmdet/full",
+      "model_key": "llmdet",
+      "model": "LLMDet-large",
+      "family": "open-vocab detector",
+      "slug": "llmdet",
+      "arm": "full",
+      "role": "full",
+      "base_arm": "full",
+      "label": "full",
+      "seed": 0,
+      "image_size": "train_short_side=480,512,544,576,608,640,672,704,736,768,800, test_short_side=800, long_cap=1333",
+      "model_id": "iSEE-Laboratory/llmdet_large",
+      "selected_epoch": 17,
+      "meta_note": null,
+      "trainable_params": 343052631,
+      "total_params": 343052631,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 1.854,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 1.66,
+      "train_cost_key": "cost_usd_train_compute",
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/llmdet_full_valid.json.gz",
+          "sha256_json": "2de6618d5038277b5e4a94ef7db0984688d6ed172e069c9f6c42f76e3a4237cd"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/llmdet_full_test.json.gz",
+          "sha256_json": "367fd8f18d903f3e8e70c1dac58f681a2f85eb7a4a13f536fdd76d5bd5a85e25"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7390689253807068,
+        "mAP_50": 0.9824851155281067,
+        "mAP_75": 0.8582726120948792,
+        "per_class_ap50": {
+          "player": 0.9859612584114075,
+          "ball": 0.9615208506584167,
+          "referee": 0.9943594336509705,
+          "rim": 0.9883866906166077,
+          "number": 0.9821974635124207
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7850790023803711,
+        "mAP_50": 0.9705522060394287,
+        "mAP_75": 0.9178047180175781,
+        "per_class_ap50": {
+          "player": 0.9785555005073547,
+          "ball": 0.9187675714492798,
+          "referee": 0.9899597764015198,
+          "rim": 1.0,
+          "number": 0.9654781818389893
+        }
+      },
+      "sibling_test_map_50_95": 0.7850790023803711
+    },
+    {
+      "row_id": "mmgdino/peft",
+      "model_key": "mmgdino",
+      "model": "MM-Grounding-DINO-B",
+      "family": "open-vocab detector",
+      "slug": "mmgdino",
+      "arm": "peft",
+      "role": "peft",
+      "base_arm": "peft",
+      "label": "peft",
+      "seed": 0,
+      "image_size": "train: shortest side random in 672,704,736,768,800,832,864,896 (max long side 1600) + hflip; eval/test: shortest side 800 (1422x800 for 1920x1080)",
+      "model_id": "openmmlab-community/mm_grounding_dino_base_all",
+      "selected_epoch": 26,
+      "meta_note": null,
+      "trainable_params": 37204515,
+      "total_params": 232976283,
+      "trainable_fraction": 0.15969228507263977,
+      "train_gpu_hours": 1.61,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.73,
+      "train_cost_key": "cost_usd",
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/mmgdino_peft_valid.json.gz",
+          "sha256_json": "d8233c38a6f34d89b81e3d0b8ec89c8106e8f1d85ae5ccd4cf7ab55854787ebc"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/mmgdino_peft_test.json.gz",
+          "sha256_json": "4329df1360fafdde36ac145ae21c20ea5889a61711848dade9b81f6a7a43bb41"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7131965756416321,
+        "mAP_50": 0.9665200710296631,
+        "mAP_75": 0.8343766331672668,
+        "per_class_ap50": {
+          "player": 0.986299991607666,
+          "ball": 0.8932791352272034,
+          "referee": 0.9975557327270508,
+          "rim": 0.9799938797950745,
+          "number": 0.975471556186676
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7494457364082336,
+        "mAP_50": 0.9703514575958252,
+        "mAP_75": 0.8756759762763977,
+        "per_class_ap50": {
+          "player": 0.9915146231651306,
+          "ball": 0.9168701767921448,
+          "referee": 0.9783845543861389,
+          "rim": 1.0,
+          "number": 0.9649878144264221
+        }
+      },
+      "sibling_test_map_50_95": 0.7494457364082336
+    },
+    {
+      "row_id": "mmgdino/full",
+      "model_key": "mmgdino",
+      "model": "MM-Grounding-DINO-B",
+      "family": "open-vocab detector",
+      "slug": "mmgdino",
+      "arm": "full",
+      "role": "full",
+      "base_arm": "full",
+      "label": "full",
+      "seed": 0,
+      "image_size": "train: shortest side random in 672,704,736,768,800,832,864,896 (max long side 1600) + hflip; eval/test: shortest side 800 (1422x800 for 1920x1080)",
+      "model_id": "openmmlab-community/mm_grounding_dino_base_all",
+      "selected_epoch": 14,
+      "meta_note": null,
+      "trainable_params": 232976283,
+      "total_params": 232976283,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 1.52,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 1.52,
+      "train_cost_key": "cost_usd",
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/mmgdino_full_valid.json.gz",
+          "sha256_json": "a89de5a8254eef960cdb1fcbe728b93e292490b0ff86aa88c6afdb097af5f6c0"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/mmgdino_full_test.json.gz",
+          "sha256_json": "30248bea50b779738647e4d08ba47b82bcf7c537343bcf825e9c7c6d169b2baf"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7126721143722534,
+        "mAP_50": 0.9698673486709595,
+        "mAP_75": 0.822333812713623,
+        "per_class_ap50": {
+          "player": 0.9858905673027039,
+          "ball": 0.9210720062255859,
+          "referee": 0.9797453284263611,
+          "rim": 0.982938826084137,
+          "number": 0.9796899557113647
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.744264543056488,
+        "mAP_50": 0.9642983078956604,
+        "mAP_75": 0.8678813576698303,
+        "per_class_ap50": {
+          "player": 0.9821825623512268,
+          "ball": 0.9131609797477722,
+          "referee": 0.9666822552680969,
+          "rim": 1.0,
+          "number": 0.9594656229019165
+        }
+      },
+      "sibling_test_map_50_95": 0.744264543056488
+    },
+    {
+      "row_id": "sam3/peft",
+      "model_key": "sam3",
+      "model": "SAM 3",
+      "family": "open-vocab detector",
+      "slug": "sam3",
+      "arm": "peft",
+      "role": "peft",
+      "base_arm": "peft",
+      "label": "peft",
+      "seed": 0,
+      "image_size": "1008 x 1008 (train: random resize 480-1008 + pad to 1008)",
+      "model_id": "facebook/sam3 (sam3.pt)",
+      "selected_epoch": 7,
+      "meta_note": null,
+      "trainable_params": 38510901,
+      "total_params": 838210869,
+      "trainable_fraction": 0.04594416801817921,
+      "train_gpu_hours": 1.048,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 1.32,
+      "train_cost_key": "cost_usd_train_compute",
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/sam3_peft_valid.json.gz",
+          "sha256_json": "a28abe2991c5bb1ed832b11e2bacb053c6de1202881e0f950f2dda0f5d03453e"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/sam3_peft_test.json.gz",
+          "sha256_json": "050bfef9051aba50c2c86454abaf172286d20d046ec08fdc6179b630dcbdb0dc"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.6680830717086792,
+        "mAP_50": 0.9515056610107422,
+        "mAP_75": 0.7182745337486267,
+        "per_class_ap50": {
+          "player": 0.9883484840393066,
+          "ball": 0.8811792731285095,
+          "referee": 0.9698291420936584,
+          "rim": 0.9672957062721252,
+          "number": 0.9508756995201111
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7020274996757507,
+        "mAP_50": 0.9282429814338684,
+        "mAP_75": 0.787964940071106,
+        "per_class_ap50": {
+          "player": 0.9890463352203369,
+          "ball": 0.8482676148414612,
+          "referee": 0.9922351837158203,
+          "rim": 0.9593925476074219,
+          "number": 0.8522732257843018
+        }
+      },
+      "sibling_test_map_50_95": 0.7020274996757507
+    },
+    {
+      "row_id": "sam3/full",
+      "model_key": "sam3",
+      "model": "SAM 3",
+      "family": "open-vocab detector",
+      "slug": "sam3",
+      "arm": "full",
+      "role": "full",
+      "base_arm": "full",
+      "label": "full",
+      "seed": 0,
+      "image_size": "1008 x 1008 (train: random resize 480-1008 + pad to 1008)",
+      "model_id": "facebook/sam3 (sam3.pt)",
+      "selected_epoch": 15,
+      "meta_note": null,
+      "trainable_params": 838210869,
+      "total_params": 838210869,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 1.895,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 2.39,
+      "train_cost_key": "cost_usd_train_compute",
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/sam3_full_valid.json.gz",
+          "sha256_json": "652df3a730c0ee6af9274a3f111ec8d74d849d946dfa4c6d12ed3cb917946cd4"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/sam3_full_test.json.gz",
+          "sha256_json": "e91da90b9c31e95957c811a10ba85d7a2131e3e4779f3125d70f9f535a3607e2"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7085256576538086,
+        "mAP_50": 0.9713529348373413,
+        "mAP_75": 0.8125669956207275,
+        "per_class_ap50": {
+          "player": 0.9860906004905701,
+          "ball": 0.9306459426879883,
+          "referee": 0.9718648195266724,
+          "rim": 0.9976754784584045,
+          "number": 0.9704879522323608
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7366749048233032,
+        "mAP_50": 0.9631218910217285,
+        "mAP_75": 0.8424894213676453,
+        "per_class_ap50": {
+          "player": 0.9896278381347656,
+          "ball": 0.9242460131645203,
+          "referee": 0.9854994416236877,
+          "rim": 1.0,
+          "number": 0.9162362813949585
+        }
+      },
+      "sibling_test_map_50_95": 0.7366749048233032
+    },
+    {
+      "row_id": "yoloe_1280/yoloe_peft",
+      "model_key": "yoloe_1280",
+      "model": "YOLOE-26x @1280",
+      "family": "open-vocab detector",
+      "slug": "yoloe",
+      "arm": "yoloe_peft",
+      "role": "peft",
+      "base_arm": "yoloe_peft",
+      "label": "peft",
+      "seed": 0,
+      "image_size": "1280",
+      "model_id": "yoloe-26x-seg.pt -> yoloe-26x.yaml (detection head)",
+      "selected_epoch": 39,
+      "meta_note": null,
+      "trainable_params": 11550,
+      "total_params": 58820118,
+      "trainable_fraction": 0.00019636138778232306,
+      "train_gpu_hours": 0.118,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.05,
+      "train_cost_key": "cost_usd",
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yoloe_yoloe_peft_valid.json.gz",
+          "sha256_json": "40943f01104a8a4542703cd26e9a04caa4e033ff4425475950832bd8c994c318"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yoloe_yoloe_peft_test.json.gz",
+          "sha256_json": "56c8179b60c0108821d333f335648baae36fde858a1e5be297c14a1912180473"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.3999568819999695,
+        "mAP_50": 0.6770949959754944,
+        "mAP_75": 0.41649559140205383,
+        "per_class_ap50": {
+          "player": 0.9698473215103149,
+          "ball": 0.6933745741844177,
+          "referee": 0.8856633305549622,
+          "rim": 0.30515581369400024,
+          "number": 0.5314340591430664
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.4140729308128357,
+        "mAP_50": 0.6385495066642761,
+        "mAP_75": 0.466616690158844,
+        "per_class_ap50": {
+          "player": 0.9711754322052002,
+          "ball": 0.6678400635719299,
+          "referee": 0.843123197555542,
+          "rim": 0.3131590187549591,
+          "number": 0.397449791431427
+        }
+      },
+      "sibling_test_map_50_95": 0.4140729308128357
+    },
+    {
+      "row_id": "yoloe_1280/yoloe_full",
+      "model_key": "yoloe_1280",
+      "model": "YOLOE-26x @1280",
+      "family": "open-vocab detector",
+      "slug": "yoloe",
+      "arm": "yoloe_full",
+      "role": "full",
+      "base_arm": "yoloe_full",
+      "label": "full",
+      "seed": 0,
+      "image_size": "1280",
+      "model_id": "yoloe-26x-seg.pt -> yoloe-26x.yaml (detection head)",
+      "selected_epoch": 28,
+      "meta_note": null,
+      "trainable_params": 58820118,
+      "total_params": 58820118,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 0.378,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.159,
+      "train_cost_key": "cost_usd",
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yoloe_yoloe_full_valid.json.gz",
+          "sha256_json": "b927f885e110e85d51fd8f246928cfc0be6f016e3caf44f00d408a068a591773"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yoloe_yoloe_full_test.json.gz",
+          "sha256_json": "988347b842c252d1046e7694736d437d6a534fe517d7371bec1512d2475a17bf"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7739776372909546,
+        "mAP_50": 0.9774847626686096,
+        "mAP_75": 0.8882050514221191,
+        "per_class_ap50": {
+          "player": 0.9868916869163513,
+          "ball": 0.9319602847099304,
+          "referee": 0.9900990128517151,
+          "rim": 1.0,
+          "number": 0.9784727096557617
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7753435373306274,
+        "mAP_50": 0.9640358686447144,
+        "mAP_75": 0.9093175530433655,
+        "per_class_ap50": {
+          "player": 0.9897172451019287,
+          "ball": 0.8791532516479492,
+          "referee": 0.9793838858604431,
+          "rim": 1.0,
+          "number": 0.9719247817993164
+        }
+      },
+      "sibling_test_map_50_95": 0.7753435373306274
+    },
+    {
+      "row_id": "yoloe_640/yoloe_peft_640",
+      "model_key": "yoloe_640",
+      "model": "YOLOE-26x @640",
+      "family": "open-vocab detector",
+      "slug": "yoloe",
+      "arm": "yoloe_peft_640",
+      "role": "peft",
+      "base_arm": "yoloe_peft_640",
+      "label": "peft",
+      "seed": 0,
+      "image_size": "640",
+      "model_id": "yoloe-26x-seg.pt -> yoloe-26x.yaml (detection head)",
+      "selected_epoch": 36,
+      "meta_note": null,
+      "trainable_params": 11550,
+      "total_params": 58820118,
+      "trainable_fraction": 0.00019636138778232306,
+      "train_gpu_hours": 0.04,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.017,
+      "train_cost_key": "cost_usd",
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yoloe_yoloe_peft_640_valid.json.gz",
+          "sha256_json": "01eb948c4e0d1bfab434477dd96bf560ccde0d777a0bd2dfc4f9e705036f3129"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yoloe_yoloe_peft_640_test.json.gz",
+          "sha256_json": "fd0a71f348906e318d87df60e915b6776f7f925f31db050622fb4334618366e6"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.31041207909584045,
+        "mAP_50": 0.467903196811676,
+        "mAP_75": 0.3437313437461853,
+        "per_class_ap50": {
+          "player": 0.9488198757171631,
+          "ball": 0.4492766559123993,
+          "referee": 0.9036281704902649,
+          "rim": 0.00044804479693993926,
+          "number": 0.03734321892261505
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.3144972622394562,
+        "mAP_50": 0.4457213580608368,
+        "mAP_75": 0.3619668483734131,
+        "per_class_ap50": {
+          "player": 0.9591643810272217,
+          "ball": 0.3861294686794281,
+          "referee": 0.8464124202728271,
+          "rim": 0.024438155815005302,
+          "number": 0.012462278828024864
+        }
+      },
+      "sibling_test_map_50_95": 0.3144972622394562
+    },
+    {
+      "row_id": "yoloe_640/yoloe_full_640",
+      "model_key": "yoloe_640",
+      "model": "YOLOE-26x @640",
+      "family": "open-vocab detector",
+      "slug": "yoloe",
+      "arm": "yoloe_full_640",
+      "role": "full",
+      "base_arm": "yoloe_full_640",
+      "label": "full",
+      "seed": 0,
+      "image_size": "640",
+      "model_id": "yoloe-26x-seg.pt -> yoloe-26x.yaml (detection head)",
+      "selected_epoch": 70,
+      "meta_note": null,
+      "trainable_params": 58820118,
+      "total_params": 58820118,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 0.178,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.075,
+      "train_cost_key": "cost_usd",
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yoloe_yoloe_full_640_valid.json.gz",
+          "sha256_json": "bb2752f8ba8e30bbf225ff5e1d9e0a3b1be46504ec154720df09cbfa980f6713"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yoloe_yoloe_full_640_test.json.gz",
+          "sha256_json": "091e3a34aa801fd1794d7fa1a7a9c7874dfb4ff9990e5e0bd67e69dd65b4eb77"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7082423567771912,
+        "mAP_50": 0.9631980657577515,
+        "mAP_75": 0.8188512325286865,
+        "per_class_ap50": {
+          "player": 0.9845284819602966,
+          "ball": 0.8787474036216736,
+          "referee": 0.9794513583183289,
+          "rim": 1.0,
+          "number": 0.973263144493103
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7371712923049927,
+        "mAP_50": 0.9552015662193298,
+        "mAP_75": 0.86229008436203,
+        "per_class_ap50": {
+          "player": 0.9875576496124268,
+          "ball": 0.8622128367424011,
+          "referee": 0.9768919348716736,
+          "rim": 1.0,
+          "number": 0.949345588684082
+        }
+      },
+      "sibling_test_map_50_95": 0.7371712923049927
+    },
+    {
+      "row_id": "yoloworld/yoloworld_peft",
+      "model_key": "yoloworld",
+      "model": "YOLO-World-v2-x @1280",
+      "family": "open-vocab detector",
+      "slug": "yoloe",
+      "arm": "yoloworld_peft",
+      "role": "peft",
+      "base_arm": "yoloworld_peft",
+      "label": "peft",
+      "seed": 0,
+      "image_size": "1280",
+      "model_id": "yolov8x-worldv2.pt",
+      "selected_epoch": 39,
+      "meta_note": null,
+      "trainable_params": 9214086,
+      "total_params": 72886377,
+      "trainable_fraction": 0.12641712181687945,
+      "train_gpu_hours": 0.135,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.057,
+      "train_cost_key": "cost_usd",
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yoloe_yoloworld_peft_valid.json.gz",
+          "sha256_json": "f5cc4467035a56ccbe11c4f373a7bde2d259b84ee463b867cc14c5475eb9db49"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yoloe_yoloworld_peft_test.json.gz",
+          "sha256_json": "b4cdbf59b9a8da528c310fb8b097987d96efefbfa82d68d3875affc8022a13dc"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.6854888796806335,
+        "mAP_50": 0.9433935284614563,
+        "mAP_75": 0.7950248122215271,
+        "per_class_ap50": {
+          "player": 0.9834242463111877,
+          "ball": 0.8301470279693604,
+          "referee": 0.987184464931488,
+          "rim": 0.974348783493042,
+          "number": 0.9418632984161377
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7106391191482544,
+        "mAP_50": 0.9230362772941589,
+        "mAP_75": 0.8163467049598694,
+        "per_class_ap50": {
+          "player": 0.9884247183799744,
+          "ball": 0.7335888147354126,
+          "referee": 0.9556557536125183,
+          "rim": 0.9977595806121826,
+          "number": 0.939752459526062
+        }
+      },
+      "sibling_test_map_50_95": 0.7106391191482544
+    },
+    {
+      "row_id": "yoloworld/yoloworld_full",
+      "model_key": "yoloworld",
+      "model": "YOLO-World-v2-x @1280",
+      "family": "open-vocab detector",
+      "slug": "yoloe",
+      "arm": "yoloworld_full",
+      "role": "full",
+      "base_arm": "yoloworld_full",
+      "label": "full",
+      "seed": 0,
+      "image_size": "1280",
+      "model_id": "yolov8x-worldv2.pt",
+      "selected_epoch": 27,
+      "meta_note": null,
+      "trainable_params": 72886361,
+      "total_params": 72886377,
+      "trainable_fraction": 0.9999997804802399,
+      "train_gpu_hours": 0.369,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.156,
+      "train_cost_key": "cost_usd",
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yoloe_yoloworld_full_valid.json.gz",
+          "sha256_json": "6adc376a6c8c2bdf909c2000b61ffe13494d83098c45b8048fdcf57a48e4c753"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yoloe_yoloworld_full_test.json.gz",
+          "sha256_json": "ab8892720e038d54057ac7bd2a3673bb17a763b02535d7f52f994a77e116c586"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7624379992485046,
+        "mAP_50": 0.9713860750198364,
+        "mAP_75": 0.874046266078949,
+        "per_class_ap50": {
+          "player": 0.9742951393127441,
+          "ball": 0.9285907745361328,
+          "referee": 0.9787649512290955,
+          "rim": 1.0,
+          "number": 0.9752796292304993
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7763243913650513,
+        "mAP_50": 0.9663894772529602,
+        "mAP_75": 0.8894451260566711,
+        "per_class_ap50": {
+          "player": 0.9899387955665588,
+          "ball": 0.8859691619873047,
+          "referee": 0.9721523523330688,
+          "rim": 1.0,
+          "number": 0.9838871359825134
+        }
+      },
+      "sibling_test_map_50_95": 0.7763243913650513
+    },
+    {
+      "row_id": "owlv2/peft",
+      "model_key": "owlv2",
+      "model": "OWLv2-L/14",
+      "family": "open-vocab detector",
+      "slug": "owlv2",
+      "arm": "peft",
+      "role": "peft",
+      "base_arm": "peft",
+      "label": "peft",
+      "seed": 0,
+      "image_size": "1008x1008 (OWLv2-L/14 native: processor pads to square bottom/right, resizes to 1008; 72x72=5184 tokens)",
+      "model_id": "google/owlv2-large-patch14-ensemble",
+      "selected_epoch": 58,
+      "meta_note": null,
+      "trainable_params": 4994823,
+      "total_params": 437610760,
+      "trainable_fraction": 0.011413848690557792,
+      "train_gpu_hours": 0.34,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.32,
+      "train_cost_key": "cost_usd",
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/owlv2_peft_valid.json.gz",
+          "sha256_json": "79a558431440594948d5bdc65a994ec963540108ae7c09c4c7275f8bdaf154eb"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/owlv2_peft_test.json.gz",
+          "sha256_json": "66b431f6191c8a68146ff3f89f4497b962db2ed97a964f474be658c59962afa7"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.5572771430015564,
+        "mAP_50": 0.9045824408531189,
+        "mAP_75": 0.6136465072631836,
+        "per_class_ap50": {
+          "player": 0.9730002880096436,
+          "ball": 0.7965214848518372,
+          "referee": 0.8975231647491455,
+          "rim": 0.9177282452583313,
+          "number": 0.938139021396637
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.5408225059509277,
+        "mAP_50": 0.8841152191162109,
+        "mAP_75": 0.6063347458839417,
+        "per_class_ap50": {
+          "player": 0.9711716771125793,
+          "ball": 0.7989136576652527,
+          "referee": 0.9532310366630554,
+          "rim": 0.8232536911964417,
+          "number": 0.8740060329437256
+        }
+      },
+      "sibling_test_map_50_95": 0.5408225059509277
+    },
+    {
+      "row_id": "owlv2/peft_seed1",
+      "model_key": "owlv2",
+      "model": "OWLv2-L/14",
+      "family": "open-vocab detector",
+      "slug": "owlv2",
+      "arm": "peft_seed1",
+      "role": "seed",
+      "base_arm": "peft",
+      "label": "peft seed",
+      "seed": 1,
+      "image_size": "1008x1008 (OWLv2-L/14 native: processor pads to square bottom/right, resizes to 1008; 72x72=5184 tokens)",
+      "model_id": "google/owlv2-large-patch14-ensemble",
+      "selected_epoch": null,
+      "meta_note": "no meta.json yet; params from peft/meta.json",
+      "trainable_params": 4994823,
+      "total_params": 437610760,
+      "trainable_fraction": 0.011413848690557792,
+      "train_gpu_hours": null,
+      "train_gpu_hours_key": null,
+      "train_cost_usd": null,
+      "train_cost_key": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/owlv2_peft_seed1_valid.json.gz",
+          "sha256_json": "03f7d8ed5bfcf240766b5d383f088159d5cdf2188bca89434298ce2aaf7bc036"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/owlv2_peft_seed1_test.json.gz",
+          "sha256_json": "dddc88b2095ddbdd40e75aed1abb4455770ff32e304b2f292fc8aa61b730559e"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.5563260316848755,
+        "mAP_50": 0.9029872417449951,
+        "mAP_75": 0.6181286573410034,
+        "per_class_ap50": {
+          "player": 0.9729548692703247,
+          "ball": 0.7959239482879639,
+          "referee": 0.8935211896896362,
+          "rim": 0.9179927110671997,
+          "number": 0.9345434904098511
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.5394818186759949,
+        "mAP_50": 0.8756000399589539,
+        "mAP_75": 0.6102867126464844,
+        "per_class_ap50": {
+          "player": 0.9709535241127014,
+          "ball": 0.790039598941803,
+          "referee": 0.9566619992256165,
+          "rim": 0.7988840937614441,
+          "number": 0.8614609241485596
+        }
+      },
+      "sibling_test_map_50_95": 0.5394818186759949
+    },
+    {
+      "row_id": "owlv2/peft_seed2",
+      "model_key": "owlv2",
+      "model": "OWLv2-L/14",
+      "family": "open-vocab detector",
+      "slug": "owlv2",
+      "arm": "peft_seed2",
+      "role": "seed",
+      "base_arm": "peft",
+      "label": "peft seed",
+      "seed": 2,
+      "image_size": "1008x1008 (OWLv2-L/14 native: processor pads to square bottom/right, resizes to 1008; 72x72=5184 tokens)",
+      "model_id": "google/owlv2-large-patch14-ensemble",
+      "selected_epoch": null,
+      "meta_note": "no meta.json yet; params from peft/meta.json",
+      "trainable_params": 4994823,
+      "total_params": 437610760,
+      "trainable_fraction": 0.011413848690557792,
+      "train_gpu_hours": null,
+      "train_gpu_hours_key": null,
+      "train_cost_usd": null,
+      "train_cost_key": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/owlv2_peft_seed2_valid.json.gz",
+          "sha256_json": "8559a062a8d9bac3604139619c0844f831615ad3c5c31db3429471e8ff89f2a8"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/owlv2_peft_seed2_test.json.gz",
+          "sha256_json": "d1450a273b902bbe8d168ba8cc85c713620d7a6079e26b0c3b1bf127852e30cf"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.5557619333267212,
+        "mAP_50": 0.9072033166885376,
+        "mAP_75": 0.6055693626403809,
+        "per_class_ap50": {
+          "player": 0.9727477431297302,
+          "ball": 0.8115763664245605,
+          "referee": 0.9027272462844849,
+          "rim": 0.9191099405288696,
+          "number": 0.929855465888977
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.5413802862167358,
+        "mAP_50": 0.8813281655311584,
+        "mAP_75": 0.6042702794075012,
+        "per_class_ap50": {
+          "player": 0.9707337617874146,
+          "ball": 0.7919593453407288,
+          "referee": 0.9569635987281799,
+          "rim": 0.8143331408500671,
+          "number": 0.8726510405540466
+        }
+      },
+      "sibling_test_map_50_95": 0.5413802862167358
+    },
+    {
+      "row_id": "owlv2/full",
+      "model_key": "owlv2",
+      "model": "OWLv2-L/14",
+      "family": "open-vocab detector",
+      "slug": "owlv2",
+      "arm": "full",
+      "role": "full",
+      "base_arm": "full",
+      "label": "full",
+      "seed": 0,
+      "image_size": "1008x1008 (OWLv2-L/14 native: processor pads to square bottom/right, resizes to 1008; 72x72=5184 tokens)",
+      "model_id": "google/owlv2-large-patch14-ensemble",
+      "selected_epoch": 12,
+      "meta_note": null,
+      "trainable_params": 313220871,
+      "total_params": 437610760,
+      "trainable_fraction": 0.7157522155076809,
+      "train_gpu_hours": 3.41,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 1.87,
+      "train_cost_key": "cost_usd",
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/owlv2_full_valid.json.gz",
+          "sha256_json": "9ba74d737e14b960fa45512730bf285db325740a730b6f52339f5e2c1efd789b"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/owlv2_full_test.json.gz",
+          "sha256_json": "83a0745402dd89132623d19ea8567aca28145c6a16d602a9354b0917620133eb"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.6235140562057495,
+        "mAP_50": 0.9581500291824341,
+        "mAP_75": 0.7067023515701294,
+        "per_class_ap50": {
+          "player": 0.9904489517211914,
+          "ball": 0.9124299883842468,
+          "referee": 0.9736347794532776,
+          "rim": 0.9448708295822144,
+          "number": 0.9693654775619507
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.612125813961029,
+        "mAP_50": 0.9297250509262085,
+        "mAP_75": 0.6964110732078552,
+        "per_class_ap50": {
+          "player": 0.97609943151474,
+          "ball": 0.8861078023910522,
+          "referee": 0.9837216734886169,
+          "rim": 0.883316159248352,
+          "number": 0.9193801879882812
+        }
+      },
+      "sibling_test_map_50_95": 0.612125813961029
+    },
+    {
+      "row_id": "deimv2_m/peft",
+      "model_key": "deimv2_m",
+      "model": "DEIMv2-M",
+      "family": "frozen backbone + DETR head",
+      "slug": "deimv2",
+      "arm": "peft",
+      "role": "peft",
+      "base_arm": "peft",
+      "label": "peft",
+      "seed": 0,
+      "image_size": "640",
+      "model_id": "DEIMv2-M (DINOv3-distilled ViT-Tiny+ backbone)",
+      "selected_epoch": 103,
+      "meta_note": null,
+      "trainable_params": 8570000,
+      "total_params": 18240000,
+      "trainable_fraction": 0.46984649122807015,
+      "train_gpu_hours": 1.1519444444444444,
+      "train_gpu_hours_key": "train_wall",
+      "train_cost_usd": 0.61,
+      "train_cost_key": "cost_usd_train_box_share",
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/deimv2_peft_valid.json.gz",
+          "sha256_json": "cd7ce9711ae8271899c446e345e4fc6ca86bdecccd0e3b09a535c44761e84f9c"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/deimv2_peft_test.json.gz",
+          "sha256_json": "a87f0a4b676593c5aa174c56151e41336f0841f3a7f388abeb27f0e0212cbfb0"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.681986927986145,
+        "mAP_50": 0.9599260091781616,
+        "mAP_75": 0.763570249080658,
+        "per_class_ap50": {
+          "player": 0.9863847494125366,
+          "ball": 0.8621644973754883,
+          "referee": 0.9981569647789001,
+          "rim": 0.9992855191230774,
+          "number": 0.9536383152008057
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.6698400378227234,
+        "mAP_50": 0.9443069100379944,
+        "mAP_75": 0.7773681282997131,
+        "per_class_ap50": {
+          "player": 0.9878832101821899,
+          "ball": 0.8218463063240051,
+          "referee": 0.9975190758705139,
+          "rim": 1.0,
+          "number": 0.9142858982086182
+        }
+      },
+      "sibling_test_map_50_95": 0.6698400378227234
+    },
+    {
+      "row_id": "deimv2_m/full",
+      "model_key": "deimv2_m",
+      "model": "DEIMv2-M",
+      "family": "frozen backbone + DETR head",
+      "slug": "deimv2",
+      "arm": "full",
+      "role": "full",
+      "base_arm": "full",
+      "label": "full",
+      "seed": 0,
+      "image_size": "640",
+      "model_id": "DEIMv2-M (DINOv3-distilled ViT-Tiny+ backbone)",
+      "selected_epoch": 104,
+      "meta_note": null,
+      "trainable_params": 18240000,
+      "total_params": 18240000,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 1.1613888888888888,
+      "train_gpu_hours_key": "train_wall",
+      "train_cost_usd": 0.61,
+      "train_cost_key": "cost_usd_train_box_share",
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/deimv2_full_valid.json.gz",
+          "sha256_json": "73b7a51ffca06e534522cf3a47accc3430f9b89c3c0beee7e90b2f23be815dba"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/deimv2_full_test.json.gz",
+          "sha256_json": "8593503a265aa4468758e0e4a3cb9404470c7a3df21e8775dfe3b5a6ef4b4540"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.6883919835090637,
+        "mAP_50": 0.9659261703491211,
+        "mAP_75": 0.767609179019928,
+        "per_class_ap50": {
+          "player": 0.9877029061317444,
+          "ball": 0.8997564315795898,
+          "referee": 0.9970341324806213,
+          "rim": 1.0,
+          "number": 0.9451375603675842
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7013276815414429,
+        "mAP_50": 0.9608569145202637,
+        "mAP_75": 0.8151928186416626,
+        "per_class_ap50": {
+          "player": 0.9882993102073669,
+          "ball": 0.8892822265625,
+          "referee": 0.9945493936538696,
+          "rim": 1.0,
+          "number": 0.9321536421775818
+        }
+      },
+      "sibling_test_map_50_95": 0.7013276815414429
+    },
+    {
+      "row_id": "deimv2_l/l_peft",
+      "model_key": "deimv2_l",
+      "model": "DEIMv2-L",
+      "family": "frozen backbone + DETR head",
+      "slug": "deimv2",
+      "arm": "l_peft",
+      "role": "peft",
+      "base_arm": "l_peft",
+      "label": "peft",
+      "seed": 0,
+      "image_size": "640",
+      "model_id": "DEIMv2-L (DINOv3 ViT-S/16 backbone)",
+      "selected_epoch": 113,
+      "meta_note": null,
+      "trainable_params": 10850000,
+      "total_params": 32130000,
+      "trainable_fraction": 0.33769063180827885,
+      "train_gpu_hours": 1.2005555555555556,
+      "train_gpu_hours_key": "train_wall",
+      "train_cost_usd": 0.51,
+      "train_cost_key": "cost_usd_train_box_share",
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/deimv2_l_peft_valid.json.gz",
+          "sha256_json": "34f7590e1cea2cd6e57e82776daeb6b986655746bbff45cb99014bd5e48c3e69"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/deimv2_l_peft_test.json.gz",
+          "sha256_json": "f61ba824937bd0596dc8e5b139191c2c883671c5f8f056916b412eefff45718c"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.6831005215644836,
+        "mAP_50": 0.9597280621528625,
+        "mAP_75": 0.7720169425010681,
+        "per_class_ap50": {
+          "player": 0.9869846105575562,
+          "ball": 0.859530508518219,
+          "referee": 0.9942412972450256,
+          "rim": 1.0,
+          "number": 0.957883894443512
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.6679256558418274,
+        "mAP_50": 0.9311397075653076,
+        "mAP_75": 0.7680636048316956,
+        "per_class_ap50": {
+          "player": 0.9881917238235474,
+          "ball": 0.7545783519744873,
+          "referee": 0.9895574450492859,
+          "rim": 1.0,
+          "number": 0.9233709573745728
+        }
+      },
+      "sibling_test_map_50_95": 0.6679256558418274
+    },
+    {
+      "row_id": "deimv2_l/l_full",
+      "model_key": "deimv2_l",
+      "model": "DEIMv2-L",
+      "family": "frozen backbone + DETR head",
+      "slug": "deimv2",
+      "arm": "l_full",
+      "role": "full",
+      "base_arm": "l_full",
+      "label": "full",
+      "seed": 0,
+      "image_size": "640",
+      "model_id": "DEIMv2-L (DINOv3 ViT-S/16 backbone)",
+      "selected_epoch": 116,
+      "meta_note": null,
+      "trainable_params": 32130000,
+      "total_params": 32130000,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 1.2719444444444443,
+      "train_gpu_hours_key": "train_wall",
+      "train_cost_usd": 0.51,
+      "train_cost_key": "cost_usd_train_box_share",
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/deimv2_l_full_valid.json.gz",
+          "sha256_json": "2194cb0b9709bde2bfb404e65987c7c222260ab962e31b1528e1e86c34b1e9f1"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/deimv2_l_full_test.json.gz",
+          "sha256_json": "62914e1789ec0d2061e2bfd11f1a2677703ad189bf0d92fc85149c1b8642de3d"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7049344778060913,
+        "mAP_50": 0.9674175381660461,
+        "mAP_75": 0.8022509813308716,
+        "per_class_ap50": {
+          "player": 0.9875965714454651,
+          "ball": 0.8860386610031128,
+          "referee": 0.9945940971374512,
+          "rim": 1.0,
+          "number": 0.9688584208488464
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.6945134997367859,
+        "mAP_50": 0.9549811482429504,
+        "mAP_75": 0.7901738882064819,
+        "per_class_ap50": {
+          "player": 0.9879491329193115,
+          "ball": 0.8708835244178772,
+          "referee": 0.9860581755638123,
+          "rim": 1.0,
+          "number": 0.9300150871276855
+        }
+      },
+      "sibling_test_map_50_95": 0.6945134997367859
+    },
+    {
+      "row_id": "florence2/peft",
+      "model_key": "florence2",
+      "model": "Florence-2-large",
+      "family": "generative VLM",
+      "slug": "florence2",
+      "arm": "peft",
+      "role": "peft",
+      "base_arm": "peft",
+      "label": "peft",
+      "seed": 0,
+      "image_size": "768x768 (processor default; 1920x1080 frames resized without aspect preservation)",
+      "model_id": "microsoft/Florence-2-large",
+      "selected_epoch": 26,
+      "meta_note": null,
+      "trainable_params": 6920192,
+      "total_params": 781184000,
+      "trainable_fraction": 0.008858594134032442,
+      "train_gpu_hours": 0.57,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.24,
+      "train_cost_key": "cost_usd",
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/florence2_peft_valid.json",
+          "sha256_json": "f69480e91884161b4ee4c783c329ac9187ccc8011ddac620f5eb9a97c8b2b33e"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/florence2_peft_test.json",
+          "sha256_json": "498843d44175e13c3735e8c07ecef34a035f38a88585aff0fa18b509fd427f1d"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.5121505260467529,
+        "mAP_50": 0.7489401698112488,
+        "mAP_75": 0.5579524636268616,
+        "per_class_ap50": {
+          "player": 0.9531650543212891,
+          "ball": 0.3226045072078705,
+          "referee": 0.8729580640792847,
+          "rim": 0.8169605135917664,
+          "number": 0.7790127396583557
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.49916237592697144,
+        "mAP_50": 0.7254253625869751,
+        "mAP_75": 0.5380138754844666,
+        "per_class_ap50": {
+          "player": 0.9461236000061035,
+          "ball": 0.2870495021343231,
+          "referee": 0.8528859615325928,
+          "rim": 0.8560653924942017,
+          "number": 0.6850022077560425
+        }
+      },
+      "sibling_test_map_50_95": 0.49916237592697144
+    },
+    {
+      "row_id": "florence2/full",
+      "model_key": "florence2",
+      "model": "Florence-2-large",
+      "family": "generative VLM",
+      "slug": "florence2",
+      "arm": "full",
+      "role": "full",
+      "base_arm": "full",
+      "label": "full",
+      "seed": 0,
+      "image_size": "768x768 (processor default; 1920x1080 frames resized without aspect preservation)",
+      "model_id": "microsoft/Florence-2-large",
+      "selected_epoch": 16,
+      "meta_note": null,
+      "trainable_params": 776465408,
+      "total_params": 776465408,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 0.572,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.24,
+      "train_cost_key": "cost_usd",
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/florence2_full_valid.json",
+          "sha256_json": "6afc5152eec8f08aa3186368bac553478c9cbd8f0e6aa01027c10f8982ed1225"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/florence2_full_test.json",
+          "sha256_json": "69ca4c9e18b1ee36b2f1540d3f18800cddf30a36d4c676f706bd506307cfca59"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.6716020107269287,
+        "mAP_50": 0.9168652296066284,
+        "mAP_75": 0.7639416456222534,
+        "per_class_ap50": {
+          "player": 0.957428514957428,
+          "ball": 0.8126814961433411,
+          "referee": 0.9453740119934082,
+          "rim": 0.9288434386253357,
+          "number": 0.9399986863136292
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.6550509333610535,
+        "mAP_50": 0.8640663027763367,
+        "mAP_75": 0.7560699582099915,
+        "per_class_ap50": {
+          "player": 0.9472904801368713,
+          "ball": 0.6500549912452698,
+          "referee": 0.8916627764701843,
+          "rim": 0.9799851179122925,
+          "number": 0.851338267326355
+        }
+      },
+      "sibling_test_map_50_95": 0.6550509333610535
+    },
+    {
+      "row_id": "florence2/lora_all64",
+      "model_key": "florence2",
+      "model": "Florence-2-large",
+      "family": "generative VLM",
+      "slug": "florence2",
+      "arm": "lora_all64",
+      "role": "variant",
+      "base_arm": "lora_all64",
+      "label": "LoRA r64, all language-side linear layers",
+      "seed": 0,
+      "image_size": "768x768 (processor default; 1920x1080 frames resized without aspect preservation)",
+      "model_id": "microsoft/Florence-2-large",
+      "selected_epoch": 40,
+      "meta_note": null,
+      "trainable_params": 36804608,
+      "total_params": 811068416,
+      "trainable_fraction": 0.04537793270450812,
+      "train_gpu_hours": 0.75,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.39,
+      "train_cost_key": "cost_usd",
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/florence2_lora_all64_valid.json",
+          "sha256_json": "88ab5db5cd8ad12d1a0fc5d7989ac6ae2ed54ba38f6affd8e5eec09848621a8e"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/florence2_lora_all64_test.json",
+          "sha256_json": "3ea592872e4e4709a4fdec3e5e5038d3130e0db00dca3668de6c4c784fe6f996"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.5025805234909058,
+        "mAP_50": 0.7583062648773193,
+        "mAP_75": 0.5487233996391296,
+        "per_class_ap50": {
+          "player": 0.9599840641021729,
+          "ball": 0.3675365746021271,
+          "referee": 0.8370265960693359,
+          "rim": 0.8697268962860107,
+          "number": 0.7572571635246277
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.4917907118797302,
+        "mAP_50": 0.7457274198532104,
+        "mAP_75": 0.5118200778961182,
+        "per_class_ap50": {
+          "player": 0.9493808746337891,
+          "ball": 0.34306731820106506,
+          "referee": 0.8513844609260559,
+          "rim": 0.9409511685371399,
+          "number": 0.6438531875610352
+        }
+      },
+      "sibling_test_map_50_95": 0.4917907118797302
+    },
+    {
+      "row_id": "qwen3vl/peft",
+      "model_key": "qwen3vl",
+      "model": "Qwen3-VL (peft 8B, full 4B)",
+      "family": "generative VLM",
+      "slug": "qwen3vl",
+      "arm": "peft",
+      "role": "peft",
+      "base_arm": "peft",
+      "label": "peft",
+      "seed": 0,
+      "image_size": "native 1920x1080 -> 1920x1088 (image_processor longest_edge=2,100,000 px; 2040 visual tokens; 2090 prompt tokens). Zero-shot row used 2x upscale (min_pixels 4.096M).",
+      "model_id": "Qwen/Qwen3-VL-8B-Instruct",
+      "selected_epoch": 5,
+      "meta_note": null,
+      "trainable_params": 15335424,
+      "total_params": 8782459120,
+      "trainable_fraction": 0.0017461423720239303,
+      "train_gpu_hours": 1.67,
+      "train_gpu_hours_key": "train_hours_wallclock",
+      "train_cost_usd": null,
+      "train_cost_key": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/qwen3vl_peft_valid.json",
+          "sha256_json": "e57ac2eb8599be180cfbee969befce9c015c620b245f3e17bdb131f2e7ce8880"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/qwen3vl_peft_test.json",
+          "sha256_json": "bf256e3f50b6b9dadc54c753a4ba5a13715000bf7277002280efd435dbac64d3"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.517003059387207,
+        "mAP_50": 0.8314321637153625,
+        "mAP_75": 0.5241543650627136,
+        "per_class_ap50": {
+          "player": 0.9596323370933533,
+          "ball": 0.5965917706489563,
+          "referee": 0.8555154204368591,
+          "rim": 0.925594687461853,
+          "number": 0.8198266625404358
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.5477739572525024,
+        "mAP_50": 0.8208713531494141,
+        "mAP_75": 0.5844491720199585,
+        "per_class_ap50": {
+          "player": 0.9479591846466064,
+          "ball": 0.5963537096977234,
+          "referee": 0.8632058501243591,
+          "rim": 0.9502774477005005,
+          "number": 0.7465606927871704
+        }
+      },
+      "sibling_test_map_50_95": 0.5477739572525024
+    },
+    {
+      "row_id": "qwen3vl/full",
+      "model_key": "qwen3vl",
+      "model": "Qwen3-VL (peft 8B, full 4B)",
+      "family": "generative VLM",
+      "slug": "qwen3vl",
+      "arm": "full",
+      "role": "full",
+      "base_arm": "full",
+      "label": "full",
+      "seed": 0,
+      "image_size": "native 1920x1080 -> 1920x1088 (image_processor longest_edge=2,100,000 px; 2040 visual tokens; 2090 prompt tokens). Zero-shot row used 2x upscale (min_pixels 4.096M).",
+      "model_id": "Qwen/Qwen3-VL-4B-Instruct",
+      "selected_epoch": 4,
+      "meta_note": null,
+      "trainable_params": 4022468096,
+      "total_params": 4437815808,
+      "trainable_fraction": 0.9064071764197024,
+      "train_gpu_hours": 0.63,
+      "train_gpu_hours_key": "train_hours_wallclock",
+      "train_cost_usd": null,
+      "train_cost_key": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/qwen3vl_full_valid.json",
+          "sha256_json": "f160ea410449adf592c33cc4f3c3b3b4b2aafc82aca6da6166e946fcd9cd8684"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/qwen3vl_full_test.json",
+          "sha256_json": "4cc564a117cf7ae2cc1a236bb1d07894c0c8c191057d4e7c4be8e804f3a49b04"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.5386635065078735,
+        "mAP_50": 0.8445453643798828,
+        "mAP_75": 0.5401536226272583,
+        "per_class_ap50": {
+          "player": 0.9380761981010437,
+          "ball": 0.6879762411117554,
+          "referee": 0.8369988203048706,
+          "rim": 0.908210277557373,
+          "number": 0.8514654636383057
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.5405989289283752,
+        "mAP_50": 0.8260021805763245,
+        "mAP_75": 0.5586220622062683,
+        "per_class_ap50": {
+          "player": 0.942940354347229,
+          "ball": 0.6587645411491394,
+          "referee": 0.8572873473167419,
+          "rim": 0.9131277203559875,
+          "number": 0.7578909993171692
+        }
+      },
+      "sibling_test_map_50_95": 0.5405989289283752
+    },
+    {
+      "row_id": "qwen3vl/peft_4b",
+      "model_key": "qwen3vl",
+      "model": "Qwen3-VL (peft 8B, full 4B)",
+      "family": "generative VLM",
+      "slug": "qwen3vl",
+      "arm": "peft_4b",
+      "role": "variant",
+      "base_arm": "peft_4b",
+      "label": "LoRA on the 4B (like-for-like with full)",
+      "seed": 0,
+      "image_size": "native 1920x1080 -> 1920x1088 (image_processor longest_edge=2,100,000 px; 2040 visual tokens; 2090 prompt tokens). Zero-shot row used 2x upscale (min_pixels 4.096M).",
+      "model_id": "Qwen/Qwen3-VL-4B-Instruct",
+      "selected_epoch": 5,
+      "meta_note": null,
+      "trainable_params": 11796480,
+      "total_params": 4449612288,
+      "trainable_fraction": 0.0026511253647454867,
+      "train_gpu_hours": 1.41,
+      "train_gpu_hours_key": "train_hours_wallclock",
+      "train_cost_usd": null,
+      "train_cost_key": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/qwen3vl_peft_4b_valid.json",
+          "sha256_json": "fa3822e007ae606c7db7a6e52baf531ce1e82e381e181bcc25ff735e32713d6c"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/qwen3vl_peft_4b_test.json",
+          "sha256_json": "6f7a1a403e7752c7b05a819a84652e6ebb3da3d77899d134931d059e29279a3b"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.503699004650116,
+        "mAP_50": 0.7928323745727539,
+        "mAP_75": 0.5164554119110107,
+        "per_class_ap50": {
+          "player": 0.9386246800422668,
+          "ball": 0.5878826379776001,
+          "referee": 0.7603597044944763,
+          "rim": 0.8418775200843811,
+          "number": 0.8354173898696899
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.5333302617073059,
+        "mAP_50": 0.8063597083091736,
+        "mAP_75": 0.5483642220497131,
+        "per_class_ap50": {
+          "player": 0.9575170278549194,
+          "ball": 0.6075559258460999,
+          "referee": 0.8463507294654846,
+          "rim": 0.8655416369438171,
+          "number": 0.7548331618309021
+        }
+      },
+      "sibling_test_map_50_95": 0.5333302617073059
+    },
+    {
+      "row_id": "paligemma2/peft",
+      "model_key": "paligemma2",
+      "model": "PaliGemma 2 3B-448",
+      "family": "generative VLM",
+      "slug": "paligemma2",
+      "arm": "peft",
+      "role": "peft",
+      "base_arm": "peft",
+      "label": "peft",
+      "seed": 0,
+      "image_size": "448x448 (1920x1080 squashed, aspect not preserved)",
+      "model_id": "google/paligemma2-3b-pt-448",
+      "selected_epoch": 13,
+      "meta_note": null,
+      "trainable_params": 9046272,
+      "total_params": 3042173424,
+      "trainable_fraction": 0.0029736214012761686,
+      "train_gpu_hours": 0.84,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 1.04,
+      "train_cost_key": "cost_usd_train_share",
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/paligemma2_peft_valid.json",
+          "sha256_json": "fe3c190ef63c8f7249d4a7170b554fae96cb64ec45b2c76d3f36d9804ba9707c"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/paligemma2_peft_test.json",
+          "sha256_json": "e4f9842f59f20372fc45f3727de48568796b4c77d651dedaddbd53efd4033608"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.2929975390434265,
+        "mAP_50": 0.5884142518043518,
+        "mAP_75": 0.2549284100532532,
+        "per_class_ap50": {
+          "player": 0.8961279988288879,
+          "ball": 0.19891664385795593,
+          "referee": 0.7582527995109558,
+          "rim": 0.7455291748046875,
+          "number": 0.3432447910308838
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.2781030535697937,
+        "mAP_50": 0.5641161799430847,
+        "mAP_75": 0.24812091886997223,
+        "per_class_ap50": {
+          "player": 0.8638277649879456,
+          "ball": 0.20941275358200073,
+          "referee": 0.7306607961654663,
+          "rim": 0.6736408472061157,
+          "number": 0.34303876757621765
+        }
+      },
+      "sibling_test_map_50_95": 0.2781030535697937
+    },
+    {
+      "row_id": "paligemma2/full",
+      "model_key": "paligemma2",
+      "model": "PaliGemma 2 3B-448",
+      "family": "generative VLM",
+      "slug": "paligemma2",
+      "arm": "full",
+      "role": "full",
+      "base_arm": "full",
+      "label": "full",
+      "seed": 0,
+      "image_size": "448x448 (1920x1080 squashed, aspect not preserved)",
+      "model_id": "google/paligemma2-3b-pt-448",
+      "selected_epoch": 14,
+      "meta_note": null,
+      "trainable_params": 2619800064,
+      "total_params": 3033127152,
+      "trainable_fraction": 0.8637290600470019,
+      "train_gpu_hours": 0.92,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 1.13,
+      "train_cost_key": "cost_usd_train_share",
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/paligemma2_full_valid.json",
+          "sha256_json": "e82cf2d611c738ef9598023ca991224b390cb3d9627d30ab0a65a3a140b31c6c"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/paligemma2_full_test.json",
+          "sha256_json": "bdebd05cb26af494f51a33353e3605e284f4c385a4ca91f99727cd5c2db4911d"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.26841241121292114,
+        "mAP_50": 0.5750988125801086,
+        "mAP_75": 0.25088706612586975,
+        "per_class_ap50": {
+          "player": 0.876833975315094,
+          "ball": 0.20553657412528992,
+          "referee": 0.7380486130714417,
+          "rim": 0.7215855717658997,
+          "number": 0.33348944783210754
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.2645456790924072,
+        "mAP_50": 0.5444741249084473,
+        "mAP_75": 0.22968660295009613,
+        "per_class_ap50": {
+          "player": 0.8700565695762634,
+          "ball": 0.21442483365535736,
+          "referee": 0.7930223345756531,
+          "rim": 0.6016418933868408,
+          "number": 0.24322496354579926
+        }
+      },
+      "sibling_test_map_50_95": 0.2645456790924072
+    },
+    {
+      "row_id": "smolvlm2/peft",
+      "model_key": "smolvlm2",
+      "model": "SmolVLM2-2.2B",
+      "family": "generative VLM",
+      "slug": "smolvlm2",
+      "arm": "peft",
+      "role": "peft",
+      "base_arm": "peft",
+      "label": "peft",
+      "seed": 0,
+      "image_size": null,
+      "model_id": "HuggingFaceTB/SmolVLM2-2.2B-Instruct",
+      "selected_epoch": 4,
+      "meta_note": null,
+      "trainable_params": 27525120,
+      "total_params": 2274310000,
+      "trainable_fraction": 0.012102624532275723,
+      "train_gpu_hours": 3.0,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 1.27,
+      "train_cost_key": "cost_usd",
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/smolvlm2_peft_valid.json",
+          "sha256_json": "cd0909993c565e18e13a93df3b855620eaa74e9dfdfd79e067d35861ddec259c"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/smolvlm2_peft_test.json",
+          "sha256_json": "a9f3880041f48bd2a82552cd14ea75b4278c6887e277cc4fb51e1ee7d8d59d46"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.0011758435284718871,
+        "mAP_50": 0.005273753311485052,
+        "mAP_75": 0.0003496769058983773,
+        "per_class_ap50": {
+          "player": 0.007340169977396727,
+          "ball": 0.0,
+          "referee": 0.019028596580028534,
+          "rim": 0.0,
+          "number": 0.0
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.0002737275790423155,
+        "mAP_50": 0.0012897156411781907,
+        "mAP_75": 4.917033948004246e-05,
+        "per_class_ap50": {
+          "player": 0.005594678223133087,
+          "ball": 0.0,
+          "referee": 0.0006209354614838958,
+          "rim": 0.00023296447761822492,
+          "number": 0.0
+        }
+      },
+      "sibling_test_map_50_95": 0.0002737275790423155
+    },
+    {
+      "row_id": "smolvlm2/full",
+      "model_key": "smolvlm2",
+      "model": "SmolVLM2-2.2B",
+      "family": "generative VLM",
+      "slug": "smolvlm2",
+      "arm": "full",
+      "role": "full",
+      "base_arm": "full",
+      "label": "full",
+      "seed": 0,
+      "image_size": null,
+      "model_id": "HuggingFaceTB/SmolVLM2-2.2B-Instruct",
+      "selected_epoch": 6,
+      "meta_note": null,
+      "trainable_params": 1833797632,
+      "total_params": 2246784880,
+      "trainable_fraction": 0.8161874544927505,
+      "train_gpu_hours": 3.0,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 1.27,
+      "train_cost_key": "cost_usd",
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/smolvlm2_full_valid.json",
+          "sha256_json": "cbf876ce448cbfa0ff46fb30bfbb965c9d3b78c33802d028f85ec3f660a8331e"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/smolvlm2_full_test.json",
+          "sha256_json": "26d3de1bb69e9b6c25c4831b2e339550fbd5701f203a70cdd922162e4e266e72"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.0009105781791731715,
+        "mAP_50": 0.00320959254167974,
+        "mAP_75": 0.00037924846401438117,
+        "per_class_ap50": {
+          "player": 0.010578096844255924,
+          "ball": 0.0,
+          "referee": 0.0017876788042485714,
+          "rim": 0.0036003601271659136,
+          "number": 8.182635792763904e-05
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.00016665959265083075,
+        "mAP_50": 0.0007138377404771745,
+        "mAP_75": 0.0001414427242707461,
+        "per_class_ap50": {
+          "player": 0.0034936084412038326,
+          "ball": 0.0,
+          "referee": 7.558007928309962e-05,
+          "rim": 0.0,
+          "number": 0.0
+        }
+      },
+      "sibling_test_map_50_95": 0.00016665959265083075
+    }
+  ],
+  "models": {
+    "llmdet": {
+      "display": "LLMDet-large",
+      "family": "open-vocab detector",
+      "slug": "llmdet",
+      "resolution": "short side 800, long cap 1333",
+      "licence": "Apache-2.0",
+      "redistribution": "permissive",
+      "arms": {
+        "peft": "peft",
+        "full": "full",
+        "variants": []
+      },
+      "zero_shot": {
+        "source": "results/vlm/vlm_metrics_merged5.json [LLMDet-large]",
+        "split": "test",
+        "metrics": {
+          "mAP_50_95": 0.3883121609687805,
+          "mAP_50": 0.5061895251274109,
+          "mAP_75": 0.431951642036438,
+          "per_class_ap50": {
+            "player": 0.8796826601028442,
+            "ball": 0.4065794348716736,
+            "referee": 0.6731314659118652,
+            "rim": 0.0009900990407913923,
+            "number": 0.5705640912055969
+          }
+        }
+      },
+      "latency_t4": [
+        {
+          "arm": "peft",
+          "runtime": "pytorch_fp16",
+          "median_ms": 734.9300895002671,
+          "tail_label": "p90",
+          "tail_ms": 743.7203149893321,
+          "n_runs": 2,
+          "stable_within_10pct": true,
+          "dtype": "fp16-autocast",
+          "gpu": "Tesla T4",
+          "notes": "native PyTorch, fp16 autocast with fp32 master weights; deformable attention via kernels-community/deformable-detr CUDA kernel in fp32; input short side 800 / cap 1333"
+        },
+        {
+          "arm": "full",
+          "runtime": "pytorch_fp16",
+          "median_ms": 743.5167924850248,
+          "tail_label": "p90",
+          "tail_ms": 752.2252449998632,
+          "n_runs": 2,
+          "stable_within_10pct": true,
+          "dtype": "fp16-autocast",
+          "gpu": "Tesla T4",
+          "notes": "native PyTorch, fp16 autocast with fp32 master weights; deformable attention via kernels-community/deformable-detr CUDA kernel in fp32; input short side 800 / cap 1333"
+        }
+      ]
+    },
+    "mmgdino": {
+      "display": "MM-Grounding-DINO-B",
+      "family": "open-vocab detector",
+      "slug": "mmgdino",
+      "resolution": "short side 800 (1422x800)",
+      "licence": "Apache-2.0",
+      "redistribution": "permissive",
+      "arms": {
+        "peft": "peft",
+        "full": "full",
+        "variants": []
+      },
+      "zero_shot": {
+        "source": "benchmarks/basketball/results/finetune/zeroshot_mmgdino_valid.json.gz",
+        "split": "valid",
+        "metrics": {
+          "mAP_50_95": 0.39576345682144165,
+          "mAP_50": 0.5480961799621582,
+          "mAP_75": 0.4450356960296631,
+          "per_class_ap50": {
+            "player": 0.966801106929779,
+            "ball": 0.5142340064048767,
+            "referee": 0.7339885234832764,
+            "rim": 0.0005413380567915738,
+            "number": 0.5249158143997192
+          }
+        }
+      },
+      "latency_t4": [
+        {
+          "arm": "peft",
+          "runtime": "pytorch_fp16",
+          "median_ms": 466.18053902057,
+          "tail_label": "p90",
+          "tail_ms": 484.8765110364184,
+          "n_runs": 2,
+          "stable_within_10pct": true,
+          "dtype": "fp16",
+          "gpu": "Tesla T4",
+          "notes": "HF transformers MMGroundingDinoForObjectDetection, fp16 weights + fp16 autocast, short side 800 (max 1600), fixed 5-phrase prompt tokenised once outside the timer, top-300 decode + conf filter inside."
+        }
+      ]
+    },
+    "sam3": {
+      "display": "SAM 3",
+      "family": "open-vocab detector",
+      "slug": "sam3",
+      "resolution": "1008x1008",
+      "licence": "SAM License (gated)",
+      "redistribution": "gated",
+      "arms": {
+        "peft": "peft",
+        "full": "full",
+        "variants": []
+      },
+      "zero_shot": {
+        "source": "benchmarks/basketball/results/finetune/zeroshot_sam3_valid.json.gz",
+        "split": "valid",
+        "metrics": {
+          "mAP_50_95": 0.47914546728134155,
+          "mAP_50": 0.7309472560882568,
+          "mAP_75": 0.5263966917991638,
+          "per_class_ap50": {
+            "player": 0.9762338399887085,
+            "ball": 0.5494000315666199,
+            "referee": 0.9144885540008545,
+            "rim": 0.5056368708610535,
+            "number": 0.7089769244194031
+          }
+        }
+      },
+      "latency_t4": [
+        {
+          "arm": "full",
+          "runtime": "pytorch_fp16",
+          "median_ms": 1137.504578975495,
+          "tail_label": "p90",
+          "tail_ms": 1141.8297220370732,
+          "n_runs": 2,
+          "stable_within_10pct": true,
+          "dtype": "fp16 autocast",
+          "gpu": "Tesla T4",
+          "notes": "Native PyTorch, fp32 weights under fp16 autocast, 1008x1008 input, five text prompts batched against one image encoding; text features for the fixed vocabulary cached at start-up. Segmentation head off (boxes only). Peft and full share the architecture, so one timing covers both arms."
+        }
+      ]
+    },
+    "yoloe_1280": {
+      "display": "YOLOE-26x @1280",
+      "family": "open-vocab detector",
+      "slug": "yoloe",
+      "resolution": "1280",
+      "licence": "AGPL-3.0",
+      "redistribution": "agpl",
+      "arms": {
+        "peft": "yoloe_peft",
+        "full": "yoloe_full",
+        "variants": []
+      },
+      "zero_shot": {
+        "source": "results/vlm/vlm_metrics_merged5.json [YOLOE]",
+        "split": "test",
+        "metrics": {
+          "mAP_50_95": 0.2777418792247772,
+          "mAP_50": 0.3850049674510956,
+          "mAP_75": 0.3245048224925995,
+          "per_class_ap50": {
+            "player": 0.935349702835083,
+            "ball": 0.2946537733078003,
+            "referee": 0.5161179900169373,
+            "rim": 0.0,
+            "number": 0.17890343070030212
+          }
+        }
+      },
+      "latency_t4": [
+        {
+          "arm": "yoloe_full",
+          "runtime": "pytorch_fp16",
+          "median_ms": 57.28909102617763,
+          "tail_label": "p90",
+          "tail_ms": 58.777501981239766,
+          "n_runs": 2,
+          "stable_within_10pct": true,
+          "dtype": "fp16",
+          "gpu": "Tesla T4",
+          "notes": "Ultralytics native PyTorch, half=True, imgsz=1280, predict() end to end incl. letterbox + NMS/top-k; masks not computed (detection-only checkpoint)."
+        }
+      ]
+    },
+    "yoloe_640": {
+      "display": "YOLOE-26x @640",
+      "family": "open-vocab detector",
+      "slug": "yoloe",
+      "resolution": "640",
+      "licence": "AGPL-3.0",
+      "redistribution": "agpl",
+      "arms": {
+        "peft": "yoloe_peft_640",
+        "full": "yoloe_full_640",
+        "variants": []
+      },
+      "zero_shot": null,
+      "latency_t4": [
+        {
+          "arm": "yoloe_full_640",
+          "runtime": "pytorch_fp16",
+          "median_ms": 28.93463196232915,
+          "tail_label": "p90",
+          "tail_ms": 36.37772798538208,
+          "n_runs": 2,
+          "stable_within_10pct": true,
+          "dtype": "fp16",
+          "gpu": "Tesla T4",
+          "notes": "Ultralytics native PyTorch, half=True, imgsz=640, predict() end to end incl. letterbox + NMS/top-k; masks not computed (detection-only checkpoint)."
+        }
+      ]
+    },
+    "yoloworld": {
+      "display": "YOLO-World-v2-x @1280",
+      "family": "open-vocab detector",
+      "slug": "yoloe",
+      "resolution": "1280",
+      "licence": "AGPL-3.0",
+      "redistribution": "agpl",
+      "arms": {
+        "peft": "yoloworld_peft",
+        "full": "yoloworld_full",
+        "variants": []
+      },
+      "zero_shot": {
+        "source": "results/vlm/vlm_metrics_merged5.json [YOLO-World]",
+        "split": "test",
+        "metrics": {
+          "mAP_50_95": 0.18917140364646912,
+          "mAP_50": 0.2414889633655548,
+          "mAP_75": 0.20911815762519836,
+          "per_class_ap50": {
+            "player": 0.8400450944900513,
+            "ball": 0.31109854578971863,
+            "referee": 0.0,
+            "rim": 0.005400540307164192,
+            "number": 0.0509006530046463
+          }
+        }
+      },
+      "latency_t4": [
+        {
+          "arm": "yoloworld_full",
+          "runtime": "pytorch_fp16",
+          "median_ms": 80.58125647949055,
+          "tail_label": "p90",
+          "tail_ms": 81.70000102836639,
+          "n_runs": 2,
+          "stable_within_10pct": true,
+          "dtype": "fp16",
+          "gpu": "Tesla T4",
+          "notes": "Ultralytics native PyTorch, half=True, imgsz=1280, predict() end to end incl. letterbox + NMS/top-k; masks not computed (detection-only checkpoint)."
+        }
+      ]
+    },
+    "owlv2": {
+      "display": "OWLv2-L/14",
+      "family": "open-vocab detector",
+      "slug": "owlv2",
+      "resolution": "1008x1008 (padded square)",
+      "licence": "Apache-2.0",
+      "redistribution": "permissive",
+      "arms": {
+        "peft": "peft",
+        "full": "full",
+        "variants": []
+      },
+      "zero_shot": {
+        "source": "results/vlm/vlm_metrics_merged5.json [OWLv2]",
+        "split": "test",
+        "metrics": {
+          "mAP_50_95": 0.31479963660240173,
+          "mAP_50": 0.4759581387042999,
+          "mAP_75": 0.3674319386482239,
+          "per_class_ap50": {
+            "player": 0.9014638662338257,
+            "ball": 0.5833103656768799,
+            "referee": 0.38846680521965027,
+            "rim": 0.0015401541022583842,
+            "number": 0.5050094723701477
+          }
+        }
+      },
+      "latency_t4": [
+        {
+          "arm": "peft",
+          "runtime": "pytorch_fp16",
+          "median_ms": 1825.8681194856763,
+          "tail_label": "p90",
+          "tail_ms": 1929.2345399735495,
+          "n_runs": 2,
+          "stable_within_10pct": true,
+          "dtype": "fp16",
+          "gpu": "Tesla T4",
+          "notes": "vision tower fp16, detection heads fp32; HF Owlv2Processor (numpy, CPU) preprocessing inside the timer; decode top-300 + optional class-wise NMS."
+        }
+      ]
+    },
+    "deimv2_m": {
+      "display": "DEIMv2-M",
+      "family": "frozen backbone + DETR head",
+      "slug": "deimv2",
+      "resolution": "640",
+      "licence": "Apache-2.0 code, DINOv3 License weights",
+      "redistribution": "gated",
+      "arms": {
+        "peft": "peft",
+        "full": "full",
+        "variants": []
+      },
+      "zero_shot": null,
+      "latency_t4": [
+        {
+          "arm": "full",
+          "runtime": "pytorch_fp16",
+          "median_ms": 66.0408340045251,
+          "tail_label": "p90",
+          "tail_ms": 72.87851901492104,
+          "n_runs": 2,
+          "stable_within_10pct": true,
+          "dtype": "fp16",
+          "gpu": "Tesla T4",
+          "notes": "DEIMv2 deploy-mode model + postprocessor, fp16 via torch.autocast (model.half() breaks DINOv3 RoPE); PIL -> Resize 640 -> normalize -> forward -> top-300 -> conf filter"
+        },
+        {
+          "arm": "full",
+          "runtime": "tensorrt_fp16",
+          "median_ms": 11.08193588256836,
+          "tail_label": "p99",
+          "tail_ms": 11.414175987243652,
+          "n_runs": 2,
+          "stable_within_10pct": null,
+          "dtype": "fp16",
+          "gpu": "Tesla T4",
+          "notes": "GPU compute, device-resident IO (trtexec --noDataTransfers equivalent)"
+        }
+      ]
+    },
+    "deimv2_l": {
+      "display": "DEIMv2-L",
+      "family": "frozen backbone + DETR head",
+      "slug": "deimv2",
+      "resolution": "640",
+      "licence": "Apache-2.0 code, DINOv3 License weights",
+      "redistribution": "gated",
+      "arms": {
+        "peft": "l_peft",
+        "full": "l_full",
+        "variants": []
+      },
+      "zero_shot": null,
+      "latency_t4": [
+        {
+          "arm": "l_full",
+          "runtime": "pytorch_fp16",
+          "median_ms": 70.64502203138545,
+          "tail_label": "p90",
+          "tail_ms": 79.41648800624534,
+          "n_runs": 2,
+          "stable_within_10pct": true,
+          "dtype": "fp16",
+          "gpu": "Tesla T4",
+          "notes": "DEIMv2 deploy-mode model + postprocessor, fp16 via torch.autocast (model.half() breaks DINOv3 RoPE); PIL -> Resize 640 -> normalize -> forward -> top-300 -> conf filter"
+        },
+        {
+          "arm": "l_full",
+          "runtime": "tensorrt_fp16",
+          "median_ms": 13.156527996063232,
+          "tail_label": "p99",
+          "tail_ms": 13.428352355957031,
+          "n_runs": 2,
+          "stable_within_10pct": null,
+          "dtype": "fp16",
+          "gpu": "Tesla T4",
+          "notes": "GPU compute, device-resident IO (trtexec --noDataTransfers equivalent)"
+        }
+      ]
+    },
+    "florence2": {
+      "display": "Florence-2-large",
+      "family": "generative VLM",
+      "slug": "florence2",
+      "resolution": "768x768 (squashed)",
+      "licence": "MIT",
+      "redistribution": "permissive",
+      "arms": {
+        "peft": "peft",
+        "full": "full",
+        "variants": [
+          {
+            "arm": "lora_all64",
+            "label": "LoRA r64, all language-side linear layers"
+          }
+        ]
+      },
+      "zero_shot": {
+        "source": "results/vlm/vlm_metrics_merged5.json [Florence-2]",
+        "split": "test",
+        "metrics": {
+          "mAP_50_95": 0.2382420301437378,
+          "mAP_50": 0.32260575890541077,
+          "mAP_75": 0.2550719082355499,
+          "per_class_ap50": {
+            "player": 0.7490584254264832,
+            "ball": 0.15144607424736023,
+            "referee": 0.560391902923584,
+            "rim": 0.0,
+            "number": 0.15213237702846527
+          }
+        }
+      },
+      "latency_t4": [
+        {
+          "arm": "full",
+          "runtime": "pytorch_fp16",
+          "median_ms": 1298.0734105221927,
+          "tail_label": "p90",
+          "tail_ms": 1452.6528092101216,
+          "n_runs": 2,
+          "stable_within_10pct": true,
+          "dtype": "fp16",
+          "gpu": "Tesla T4",
+          "notes": "selected (better) arm: full fine-tune. num_beams=1, max_new_tokens=400; includes generation AND the teacher-forced re-scoring forward pass that produces per-box confidences, token parsing and the conf>=0.25 filter; transformers 4.49.0 remote-code Florence-2, eager attention, fp16 weights; 768x768 input"
+        },
+        {
+          "arm": "peft",
+          "runtime": "pytorch_fp16",
+          "median_ms": 1274.61843425408,
+          "tail_label": "p90",
+          "tail_ms": 1369.5375360548496,
+          "n_runs": 2,
+          "stable_within_10pct": true,
+          "dtype": "fp16",
+          "gpu": "Tesla T4",
+          "notes": "LoRA adapter merged into base weights (same architecture/FLOPs as full). num_beams=1, max_new_tokens=400; includes generation AND the teacher-forced re-scoring forward pass that produces per-box confidences, token parsing and the conf>=0.25 filter; transformers 4.49.0 remote-code Florence-2, eager attention, fp16 weights; 768x768 input"
+        }
+      ]
+    },
+    "qwen3vl": {
+      "display": "Qwen3-VL (peft 8B, full 4B)",
+      "family": "generative VLM",
+      "slug": "qwen3vl",
+      "resolution": "native 1920x1088",
+      "licence": "Apache-2.0",
+      "redistribution": "permissive",
+      "arms": {
+        "peft": "peft",
+        "full": "full",
+        "variants": [
+          {
+            "arm": "peft_4b",
+            "label": "LoRA on the 4B (like-for-like with full)"
+          }
+        ]
+      },
+      "zero_shot": {
+        "source": "results/vlm/vlm_metrics_merged5.json [Qwen3-VL]",
+        "split": "test",
+        "metrics": {
+          "mAP_50_95": 0.31751686334609985,
+          "mAP_50": 0.452224463224411,
+          "mAP_75": 0.336713582277298,
+          "per_class_ap50": {
+            "player": 0.933837890625,
+            "ball": 0.3340285122394562,
+            "referee": 0.7269189953804016,
+            "rim": 0.0,
+            "number": 0.2663368582725525
+          }
+        }
+      },
+      "latency_t4": []
+    },
+    "paligemma2": {
+      "display": "PaliGemma 2 3B-448",
+      "family": "generative VLM",
+      "slug": "paligemma2",
+      "resolution": "448x448 (squashed)",
+      "licence": "Gemma Terms of Use (gated)",
+      "redistribution": "gated",
+      "arms": {
+        "peft": "peft",
+        "full": "full",
+        "variants": []
+      },
+      "zero_shot": {
+        "source": "benchmarks/basketball/results/finetune/zeroshot_paligemma2_valid.json",
+        "split": "valid",
+        "metrics": {
+          "mAP_50_95": 0.007521288003772497,
+          "mAP_50": 0.018100105226039886,
+          "mAP_75": 0.004799406975507736,
+          "per_class_ap50": {
+            "player": 0.0373191200196743,
+            "ball": 0.05318140983581543,
+            "referee": 0.0,
+            "rim": 0.0,
+            "number": 0.0
+          }
+        }
+      },
+      "latency_t4": [
+        {
+          "arm": "peft",
+          "runtime": "pytorch_fp16",
+          "median_ms": 9924.690296524204,
+          "tail_label": "p90",
+          "tail_ms": 11431.983386864886,
+          "n_runs": 2,
+          "stable_within_10pct": true,
+          "dtype": "fp16",
+          "gpu": "Tesla T4",
+          "notes": "native PyTorch fp16, greedy generate (max_new_tokens=320), transformers PaliGemmaForConditionalGeneration, LoRA merged"
+        }
+      ]
+    },
+    "smolvlm2": {
+      "display": "SmolVLM2-2.2B",
+      "family": "generative VLM",
+      "slug": "smolvlm2",
+      "resolution": "SigLIP tiles, pixel-shuffled",
+      "licence": "Apache-2.0",
+      "redistribution": "permissive",
+      "arms": {
+        "peft": "peft",
+        "full": "full",
+        "variants": []
+      },
+      "zero_shot": {
+        "source": "benchmarks/basketball/results/finetune/zeroshot_smolvlm2_valid.json",
+        "split": "valid",
+        "metrics": {
+          "mAP_50_95": 0.0,
+          "mAP_50": 0.0,
+          "mAP_75": 0.0,
+          "per_class_ap50": {
+            "player": 0.0,
+            "ball": 0.0,
+            "referee": 0.0,
+            "rim": 0.0,
+            "number": 0.0
+          }
+        }
+      },
+      "latency_t4": []
+    }
+  },
+  "costs": [
+    {
+      "slug": "yoloe",
+      "usd": 1.11,
+      "complete": true,
+      "source": "docs/plans/yoloe.md, Cost table (all six arms, one failed box, T4)"
+    },
+    {
+      "slug": "llmdet",
+      "usd": 3.8,
+      "complete": true,
+      "source": "docs/plans/llmdet.md: Cost table about $2.9 (both arms, seed 1, T4) + seed 2 section about $0.9"
+    },
+    {
+      "slug": "mmgdino",
+      "usd": 2.25,
+      "complete": false,
+      "source": "meta.json cost_usd, full 1.52 (both full runs + setup share) + peft 0.73; peft seeds 1-2 and the T4 box not yet in"
+    },
+    {
+      "slug": "owlv2",
+      "usd": 2.19,
+      "complete": false,
+      "source": "meta.json cost_usd, full 1.87 + peft 0.32 (approximate share); T4 box and extra peft seeds not yet in"
+    },
+    {
+      "slug": "sam3",
+      "usd": 2.75,
+      "complete": true,
+      "source": "docs/plans/sam3.md, Cost table (A100 both arms + T4)"
+    },
+    {
+      "slug": "deimv2",
+      "usd": 2.49,
+      "complete": true,
+      "source": "docs/plans/deimv2.md, Cost table (M box, L box, T4)"
+    },
+    {
+      "slug": "florence2",
+      "usd": 1.49,
+      "complete": true,
+      "source": "docs/plans/florence2.md: Cost table ~1.04 (both arms, 1024 exploration, T4) + lora_all64 box 0.45"
+    },
+    {
+      "slug": "qwen3vl",
+      "usd": 5.99,
+      "complete": false,
+      "source": "docs/plans/qwen3vl.md, Cost table: A100 5.86 + failed T4 0.13; T4 latency box not yet in"
+    },
+    {
+      "slug": "paligemma2",
+      "usd": 2.75,
+      "complete": true,
+      "source": "docs/plans/paligemma2.md, Cost table (A100 + T4)"
+    },
+    {
+      "slug": "smolvlm2",
+      "usd": 2.26,
+      "complete": false,
+      "source": "meta.json total_model_cost_usd (A6000 box 2.11 + T4 0.15 estimated); T4 latency file not yet in"
+    }
+  ],
+  "latency_anchor_t4": [
+    {
+      "model": "YOLOX-M",
+      "onnx": "yolox_m_basketball_640.onnx",
+      "trt_version": "10.3.0",
+      "gpu": "Tesla T4",
+      "scope": "GPU compute, device-resident IO (trtexec --noDataTransfers equivalent)",
+      "median_ms": 5.83955192565918,
+      "run_medians_ms": [
+        5.826335906982422,
+        5.83955192565918
+      ],
+      "published_median_ms": 5.68115
+    },
+    {
+      "model": "DEIM-M",
+      "onnx": "deim_m_640.onnx",
+      "trt_version": "10.3.0",
+      "gpu": "Tesla T4",
+      "scope": "GPU compute, device-resident IO (trtexec --noDataTransfers equivalent)",
+      "median_ms": 6.673408031463623,
+      "run_medians_ms": [
+        6.651904106140137,
+        6.673408031463623
+      ],
+      "published_median_ms": 6.61182
+    }
+  ],
+  "published_trt_fp16_ms": {
+    "YOLO26m": 5.84912,
+    "DEIM-M": 6.61182,
+    "YOLOX-M": 5.68115,
+    "RF-DETR-M": 7.70679,
+    "RTMDet-M": 8.18799,
+    "DAMO-YOLO-M": 6.70044,
+    "RT-DETRv2-M": 7.93237
+  },
+  "missing": [
+    "mmgdino: mmgdino/peft_s1 (queued seed, not started or not copied)",
+    "mmgdino: mmgdino/peft_s2 (queued seed, not started or not copied)",
+    "owlv2: owlv2/peft_seed1/meta.json",
+    "owlv2: owlv2/peft_seed2/meta.json",
+    "qwen3vl: qwen3vl/latency_t4.json",
+    "smolvlm2: smolvlm2/latency_t4.json"
+  ]
+}

@@ -1,0 +1,259 @@
+# finetune_study.yaml -- the foundation-model fine-tuning study (FOUNDATION_FINETUNE.md).
+#
+# The runs live in the sibling `foundation-finetune` repo (results/<slug>/<arm>/).
+# This manifest says which of its arm folders are rows of the report, what each row
+# is, and the few facts the sibling repo keeps only in prose (docs/plans/<slug>.md):
+# the per-slug vast.ai spend, the input resolution, the licence of the weights.
+#
+# Everything measured (val/test mAP, per-class AP, params, per-arm GPU hours and $,
+# T4 latency) is read from the sibling repo's files by
+# scripts/write_finetune_results.py, never typed here.
+#
+# Seeds need not be listed: any folder named `<arm>_s<N>` or `<arm>_seed<N>` next to a
+# listed arm is picked up as another seed of that arm when its test.json exists.
+#
+# zero_shot: the same checkpoint before fine-tuning.
+#   source: vlm_metrics  -> the published row in results/vlm/vlm_metrics_merged5.json
+#                           (test split; `key` is the row label)
+#   source: sibling      -> a val-only zero-shot dump in the sibling repo (`path`,
+#                           relative to its results/); rescored here
+# latency: where the slug's results/<slug>/latency_t4.json keeps each timed arm.
+#   `path` is a dot path into that file; omitted -> the generic layout (top-level
+#   reported_median_ms, per_arm.*, other_arms.*) is used.
+
+sibling_repo_default: "/Users/ortizeg/1Projects/⛹️‍♂️ Next Play/code/foundation-finetune"
+
+references:
+  # Fine-tuned conventional detectors every row is compared with. Names are
+  # reproduction_640.yaml entries; their test predictions come from that manifest.
+  - YOLO26m
+  - DEIM-M
+
+models:
+  - key: llmdet
+    display: LLMDet-large
+    family: open-vocab detector
+    slug: llmdet
+    resolution: "short side 800, long cap 1333"
+    licence: Apache-2.0
+    redistribution: permissive
+    arms:
+      peft: peft
+      full: full
+    zero_shot: {source: vlm_metrics, key: LLMDet-large}
+    latency:
+      - {path: per_arm.peft, arm: peft, runtime: pytorch_fp16}
+      - {path: per_arm.full, arm: full, runtime: pytorch_fp16}
+
+  - key: mmgdino
+    display: MM-Grounding-DINO-B
+    family: open-vocab detector
+    slug: mmgdino
+    resolution: "short side 800 (1422x800)"
+    licence: Apache-2.0
+    redistribution: permissive
+    arms:
+      peft: peft
+      full: full
+    zero_shot: {source: sibling, path: mmgdino/zeroshot_valid.json}
+    # Queued (results/QUEUE.md item 3); listed as pending until they land.
+    expected_seed_arms: [peft_s1, peft_s2]
+
+  - key: sam3
+    display: SAM 3
+    family: open-vocab detector
+    slug: sam3
+    resolution: "1008x1008"
+    licence: SAM License (gated)
+    redistribution: gated
+    arms:
+      peft: peft
+      full: full
+    zero_shot: {source: sibling, path: sam3/zeroshot/valid.json}
+    latency:
+      - {path: "", arm: full, runtime: pytorch_fp16}
+
+  - key: yoloe_1280
+    display: YOLOE-26x @1280
+    family: open-vocab detector
+    slug: yoloe
+    resolution: "1280"
+    licence: AGPL-3.0
+    redistribution: agpl
+    arms:
+      peft: yoloe_peft
+      full: yoloe_full
+    zero_shot: {source: vlm_metrics, key: YOLOE}
+    latency:
+      - {path: runs.yoloe_full_1280, arm: yoloe_full, runtime: pytorch_fp16}
+
+  - key: yoloe_640
+    display: YOLOE-26x @640
+    family: open-vocab detector
+    slug: yoloe
+    resolution: "640"
+    licence: AGPL-3.0
+    redistribution: agpl
+    arms:
+      peft: yoloe_peft_640
+      full: yoloe_full_640
+    latency:
+      - {path: runs.yoloe_full_640, arm: yoloe_full_640, runtime: pytorch_fp16}
+
+  - key: yoloworld
+    display: YOLO-World-v2-x @1280
+    family: open-vocab detector
+    slug: yoloe
+    resolution: "1280"
+    licence: AGPL-3.0
+    redistribution: agpl
+    arms:
+      peft: yoloworld_peft
+      full: yoloworld_full
+    zero_shot: {source: vlm_metrics, key: YOLO-World}
+    latency:
+      - {path: runs.yoloworld_full_1280, arm: yoloworld_full, runtime: pytorch_fp16}
+
+  - key: owlv2
+    display: OWLv2-L/14
+    family: open-vocab detector
+    slug: owlv2
+    resolution: "1008x1008 (padded square)"
+    licence: Apache-2.0
+    redistribution: permissive
+    arms:
+      peft: peft
+      full: full
+    zero_shot: {source: vlm_metrics, key: OWLv2}
+    latency:
+      - {path: "", arm: peft, runtime: pytorch_fp16}
+
+  - key: deimv2_m
+    display: DEIMv2-M
+    family: frozen backbone + DETR head
+    slug: deimv2
+    resolution: "640"
+    licence: Apache-2.0 code, DINOv3 License weights
+    redistribution: gated
+    arms:
+      peft: peft
+      full: full
+    latency:
+      - {path: "pytorch_fp16.DEIMv2-M (full)", arm: full, runtime: pytorch_fp16}
+      - {path: "tensorrt_fp16.DEIMv2-M (full)", arm: full, runtime: tensorrt_fp16}
+
+  - key: deimv2_l
+    display: DEIMv2-L
+    family: frozen backbone + DETR head
+    slug: deimv2
+    resolution: "640"
+    licence: Apache-2.0 code, DINOv3 License weights
+    redistribution: gated
+    arms:
+      peft: l_peft
+      full: l_full
+    latency:
+      - {path: "pytorch_fp16.DEIMv2-L (l_full)", arm: l_full, runtime: pytorch_fp16}
+      - {path: "tensorrt_fp16.DEIMv2-L (l_full)", arm: l_full, runtime: tensorrt_fp16}
+
+  - key: florence2
+    display: Florence-2-large
+    family: generative VLM
+    slug: florence2
+    resolution: "768x768 (squashed)"
+    licence: MIT
+    redistribution: permissive
+    arms:
+      peft: peft
+      full: full
+      variants:
+        - {arm: lora_all64, label: "LoRA r64, all language-side linear layers"}
+    zero_shot: {source: vlm_metrics, key: Florence-2}
+    latency:
+      - {path: "", arm: full, runtime: pytorch_fp16}
+      - {path: other_arms.peft, arm: peft, runtime: pytorch_fp16}
+
+  - key: qwen3vl
+    display: Qwen3-VL (peft 8B, full 4B)
+    family: generative VLM
+    slug: qwen3vl
+    resolution: "native 1920x1088"
+    licence: Apache-2.0
+    redistribution: permissive
+    arms:
+      peft: peft
+      full: full
+      variants:
+        - {arm: peft_4b, label: "LoRA on the 4B (like-for-like with full)"}
+    zero_shot: {source: vlm_metrics, key: Qwen3-VL}
+
+  - key: paligemma2
+    display: PaliGemma 2 3B-448
+    family: generative VLM
+    slug: paligemma2
+    resolution: "448x448 (squashed)"
+    licence: Gemma Terms of Use (gated)
+    redistribution: gated
+    arms:
+      peft: peft
+      full: full
+    zero_shot: {source: sibling, path: paligemma2/zeroshot_mix448/valid.json}
+    latency:
+      - {path: "", arm: peft, runtime: pytorch_fp16}
+
+  - key: smolvlm2
+    display: SmolVLM2-2.2B
+    family: generative VLM
+    slug: smolvlm2
+    resolution: "SigLIP tiles, pixel-shuffled"
+    licence: Apache-2.0
+    redistribution: permissive
+    arms:
+      peft: peft
+      full: full
+    zero_shot: {source: sibling, path: smolvlm2/zeroshot/valid.json}
+
+# Whole-slug vast.ai spend (training boxes, failed rentals, T4 latency boxes), from the
+# sibling repo's plan docs. `complete: false` marks a slug whose total is still missing
+# a box (a T4 latency job or extra seeds); the report flags it.
+costs:
+  - slug: yoloe
+    usd: 1.11
+    complete: true
+    source: "docs/plans/yoloe.md, Cost table (all six arms, one failed box, T4)"
+  - slug: llmdet
+    usd: 3.80
+    complete: true
+    source: "docs/plans/llmdet.md: Cost table about $2.9 (both arms, seed 1, T4) + seed 2 section about $0.9"
+  - slug: mmgdino
+    usd: 2.25
+    complete: false
+    source: "meta.json cost_usd, full 1.52 (both full runs + setup share) + peft 0.73; peft seeds 1-2 and the T4 box not yet in"
+  - slug: owlv2
+    usd: 2.19
+    complete: false
+    source: "meta.json cost_usd, full 1.87 + peft 0.32 (approximate share); T4 box and extra peft seeds not yet in"
+  - slug: sam3
+    usd: 2.75
+    complete: true
+    source: "docs/plans/sam3.md, Cost table (A100 both arms + T4)"
+  - slug: deimv2
+    usd: 2.49
+    complete: true
+    source: "docs/plans/deimv2.md, Cost table (M box, L box, T4)"
+  - slug: florence2
+    usd: 1.49
+    complete: true
+    source: "docs/plans/florence2.md: Cost table ~1.04 (both arms, 1024 exploration, T4) + lora_all64 box 0.45"
+  - slug: qwen3vl
+    usd: 5.99
+    complete: false
+    source: "docs/plans/qwen3vl.md, Cost table: A100 5.86 + failed T4 0.13; T4 latency box not yet in"
+  - slug: paligemma2
+    usd: 2.75
+    complete: true
+    source: "docs/plans/paligemma2.md, Cost table (A100 + T4)"
+  - slug: smolvlm2
+    usd: 2.26
+    complete: false
+    source: "meta.json total_model_cost_usd (A6000 box 2.11 + T4 0.15 estimated); T4 latency file not yet in"
