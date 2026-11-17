@@ -19,7 +19,7 @@ the two `results/bootstrap/*finetune.json` files, and injected between
 **94 test images = 3 video clips (30 / 33 / 31 frames).** The clip-clustered bootstrap enumerates all 10 distinct clip resamples.
 
 - Of 26 main arms (peft and full, seed 0): **7 tie YOLO26m**, 7 above, 12 below (clustered 95% CI). The image-level bootstrap would call 24 of 26 significant.
-- Of 32 all scored rows (seeds and variants included): **7 tie YOLO26m**, 9 above, 16 below (clustered 95% CI). The image-level bootstrap would call 30 of 32 significant.
+- Of 35 all scored rows (seeds and variants included): **9 tie YOLO26m**, 10 above, 16 below (clustered 95% CI). The image-level bootstrap would call 33 of 35 significant.
 
 **What "above" means with 3 clips.** 7 of the 7 main-arm rows called above YOLO26m won all 3 clips. With 3 clusters the percentile interval excludes zero when a row wins every clip by a margin no resample can reverse, and a one-sided sign test on 3 of 3 clips gives p = 1/8 = 0.125. So "above" reads as "ahead on every clip we have", not as significance at 5%; only more test clips can tighten it.
 <!-- TABLE:ft_caveat END -->
@@ -135,6 +135,8 @@ that no resample of clips reverses it.
 | LLMDet-large, peft, seed 2 | 0.786 | +0.070 [+0.049, +0.105] | [+0.058, +0.083] | 3 of 3 | +0.099 [+0.077, +0.126] | [+0.086, +0.113] | 3 of 3 |
 | LLMDet-large, full | 0.785 | +0.070 [+0.046, +0.100] | [+0.057, +0.084] | 3 of 3 | +0.099 [+0.074, +0.137] | [+0.084, +0.114] | 3 of 3 |
 | MM-Grounding-DINO-B, peft | 0.749 | +0.034 [+0.007, +0.089] | [+0.022, +0.048] | 3 of 3 | +0.063 [+0.040, +0.082] | [+0.051, +0.076] | 3 of 3 |
+| MM-Grounding-DINO-B, peft, seed 1 | 0.761 | +0.046 [+0.015, +0.091] | [+0.033, +0.058] | 3 of 3 | +0.075 [+0.043, +0.104] | [+0.062, +0.089] | 3 of 3 |
+| MM-Grounding-DINO-B, peft, seed 2 | 0.747 | +0.031 [-0.009, +0.081] | [+0.015, +0.047] | 2 of 3 | +0.060 [+0.046, +0.066] | [+0.046, +0.075] | 3 of 3 |
 | MM-Grounding-DINO-B, full | 0.744 | +0.029 [+0.002, +0.082] | [+0.015, +0.043] | 3 of 3 | +0.058 [+0.036, +0.077] | [+0.045, +0.073] | 3 of 3 |
 | SAM 3, peft | 0.702 | -0.014 [-0.064, +0.048] | [-0.029, +0.003] | 1 of 3 | +0.016 [+0.008, +0.026] | [+0.003, +0.029] | 3 of 3 |
 | SAM 3, full | 0.737 | +0.021 [-0.019, +0.062] | [+0.007, +0.036] | 2 of 3 | +0.050 [+0.039, +0.058] | [+0.036, +0.065] | 3 of 3 |
@@ -148,6 +150,7 @@ that no resample of clips reverses it.
 | OWLv2-L/14, peft, seed 1 | 0.539 | -0.176 [-0.254, -0.068] | [-0.195, -0.152] | 0 of 3 | -0.147 [-0.178, -0.091] | [-0.165, -0.126] | 0 of 3 |
 | OWLv2-L/14, peft, seed 2 | 0.541 | -0.174 [-0.254, -0.077] | [-0.194, -0.150] | 0 of 3 | -0.145 [-0.179, -0.099] | [-0.165, -0.123] | 0 of 3 |
 | OWLv2-L/14, full | 0.612 | -0.103 [-0.175, -0.014] | [-0.122, -0.081] | 0 of 3 | -0.074 [-0.100, -0.037] | [-0.089, -0.057] | 0 of 3 |
+| OWLv2-L/14, full, seed 1 | 0.638 | -0.077 [-0.152, +0.013] | [-0.095, -0.058] | 1 of 3 | -0.048 [-0.077, -0.009] | [-0.063, -0.032] | 0 of 3 |
 | DEIMv2-M, peft | 0.670 | -0.046 [-0.078, -0.002] | [-0.060, -0.030] | 1 of 3 | -0.016 [-0.025, -0.003] | [-0.027, -0.005] | 0 of 3 |
 | DEIMv2-M, full | 0.701 | -0.014 [-0.034, +0.025] | [-0.026, -0.001] | 1 of 3 | +0.015 [-0.006, +0.046] | [+0.004, +0.026] | 2 of 3 |
 | DEIMv2-L, peft (`l_peft`) | 0.668 | -0.048 [-0.104, +0.004] | [-0.062, -0.033] | 1 of 3 | -0.018 [-0.030, -0.014] | [-0.029, -0.008] | 0 of 3 |
@@ -170,7 +173,9 @@ that no resample of clips reverses it.
 | Model | Arm | Seeds | Val by seed | Test by seed | Test mean ± sd | Test range | Other arm, seed 0 (test) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | LLMDet-large | peft | 0 / 1 / 2 | 0.739 / 0.731 / 0.734 | 0.776 / 0.770 / 0.786 | 0.777 ± 0.008 | 0.016 | full 0.785 |
+| MM-Grounding-DINO-B | peft | 0 / 1 / 2 | 0.713 / 0.719 / 0.717 | 0.749 / 0.761 / 0.747 | 0.752 ± 0.008 | 0.014 | full 0.744 |
 | OWLv2-L/14 | peft | 0 / 1 / 2 | 0.557 / 0.556 / 0.556 | 0.541 / 0.539 / 0.541 | 0.541 ± 0.001 | 0.002 | full 0.612 |
+| OWLv2-L/14 | full | 0 / 1 | 0.624 / 0.647 | 0.612 / 0.638 | 0.625 ± 0.018 | 0.026 | peft 0.541 |
 <!-- TABLE:ft_seeds END -->
 
 The sd is across training seeds on a fixed test set. It does not include the test-set
@@ -252,6 +257,8 @@ latency table below.
 | LLMDet-large, peft, seed 2 | 0.970 | 0.984 | 0.913 | 0.992 | 0.999 | 0.960 |
 | LLMDet-large, full | 0.971 | 0.979 | 0.919 | 0.990 | 1.000 | 0.965 |
 | MM-Grounding-DINO-B, peft | 0.970 | 0.992 | 0.917 | 0.978 | 1.000 | 0.965 |
+| MM-Grounding-DINO-B, peft, seed 1 | 0.974 | 0.988 | 0.930 | 0.981 | 1.000 | 0.970 |
+| MM-Grounding-DINO-B, peft, seed 2 | 0.972 | 0.989 | 0.917 | 0.984 | 1.000 | 0.968 |
 | MM-Grounding-DINO-B, full | 0.964 | 0.982 | 0.913 | 0.967 | 1.000 | 0.959 |
 | SAM 3, peft | 0.928 | 0.989 | 0.848 | 0.992 | 0.959 | 0.852 |
 | SAM 3, full | 0.963 | 0.990 | 0.924 | 0.985 | 1.000 | 0.916 |
@@ -265,6 +272,7 @@ latency table below.
 | OWLv2-L/14, peft, seed 1 | 0.876 | 0.971 | 0.790 | 0.957 | 0.799 | 0.861 |
 | OWLv2-L/14, peft, seed 2 | 0.881 | 0.971 | 0.792 | 0.957 | 0.814 | 0.873 |
 | OWLv2-L/14, full | 0.930 | 0.976 | 0.886 | 0.984 | 0.883 | 0.919 |
+| OWLv2-L/14, full, seed 1 | 0.945 | 0.986 | 0.877 | 0.990 | 0.945 | 0.925 |
 | DEIMv2-M, peft | 0.944 | 0.988 | 0.822 | 0.998 | 1.000 | 0.914 |
 | DEIMv2-M, full | 0.961 | 0.988 | 0.889 | 0.995 | 1.000 | 0.932 |
 | DEIMv2-L, peft (`l_peft`) | 0.931 | 0.988 | 0.755 | 0.990 | 1.000 | 0.923 |
@@ -346,8 +354,9 @@ below sit on the same footing as the published detectors.
 | Florence-2-large | full | 768x768 (squashed) | 1298.1 | p90 1452.7 | 0.655 |
 | Florence-2-large | peft | 768x768 (squashed) | 1274.6 | p90 1369.5 | 0.499 |
 | PaliGemma 2 3B-448 | peft | 448x448 (squashed) | 9924.7 | p90 11432.0 | 0.278 |
+| SmolVLM2-2.2B | peft | SigLIP tiles, pixel-shuffled | 21422.8 | p90 25776.1 | 0.000 |
 
-Not timed yet: Qwen3-VL (peft 8B, full 4B), SmolVLM2-2.2B.
+Not timed yet: Qwen3-VL (peft 8B, full 4B).
 <!-- TABLE:ft_latency_pytorch END -->
 
 A PyTorch row with the same architecture as another arm (LoRA merged, or a frozen
@@ -364,7 +373,7 @@ fine-tuning repo splits it out).
 | --- | --- | --- | --- | --- |
 | yoloe | YOLO-World-v2-x @1280, YOLOE-26x @1280, YOLOE-26x @640 | 1.11 | 1.2 | docs/plans/yoloe.md, Cost table (all six arms, one failed box, T4) |
 | llmdet | LLMDet-large | 3.80 | 5.1 | docs/plans/llmdet.md: Cost table about $2.9 (both arms, seed 1, T4) + seed 2 section about $0.9 |
-| mmgdino | MM-Grounding-DINO-B | 2.25 (partial) | 3.1 | meta.json cost_usd, full 1.52 (both full runs + setup share) + peft 0.73; peft seeds 1-2 and the T4 box not yet in |
+| mmgdino | MM-Grounding-DINO-B | 2.25 (partial) | 6.2 | meta.json cost_usd, full 1.52 (both full runs + setup share) + peft 0.73; peft seeds 1-2 and the T4 box not yet in |
 | owlv2 | OWLv2-L/14 | 2.19 (partial) | 3.8 | meta.json cost_usd, full 1.87 + peft 0.32 (approximate share); T4 box and extra peft seeds not yet in |
 | sam3 | SAM 3 | 2.75 | 2.9 | docs/plans/sam3.md, Cost table (A100 both arms + T4) |
 | deimv2 | DEIMv2-L, DEIMv2-M | 2.49 | 4.8 | docs/plans/deimv2.md, Cost table (M box, L box, T4) |
@@ -498,10 +507,8 @@ Runs still in flight when this report was generated. Re-running the three comman
 above picks them up.
 
 <!-- TABLE:ft_pending START -->
-- mmgdino: mmgdino/peft_s1 (queued seed, not started or not copied)
-- mmgdino: mmgdino/peft_s2 (queued seed, not started or not copied)
 - owlv2: owlv2/peft_seed1/meta.json
 - owlv2: owlv2/peft_seed2/meta.json
+- owlv2: owlv2/full_seed1/meta.json
 - qwen3vl: qwen3vl/latency_t4.json
-- smolvlm2: smolvlm2/latency_t4.json
 <!-- TABLE:ft_pending END -->
