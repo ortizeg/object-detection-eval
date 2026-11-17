@@ -2510,7 +2510,20 @@
           }
         }
       },
-      "latency_t4": []
+      "latency_t4": [
+        {
+          "arm": "unspecified",
+          "runtime": "pytorch_fp16",
+          "median_ms": 74712.41551311687,
+          "tail_label": "p90",
+          "tail_ms": 78616.15229491144,
+          "n_runs": 1,
+          "stable_within_10pct": true,
+          "dtype": "fp16",
+          "gpu": "Tesla T4",
+          "notes": "SUBSET: first 20 of 94 test images (sorted), warmup 3, 1 pass, 1 run (no same-config rerun) -- the full protocol (94 imgs x 1 pass x 2 runs) ran >2.7 h on the T4 without finishing and was killed. HF transformers 5.23 generate, greedy, max_new_tokens 2048, sdpa, fp16, torch 2.6.0+cu124, native 1920x1088 input (2090 prompt tokens). Includes per-box log-prob confidence + JSON parse."
+        }
+      ]
     },
     "paligemma2": {
       "display": "PaliGemma 2 3B-448",
@@ -2701,7 +2714,6 @@
   "missing": [
     "owlv2: owlv2/peft_seed1/meta.json",
     "owlv2: owlv2/peft_seed2/meta.json",
-    "owlv2: owlv2/full_seed1/meta.json",
-    "qwen3vl: qwen3vl/latency_t4.json"
+    "owlv2: owlv2/full_seed1/meta.json"
   ]
 }

@@ -189,7 +189,11 @@ def train_cost(meta: Mapping[str, Any]) -> tuple[float | None, str | None]:
     """Per-arm training $ and the meta key it came from."""
     for key in _COST_KEYS:
         value = meta.get(key)
-        if value is not None:
+        # Some meta.json files record a per-MODEL breakdown object under a cost
+        # key (one box shared by several arms); that is not a per-arm figure, so
+        # skip it rather than guess a split. Per-model spend comes from the
+        # study manifest instead.
+        if isinstance(value, int | float) and not isinstance(value, bool):
             return float(value), key
     return None, None
 

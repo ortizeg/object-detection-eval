@@ -353,10 +353,9 @@ below sit on the same footing as the published detectors.
 | DEIMv2-L | l_full | 640 | 70.6 | p90 79.4 | 0.695 |
 | Florence-2-large | full | 768x768 (squashed) | 1298.1 | p90 1452.7 | 0.655 |
 | Florence-2-large | peft | 768x768 (squashed) | 1274.6 | p90 1369.5 | 0.499 |
+| Qwen3-VL (peft 8B, full 4B) | unspecified | native 1920x1088 | 74712.4 | p90 78616.2 | — |
 | PaliGemma 2 3B-448 | peft | 448x448 (squashed) | 9924.7 | p90 11432.0 | 0.278 |
 | SmolVLM2-2.2B | peft | SigLIP tiles, pixel-shuffled | 21422.8 | p90 25776.1 | 0.000 |
-
-Not timed yet: Qwen3-VL (peft 8B, full 4B).
 <!-- TABLE:ft_latency_pytorch END -->
 
 A PyTorch row with the same architecture as another arm (LoRA merged, or a frozen
@@ -510,5 +509,4 @@ above picks them up.
 - owlv2: owlv2/peft_seed1/meta.json
 - owlv2: owlv2/peft_seed2/meta.json
 - owlv2: owlv2/full_seed1/meta.json
-- qwen3vl: qwen3vl/latency_t4.json
 <!-- TABLE:ft_pending END -->

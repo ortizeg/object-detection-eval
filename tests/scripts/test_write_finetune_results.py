@@ -183,3 +183,9 @@ def test_vlm_zero_shot_keys_exist_in_the_committed_metrics() -> None:
     for model in manifest.models:
         if model.zero_shot is not None and model.zero_shot.source == "vlm_metrics":
             assert model.zero_shot.key in metrics
+
+
+def test_train_cost_skips_per_model_breakdown_object() -> None:
+    """A dict under a cost key is a per-model breakdown, not a per-arm cost."""
+    meta = {"cost_usd": {"model_total_usd": 6.5, "breakdown": "A100 4.3 h"}}
+    assert wfr.train_cost(meta) == (None, None)
