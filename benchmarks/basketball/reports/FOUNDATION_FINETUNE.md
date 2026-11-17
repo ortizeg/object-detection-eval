@@ -372,15 +372,15 @@ fine-tuning repo splits it out).
 | --- | --- | --- | --- | --- |
 | yoloe | YOLO-World-v2-x @1280, YOLOE-26x @1280, YOLOE-26x @640 | 1.11 | 1.2 | docs/plans/yoloe.md, Cost table (all six arms, one failed box, T4) |
 | llmdet | LLMDet-large | 3.80 | 5.1 | docs/plans/llmdet.md: Cost table about $2.9 (both arms, seed 1, T4) + seed 2 section about $0.9 |
-| mmgdino | MM-Grounding-DINO-B | 2.25 (partial) | 6.2 | meta.json cost_usd, full 1.52 (both full runs + setup share) + peft 0.73; peft seeds 1-2 and the T4 box not yet in |
-| owlv2 | OWLv2-L/14 | 2.19 (partial) | 3.8 | meta.json cost_usd, full 1.87 + peft 0.32 (approximate share); T4 box and extra peft seeds not yet in |
+| mmgdino | MM-Grounding-DINO-B | 3.97 | 6.2 | docs/plans/mmgdino.md: main arms + T4 about $2.31, peft seeds 1-2 about $1.66 |
+| owlv2 | OWLv2-L/14 | 4.64 | 3.8 | docs/plans/owlv2.md: A6000 7.74 h (both arms, sweeps, seeds) $4.47 + three T4 rentals $0.17 |
 | sam3 | SAM 3 | 2.75 | 2.9 | docs/plans/sam3.md, Cost table (A100 both arms + T4) |
 | deimv2 | DEIMv2-L, DEIMv2-M | 2.49 | 4.8 | docs/plans/deimv2.md, Cost table (M box, L box, T4) |
 | florence2 | Florence-2-large | 1.49 | 1.9 | docs/plans/florence2.md: Cost table ~1.04 (both arms, 1024 exploration, T4) + lora_all64 box 0.45 |
-| qwen3vl | Qwen3-VL (peft 8B, full 4B) | 5.99 (partial) | 3.7 | docs/plans/qwen3vl.md, Cost table: A100 5.86 + failed T4 0.13; T4 latency box not yet in |
+| qwen3vl | Qwen3-VL (peft 8B, full 4B) | 6.50 | 3.7 | docs/plans/qwen3vl.md, Cost table: A100 5.86 + failed T4 0.13 + T4 latency 0.51 |
 | paligemma2 | PaliGemma 2 3B-448 | 2.75 | 1.8 | docs/plans/paligemma2.md, Cost table (A100 + T4) |
-| smolvlm2 | SmolVLM2-2.2B | 2.26 (partial) | 6.0 | meta.json total_model_cost_usd (A6000 box 2.11 + T4 0.15 estimated); T4 latency file not yet in |
-| **total** |  | **27.08** (partial) |  | partial: mmgdino, owlv2, qwen3vl, smolvlm2 |
+| smolvlm2 | SmolVLM2-2.2B | 2.42 | 6.0 | docs/plans/smolvlm2.md: A6000 4.99 h $2.11 + T4 1.39 h $0.31 |
+| **total** |  | **31.92** |  |  |
 <!-- TABLE:ft_cost END -->
 
 Spend is the whole vast.ai bill per model: training boxes, failed rentals, exploration

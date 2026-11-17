@@ -226,13 +226,13 @@ costs:
     complete: true
     source: "docs/plans/llmdet.md: Cost table about $2.9 (both arms, seed 1, T4) + seed 2 section about $0.9"
   - slug: mmgdino
-    usd: 2.25
-    complete: false
-    source: "meta.json cost_usd, full 1.52 (both full runs + setup share) + peft 0.73; peft seeds 1-2 and the T4 box not yet in"
+    usd: 3.97
+    complete: true
+    source: "docs/plans/mmgdino.md: main arms + T4 about $2.31, peft seeds 1-2 about $1.66"
   - slug: owlv2
-    usd: 2.19
-    complete: false
-    source: "meta.json cost_usd, full 1.87 + peft 0.32 (approximate share); T4 box and extra peft seeds not yet in"
+    usd: 4.64
+    complete: true
+    source: "docs/plans/owlv2.md: A6000 7.74 h (both arms, sweeps, seeds) $4.47 + three T4 rentals $0.17"
   - slug: sam3
     usd: 2.75
     complete: true
@@ -246,14 +246,14 @@ costs:
     complete: true
     source: "docs/plans/florence2.md: Cost table ~1.04 (both arms, 1024 exploration, T4) + lora_all64 box 0.45"
   - slug: qwen3vl
-    usd: 5.99
-    complete: false
-    source: "docs/plans/qwen3vl.md, Cost table: A100 5.86 + failed T4 0.13; T4 latency box not yet in"
+    usd: 6.50
+    complete: true
+    source: "docs/plans/qwen3vl.md, Cost table: A100 5.86 + failed T4 0.13 + T4 latency 0.51"
   - slug: paligemma2
     usd: 2.75
     complete: true
     source: "docs/plans/paligemma2.md, Cost table (A100 + T4)"
   - slug: smolvlm2
-    usd: 2.26
-    complete: false
-    source: "meta.json total_model_cost_usd (A6000 box 2.11 + T4 0.15 estimated); T4 latency file not yet in"
+    usd: 2.42
+    complete: true
+    source: "docs/plans/smolvlm2.md: A6000 4.99 h $2.11 + T4 1.39 h $0.31"
