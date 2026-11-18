@@ -85,9 +85,29 @@ class Variant(_Frozen):
 
 
 class Arms(_Frozen):
-    peft: str
-    full: str
+    peft: str | None = None
+    full: str | None = None
     variants: list[Variant] = Field(default_factory=list)
+
+
+Experiment = Literal["E1", "E2", "E3", "E4", "fix"]
+
+
+class ExtraArm(_Frozen):
+    """A round-2 or follow-up arm folder: one row of the report, tagged by experiment."""
+
+    arm: str
+    experiment: Experiment
+    label: str
+    input: str | None = None
+
+
+class SweepArm(_Frozen):
+    """An E1 val-sweep configuration (scored on val; test only if it was predicted)."""
+
+    arm: str
+    label: str
+    selected: bool = False
 
 
 class ZeroShot(_Frozen):
@@ -114,6 +134,10 @@ class ModelSpec(_Frozen):
     zero_shot: ZeroShot | None = None
     latency: list[LatencySpec] | None = None
     expected_seed_arms: list[str] = Field(default_factory=list)
+    baseline: bool = False
+    light_trains: str | None = None
+    extra: list[ExtraArm] = Field(default_factory=list)
+    sweep: list[SweepArm] = Field(default_factory=list)
 
 
 class CostSpec(_Frozen):
@@ -121,6 +145,71 @@ class CostSpec(_Frozen):
     usd: float
     complete: bool
     source: str
+    stage: Literal["round1", "round2", "followup"] = "round1"
+
+
+class GroupSpec(_Frozen):
+    """Seeds of one configuration, scored as their per-draw mean by the bootstrap."""
+
+    key: str
+    label: str
+    input: str
+    members: list[str]
+
+
+class TableSpec(_Frozen):
+    entries: list[str] = Field(default_factory=list)
+    pairs: list[tuple[str, str]] = Field(default_factory=list)
+
+
+class ScalingSpec(_Frozen):
+    label: str
+    full: str
+    subsets: list[str]
+
+
+class FixSpec(_Frozen):
+    before: str
+    after: str
+    change: str
+    audit: str
+
+
+class AuditSpec(_Frozen):
+    slug: str
+    outcome: str
+
+
+class FileValue(_Frozen):
+    file: str
+    path: list[str]
+
+
+ValuePath = list[str] | FileValue
+
+
+class TrtSpec(_Frozen):
+    """One TensorRT fp16 engine timed on the rented T4 (or a published engine)."""
+
+    key: str
+    label: str
+    input: str
+    applies_to: list[str]
+    published: str | None = None
+    file: str | None = None
+    status: Literal["current", "superseded", "invalid"] = "current"
+    gpu_ms: ValuePath | None = None
+    gpu_runs: ValuePath | None = None
+    e2e_ms: ValuePath | None = None
+    pytorch_ms: ValuePath | None = None
+    val_pt: ValuePath | None = None
+    val_trt: ValuePath | None = None
+    note: str | None = None
+
+
+class NotTimed(_Frozen):
+    what: str
+    why: str
 
 
 class StudyManifest(_Frozen):
@@ -128,6 +217,13 @@ class StudyManifest(_Frozen):
     references: list[str]
     models: list[ModelSpec]
     costs: list[CostSpec]
+    groups: list[GroupSpec] = Field(default_factory=list)
+    tables: dict[str, TableSpec] = Field(default_factory=dict)
+    scaling: list[ScalingSpec] = Field(default_factory=list)
+    fixes: list[FixSpec] = Field(default_factory=list)
+    audits: list[AuditSpec] = Field(default_factory=list)
+    trt: list[TrtSpec] = Field(default_factory=list)
+    not_timed: list[NotTimed] = Field(default_factory=list)
 
 
 def load_manifest(path: Path) -> StudyManifest:
@@ -164,7 +260,7 @@ def _hours_from_clock(value: str) -> float:
 
 #: meta.json keys in priority order. The sibling runs were written by different
 #: people; these are every spelling they used.
-_HOUR_KEYS = ("train_hours", "train_hours_wallclock", "train_wall")
+_HOUR_KEYS = ("train_hours", "train_hours_wallclock", "train_wall", "train_seconds", "box_hours")
 _COST_KEYS = (
     "cost_usd",
     "cost_usd_train_compute",
@@ -181,8 +277,70 @@ def train_hours(meta: Mapping[str, Any]) -> tuple[float | None, str | None]:
             continue
         if isinstance(value, str):
             return _hours_from_clock(value), key
+        if key == "train_seconds":
+            return float(value) / 3600.0, key
         return float(value), key
     return None, None
+
+
+def epochs_run(meta: Mapping[str, Any]) -> int | None:
+    """Epochs the run actually trained (``epochs_run``, else a fixed ``epochs``)."""
+    for key in ("epochs_run", "epochs"):
+        value = meta.get(key)
+        if isinstance(value, int) and not isinstance(value, bool):
+            return value
+    return None
+
+
+def optimizer_steps(meta: Mapping[str, Any]) -> int | None:
+    """Optimizer steps the run took, under any of the spellings the runs used."""
+    for key in ("optimizer_steps", "steps_run", "optimizer_steps_run", "steps"):
+        value = meta.get(key)
+        if isinstance(value, int) and not isinstance(value, bool):
+            return value
+    return None
+
+
+_SUBSET = re.compile(r"frac(?P<pct>\d+)_d(?:raw)?(?P<draw>\d+)")
+
+
+def subset_info(meta: Mapping[str, Any], arm: str) -> dict[str, Any]:
+    """Image fraction, image count, subset id and draw of an E3 subset run.
+
+    The runs spell these differently (``image_fraction`` / ``train_image_fraction``,
+    ``subset_id`` / ``subset``); the fraction is the ACTUAL share of training images,
+    not the 25/50 target. Full-data runs return an empty dict.
+    """
+    fraction = meta.get("image_fraction", meta.get("train_image_fraction"))
+    subset = meta.get("subset_id", meta.get("subset"))
+    match = _SUBSET.search(str(subset or "")) or _SUBSET.search(arm)
+    if match is None:
+        return {}
+    return {
+        "image_fraction": None if fraction is None else float(fraction),
+        "train_images": meta.get("train_images", meta.get("n_train_images")),
+        "subset_target_pct": int(match.group("pct")),
+        "subset_draw": int(match.group("draw")),
+    }
+
+
+def dig_value(data: Any, path: list[str]) -> Any:
+    """Follow a key list into nested dicts; ``None`` if any key is missing."""
+    node = data
+    for part in path:
+        if not isinstance(node, Mapping) or part not in node:
+            return None
+        node = node[part]
+    return node
+
+
+_VERDICT = re.compile(r"Verdict:?\**\s*\**\s*(?P<word>[A-Z]{3,})")
+
+
+def audit_verdict(text: str) -> str | None:
+    """The first ``Verdict: WORD`` in an AUDIT.md (REAL, RECIPE, BUG, ...)."""
+    match = _VERDICT.search(text)
+    return match.group("word") if match else None
 
 
 def train_cost(meta: Mapping[str, Any]) -> tuple[float | None, str | None]:
@@ -305,7 +463,8 @@ def copy_dump(src: Path, dest_dir: Path, name_stem: str, gzip_over_bytes: int) -
     """Copy a dump into the repo, gzipping it (deterministically) when large.
 
     The gzip header carries no mtime or file name, so re-running on an unchanged
-    dump writes identical bytes and leaves git clean. A stale copy in the other
+    dump writes identical bytes and leaves git clean. A plain copy always ends in a
+    newline. A stale copy in the other
     form (plain vs gz) is removed so each dump exists once.
     """
     dest_dir.mkdir(parents=True, exist_ok=True)
@@ -320,7 +479,10 @@ def copy_dump(src: Path, dest_dir: Path, name_stem: str, gzip_over_bytes: int) -
             gz.write(data)
         plain.unlink(missing_ok=True)
         return packed
-    shutil.copyfile(src, plain)
+    # End the plain copy with a newline (the repo's end-of-file hook would add one
+    # anyway); otherwise every re-import of a newline-less dump would churn git.
+    data = src.read_bytes()
+    plain.write_bytes(data if data.endswith(b"\n") else data + b"\n")
     packed.unlink(missing_ok=True)
     return plain
 
@@ -363,6 +525,8 @@ def _arm_plan(spec: ModelSpec, slug_dir: Path) -> list[dict[str, Any]]:
     """Every (arm folder, role) row this model contributes, seeds included."""
     rows: list[dict[str, Any]] = []
     for role, arm in (("peft", spec.arms.peft), ("full", spec.arms.full)):
+        if arm is None:
+            continue
         rows.append({"arm": arm, "role": role, "base_arm": arm, "label": role, "dir": arm})
         for parent in _SEED_PARENTS:
             where = slug_dir / parent
@@ -390,7 +554,149 @@ def _arm_plan(spec: ModelSpec, slug_dir: Path) -> list[dict[str, Any]]:
                 "dir": variant.arm,
             }
         )
+    for extra in spec.extra:
+        rows.append(
+            {
+                "arm": extra.arm,
+                "role": "extra",
+                "base_arm": extra.arm,
+                "label": extra.label,
+                "dir": extra.arm,
+                "experiment": extra.experiment,
+                "input": extra.input,
+            }
+        )
     return rows
+
+
+#: TRAINING_SUMMARY.json fields copied onto a row (round-1 arms only; it predates round 2).
+_SUMMARY_FIELDS = ("epochs_run", "optimizer_steps", "train_hours", "gpu", "box_shared")
+
+
+def training_summary_index(path: Path) -> dict[tuple[str, str], dict[str, Any]]:
+    """``{(slug, arm dir): {field: value}}`` from the sibling's TRAINING_SUMMARY.json.
+
+    Each field there is ``{value, source, note}``; ``full_type`` keeps its note.
+    """
+    if not path.is_file():
+        return {}
+    out: dict[tuple[str, str], dict[str, Any]] = {}
+    for row in _read_json(path)["rows"]:
+        entry = {f: (row.get(f) or {}).get("value") for f in _SUMMARY_FIELDS}
+        full_type = row.get("full_type") or {}
+        entry["full_type"] = full_type.get("value")
+        entry["full_type_note"] = full_type.get("note")
+        out[(row["slug"], row["arm"])] = entry
+    return out
+
+
+def _value(spec: ValuePath | None, base_file: Path | None, results: Path) -> Any:
+    if spec is None:
+        return None
+    if isinstance(spec, FileValue):
+        path = results / spec.file
+        return dig_value(_read_json(path), spec.path) if path.is_file() else None
+    if base_file is None or not base_file.is_file():
+        return None
+    return dig_value(_read_json(base_file), spec)
+
+
+def unresolved_refs(manifest: StudyManifest, row_ids: set[str]) -> list[str]:
+    """Every report reference (group member, table entry, pair side, series point,
+    fix, TensorRT target) that names neither a scored row, a group nor a reference."""
+    groups = {g.key for g in manifest.groups}
+    known = row_ids | groups | set(manifest.references)
+    refs: list[str] = [m for g in manifest.groups for m in g.members]
+    for table in manifest.tables.values():
+        refs += table.entries + [side for pair in table.pairs for side in pair]
+    for series in manifest.scaling:
+        refs += [series.full, *series.subsets]
+    refs += [r for fix in manifest.fixes for r in (fix.before, fix.after)]
+    refs += [r for spec in manifest.trt for r in spec.applies_to]
+    return sorted({r for r in refs if r not in known})
+
+
+def trt_records(
+    specs: list[TrtSpec], results: Path, published: Mapping[str, float], missing: list[str]
+) -> list[dict[str, Any]]:
+    """Resolve every TensorRT spec's value paths into one flat record each."""
+    out = []
+    for spec in specs:
+        record: dict[str, Any] = {
+            "key": spec.key,
+            "label": spec.label,
+            "input": spec.input,
+            "status": spec.status,
+            "applies_to": spec.applies_to,
+            "note": spec.note,
+            "source": spec.file or "published (results/latency/trt_fp16_toboxes.json)",
+        }
+        if spec.published is not None:
+            record.update(gpu_ms=published.get(spec.published), gpu_runs_ms=[], published=True)
+        else:
+            base = results / str(spec.file)
+            runs = _value(spec.gpu_runs, base, results) or []
+            record.update(
+                gpu_ms=_value(spec.gpu_ms, base, results),
+                gpu_runs_ms=[float(r["median_ms"]) for r in runs if isinstance(r, Mapping)],
+                e2e_ms=_value(spec.e2e_ms, base, results),
+                pytorch_ms=_value(spec.pytorch_ms, base, results),
+                val_pytorch=_value(spec.val_pt, base, results),
+                val_trt=_value(spec.val_trt, base, results),
+                published=False,
+            )
+        if record["gpu_ms"] is None:
+            missing.append(f"trt {spec.key}: GPU-compute median not found in {record['source']}")
+        out.append(record)
+    return out
+
+
+def audit_records(
+    specs: list[AuditSpec], results: Path, missing: list[str]
+) -> list[dict[str, Any]]:
+    """Parse each slug's AUDIT.md for its verdict and title line."""
+    out = []
+    for spec in specs:
+        path = results / spec.slug / "audit" / "AUDIT.md"
+        if not path.is_file():
+            missing.append(f"audit {spec.slug}: {path.name} not found")
+            continue
+        text = path.read_text(encoding="utf-8")
+        title = next((ln.lstrip("# ").strip() for ln in text.splitlines() if ln.strip()), "")
+        out.append(
+            {
+                "slug": spec.slug,
+                "verdict": audit_verdict(text),
+                "title": title,
+                "outcome": spec.outcome,
+                "path": f"results/{spec.slug}/audit/AUDIT.md",
+            }
+        )
+    return out
+
+
+def sweep_records(
+    spec: ModelSpec, slug_dir: Path, gt: Mapping[str, Path], missing: list[str]
+) -> list[dict[str, Any]]:
+    """Score every E1 sweep configuration on val (and on test where it was predicted)."""
+    out = []
+    for sweep in spec.sweep:
+        arm_dir = slug_dir / sweep.arm
+        if not (arm_dir / "valid.json").is_file():
+            missing.append(f"{spec.key}: sweep {sweep.arm}/valid.json")
+            continue
+        record: dict[str, Any] = {
+            "model_key": spec.key,
+            "arm": sweep.arm,
+            "label": sweep.label,
+            "selected": sweep.selected,
+            "valid": score_vlm_metrics(arm_dir / "valid.json", gt["valid"]),
+            "test": None,
+        }
+        if (arm_dir / "test.json").is_file():
+            record["test"] = score_vlm_metrics(arm_dir / "test.json", gt["test"])
+        out.append(record)
+    return out
 
 
 def _score(path: Path, gt: Path, tmp: Path) -> dict[str, Any]:
@@ -450,7 +756,9 @@ def build_results(
     results = sibling / "results"
     gt = {split: data_root / split / "_annotations.coco.json" for split in _SPLITS}
     vlm_metrics = _read_json(vlm_metrics_path)
+    summary = training_summary_index(results / "TRAINING_SUMMARY.json")
     missing: list[str] = []
+    sweeps: list[dict[str, Any]] = []
     rows: list[dict[str, Any]] = []
     models: dict[str, Any] = {}
 
@@ -467,7 +775,8 @@ def build_results(
             )
             for plan in plans:
                 seed_from_name = plan.pop("seed_from_name", None)
-                arm_dir = slug_dir / plan.pop("dir")
+                arm_rel = plan.pop("dir")
+                arm_dir = slug_dir / arm_rel
                 meta_path = arm_dir / "meta.json"
                 meta_note = None
                 if not meta_path.is_file() and seed_from_name is not None:
@@ -498,13 +807,21 @@ def build_results(
                     "model": spec.display,
                     "family": spec.family,
                     "slug": spec.slug,
+                    "experiment": None,
+                    "input": None,
                     **plan,
                     "seed": meta.get("seed", 0),
                     "image_size": image_size_text(meta.get("image_size")),
                     "model_id": meta.get("model_id") or meta.get("model"),
                     "selected_epoch": meta.get("selected_epoch"),
+                    "epochs_run": epochs_run(meta),
+                    "optimizer_steps": optimizer_steps(meta),
+                    "gpu": meta.get("gpu"),
                     "meta_note": meta_note,
+                    **subset_info(meta, plan["arm"]),
                 }
+                if row["input"] is None:
+                    row["input"] = spec.resolution
                 if seed_from_name is not None and "seed" not in meta:
                     row["seed"] = seed_from_name
                 trainable, total, fraction = param_counts(meta)
@@ -518,7 +835,22 @@ def build_results(
                     train_gpu_hours_key=hours_key,
                     train_cost_usd=cost,
                     train_cost_key=cost_key,
+                    full_type=None,
+                    full_type_note=None,
+                    box_shared=None,
                 )
+                ts = summary.get((spec.slug, arm_rel))
+                if ts is not None:
+                    # Round-1 arms: the sibling's TRAINING_SUMMARY.json recovered epochs,
+                    # steps and hours from the logs where meta.json lacks them.
+                    for field, value in ts.items():
+                        if value is None:
+                            continue
+                        if field == "train_hours":
+                            row["train_gpu_hours"] = float(value)
+                            row["train_gpu_hours_key"] = "TRAINING_SUMMARY.json"
+                        else:
+                            row[field] = value
                 row["dumps"] = {}
                 for split in _SPLITS:
                     src = arm_dir / f"{split}.json"
@@ -547,16 +879,21 @@ def build_results(
 
             latency_path = slug_dir / "latency_t4.json"
             latency: list[dict[str, Any]] = []
-            if latency_path.is_file():
+            if spec.baseline:
+                pass  # retrained baselines are timed under TensorRT only (see `trt`)
+            elif latency_path.is_file():
                 latency = extract_latency(_read_json(latency_path), spec.latency)
                 if not latency:
                     missing.append(f"{spec.key}: latency_t4.json has no usable entry")
             else:
                 missing.append(f"{spec.key}: {spec.slug}/latency_t4.json")
+            sweeps.extend(sweep_records(spec, slug_dir, gt, missing))
             models[spec.key] = {
                 "display": spec.display,
                 "family": spec.family,
                 "slug": spec.slug,
+                "baseline": spec.baseline,
+                "light_trains": spec.light_trains,
                 "resolution": spec.resolution,
                 "licence": spec.licence,
                 "redistribution": spec.redistribution,
@@ -567,6 +904,10 @@ def build_results(
                 "latency_t4": latency,
             }
 
+    missing.extend(
+        f"report reference {ref!r} names no scored row or group"
+        for ref in unresolved_refs(manifest, {r["row_id"] for r in rows})
+    )
     published = _published_trt(published_trt_path)
     anchors = []
     for fname, name in _ANCHORS.items():
@@ -598,6 +939,14 @@ def build_results(
         "costs": [c.model_dump() for c in manifest.costs],
         "latency_anchor_t4": anchors,
         "published_trt_fp16_ms": published,
+        "sweeps": sweeps,
+        "groups": [g.model_dump() for g in manifest.groups],
+        "tables": {k: v.model_dump() for k, v in manifest.tables.items()},
+        "scaling": [s.model_dump() for s in manifest.scaling],
+        "fixes": [f.model_dump() for f in manifest.fixes],
+        "audits": audit_records(manifest.audits, results, missing),
+        "trt_latency": trt_records(manifest.trt, results, published, missing),
+        "not_timed": [n.model_dump() for n in manifest.not_timed],
         "missing": missing,
     }
 

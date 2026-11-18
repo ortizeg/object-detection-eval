@@ -37,9 +37,16 @@ models:
     resolution: "short side 800, long cap 1333"
     licence: Apache-2.0
     redistribution: permissive
+    light_trains: "fusion encoder, decoder, heads (Swin-L and BERT frozen)"
     arms:
       peft: peft
       full: full
+    extra:
+      - {arm: mid, experiment: E4, label: "mid: light + Swin-L stage 4 at lr x0.1"}
+      - {arm: peft_frac25_d0, experiment: E3, label: "peft on frac25, draw 0"}
+      - {arm: peft_frac25_d1, experiment: E3, label: "peft on frac25, draw 1"}
+      - {arm: peft_frac50_d0, experiment: E3, label: "peft on frac50, draw 0"}
+      - {arm: peft_frac50_d1, experiment: E3, label: "peft on frac50, draw 1"}
     zero_shot: {source: vlm_metrics, key: LLMDet-large}
     latency:
       - {path: per_arm.peft, arm: peft, runtime: pytorch_fp16}
@@ -52,11 +59,17 @@ models:
     resolution: "short side 800 (1422x800)"
     licence: Apache-2.0
     redistribution: permissive
+    light_trains: "feature enhancer, decoder, heads (Swin-B and BERT frozen)"
     arms:
       peft: peft
       full: full
+    extra:
+      - {arm: mid, experiment: E4, label: "mid: light + Swin-B stage 4 at lr x0.1"}
+      - {arm: peft_frac25_d0, experiment: E3, label: "peft on frac25, draw 0"}
+      - {arm: peft_frac25_d1, experiment: E3, label: "peft on frac25, draw 1"}
+      - {arm: peft_frac50_d0, experiment: E3, label: "peft on frac50, draw 0"}
+      - {arm: peft_frac50_d1, experiment: E3, label: "peft on frac50, draw 1"}
     zero_shot: {source: sibling, path: mmgdino/zeroshot_valid.json}
-    # Queued (results/QUEUE.md item 3); listed as pending until they land.
     expected_seed_arms: [peft_s1, peft_s2]
 
   - key: sam3
@@ -66,9 +79,12 @@ models:
     resolution: "1008x1008"
     licence: SAM License (gated)
     redistribution: gated
+    light_trains: "fusion encoder, DETR decoder, heads (PE ViT trunk and text encoder frozen)"
     arms:
       peft: peft
       full: full
+    extra:
+      - {arm: mid, experiment: E4, label: "mid: light + last 8 of 32 ViT blocks (layer decay)"}
     zero_shot: {source: sibling, path: sam3/zeroshot/valid.json}
     latency:
       - {path: "", arm: full, runtime: pytorch_fp16}
@@ -80,6 +96,7 @@ models:
     resolution: "1280"
     licence: AGPL-3.0
     redistribution: agpl
+    light_trains: "official linear probe: the last 1x1 conv of each class branch"
     arms:
       peft: yoloe_peft
       full: yoloe_full
@@ -94,9 +111,16 @@ models:
     resolution: "640"
     licence: AGPL-3.0
     redistribution: agpl
+    light_trains: "official linear probe: the last 1x1 conv of each class branch"
     arms:
       peft: yoloe_peft_640
       full: yoloe_full_640
+    extra:
+      - {arm: yoloe_mid_640, experiment: E4, label: "mid: backbone frozen, neck + head train"}
+      - {arm: yoloe_full_640_frac25_d0, experiment: E3, label: "full on frac25, draw 0"}
+      - {arm: yoloe_full_640_frac25_d1, experiment: E3, label: "full on frac25, draw 1"}
+      - {arm: yoloe_full_640_frac50_d0, experiment: E3, label: "full on frac50, draw 0"}
+      - {arm: yoloe_full_640_frac50_d1, experiment: E3, label: "full on frac50, draw 1"}
     latency:
       - {path: runs.yoloe_full_640, arm: yoloe_full_640, runtime: pytorch_fp16}
 
@@ -107,6 +131,7 @@ models:
     resolution: "1280"
     licence: AGPL-3.0
     redistribution: agpl
+    light_trains: "WorldDetect head (backbone, neck and CLIP text encoder frozen)"
     arms:
       peft: yoloworld_peft
       full: yoloworld_full
@@ -121,9 +146,12 @@ models:
     resolution: "1008x1008 (padded square)"
     licence: Apache-2.0
     redistribution: permissive
+    light_trains: "detection heads + final layer norm (ViT-L and text tower frozen)"
     arms:
       peft: peft
       full: full
+    extra:
+      - {arm: mid, experiment: E4, label: "mid: light + last 6 of 24 ViT layers at lr 5e-6"}
     zero_shot: {source: vlm_metrics, key: OWLv2}
     latency:
       - {path: "", arm: peft, runtime: pytorch_fp16}
@@ -135,6 +163,7 @@ models:
     resolution: "640"
     licence: Apache-2.0 code, DINOv3 License weights
     redistribution: gated
+    light_trains: "STA adapter, hybrid encoder, decoder (DINOv3 backbone frozen)"
     arms:
       peft: peft
       full: full
@@ -149,6 +178,7 @@ models:
     resolution: "640"
     licence: Apache-2.0 code, DINOv3 License weights
     redistribution: gated
+    light_trains: "STA adapter, hybrid encoder, decoder (DINOv3 backbone frozen)"
     arms:
       peft: l_peft
       full: l_full
@@ -163,6 +193,7 @@ models:
     resolution: "768x768 (squashed)"
     licence: MIT
     redistribution: permissive
+    light_trains: "LoRA r16 on language attention + connector (DaViT frozen)"
     arms:
       peft: peft
       full: full
@@ -180,12 +211,19 @@ models:
     resolution: "native 1920x1088"
     licence: Apache-2.0
     redistribution: permissive
+    light_trains: "LoRA r16 on LLM attention (vision tower and mergers frozen)"
     arms:
       peft: peft
       full: full
       variants:
         - {arm: peft_4b, label: "LoRA on the 4B (like-for-like with full)"}
+    extra:
+      - {arm: peft_merger, experiment: fix, label: "8B LoRA + vision merger unfrozen (audit fix)"}
+      - {arm: peft_4b_merger, experiment: fix, label: "4B LoRA + vision merger unfrozen (audit fix)"}
     zero_shot: {source: vlm_metrics, key: Qwen3-VL}
+    # 4B full arm, first 20 test images, one pass (the full protocol ran >2.7 h).
+    latency:
+      - {path: "", arm: full, runtime: pytorch_fp16}
 
   - key: paligemma2
     display: PaliGemma 2 3B-448
@@ -194,9 +232,12 @@ models:
     resolution: "448x448 (squashed)"
     licence: Gemma Terms of Use (gated)
     redistribution: gated
+    light_trains: "LoRA r16 on Gemma attention + projector (SigLIP frozen)"
     arms:
       peft: peft
       full: full
+    extra:
+      - {arm: peft_896, experiment: fix, label: "peft recipe at 896 px (audit fix)", input: "896x896 (squashed)"}
     zero_shot: {source: sibling, path: paligemma2/zeroshot_mix448/valid.json}
     latency:
       - {path: "", arm: peft, runtime: pytorch_fp16}
@@ -208,14 +249,75 @@ models:
     resolution: "SigLIP tiles, pixel-shuffled"
     licence: Apache-2.0
     redistribution: permissive
+    light_trains: "QLoRA r16 on LLM attention + connector (SigLIP frozen)"
     arms:
       peft: peft
       full: full
     zero_shot: {source: sibling, path: smolvlm2/zeroshot/valid.json}
 
+  # ---- Round 2 baselines: the two best published 640 px detectors, retrained under
+  # the same protocol (E1 equal-effort tuning, E2 1280 px, E3 data scaling). They are
+  # conventional detectors, not foundation models: `baseline: true` keeps them out of
+  # the light/full tables and the PyTorch latency list.
+  - key: yolo26m
+    display: YOLO26m
+    family: conventional detector
+    baseline: true
+    slug: yolo26m
+    resolution: "640"
+    licence: AGPL-3.0
+    redistribution: agpl
+    arms: {}
+    extra:
+      - {arm: default_s0, experiment: E1, label: "default recipe, seed 0 (taxonomy-ablation run)"}
+      - {arm: default_s1, experiment: E1, label: "default recipe, seed 1 (taxonomy-ablation run)"}
+      - {arm: default_s2, experiment: E1, label: "default recipe, seed 2 (taxonomy-ablation run)"}
+      - {arm: yolo26m_e1_s0, experiment: E1, label: "E1 recipe (lr x2), seed 0"}
+      - {arm: yolo26m_e1_s1, experiment: E1, label: "E1 recipe (lr x2), seed 1"}
+      - {arm: yolo26m_e1_s2, experiment: E1, label: "E1 recipe (lr x2), seed 2"}
+      - {arm: yolo26m_1280_s0, experiment: E2, label: "E1 recipe @1280, seed 0", input: "1280"}
+      - {arm: yolo26m_1280_s1, experiment: E2, label: "E1 recipe @1280, seed 1", input: "1280"}
+      - {arm: yolo26m_1280_s2, experiment: E2, label: "E1 recipe @1280, seed 2", input: "1280"}
+      - {arm: yolo26m_frac25_d0, experiment: E3, label: "E1 recipe on frac25, draw 0"}
+      - {arm: yolo26m_frac25_d1, experiment: E3, label: "E1 recipe on frac25, draw 1"}
+      - {arm: yolo26m_frac50_d0, experiment: E3, label: "E1 recipe on frac50, draw 0"}
+      - {arm: yolo26m_frac50_d1, experiment: E3, label: "E1 recipe on frac50, draw 1"}
+    # E1 val sweep (seed 0, 640). Selected on val; YOLO26m sweep configs were never
+    # predicted on test.
+    sweep:
+      - {arm: yolo26m_e1_lr05, label: "lr0 x0.5"}
+      - {arm: yolo26m_e1_lr1, label: "lr0 x1 (published recipe)"}
+      - {arm: yolo26m_e1_lr2, label: "lr0 x2", selected: true}
+      - {arm: yolo26m_e1_ep450, label: "lr0 x1, 450 epochs (early-stopped at 374)"}
+
+  - key: deimm
+    display: DEIM-M
+    family: conventional detector
+    baseline: true
+    slug: deimm
+    resolution: "640"
+    licence: Apache-2.0
+    redistribution: permissive
+    arms: {}
+    extra:
+      - {arm: e1_s0, experiment: E1, label: "E1 recipe (lr x2), seed 0"}
+      - {arm: e1_s1, experiment: E1, label: "E1 recipe (lr x2), seed 1"}
+      - {arm: e1_s2, experiment: E1, label: "E1 recipe (lr x2), seed 2"}
+      - {arm: 1280_s0, experiment: E2, label: "E1 recipe @1280, seed 0", input: "1280"}
+      - {arm: 1280_s1, experiment: E2, label: "E1 recipe @1280, seed 1", input: "1280"}
+      - {arm: 1280_s2, experiment: E2, label: "E1 recipe @1280, seed 2", input: "1280"}
+    # E1 val sweep (seed 0, 640). Every DEIM-M sweep config was also predicted on
+    # test once, after training; selection used val only. e1_lr2 is the same run as e1_s0.
+    sweep:
+      - {arm: e1_lr05, label: "lr x0.5"}
+      - {arm: e1_lr1, label: "lr x1 (published recipe, retrained on merged5)"}
+      - {arm: e1_lr2, label: "lr x2", selected: true}
+      - {arm: e1_long, label: "160 epochs, milestones x4/3"}
+
 # Whole-slug vast.ai spend (training boxes, failed rentals, T4 latency boxes), from the
-# sibling repo's plan docs. `complete: false` marks a slug whose total is still missing
-# a box (a T4 latency job or extra seeds); the report flags it.
+# sibling repo's plan docs. `complete: false` marks a total that is known to miss a box
+# or is the doc's own approximation; the report flags it. `stage`: round1 (the
+# overnight runs), round2 (E1-E4), followup (TensorRT boxes, audit fixes).
 costs:
   - slug: yoloe
     usd: 1.11
@@ -257,3 +359,311 @@ costs:
     usd: 2.42
     complete: true
     source: "docs/plans/smolvlm2.md: A6000 4.99 h $2.11 + T4 1.39 h $0.31"
+
+  # ---- round 2 (E1-E4)
+  - slug: yolo26m
+    stage: round2
+    usd: 11.0
+    complete: false
+    source: "docs/plans/yolo26m.md, Cost: about $11 on 4090 boxes (arms, sweep, ~$1.2 dead boots) plus a ~$0.04 T4 box"
+  - slug: deimm
+    stage: round2
+    usd: 13.72
+    complete: false
+    source: "results/deimm/costs_r2.tsv summed (11.88, incl. T4 boxes and failed boxes) + 1280_s0 box from its meta.json (1.84, not in the TSV)"
+  - slug: llmdet
+    stage: round2
+    usd: 2.94
+    complete: false
+    source: "docs/plans/llmdet.md, Round 2 cost table: box $ for frac25_d0 (0.62) and mid (1.36), train $ only for the other three"
+  - slug: mmgdino
+    stage: round2
+    usd: 3.19
+    complete: false
+    source: "docs/plans/mmgdino.md, Round 2 E3 table $ column + mid $0.97; the first launch that crashed (no pycocotools) is not included"
+  - slug: sam3
+    stage: round2
+    usd: 1.90
+    complete: true
+    source: "docs/plans/sam3.md, Round 2: mid 1.57 box-h, about $1.90"
+  - slug: owlv2
+    stage: round2
+    usd: 2.42
+    complete: true
+    source: "docs/plans/owlv2.md, Round 2: mid ~4.6 h, ~$2.42"
+  - slug: yoloe
+    stage: round2
+    usd: 1.25
+    complete: true
+    source: "docs/plans/yoloe.md, Round 2 cost table total ~$1.25"
+  # ---- follow-ups: TensorRT boxes and the user-approved audit fixes
+  - slug: llmdet
+    stage: followup
+    usd: 0.49
+    complete: true
+    source: "results/llmdet/latency_trt_t4.json cost_usd (T4 TensorRT box)"
+  - slug: mmgdino
+    stage: followup
+    usd: 1.05
+    complete: true
+    source: "results/mmgdino/latency_trt_t4.json cost_usd 0.40 (GridSample engine) + msda_plugin.cost_usd 0.65"
+  - slug: sam3
+    stage: followup
+    usd: 0.72
+    complete: true
+    source: "results/sam3/latency_trt_t4.json cost_usd 0.32 (round 1, invalid engine) + round2.cost_usd 0.40 (fixed engine)"
+  - slug: yoloe
+    stage: followup
+    usd: 0.40
+    complete: true
+    source: "results/yoloe/latency_trt_t4.json notes: Norway T4 1.37 h x $0.276 + ~$0.02"
+  - slug: paligemma2
+    stage: followup
+    usd: 4.43
+    complete: true
+    source: "results/paligemma2/peft_896/meta.json cost_usd 3.83 (A100 3.45 box-h) + NIGHT_LOG 20:55 test-predict box ~$0.6"
+  - slug: qwen3vl
+    stage: followup
+    usd: 2.72
+    complete: true
+    source: "NIGHT_LOG 21:17 and docs/plans/qwen3vl.md: two merger-unfrozen boxes, $1.36 each"
+  - slug: owlv2
+    stage: followup
+    usd: 0.0
+    complete: false
+    source: "OWLv2 TensorRT box (vast 61096023, T4 $0.155/h): no cost total recorded in the results files"
+
+# --------------------------------------------------------------------------- #
+# Round 2 report structure. Everything below names rows; no number is typed here.
+# A "ref" is a group key, a row id (`<model key>/<arm folder>`), or a reference
+# detector name (YOLO26m, DEIM-M: the published 640 px predictions).
+# --------------------------------------------------------------------------- #
+
+# Seed groups: the bootstrap scores a group as the per-draw mean of its members, so a
+# group's clustered CI is the CI of the seed-averaged model.
+groups:
+  - {key: yolo26m_640_default, label: "YOLO26m @640, default recipe", input: "640", members: [yolo26m/default_s0, yolo26m/default_s1, yolo26m/default_s2]}
+  - {key: yolo26m_640_e1, label: "YOLO26m @640, E1 recipe", input: "640", members: [yolo26m/yolo26m_e1_s0, yolo26m/yolo26m_e1_s1, yolo26m/yolo26m_e1_s2]}
+  - {key: yolo26m_1280, label: "YOLO26m @1280, E1 recipe", input: "1280", members: [yolo26m/yolo26m_1280_s0, yolo26m/yolo26m_1280_s1, yolo26m/yolo26m_1280_s2]}
+  - {key: deimm_640_e1, label: "DEIM-M @640, E1 recipe", input: "640", members: [deimm/e1_s0, deimm/e1_s1, deimm/e1_s2]}
+  - {key: deimm_1280, label: "DEIM-M @1280, E1 recipe", input: "1280", members: [deimm/1280_s0, deimm/1280_s1, deimm/1280_s2]}
+  - {key: llmdet_peft, label: "LLMDet-large, light (peft)", input: "short side 800, long cap 1333", members: [llmdet/peft, llmdet/peft_s1, llmdet/peft_s2]}
+  - {key: mmgdino_peft, label: "MM-Grounding-DINO-B, light (peft)", input: "short side 800 (1422x800)", members: [mmgdino/peft, mmgdino/peft_s1, mmgdino/peft_s2]}
+  - {key: owlv2_peft, label: "OWLv2-L/14, light (peft)", input: "1008x1008", members: [owlv2/peft, owlv2/peft_seed1, owlv2/peft_seed2]}
+
+# Which entries each report table shows, and which paired clustered deltas it quotes.
+tables:
+  headline:
+    entries: [deimm_1280, yolo26m_1280, llmdet_peft, llmdet/full, yoloe_1280/yoloe_full, yoloworld/yoloworld_full, mmgdino_peft, sam3/full, deimm_640_e1, yolo26m_640_e1, yoloe_640/yoloe_full_640]
+    pairs:
+      - [deimm_1280, llmdet_peft]
+      - [deimm_1280, llmdet/full]
+      - [yolo26m_1280, llmdet_peft]
+      - [yolo26m_1280, yoloe_1280/yoloe_full]
+      - [deimm_1280, yoloworld/yoloworld_full]
+      - [deimm_1280, mmgdino_peft]
+      - [llmdet_peft, yolo26m_640_e1]
+      - [llmdet_peft, deimm_640_e1]
+  e1:
+    entries: [YOLO26m, yolo26m_640_default, yolo26m_640_e1, DEIM-M, deimm_640_e1, llmdet_peft]
+    pairs:
+      - [yolo26m_640_e1, yolo26m_640_default]
+      - [yolo26m_640_e1, YOLO26m]
+      - [deimm_640_e1, DEIM-M]
+      - [llmdet_peft, yolo26m_640_e1]
+      - [llmdet_peft, deimm_640_e1]
+  e2:
+    entries: [yolo26m_640_e1, yolo26m_1280, deimm_640_e1, deimm_1280, yoloe_640/yoloe_full_640, yoloe_1280/yoloe_full, yoloe_640/yoloe_peft_640, yoloe_1280/yoloe_peft]
+    pairs:
+      - [yolo26m_1280, yolo26m_640_e1]
+      - [deimm_1280, deimm_640_e1]
+      - [yoloe_1280/yoloe_full, yoloe_640/yoloe_full_640]
+      - [yoloe_640/yoloe_full_640, yolo26m_640_e1]
+      - [yoloe_1280/yoloe_full, yolo26m_1280]
+  e3:
+    entries: []
+    pairs:
+      - [llmdet/peft_frac25_d1, yolo26m/yolo26m_frac25_d1]
+      - [mmgdino/peft_frac25_d1, yolo26m/yolo26m_frac25_d1]
+      - [yoloe_640/yoloe_full_640_frac25_d1, yolo26m/yolo26m_frac25_d1]
+      - [llmdet/peft_frac25_d0, yolo26m/yolo26m_frac25_d0]
+      - [yoloe_640/yoloe_full_640_frac25_d0, yolo26m/yolo26m_frac25_d0]
+
+# E3 data scaling: one series per model. `full` is the 100% point (a seed group or a
+# row); the subset rows carry their image fraction and draw in meta.json.
+scaling:
+  - {label: "YOLO26m @640 (E1 recipe)", full: yolo26m_640_e1, subsets: [yolo26m/yolo26m_frac25_d0, yolo26m/yolo26m_frac25_d1, yolo26m/yolo26m_frac50_d0, yolo26m/yolo26m_frac50_d1]}
+  - {label: "YOLOE-26x @640 (full)", full: yoloe_640/yoloe_full_640, subsets: [yoloe_640/yoloe_full_640_frac25_d0, yoloe_640/yoloe_full_640_frac25_d1, yoloe_640/yoloe_full_640_frac50_d0, yoloe_640/yoloe_full_640_frac50_d1]}
+  - {label: "LLMDet-large (light)", full: llmdet_peft, subsets: [llmdet/peft_frac25_d0, llmdet/peft_frac25_d1, llmdet/peft_frac50_d0, llmdet/peft_frac50_d1]}
+  - {label: "MM-Grounding-DINO-B (light)", full: mmgdino_peft, subsets: [mmgdino/peft_frac25_d0, mmgdino/peft_frac25_d1, mmgdino/peft_frac50_d0, mmgdino/peft_frac50_d1]}
+
+# Generative-VLM recipe fixes found in audit (user-approved; test predicted once each).
+fixes:
+  - {before: paligemma2/peft, after: paligemma2/peft_896, change: "input 448 -> 896 px (google/paligemma2-3b-pt-896), same LoRA + projector recipe", audit: paligemma2}
+  - {before: qwen3vl/peft, after: qwen3vl/peft_merger, change: "8B LoRA, vision merger + deepstack mergers unfrozen (upstream tune_mm_mlp)", audit: qwen3vl}
+  - {before: qwen3vl/peft_4b, after: qwen3vl/peft_4b_merger, change: "4B LoRA, vision merger + deepstack mergers unfrozen", audit: qwen3vl}
+
+# Audits (results/<slug>/audit/AUDIT.md). The verdict word is parsed from the file;
+# `outcome` says what happened to the published numbers.
+audits:
+  - {slug: owlv2, outcome: "Numbers stand. The light arm is capacity-limited (train fit 0.693 vs val 0.557)."}
+  - {slug: yoloe, outcome: "Numbers stand. The linear probe cannot move a box; that is its ceiling."}
+  - {slug: florence2, outcome: "Numbers stand. Frozen DaViT limits the LoRA arms, above all on the ball."}
+  - {slug: smolvlm2, outcome: "Numbers stand (about 0). The model does not fit its own training images (train 0.008 / 0.016)."}
+  - {slug: paligemma2, outcome: "Recipe fix run: 896 px input. Val 0.293 -> 0.447; test predicted once after user approval (0.278 -> 0.432)."}
+  - {slug: qwen3vl, outcome: "Recipe fix run: merger unfrozen. Test predicted once each after user approval (8B 0.548 -> 0.570, 4B 0.533 -> 0.588)."}
+
+# TensorRT fp16 engines on a rented T4 (TensorRT 10.3). Value paths are key lists into
+# `file` (relative to the sibling results/), or {file, path} for a value kept in another
+# file. `applies_to`: the report entries this engine times (same graph).
+# status: current | superseded (kept to show what changed) | invalid.
+trt:
+  - key: yolo26m_640_published
+    label: "YOLO26m @640 (published engine)"
+    published: YOLO26m
+    input: "640x640"
+    applies_to: [yolo26m_640_e1, yolo26m_640_default, YOLO26m]
+  - key: deimm_640_published
+    label: "DEIM-M @640 (published engine)"
+    published: DEIM-M
+    input: "640x640"
+    applies_to: [DEIM-M]
+  - key: yolo26m_1280
+    label: "YOLO26m @1280 (1280_s0)"
+    file: yolo26m/latency_trt_t4.json
+    input: "1280x1280"
+    gpu_ms: [reported_median_ms]
+    gpu_runs: [runs]
+    applies_to: [yolo26m_1280]
+  - key: deimm_640
+    label: "DEIM-M @640 (e1_lr2)"
+    file: deimm/latency_t4/trt_deimm_e1_lr2_640.json
+    input: "640x640"
+    gpu_ms: [reported_median_ms]
+    gpu_runs: [runs]
+    applies_to: [deimm_640_e1, deimm/e1_s0]
+  - key: deimm_1280
+    label: "DEIM-M @1280 (1280_s0)"
+    file: deimm/latency_t4/trt_deimm_1280_s0_1280.json
+    input: "1280x1280"
+    gpu_ms: [reported_median_ms]
+    gpu_runs: [runs]
+    applies_to: [deimm_1280]
+  - key: yoloe_full_640
+    label: "YOLOE-26x @640 (full)"
+    file: yoloe/latency_trt_t4.json
+    input: "640x640"
+    gpu_ms: [arms, yoloe_full_640, gpu_compute, median_ms]
+    gpu_runs: [arms, yoloe_full_640, gpu_compute, runs]
+    e2e_ms: [arms, yoloe_full_640, e2e, median_ms]
+    pytorch_ms: {file: yoloe/latency_t4.json, path: [runs, yoloe_full_640, reported_median_ms]}
+    val_pt: [arms, yoloe_full_640, valid_mAP_50_95, pytorch]
+    val_trt: [arms, yoloe_full_640, valid_mAP_50_95, trt_fp16]
+    applies_to: [yoloe_640/yoloe_full_640]
+  - key: yoloe_full
+    label: "YOLOE-26x @1280 (full)"
+    file: yoloe/latency_trt_t4.json
+    input: "1280x1280"
+    gpu_ms: [arms, yoloe_full, gpu_compute, median_ms]
+    gpu_runs: [arms, yoloe_full, gpu_compute, runs]
+    e2e_ms: [arms, yoloe_full, e2e, median_ms]
+    pytorch_ms: {file: yoloe/latency_t4.json, path: [runs, yoloe_full_1280, reported_median_ms]}
+    val_pt: [arms, yoloe_full, valid_mAP_50_95, pytorch]
+    val_trt: [arms, yoloe_full, valid_mAP_50_95, trt_fp16]
+    note: "val gap is the square letterbox, not fp16 (an fp32 engine scores the same)"
+    applies_to: [yoloe_1280/yoloe_full]
+  - key: yoloworld_full
+    label: "YOLO-World-v2-x @1280 (full)"
+    file: yoloe/latency_trt_t4.json
+    input: "1280x1280"
+    gpu_ms: [arms, yoloworld_full, gpu_compute, median_ms]
+    gpu_runs: [arms, yoloworld_full, gpu_compute, runs]
+    e2e_ms: [arms, yoloworld_full, e2e, median_ms]
+    pytorch_ms: {file: yoloe/latency_t4.json, path: [runs, yoloworld_full_1280, reported_median_ms]}
+    val_pt: [arms, yoloworld_full, valid_mAP_50_95, pytorch]
+    val_trt: [arms, yoloworld_full, valid_mAP_50_95, trt_fp16]
+    note: "EfficientNMS in the engine"
+    applies_to: [yoloworld/yoloworld_full, yoloworld/yoloworld_peft]
+  - key: deimv2_m
+    label: "DEIMv2-M (full)"
+    file: deimv2/latency_t4.json
+    input: "640x640"
+    gpu_ms: [tensorrt_fp16, "DEIMv2-M (full)", reported_median_ms]
+    gpu_runs: [tensorrt_fp16, "DEIMv2-M (full)", runs]
+    pytorch_ms: [pytorch_fp16, "DEIMv2-M (full)", reported_median_ms]
+    applies_to: [deimv2_m/full, deimv2_m/peft]
+  - key: deimv2_l
+    label: "DEIMv2-L (l_full)"
+    file: deimv2/latency_t4.json
+    input: "640x640"
+    gpu_ms: [tensorrt_fp16, "DEIMv2-L (l_full)", reported_median_ms]
+    gpu_runs: [tensorrt_fp16, "DEIMv2-L (l_full)", runs]
+    pytorch_ms: [pytorch_fp16, "DEIMv2-L (l_full)", reported_median_ms]
+    applies_to: [deimv2_l/l_full, deimv2_l/l_peft]
+  - key: mmgdino_msda
+    label: "MM-Grounding-DINO-B (peft), MSDA plugin"
+    file: mmgdino/latency_trt_t4.json
+    input: "800x1422"
+    gpu_ms: [msda_plugin, gpu_compute, reported_median_ms]
+    gpu_runs: [msda_plugin, gpu_compute, runs]
+    e2e_ms: [msda_plugin, e2e, reported_median_ms]
+    pytorch_ms: [pytorch_fp16_e2e_median_ms]
+    val_pt: [msda_plugin, val_mAP_50_95, pytorch_fp32_engine_input]
+    val_trt: [msda_plugin, val_mAP_50_95, trt_fp16_plugin]
+    note: "GPU-compute runs 12% apart: quote the range; plugin precision loss not isolated"
+    applies_to: [mmgdino_peft, mmgdino/peft, mmgdino/full]
+  - key: mmgdino_gridsample
+    label: "MM-Grounding-DINO-B (peft), ONNX GridSample"
+    status: superseded
+    file: mmgdino/latency_trt_t4.json
+    input: "800x1422"
+    gpu_ms: [gpu_compute, reported_median_ms]
+    gpu_runs: [gpu_compute, runs]
+    e2e_ms: [e2e, reported_median_ms]
+    pytorch_ms: [pytorch_fp16_e2e_median_ms]
+    val_pt: [val_mAP_50_95, pytorch_fp32_engine_input]
+    val_trt: [val_mAP_50_95, trt_fp16]
+    note: "superseded by the MSDA plugin engine; slower than PyTorch"
+    applies_to: []
+  - key: llmdet_msda
+    label: "LLMDet-large (peft), MSDA plugin"
+    file: llmdet/latency_trt_t4.json
+    input: "750x1333"
+    gpu_ms: [gpu_compute_median_ms]
+    gpu_runs: [variants, plugin_fp16, gpu_compute, runs]
+    e2e_ms: [e2e_median_ms]
+    pytorch_ms: [pytorch_fp16_t4_e2e_median_ms]
+    val_pt: [val_map_50_95_pytorch]
+    val_trt: [val_map_50_95_trt]
+    note: "fp32 islands do not recover the fp16 loss; an fp32 engine scores -0.18 pt"
+    applies_to: [llmdet_peft, llmdet/peft, llmdet/full]
+  - key: sam3_fixed
+    label: "SAM 3 (full), --attn-out-3d export"
+    file: sam3/latency_trt_t4.json
+    input: "1008x1008"
+    gpu_ms: [round2, reported, gpu_compute_median_ms]
+    gpu_runs: [round2, gpu_compute_runs]
+    e2e_ms: [round2, reported, e2e_median_ms]
+    pytorch_ms: [pytorch_fp16_reference_ms, e2e_median]
+    val_pt: [round2, val_mAP_50_95, pytorch_bf16]
+    val_trt: [round2, val_mAP_50_95, trt_fp16]
+    note: "round-1 engine gave val 0.000 (TRT 10.3 fp16 mis-computed the ViT attention projection on sm75); fixed by an export rewrite"
+    applies_to: [sam3/full, sam3/peft]
+  - key: owlv2_full
+    label: "OWLv2-L/14 (full)"
+    file: owlv2/latency_trt_t4.json
+    input: "1008x1008"
+    gpu_ms: [gpu_compute, reported_median_ms]
+    gpu_runs: [gpu_compute, runs]
+    e2e_ms: [e2e, cv2pre, median_ms]
+    pytorch_ms: {file: owlv2/latency_t4.json, path: [reported_median_ms]}
+    val_pt: [val_mAP_50_95, pytorch]
+    val_trt: [val_mAP_50_95, trt_fp16_cv2pre]
+    note: "e2e with cv2 pre-processing; the HF image processor alone takes ~470 ms on the CPU"
+    applies_to: [owlv2/full, owlv2/peft, owlv2_peft]
+
+# Timings this study does not have, listed in the report so their absence is explicit.
+not_timed:
+  - {what: "PaliGemma 2 @896 (peft_896)", why: "T4 latency at 896 px was not measured (the 448 px peft arm took ~9.9 s/frame in PyTorch)"}
+  - {what: "Generative VLMs under TensorRT", why: "token-by-token generation needs TensorRT-LLM, not a TensorRT engine; VLMs are timed in PyTorch only"}
+  - {what: "YOLO26m / DEIM-M end to end at 1280", why: "only GPU compute was timed for the retrained baselines"}

@@ -13,6 +13,8 @@
       "model": "LLMDet-large",
       "family": "open-vocab detector",
       "slug": "llmdet",
+      "experiment": null,
+      "input": "short side 800, long cap 1333",
       "arm": "peft",
       "role": "peft",
       "base_arm": "peft",
@@ -21,14 +23,20 @@
       "image_size": "train_short_side=480,512,544,576,608,640,672,704,736,768,800, test_short_side=800, long_cap=1333",
       "model_id": "iSEE-Laboratory/llmdet_large",
       "selected_epoch": 13,
+      "epochs_run": 18,
+      "optimizer_steps": 2088,
+      "gpu": "NVIDIA A100 80GB PCIe (vast.ai)",
       "meta_note": null,
       "trainable_params": 38959779,
       "total_params": 343052631,
       "trainable_fraction": 0.1135679352944534,
       "train_gpu_hours": 1.513,
-      "train_gpu_hours_key": "train_hours",
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": 1.35,
       "train_cost_key": "cost_usd_train_compute",
+      "full_type": "peft",
+      "full_type_note": null,
+      "box_shared": true,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/llmdet_peft_valid.json.gz",
@@ -71,6 +79,8 @@
       "model": "LLMDet-large",
       "family": "open-vocab detector",
       "slug": "llmdet",
+      "experiment": null,
+      "input": "short side 800, long cap 1333",
       "arm": "peft_s1",
       "role": "seed",
       "base_arm": "peft",
@@ -79,14 +89,20 @@
       "image_size": "train_short_side=480,512,544,576,608,640,672,704,736,768,800, test_short_side=800, long_cap=1333",
       "model_id": "iSEE-Laboratory/llmdet_large",
       "selected_epoch": 18,
+      "epochs_run": 20,
+      "optimizer_steps": 2320,
+      "gpu": "NVIDIA A100 80GB PCIe (vast.ai)",
       "meta_note": null,
       "trainable_params": 38959779,
       "total_params": 343052631,
       "trainable_fraction": 0.1135679352944534,
       "train_gpu_hours": 0.951,
-      "train_gpu_hours_key": "train_hours",
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": 0.85,
       "train_cost_key": "cost_usd_train_compute",
+      "full_type": "peft",
+      "full_type_note": null,
+      "box_shared": true,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/llmdet_peft_s1_valid.json.gz",
@@ -129,6 +145,8 @@
       "model": "LLMDet-large",
       "family": "open-vocab detector",
       "slug": "llmdet",
+      "experiment": null,
+      "input": "short side 800, long cap 1333",
       "arm": "peft_s2",
       "role": "seed",
       "base_arm": "peft",
@@ -137,14 +155,20 @@
       "image_size": "train_short_side=480,512,544,576,608,640,672,704,736,768,800, test_short_side=800, long_cap=1333",
       "model_id": "iSEE-Laboratory/llmdet_large",
       "selected_epoch": 20,
+      "epochs_run": 20,
+      "optimizer_steps": 2320,
+      "gpu": "NVIDIA A100 80GB PCIe (vast.ai)",
       "meta_note": null,
       "trainable_params": 38959779,
       "total_params": 343052631,
       "trainable_fraction": 0.1135679352944534,
       "train_gpu_hours": 0.787,
-      "train_gpu_hours_key": "train_hours",
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": 0.7,
       "train_cost_key": "cost_usd_train_compute",
+      "full_type": "peft",
+      "full_type_note": null,
+      "box_shared": false,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/llmdet_peft_s2_valid.json.gz",
@@ -187,6 +211,8 @@
       "model": "LLMDet-large",
       "family": "open-vocab detector",
       "slug": "llmdet",
+      "experiment": null,
+      "input": "short side 800, long cap 1333",
       "arm": "full",
       "role": "full",
       "base_arm": "full",
@@ -195,14 +221,20 @@
       "image_size": "train_short_side=480,512,544,576,608,640,672,704,736,768,800, test_short_side=800, long_cap=1333",
       "model_id": "iSEE-Laboratory/llmdet_large",
       "selected_epoch": 17,
+      "epochs_run": 20,
+      "optimizer_steps": 2320,
+      "gpu": "NVIDIA A100 80GB PCIe (vast.ai)",
       "meta_note": null,
       "trainable_params": 343052631,
       "total_params": 343052631,
       "trainable_fraction": 1.0,
       "train_gpu_hours": 1.854,
-      "train_gpu_hours_key": "train_hours",
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": 1.66,
       "train_cost_key": "cost_usd_train_compute",
+      "full_type": "b",
+      "full_type_note": "Swin-L + BERT at 0.1x",
+      "box_shared": true,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/llmdet_full_valid.json.gz",
@@ -240,11 +272,359 @@
       "sibling_test_map_50_95": 0.7850790023803711
     },
     {
+      "row_id": "llmdet/mid",
+      "model_key": "llmdet",
+      "model": "LLMDet-large",
+      "family": "open-vocab detector",
+      "slug": "llmdet",
+      "experiment": "E4",
+      "input": "short side 800, long cap 1333",
+      "arm": "mid",
+      "role": "extra",
+      "base_arm": "mid",
+      "label": "mid: light + Swin-L stage 4 at lr x0.1",
+      "seed": 0,
+      "image_size": "train_short_side=480,512,544,576,608,640,672,704,736,768,800, test_short_side=800, long_cap=1333",
+      "model_id": "iSEE-Laboratory/llmdet_large",
+      "selected_epoch": 15,
+      "epochs_run": 20,
+      "optimizer_steps": 2320,
+      "gpu": "A100 SXM4 80GB (vast.ai)",
+      "meta_note": null,
+      "trainable_params": 100401411,
+      "total_params": 343052631,
+      "trainable_fraction": 0.29267057567035537,
+      "train_gpu_hours": 0.765,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.84,
+      "train_cost_key": "cost_usd_train_compute",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/llmdet_mid_valid.json.gz",
+          "sha256_json": "92fc62600e1d339a7bc7c3b22fc49d357a3c67c0b1bdf6f864142df059715898"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/llmdet_mid_test.json.gz",
+          "sha256_json": "143b1147e564044ed575f42d2fdb4cfe39460f65af43b9dd9613f79dd24ac1df"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7386902570724487,
+        "mAP_50": 0.9712302088737488,
+        "mAP_75": 0.8680691719055176,
+        "per_class_ap50": {
+          "player": 0.9912436008453369,
+          "ball": 0.8970522880554199,
+          "referee": 0.9925975799560547,
+          "rim": 1.0,
+          "number": 0.9752574563026428
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7724748849868774,
+        "mAP_50": 0.9715214371681213,
+        "mAP_75": 0.9131891131401062,
+        "per_class_ap50": {
+          "player": 0.9870750308036804,
+          "ball": 0.9069593548774719,
+          "referee": 0.9867292642593384,
+          "rim": 1.0,
+          "number": 0.9768434166908264
+        }
+      },
+      "sibling_test_map_50_95": 0.7724748849868774
+    },
+    {
+      "row_id": "llmdet/peft_frac25_d0",
+      "model_key": "llmdet",
+      "model": "LLMDet-large",
+      "family": "open-vocab detector",
+      "slug": "llmdet",
+      "experiment": "E3",
+      "input": "short side 800, long cap 1333",
+      "arm": "peft_frac25_d0",
+      "role": "extra",
+      "base_arm": "peft_frac25_d0",
+      "label": "peft on frac25, draw 0",
+      "seed": 0,
+      "image_size": "train_short_side=480,512,544,576,608,640,672,704,736,768,800, test_short_side=800, long_cap=1333",
+      "model_id": "iSEE-Laboratory/llmdet_large",
+      "selected_epoch": 31,
+      "epochs_run": 36,
+      "optimizer_steps": 1458,
+      "gpu": "A40 48GB (vast.ai)",
+      "meta_note": null,
+      "image_fraction": 0.35129310344827586,
+      "train_images": 163,
+      "subset_target_pct": 25,
+      "subset_draw": 0,
+      "trainable_params": 38959779,
+      "total_params": 343052631,
+      "trainable_fraction": 0.1135679352944534,
+      "train_gpu_hours": 0.949,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.48,
+      "train_cost_key": "cost_usd_train_compute",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/llmdet_peft_frac25_d0_valid.json.gz",
+          "sha256_json": "c84074c6e58f3ffc6147e172da6f1054f7e946e724ebdc41b4593917ecac9daf"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/llmdet_peft_frac25_d0_test.json.gz",
+          "sha256_json": "36ca363b2e9a1c67b26447df93fefdf0a0bedb4061cd80442ac8ece6e2fb1713"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7149273753166199,
+        "mAP_50": 0.95068359375,
+        "mAP_75": 0.8153462409973145,
+        "per_class_ap50": {
+          "player": 0.9659625291824341,
+          "ball": 0.8677142262458801,
+          "referee": 0.9604814648628235,
+          "rim": 0.9919013977050781,
+          "number": 0.9673582911491394
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7570194005966187,
+        "mAP_50": 0.9333649277687073,
+        "mAP_75": 0.8767110109329224,
+        "per_class_ap50": {
+          "player": 0.9533363580703735,
+          "ball": 0.8756250143051147,
+          "referee": 0.9256461262702942,
+          "rim": 0.9766847491264343,
+          "number": 0.9355323314666748
+        }
+      },
+      "sibling_test_map_50_95": 0.7570194005966187
+    },
+    {
+      "row_id": "llmdet/peft_frac25_d1",
+      "model_key": "llmdet",
+      "model": "LLMDet-large",
+      "family": "open-vocab detector",
+      "slug": "llmdet",
+      "experiment": "E3",
+      "input": "short side 800, long cap 1333",
+      "arm": "peft_frac25_d1",
+      "role": "extra",
+      "base_arm": "peft_frac25_d1",
+      "label": "peft on frac25, draw 1",
+      "seed": 0,
+      "image_size": "train_short_side=480,512,544,576,608,640,672,704,736,768,800, test_short_side=800, long_cap=1333",
+      "model_id": "iSEE-Laboratory/llmdet_large",
+      "selected_epoch": 34,
+      "epochs_run": 39,
+      "optimizer_steps": 1365,
+      "gpu": "RTX 5880 Ada 48GB (vast.ai)",
+      "meta_note": null,
+      "image_fraction": 0.30387931034482757,
+      "train_images": 141,
+      "subset_target_pct": 25,
+      "subset_draw": 1,
+      "trainable_params": 38959779,
+      "total_params": 343052631,
+      "trainable_fraction": 0.1135679352944534,
+      "train_gpu_hours": 0.582,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.32,
+      "train_cost_key": "cost_usd_train_compute",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/llmdet_peft_frac25_d1_valid.json.gz",
+          "sha256_json": "0534377e95d909aaf40ec42ebe394b7d3ddd3e0a3d5a6489aec8b30ac3a3ed24"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/llmdet_peft_frac25_d1_test.json.gz",
+          "sha256_json": "5853fc40fe6eb6d84a159dee69b8bc80e0be63599bcf05747a542f538025a768"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.6856902837753296,
+        "mAP_50": 0.9418159127235413,
+        "mAP_75": 0.8208233714103699,
+        "per_class_ap50": {
+          "player": 0.981283962726593,
+          "ball": 0.8206679224967957,
+          "referee": 0.9637234807014465,
+          "rim": 0.9740420579910278,
+          "number": 0.9693620204925537
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.6989670991897583,
+        "mAP_50": 0.9404752850532532,
+        "mAP_75": 0.8161588907241821,
+        "per_class_ap50": {
+          "player": 0.9684701561927795,
+          "ball": 0.8652788400650024,
+          "referee": 0.9518049359321594,
+          "rim": 0.9685857892036438,
+          "number": 0.9482367634773254
+        }
+      },
+      "sibling_test_map_50_95": 0.6989670991897583
+    },
+    {
+      "row_id": "llmdet/peft_frac50_d0",
+      "model_key": "llmdet",
+      "model": "LLMDet-large",
+      "family": "open-vocab detector",
+      "slug": "llmdet",
+      "experiment": "E3",
+      "input": "short side 800, long cap 1333",
+      "arm": "peft_frac50_d0",
+      "role": "extra",
+      "base_arm": "peft_frac50_d0",
+      "label": "peft on frac50, draw 0",
+      "seed": 0,
+      "image_size": "train_short_side=480,512,544,576,608,640,672,704,736,768,800, test_short_side=800, long_cap=1333",
+      "model_id": "iSEE-Laboratory/llmdet_large",
+      "selected_epoch": 23,
+      "epochs_run": 28,
+      "optimizer_steps": 1778,
+      "gpu": "RTX 6000 Ada 48GB (vast.ai)",
+      "meta_note": null,
+      "image_fraction": 0.5474137931034483,
+      "train_images": 254,
+      "subset_target_pct": 50,
+      "subset_draw": 0,
+      "trainable_params": 38959779,
+      "total_params": 343052631,
+      "trainable_fraction": 0.1135679352944534,
+      "train_gpu_hours": 0.594,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.37,
+      "train_cost_key": "cost_usd_train_compute",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/llmdet_peft_frac50_d0_valid.json.gz",
+          "sha256_json": "32e9d3500de315edc86361fc63dce6887756456d50ce3e649a8f6bf2c6aabdff"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/llmdet_peft_frac50_d0_test.json.gz",
+          "sha256_json": "1820ba700ff984d6ba34a679a244a0186f25d0a61585b936642037ad67d43f5d"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7284032702445984,
+        "mAP_50": 0.9730713367462158,
+        "mAP_75": 0.835453450679779,
+        "per_class_ap50": {
+          "player": 0.9871682524681091,
+          "ball": 0.9204716682434082,
+          "referee": 0.9824294447898865,
+          "rim": 1.0,
+          "number": 0.9752871990203857
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.779204249382019,
+        "mAP_50": 0.9570602178573608,
+        "mAP_75": 0.9101247787475586,
+        "per_class_ap50": {
+          "player": 0.9824293255805969,
+          "ball": 0.8898302316665649,
+          "referee": 0.9758123755455017,
+          "rim": 0.991362988948822,
+          "number": 0.9458662271499634
+        }
+      },
+      "sibling_test_map_50_95": 0.779204249382019
+    },
+    {
+      "row_id": "llmdet/peft_frac50_d1",
+      "model_key": "llmdet",
+      "model": "LLMDet-large",
+      "family": "open-vocab detector",
+      "slug": "llmdet",
+      "experiment": "E3",
+      "input": "short side 800, long cap 1333",
+      "arm": "peft_frac50_d1",
+      "role": "extra",
+      "base_arm": "peft_frac50_d1",
+      "label": "peft on frac50, draw 1",
+      "seed": 0,
+      "image_size": "train_short_side=480,512,544,576,608,640,672,704,736,768,800, test_short_side=800, long_cap=1333",
+      "model_id": "iSEE-Laboratory/llmdet_large",
+      "selected_epoch": 12,
+      "epochs_run": 21,
+      "optimizer_steps": 1312,
+      "gpu": "RTX 6000 Ada 48GB (vast.ai)",
+      "meta_note": null,
+      "image_fraction": 0.5387931034482759,
+      "train_images": 250,
+      "subset_target_pct": 50,
+      "subset_draw": 1,
+      "trainable_params": 38959779,
+      "total_params": 343052631,
+      "trainable_fraction": 0.1135679352944534,
+      "train_gpu_hours": 0.438,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.27,
+      "train_cost_key": "cost_usd_train_compute",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/llmdet_peft_frac50_d1_valid.json.gz",
+          "sha256_json": "1a144ee0234760348c27e01a234f15b71acdc28500753674cab8cf189eeaab56"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/llmdet_peft_frac50_d1_test.json.gz",
+          "sha256_json": "b6b0356e0f22788224eabf299509cd6f091c9e80e254a0dc19bc2eeef999163c"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7203327417373657,
+        "mAP_50": 0.9685810804367065,
+        "mAP_75": 0.8411322236061096,
+        "per_class_ap50": {
+          "player": 0.9761360883712769,
+          "ball": 0.9140983819961548,
+          "referee": 0.9806167483329773,
+          "rim": 0.9984767436981201,
+          "number": 0.9735774397850037
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7516794204711914,
+        "mAP_50": 0.9535284042358398,
+        "mAP_75": 0.8776171803474426,
+        "per_class_ap50": {
+          "player": 0.9718183875083923,
+          "ball": 0.8679803609848022,
+          "referee": 0.9705212116241455,
+          "rim": 0.9988413453102112,
+          "number": 0.9584805369377136
+        }
+      },
+      "sibling_test_map_50_95": 0.7516794204711914
+    },
+    {
       "row_id": "mmgdino/peft",
       "model_key": "mmgdino",
       "model": "MM-Grounding-DINO-B",
       "family": "open-vocab detector",
       "slug": "mmgdino",
+      "experiment": null,
+      "input": "short side 800 (1422x800)",
       "arm": "peft",
       "role": "peft",
       "base_arm": "peft",
@@ -253,14 +633,20 @@
       "image_size": "train: shortest side random in 672,704,736,768,800,832,864,896 (max long side 1600) + hflip; eval/test: shortest side 800 (1422x800 for 1920x1080)",
       "model_id": "openmmlab-community/mm_grounding_dino_base_all",
       "selected_epoch": 26,
+      "epochs_run": 36,
+      "optimizer_steps": 4176,
+      "gpu": "1x RTX A6000 48GB (vast.ai)",
       "meta_note": null,
       "trainable_params": 37204515,
       "total_params": 232976283,
       "trainable_fraction": 0.15969228507263977,
       "train_gpu_hours": 1.61,
-      "train_gpu_hours_key": "train_hours",
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": 0.73,
       "train_cost_key": "cost_usd",
+      "full_type": "peft",
+      "full_type_note": null,
+      "box_shared": false,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/mmgdino_peft_valid.json.gz",
@@ -303,6 +689,8 @@
       "model": "MM-Grounding-DINO-B",
       "family": "open-vocab detector",
       "slug": "mmgdino",
+      "experiment": null,
+      "input": "short side 800 (1422x800)",
       "arm": "peft_s1",
       "role": "seed",
       "base_arm": "peft",
@@ -311,14 +699,20 @@
       "image_size": "train: shortest side random in 672,704,736,768,800,832,864,896 (max long side 1600) + hflip; eval/test: shortest side 800 (1422x800 for 1920x1080)",
       "model_id": "openmmlab-community/mm_grounding_dino_base_all",
       "selected_epoch": 36,
+      "epochs_run": 40,
+      "optimizer_steps": 4640,
+      "gpu": "1x RTX A6000 48GB (vast.ai)",
       "meta_note": null,
       "trainable_params": 37204515,
       "total_params": 232976283,
       "trainable_fraction": 0.15969228507263977,
       "train_gpu_hours": 1.784,
-      "train_gpu_hours_key": "train_hours",
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": 0.86,
       "train_cost_key": "cost_usd",
+      "full_type": "peft",
+      "full_type_note": null,
+      "box_shared": false,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/mmgdino_peft_s1_valid.json.gz",
@@ -361,6 +755,8 @@
       "model": "MM-Grounding-DINO-B",
       "family": "open-vocab detector",
       "slug": "mmgdino",
+      "experiment": null,
+      "input": "short side 800 (1422x800)",
       "arm": "peft_s2",
       "role": "seed",
       "base_arm": "peft",
@@ -369,14 +765,20 @@
       "image_size": "train: shortest side random in 672,704,736,768,800,832,864,896 (max long side 1600) + hflip; eval/test: shortest side 800 (1422x800 for 1920x1080)",
       "model_id": "openmmlab-community/mm_grounding_dino_base_all",
       "selected_epoch": 18,
+      "epochs_run": 28,
+      "optimizer_steps": 3248,
+      "gpu": "1x RTX A6000 48GB (vast.ai)",
       "meta_note": null,
       "trainable_params": 37204515,
       "total_params": 232976283,
       "trainable_fraction": 0.15969228507263977,
       "train_gpu_hours": 1.257,
-      "train_gpu_hours_key": "train_hours",
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": 0.8,
       "train_cost_key": "cost_usd",
+      "full_type": "peft",
+      "full_type_note": null,
+      "box_shared": false,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/mmgdino_peft_s2_valid.json.gz",
@@ -419,6 +821,8 @@
       "model": "MM-Grounding-DINO-B",
       "family": "open-vocab detector",
       "slug": "mmgdino",
+      "experiment": null,
+      "input": "short side 800 (1422x800)",
       "arm": "full",
       "role": "full",
       "base_arm": "full",
@@ -427,14 +831,20 @@
       "image_size": "train: shortest side random in 672,704,736,768,800,832,864,896 (max long side 1600) + hflip; eval/test: shortest side 800 (1422x800 for 1920x1080)",
       "model_id": "openmmlab-community/mm_grounding_dino_base_all",
       "selected_epoch": 14,
+      "epochs_run": 24,
+      "optimizer_steps": 2784,
+      "gpu": "1x RTX A6000 48GB (vast.ai)",
       "meta_note": null,
       "trainable_params": 232976283,
       "total_params": 232976283,
       "trainable_fraction": 1.0,
       "train_gpu_hours": 1.52,
-      "train_gpu_hours_key": "train_hours",
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": 1.52,
       "train_cost_key": "cost_usd",
+      "full_type": "b",
+      "full_type_note": "Swin-B + BERT at 0.1x (run A, selected)",
+      "box_shared": false,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/mmgdino_full_valid.json.gz",
@@ -472,11 +882,359 @@
       "sibling_test_map_50_95": 0.744264543056488
     },
     {
+      "row_id": "mmgdino/mid",
+      "model_key": "mmgdino",
+      "model": "MM-Grounding-DINO-B",
+      "family": "open-vocab detector",
+      "slug": "mmgdino",
+      "experiment": "E4",
+      "input": "short side 800 (1422x800)",
+      "arm": "mid",
+      "role": "extra",
+      "base_arm": "mid",
+      "label": "mid: light + Swin-B stage 4 at lr x0.1",
+      "seed": 0,
+      "image_size": "train: shortest side random in 672,704,736,768,800,832,864,896 (max long side 1600) + hflip; eval/test: shortest side 800 (1422x800 for 1920x1080)",
+      "model_id": "openmmlab-community/mm_grounding_dino_base_all",
+      "selected_epoch": 28,
+      "epochs_run": 38,
+      "optimizer_steps": 4408,
+      "gpu": "1x RTX 6000 Ada 48GB (vast.ai)",
+      "meta_note": null,
+      "trainable_params": 62432867,
+      "total_params": 232976283,
+      "trainable_fraction": 0.2679794964365536,
+      "train_gpu_hours": 1.1725697319375143,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.973,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/mmgdino_mid_valid.json.gz",
+          "sha256_json": "1009266af65a86f2312a3a3a3776080c93fcd2ad4228c7887be7f93ea142858c"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/mmgdino_mid_test.json.gz",
+          "sha256_json": "d5c4caf87ea84f9905b854fb94f664a921d13ed7e280812e84191bb63f7e92f9"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.718963086605072,
+        "mAP_50": 0.9768332242965698,
+        "mAP_75": 0.8494013547897339,
+        "per_class_ap50": {
+          "player": 0.9875369668006897,
+          "ball": 0.931294322013855,
+          "referee": 0.9866701364517212,
+          "rim": 1.0,
+          "number": 0.9786648154258728
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7585666179656982,
+        "mAP_50": 0.9744803309440613,
+        "mAP_75": 0.9027348160743713,
+        "per_class_ap50": {
+          "player": 0.9865699410438538,
+          "ball": 0.9353882074356079,
+          "referee": 0.9810750484466553,
+          "rim": 1.0,
+          "number": 0.9693683981895447
+        }
+      },
+      "sibling_test_map_50_95": 0.7585666179656982
+    },
+    {
+      "row_id": "mmgdino/peft_frac25_d0",
+      "model_key": "mmgdino",
+      "model": "MM-Grounding-DINO-B",
+      "family": "open-vocab detector",
+      "slug": "mmgdino",
+      "experiment": "E3",
+      "input": "short side 800 (1422x800)",
+      "arm": "peft_frac25_d0",
+      "role": "extra",
+      "base_arm": "peft_frac25_d0",
+      "label": "peft on frac25, draw 0",
+      "seed": 0,
+      "image_size": "train: shortest side random in 672,704,736,768,800,832,864,896 (max long side 1600) + hflip; eval/test: shortest side 800 (1422x800 for 1920x1080)",
+      "model_id": "openmmlab-community/mm_grounding_dino_base_all",
+      "selected_epoch": 44,
+      "epochs_run": 54,
+      "optimizer_steps": 2160,
+      "gpu": "1x RTX A6000 48GB (vast.ai)",
+      "meta_note": null,
+      "image_fraction": 0.35129310344827586,
+      "train_images": null,
+      "subset_target_pct": 25,
+      "subset_draw": 0,
+      "trainable_params": 37204515,
+      "total_params": 232976283,
+      "trainable_fraction": 0.15969228507263977,
+      "train_gpu_hours": 0.9935028923220105,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.647,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/mmgdino_peft_frac25_d0_valid.json.gz",
+          "sha256_json": "096e382ef5f47f5fe1a2273ca7bff4652c98b7357613f4c42d0eff4a71220bbf"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/mmgdino_peft_frac25_d0_test.json.gz",
+          "sha256_json": "7e9fa83d1422f854edf4c2d217aca8527f05ffece90f1e34f5980e8b211bf97a"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7197775840759277,
+        "mAP_50": 0.9700652360916138,
+        "mAP_75": 0.8186249732971191,
+        "per_class_ap50": {
+          "player": 0.9867222905158997,
+          "ball": 0.8953989148139954,
+          "referee": 0.9943913221359253,
+          "rim": 0.9963811039924622,
+          "number": 0.9774326682090759
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.746936559677124,
+        "mAP_50": 0.9487784504890442,
+        "mAP_75": 0.8646095395088196,
+        "per_class_ap50": {
+          "player": 0.9845610857009888,
+          "ball": 0.8966233730316162,
+          "referee": 0.9304911494255066,
+          "rim": 1.0,
+          "number": 0.9322167038917542
+        }
+      },
+      "sibling_test_map_50_95": 0.746936559677124
+    },
+    {
+      "row_id": "mmgdino/peft_frac25_d1",
+      "model_key": "mmgdino",
+      "model": "MM-Grounding-DINO-B",
+      "family": "open-vocab detector",
+      "slug": "mmgdino",
+      "experiment": "E3",
+      "input": "short side 800 (1422x800)",
+      "arm": "peft_frac25_d1",
+      "role": "extra",
+      "base_arm": "peft_frac25_d1",
+      "label": "peft on frac25, draw 1",
+      "seed": 0,
+      "image_size": "train: shortest side random in 672,704,736,768,800,832,864,896 (max long side 1600) + hflip; eval/test: shortest side 800 (1422x800 for 1920x1080)",
+      "model_id": "openmmlab-community/mm_grounding_dino_base_all",
+      "selected_epoch": 38,
+      "epochs_run": 48,
+      "optimizer_steps": 1680,
+      "gpu": "1x L40S 48GB (vast.ai)",
+      "meta_note": null,
+      "image_fraction": 0.30387931034482757,
+      "train_images": null,
+      "subset_target_pct": 25,
+      "subset_draw": 1,
+      "trainable_params": 37204515,
+      "total_params": 232976283,
+      "trainable_fraction": 0.15969228507263977,
+      "train_gpu_hours": 0.6005266939269172,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.449,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/mmgdino_peft_frac25_d1_valid.json.gz",
+          "sha256_json": "2f5212ff81ff643aaab6f8f4d1434f8cb7986e78cb0cb61868a2a88c6adbc9c9"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/mmgdino_peft_frac25_d1_test.json.gz",
+          "sha256_json": "a07e5cabe95d479be26e7dc1fa93ad7522de72ab1f6007a06c1cf7498eac9de6"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.680748462677002,
+        "mAP_50": 0.9375113844871521,
+        "mAP_75": 0.800531804561615,
+        "per_class_ap50": {
+          "player": 0.9860201478004456,
+          "ball": 0.8386010527610779,
+          "referee": 0.9719511866569519,
+          "rim": 0.9232563972473145,
+          "number": 0.9677280783653259
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.6991994380950928,
+        "mAP_50": 0.9590040445327759,
+        "mAP_75": 0.8128498196601868,
+        "per_class_ap50": {
+          "player": 0.9837537407875061,
+          "ball": 0.9041928052902222,
+          "referee": 0.9507073163986206,
+          "rim": 0.9997893571853638,
+          "number": 0.9565770030021667
+        }
+      },
+      "sibling_test_map_50_95": 0.6991994380950928
+    },
+    {
+      "row_id": "mmgdino/peft_frac50_d0",
+      "model_key": "mmgdino",
+      "model": "MM-Grounding-DINO-B",
+      "family": "open-vocab detector",
+      "slug": "mmgdino",
+      "experiment": "E3",
+      "input": "short side 800 (1422x800)",
+      "arm": "peft_frac50_d0",
+      "role": "extra",
+      "base_arm": "peft_frac50_d0",
+      "label": "peft on frac50, draw 0",
+      "seed": 0,
+      "image_size": "train: shortest side random in 672,704,736,768,800,832,864,896 (max long side 1600) + hflip; eval/test: shortest side 800 (1422x800 for 1920x1080)",
+      "model_id": "openmmlab-community/mm_grounding_dino_base_all",
+      "selected_epoch": 18,
+      "epochs_run": 28,
+      "optimizer_steps": 1764,
+      "gpu": "1x RTX 6000 Ada 48GB (vast.ai)",
+      "meta_note": null,
+      "image_fraction": 0.5474137931034483,
+      "train_images": null,
+      "subset_target_pct": 50,
+      "subset_draw": 0,
+      "trainable_params": 37204515,
+      "total_params": 232976283,
+      "trainable_fraction": 0.15969228507263977,
+      "train_gpu_hours": 0.5214882832765579,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.506,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/mmgdino_peft_frac50_d0_valid.json.gz",
+          "sha256_json": "511cdd7101d35bf1b27922e8dadceb74f81c966d3c09402af0c11f22f30142d8"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/mmgdino_peft_frac50_d0_test.json.gz",
+          "sha256_json": "254fefeddb61fe054d92c7cfd2bb1bdba4d7f54f62596d69cb5f0b7a7e4eadda"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.6979382038116455,
+        "mAP_50": 0.9541437029838562,
+        "mAP_75": 0.7835981845855713,
+        "per_class_ap50": {
+          "player": 0.9793761968612671,
+          "ball": 0.8597717881202698,
+          "referee": 0.989227294921875,
+          "rim": 0.9791653752326965,
+          "number": 0.9631779193878174
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7348266243934631,
+        "mAP_50": 0.9535645246505737,
+        "mAP_75": 0.847721517086029,
+        "per_class_ap50": {
+          "player": 0.982183575630188,
+          "ball": 0.8946568965911865,
+          "referee": 0.9745600819587708,
+          "rim": 0.9919278621673584,
+          "number": 0.9244943261146545
+        }
+      },
+      "sibling_test_map_50_95": 0.7348266243934631
+    },
+    {
+      "row_id": "mmgdino/peft_frac50_d1",
+      "model_key": "mmgdino",
+      "model": "MM-Grounding-DINO-B",
+      "family": "open-vocab detector",
+      "slug": "mmgdino",
+      "experiment": "E3",
+      "input": "short side 800 (1422x800)",
+      "arm": "peft_frac50_d1",
+      "role": "extra",
+      "base_arm": "peft_frac50_d1",
+      "label": "peft on frac50, draw 1",
+      "seed": 0,
+      "image_size": "train: shortest side random in 672,704,736,768,800,832,864,896 (max long side 1600) + hflip; eval/test: shortest side 800 (1422x800 for 1920x1080)",
+      "model_id": "openmmlab-community/mm_grounding_dino_base_all",
+      "selected_epoch": 16,
+      "epochs_run": 26,
+      "optimizer_steps": 1612,
+      "gpu": "1x RTX 6000 Ada 48GB (vast.ai)",
+      "meta_note": null,
+      "image_fraction": 0.5387931034482759,
+      "train_images": null,
+      "subset_target_pct": 50,
+      "subset_draw": 1,
+      "trainable_params": 37204515,
+      "total_params": 232976283,
+      "trainable_fraction": 0.15969228507263977,
+      "train_gpu_hours": 0.4788794598976771,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.614,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/mmgdino_peft_frac50_d1_valid.json.gz",
+          "sha256_json": "8b3270b07f128149ee8c48a2a38865685259b75926271693310465c9e0c35db3"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/mmgdino_peft_frac50_d1_test.json.gz",
+          "sha256_json": "5af99f54b61dd670d035af8701111f16beb795b7fe0e362cb139816705f978a4"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.6829296946525574,
+        "mAP_50": 0.9466434717178345,
+        "mAP_75": 0.7885159850120544,
+        "per_class_ap50": {
+          "player": 0.9839391112327576,
+          "ball": 0.8409073948860168,
+          "referee": 0.9856910705566406,
+          "rim": 0.9547594785690308,
+          "number": 0.9679203629493713
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.6943634152412415,
+        "mAP_50": 0.9542405605316162,
+        "mAP_75": 0.7865225672721863,
+        "per_class_ap50": {
+          "player": 0.9838114976882935,
+          "ball": 0.8829842805862427,
+          "referee": 0.948949933052063,
+          "rim": 1.0,
+          "number": 0.9554570317268372
+        }
+      },
+      "sibling_test_map_50_95": 0.6943634152412415
+    },
+    {
       "row_id": "sam3/peft",
       "model_key": "sam3",
       "model": "SAM 3",
       "family": "open-vocab detector",
       "slug": "sam3",
+      "experiment": null,
+      "input": "1008x1008",
       "arm": "peft",
       "role": "peft",
       "base_arm": "peft",
@@ -485,14 +1243,20 @@
       "image_size": "1008 x 1008 (train: random resize 480-1008 + pad to 1008)",
       "model_id": "facebook/sam3 (sam3.pt)",
       "selected_epoch": 7,
+      "epochs_run": 12,
+      "optimizer_steps": 2784,
+      "gpu": "NVIDIA A100-SXM4-80GB (vast.ai)",
       "meta_note": null,
       "trainable_params": 38510901,
       "total_params": 838210869,
       "trainable_fraction": 0.04594416801817921,
       "train_gpu_hours": 1.048,
-      "train_gpu_hours_key": "train_hours",
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": 1.32,
       "train_cost_key": "cost_usd_train_compute",
+      "full_type": "peft",
+      "full_type_note": null,
+      "box_shared": true,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/sam3_peft_valid.json.gz",
@@ -535,6 +1299,8 @@
       "model": "SAM 3",
       "family": "open-vocab detector",
       "slug": "sam3",
+      "experiment": null,
+      "input": "1008x1008",
       "arm": "full",
       "role": "full",
       "base_arm": "full",
@@ -543,14 +1309,20 @@
       "image_size": "1008 x 1008 (train: random resize 480-1008 + pad to 1008)",
       "model_id": "facebook/sam3 (sam3.pt)",
       "selected_epoch": 15,
+      "epochs_run": 20,
+      "optimizer_steps": 4640,
+      "gpu": "NVIDIA A100-SXM4-80GB (vast.ai)",
       "meta_note": null,
       "trainable_params": 838210869,
       "total_params": 838210869,
       "trainable_fraction": 1.0,
       "train_gpu_hours": 1.895,
-      "train_gpu_hours_key": "train_hours",
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": 2.39,
       "train_cost_key": "cost_usd_train_compute",
+      "full_type": "b",
+      "full_type_note": "ViT trunk 2.5e-5 with layer decay 0.9, text 5e-6, rest 8e-5",
+      "box_shared": true,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/sam3_full_valid.json.gz",
@@ -588,11 +1360,79 @@
       "sibling_test_map_50_95": 0.7366749048233032
     },
     {
+      "row_id": "sam3/mid",
+      "model_key": "sam3",
+      "model": "SAM 3",
+      "family": "open-vocab detector",
+      "slug": "sam3",
+      "experiment": "E4",
+      "input": "1008x1008",
+      "arm": "mid",
+      "role": "extra",
+      "base_arm": "mid",
+      "label": "mid: light + last 8 of 32 ViT blocks (layer decay)",
+      "seed": 0,
+      "image_size": "1008 x 1008 (train: random resize 480-1008 + pad to 1008)",
+      "model_id": "facebook/sam3 (sam3.pt)",
+      "selected_epoch": 17,
+      "epochs_run": 20,
+      "optimizer_steps": 4640,
+      "gpu": "NVIDIA A100-SXM4-80GB (vast.ai)",
+      "meta_note": null,
+      "trainable_params": 149771573,
+      "total_params": 838210869,
+      "trainable_fraction": 0.17868006552895224,
+      "train_gpu_hours": 1.568,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 1.9,
+      "train_cost_key": "cost_usd_train_compute",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/sam3_mid_valid.json.gz",
+          "sha256_json": "45dbc05fb4f3c0f636a85b49e54292c5ed9322b1e0acabb07bca9e22cb6d335e"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/sam3_mid_test.json.gz",
+          "sha256_json": "86755d473855cf2a02d6eccbf84233803d1393d3c2b115d4fe7b09e515624be2"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.6954280138015747,
+        "mAP_50": 0.9640675187110901,
+        "mAP_75": 0.7842269539833069,
+        "per_class_ap50": {
+          "player": 0.9907861948013306,
+          "ball": 0.9180089831352234,
+          "referee": 0.9726662635803223,
+          "rim": 0.976753294467926,
+          "number": 0.9621229767799377
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7067698240280151,
+        "mAP_50": 0.9422731399536133,
+        "mAP_75": 0.8138078451156616,
+        "per_class_ap50": {
+          "player": 0.9893075823783875,
+          "ball": 0.8891298174858093,
+          "referee": 0.9890456795692444,
+          "rim": 0.9799851179122925,
+          "number": 0.8638975024223328
+        }
+      },
+      "sibling_test_map_50_95": 0.7067698240280151
+    },
+    {
       "row_id": "yoloe_1280/yoloe_peft",
       "model_key": "yoloe_1280",
       "model": "YOLOE-26x @1280",
       "family": "open-vocab detector",
       "slug": "yoloe",
+      "experiment": null,
+      "input": "1280",
       "arm": "yoloe_peft",
       "role": "peft",
       "base_arm": "yoloe_peft",
@@ -601,14 +1441,20 @@
       "image_size": "1280",
       "model_id": "yoloe-26x-seg.pt -> yoloe-26x.yaml (detection head)",
       "selected_epoch": 39,
+      "epochs_run": 40,
+      "optimizer_steps": 321,
+      "gpu": "RTX 4090 (vast.ai)",
       "meta_note": null,
       "trainable_params": 11550,
       "total_params": 58820118,
       "trainable_fraction": 0.00019636138778232306,
       "train_gpu_hours": 0.118,
-      "train_gpu_hours_key": "train_hours",
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": 0.05,
       "train_cost_key": "cost_usd",
+      "full_type": "peft",
+      "full_type_note": null,
+      "box_shared": null,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/yoloe_yoloe_peft_valid.json.gz",
@@ -651,6 +1497,8 @@
       "model": "YOLOE-26x @1280",
       "family": "open-vocab detector",
       "slug": "yoloe",
+      "experiment": null,
+      "input": "1280",
       "arm": "yoloe_full",
       "role": "full",
       "base_arm": "yoloe_full",
@@ -659,14 +1507,20 @@
       "image_size": "1280",
       "model_id": "yoloe-26x-seg.pt -> yoloe-26x.yaml (detection head)",
       "selected_epoch": 28,
+      "epochs_run": 48,
+      "optimizer_steps": 392,
+      "gpu": "RTX 4090 (vast.ai)",
       "meta_note": null,
       "trainable_params": 58820118,
       "total_params": 58820118,
       "trainable_fraction": 1.0,
       "train_gpu_hours": 0.378,
-      "train_gpu_hours_key": "train_hours",
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": 0.159,
       "train_cost_key": "cost_usd",
+      "full_type": "a",
+      "full_type_note": "nothing frozen, single lr0",
+      "box_shared": null,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/yoloe_yoloe_full_valid.json.gz",
@@ -709,6 +1563,8 @@
       "model": "YOLOE-26x @640",
       "family": "open-vocab detector",
       "slug": "yoloe",
+      "experiment": null,
+      "input": "640",
       "arm": "yoloe_peft_640",
       "role": "peft",
       "base_arm": "yoloe_peft_640",
@@ -717,14 +1573,20 @@
       "image_size": "640",
       "model_id": "yoloe-26x-seg.pt -> yoloe-26x.yaml (detection head)",
       "selected_epoch": 36,
+      "epochs_run": 40,
+      "optimizer_steps": 314,
+      "gpu": "RTX 4090 (vast.ai)",
       "meta_note": null,
       "trainable_params": 11550,
       "total_params": 58820118,
       "trainable_fraction": 0.00019636138778232306,
       "train_gpu_hours": 0.04,
-      "train_gpu_hours_key": "train_hours",
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": 0.017,
       "train_cost_key": "cost_usd",
+      "full_type": "peft",
+      "full_type_note": null,
+      "box_shared": null,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/yoloe_yoloe_peft_640_valid.json.gz",
@@ -767,6 +1629,8 @@
       "model": "YOLOE-26x @640",
       "family": "open-vocab detector",
       "slug": "yoloe",
+      "experiment": null,
+      "input": "640",
       "arm": "yoloe_full_640",
       "role": "full",
       "base_arm": "yoloe_full_640",
@@ -775,14 +1639,20 @@
       "image_size": "640",
       "model_id": "yoloe-26x-seg.pt -> yoloe-26x.yaml (detection head)",
       "selected_epoch": 70,
+      "epochs_run": 80,
+      "optimizer_steps": 604,
+      "gpu": "RTX 4090 (vast.ai)",
       "meta_note": null,
       "trainable_params": 58820118,
       "total_params": 58820118,
       "trainable_fraction": 1.0,
       "train_gpu_hours": 0.178,
-      "train_gpu_hours_key": "train_hours",
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": 0.075,
       "train_cost_key": "cost_usd",
+      "full_type": "a",
+      "full_type_note": "nothing frozen, single lr0",
+      "box_shared": null,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/yoloe_yoloe_full_640_valid.json.gz",
@@ -820,11 +1690,359 @@
       "sibling_test_map_50_95": 0.7371712923049927
     },
     {
+      "row_id": "yoloe_640/yoloe_mid_640",
+      "model_key": "yoloe_640",
+      "model": "YOLOE-26x @640",
+      "family": "open-vocab detector",
+      "slug": "yoloe",
+      "experiment": "E4",
+      "input": "640",
+      "arm": "yoloe_mid_640",
+      "role": "extra",
+      "base_arm": "yoloe_mid_640",
+      "label": "mid: backbone frozen, neck + head train",
+      "seed": 0,
+      "image_size": "640",
+      "model_id": "yoloe-26x-seg.pt -> yoloe-26x.yaml (detection head)",
+      "selected_epoch": 71,
+      "epochs_run": 80,
+      "optimizer_steps": 2320,
+      "gpu": "RTX 4090 (vast.ai)",
+      "meta_note": null,
+      "trainable_params": 29972790,
+      "total_params": 58820118,
+      "trainable_fraction": 0.5095669818275441,
+      "train_gpu_hours": 0.108,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.051,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yoloe_yoloe_mid_640_valid.json.gz",
+          "sha256_json": "6731c028450ba0596964b75088f2eb9445aa56fe14a5405882be45d6e92b0b99"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yoloe_yoloe_mid_640_test.json.gz",
+          "sha256_json": "2a518162a713ca2d5796f9f71075b1270463c4bde29bf97d62e0eb1000ad2459"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.6759976148605347,
+        "mAP_50": 0.9338402152061462,
+        "mAP_75": 0.7643770575523376,
+        "per_class_ap50": {
+          "player": 0.9819732308387756,
+          "ball": 0.7657941579818726,
+          "referee": 0.980163037776947,
+          "rim": 0.9996938109397888,
+          "number": 0.9415768384933472
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.6839355230331421,
+        "mAP_50": 0.9295636415481567,
+        "mAP_75": 0.7905264496803284,
+        "per_class_ap50": {
+          "player": 0.9876889586448669,
+          "ball": 0.7659889459609985,
+          "referee": 0.9582205414772034,
+          "rim": 1.0,
+          "number": 0.9359197020530701
+        }
+      },
+      "sibling_test_map_50_95": 0.6839355230331421
+    },
+    {
+      "row_id": "yoloe_640/yoloe_full_640_frac25_d0",
+      "model_key": "yoloe_640",
+      "model": "YOLOE-26x @640",
+      "family": "open-vocab detector",
+      "slug": "yoloe",
+      "experiment": "E3",
+      "input": "640",
+      "arm": "yoloe_full_640_frac25_d0",
+      "role": "extra",
+      "base_arm": "yoloe_full_640_frac25_d0",
+      "label": "full on frac25, draw 0",
+      "seed": 0,
+      "image_size": "640",
+      "model_id": "yoloe-26x-seg.pt -> yoloe-26x.yaml (detection head)",
+      "selected_epoch": 147,
+      "epochs_run": 204,
+      "optimizer_steps": 2244,
+      "gpu": "RTX 4090 (vast.ai)",
+      "meta_note": null,
+      "image_fraction": 0.35129310344827586,
+      "train_images": null,
+      "subset_target_pct": 25,
+      "subset_draw": 0,
+      "trainable_params": 58820118,
+      "total_params": 58820118,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 0.209,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.091,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yoloe_yoloe_full_640_frac25_d0_valid.json.gz",
+          "sha256_json": "4a92787f7226cb8ad16463d941bf77fd9b334a57286c0f062d23b40d356de319"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yoloe_yoloe_full_640_frac25_d0_test.json.gz",
+          "sha256_json": "8d6bff2a0746035d4650f891e97efc67e9b2369532c1853b0c651f2bdf1e3daa"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.6944602727890015,
+        "mAP_50": 0.9555187821388245,
+        "mAP_75": 0.7794957160949707,
+        "per_class_ap50": {
+          "player": 0.9774863123893738,
+          "ball": 0.8407475352287292,
+          "referee": 0.9953458309173584,
+          "rim": 0.9994927644729614,
+          "number": 0.9645214080810547
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7388373017311096,
+        "mAP_50": 0.9404156804084778,
+        "mAP_75": 0.8694102764129639,
+        "per_class_ap50": {
+          "player": 0.9788727760314941,
+          "ball": 0.8294358253479004,
+          "referee": 0.9706763029098511,
+          "rim": 1.0,
+          "number": 0.9230934381484985
+        }
+      },
+      "sibling_test_map_50_95": 0.7388373017311096
+    },
+    {
+      "row_id": "yoloe_640/yoloe_full_640_frac25_d1",
+      "model_key": "yoloe_640",
+      "model": "YOLOE-26x @640",
+      "family": "open-vocab detector",
+      "slug": "yoloe",
+      "experiment": "E3",
+      "input": "640",
+      "arm": "yoloe_full_640_frac25_d1",
+      "role": "extra",
+      "base_arm": "yoloe_full_640_frac25_d1",
+      "label": "full on frac25, draw 1",
+      "seed": 0,
+      "image_size": "640",
+      "model_id": "yoloe-26x-seg.pt -> yoloe-26x.yaml (detection head)",
+      "selected_epoch": 141,
+      "epochs_run": 207,
+      "optimizer_steps": 1863,
+      "gpu": "RTX 4090 (vast.ai)",
+      "meta_note": null,
+      "image_fraction": 0.30387931034482757,
+      "train_images": null,
+      "subset_target_pct": 25,
+      "subset_draw": 1,
+      "trainable_params": 58820118,
+      "total_params": 58820118,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 0.282,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.129,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yoloe_yoloe_full_640_frac25_d1_valid.json.gz",
+          "sha256_json": "b8e997be8e73849e8be39345dee229bb3a00f1665632707a68148b86415a632f"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yoloe_yoloe_full_640_frac25_d1_test.json.gz",
+          "sha256_json": "79f6b92e26e7b6a770b1210c58ee38e238601f1d7386928f51136ca77c067e5e"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.6556057333946228,
+        "mAP_50": 0.9377821683883667,
+        "mAP_75": 0.7534763813018799,
+        "per_class_ap50": {
+          "player": 0.967501163482666,
+          "ball": 0.7843683958053589,
+          "referee": 0.9727256298065186,
+          "rim": 0.9993938207626343,
+          "number": 0.9649216532707214
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.6734908819198608,
+        "mAP_50": 0.9339784979820251,
+        "mAP_75": 0.8003280162811279,
+        "per_class_ap50": {
+          "player": 0.9765903353691101,
+          "ball": 0.8203850984573364,
+          "referee": 0.9558771252632141,
+          "rim": 1.0,
+          "number": 0.9170399308204651
+        }
+      },
+      "sibling_test_map_50_95": 0.6734908819198608
+    },
+    {
+      "row_id": "yoloe_640/yoloe_full_640_frac50_d0",
+      "model_key": "yoloe_640",
+      "model": "YOLOE-26x @640",
+      "family": "open-vocab detector",
+      "slug": "yoloe",
+      "experiment": "E3",
+      "input": "640",
+      "arm": "yoloe_full_640_frac50_d0",
+      "role": "extra",
+      "base_arm": "yoloe_full_640_frac50_d0",
+      "label": "full on frac50, draw 0",
+      "seed": 0,
+      "image_size": "640",
+      "model_id": "yoloe-26x-seg.pt -> yoloe-26x.yaml (detection head)",
+      "selected_epoch": 127,
+      "epochs_run": 146,
+      "optimizer_steps": 2336,
+      "gpu": "RTX 4090 (vast.ai)",
+      "meta_note": null,
+      "image_fraction": 0.5474137931034483,
+      "train_images": null,
+      "subset_target_pct": 50,
+      "subset_draw": 0,
+      "trainable_params": 58820118,
+      "total_params": 58820118,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 0.222,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.106,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yoloe_yoloe_full_640_frac50_d0_valid.json.gz",
+          "sha256_json": "523202d6131ed3972dd08ce8d5f4c457400466b86688c08761022870efdec436"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yoloe_yoloe_full_640_frac50_d0_test.json.gz",
+          "sha256_json": "88c551eb0cf07c3f12dfe568be8decdb9eecb0e4fa8c90497a02e2554962a8ac"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7021472454071045,
+        "mAP_50": 0.9609622955322266,
+        "mAP_75": 0.7923167943954468,
+        "per_class_ap50": {
+          "player": 0.9865499138832092,
+          "ball": 0.8538541197776794,
+          "referee": 0.9960747957229614,
+          "rim": 1.0,
+          "number": 0.9683325290679932
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7374406456947327,
+        "mAP_50": 0.9399727582931519,
+        "mAP_75": 0.8529052138328552,
+        "per_class_ap50": {
+          "player": 0.9779913425445557,
+          "ball": 0.8005700707435608,
+          "referee": 0.9871982336044312,
+          "rim": 1.0,
+          "number": 0.9341040253639221
+        }
+      },
+      "sibling_test_map_50_95": 0.7374406456947327
+    },
+    {
+      "row_id": "yoloe_640/yoloe_full_640_frac50_d1",
+      "model_key": "yoloe_640",
+      "model": "YOLOE-26x @640",
+      "family": "open-vocab detector",
+      "slug": "yoloe",
+      "experiment": "E3",
+      "input": "640",
+      "arm": "yoloe_full_640_frac50_d1",
+      "role": "extra",
+      "base_arm": "yoloe_full_640_frac50_d1",
+      "label": "full on frac50, draw 1",
+      "seed": 0,
+      "image_size": "640",
+      "model_id": "yoloe-26x-seg.pt -> yoloe-26x.yaml (detection head)",
+      "selected_epoch": 105,
+      "epochs_run": 142,
+      "optimizer_steps": 2272,
+      "gpu": "RTX 4090 (vast.ai)",
+      "meta_note": null,
+      "image_fraction": 0.5387931034482759,
+      "train_images": null,
+      "subset_target_pct": 50,
+      "subset_draw": 1,
+      "trainable_params": 58820118,
+      "total_params": 58820118,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 0.232,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.094,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yoloe_yoloe_full_640_frac50_d1_valid.json.gz",
+          "sha256_json": "00bc8b1caab07681abac7da175cbe586b37db14ab1f60438203dcf3c28edbc9c"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yoloe_yoloe_full_640_frac50_d1_test.json.gz",
+          "sha256_json": "fa6fa0a7e197f8e18dc1f461b342ee9167a7ddbec8de990ad0bd49eebd1c4d00"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.662520706653595,
+        "mAP_50": 0.9407752752304077,
+        "mAP_75": 0.7645532488822937,
+        "per_class_ap50": {
+          "player": 0.9720211029052734,
+          "ball": 0.7982447147369385,
+          "referee": 0.9697826504707336,
+          "rim": 1.0,
+          "number": 0.9638278484344482
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.69007408618927,
+        "mAP_50": 0.9442204236984253,
+        "mAP_75": 0.8027821183204651,
+        "per_class_ap50": {
+          "player": 0.9857537150382996,
+          "ball": 0.8211398720741272,
+          "referee": 0.9760497808456421,
+          "rim": 1.0,
+          "number": 0.9381587505340576
+        }
+      },
+      "sibling_test_map_50_95": 0.69007408618927
+    },
+    {
       "row_id": "yoloworld/yoloworld_peft",
       "model_key": "yoloworld",
       "model": "YOLO-World-v2-x @1280",
       "family": "open-vocab detector",
       "slug": "yoloe",
+      "experiment": null,
+      "input": "1280",
       "arm": "yoloworld_peft",
       "role": "peft",
       "base_arm": "yoloworld_peft",
@@ -833,14 +2051,20 @@
       "image_size": "1280",
       "model_id": "yolov8x-worldv2.pt",
       "selected_epoch": 39,
+      "epochs_run": 40,
+      "optimizer_steps": 321,
+      "gpu": "RTX 4090 (vast.ai)",
       "meta_note": null,
       "trainable_params": 9214086,
       "total_params": 72886377,
       "trainable_fraction": 0.12641712181687945,
       "train_gpu_hours": 0.135,
-      "train_gpu_hours_key": "train_hours",
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": 0.057,
       "train_cost_key": "cost_usd",
+      "full_type": "peft",
+      "full_type_note": null,
+      "box_shared": null,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/yoloe_yoloworld_peft_valid.json.gz",
@@ -883,6 +2107,8 @@
       "model": "YOLO-World-v2-x @1280",
       "family": "open-vocab detector",
       "slug": "yoloe",
+      "experiment": null,
+      "input": "1280",
       "arm": "yoloworld_full",
       "role": "full",
       "base_arm": "yoloworld_full",
@@ -891,14 +2117,20 @@
       "image_size": "1280",
       "model_id": "yolov8x-worldv2.pt",
       "selected_epoch": 27,
+      "epochs_run": 47,
+      "optimizer_steps": 372,
+      "gpu": "RTX 4090 (vast.ai)",
       "meta_note": null,
       "trainable_params": 72886361,
       "total_params": 72886377,
       "trainable_fraction": 0.9999997804802399,
       "train_gpu_hours": 0.369,
-      "train_gpu_hours_key": "train_hours",
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": 0.156,
       "train_cost_key": "cost_usd",
+      "full_type": "a",
+      "full_type_note": "reclassified by lead: the CLIP text encoder is outside the detector graph (class embeddings precomputed once); 72,886,361 of 72,886,377 detector params train, uniform recipe",
+      "box_shared": null,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/yoloe_yoloworld_full_valid.json.gz",
@@ -941,6 +2173,8 @@
       "model": "OWLv2-L/14",
       "family": "open-vocab detector",
       "slug": "owlv2",
+      "experiment": null,
+      "input": "1008x1008 (padded square)",
       "arm": "peft",
       "role": "peft",
       "base_arm": "peft",
@@ -949,14 +2183,20 @@
       "image_size": "1008x1008 (OWLv2-L/14 native: processor pads to square bottom/right, resizes to 1008; 72x72=5184 tokens)",
       "model_id": "google/owlv2-large-patch14-ensemble",
       "selected_epoch": 58,
+      "epochs_run": 60,
+      "optimizer_steps": 3480,
+      "gpu": "RTX A6000 48GB (vast.ai, $0.535/h)",
       "meta_note": null,
       "trainable_params": 4994823,
       "total_params": 437610760,
       "trainable_fraction": 0.011413848690557792,
       "train_gpu_hours": 0.34,
-      "train_gpu_hours_key": "train_hours",
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": 0.32,
       "train_cost_key": "cost_usd",
+      "full_type": "peft",
+      "full_type_note": null,
+      "box_shared": true,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/owlv2_peft_valid.json.gz",
@@ -999,6 +2239,8 @@
       "model": "OWLv2-L/14",
       "family": "open-vocab detector",
       "slug": "owlv2",
+      "experiment": null,
+      "input": "1008x1008 (padded square)",
       "arm": "peft_seed1",
       "role": "seed",
       "base_arm": "peft",
@@ -1007,14 +2249,20 @@
       "image_size": "1008x1008 (OWLv2-L/14 native: processor pads to square bottom/right, resizes to 1008; 72x72=5184 tokens)",
       "model_id": "google/owlv2-large-patch14-ensemble",
       "selected_epoch": null,
+      "epochs_run": 60,
+      "optimizer_steps": 3480,
+      "gpu": "RTX A6000 48GB (vast.ai, same ffm-owlv2 box)",
       "meta_note": "no meta.json yet; params from peft/meta.json",
       "trainable_params": 4994823,
       "total_params": 437610760,
       "trainable_fraction": 0.011413848690557792,
-      "train_gpu_hours": null,
-      "train_gpu_hours_key": null,
+      "train_gpu_hours": 0.471,
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": null,
       "train_cost_key": null,
+      "full_type": "peft",
+      "full_type_note": null,
+      "box_shared": null,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/owlv2_peft_seed1_valid.json.gz",
@@ -1057,6 +2305,8 @@
       "model": "OWLv2-L/14",
       "family": "open-vocab detector",
       "slug": "owlv2",
+      "experiment": null,
+      "input": "1008x1008 (padded square)",
       "arm": "peft_seed2",
       "role": "seed",
       "base_arm": "peft",
@@ -1065,14 +2315,20 @@
       "image_size": "1008x1008 (OWLv2-L/14 native: processor pads to square bottom/right, resizes to 1008; 72x72=5184 tokens)",
       "model_id": "google/owlv2-large-patch14-ensemble",
       "selected_epoch": null,
+      "epochs_run": 60,
+      "optimizer_steps": 3480,
+      "gpu": "RTX A6000 48GB (vast.ai, same ffm-owlv2 box)",
       "meta_note": "no meta.json yet; params from peft/meta.json",
       "trainable_params": 4994823,
       "total_params": 437610760,
       "trainable_fraction": 0.011413848690557792,
-      "train_gpu_hours": null,
-      "train_gpu_hours_key": null,
+      "train_gpu_hours": 0.456,
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": null,
       "train_cost_key": null,
+      "full_type": "peft",
+      "full_type_note": null,
+      "box_shared": null,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/owlv2_peft_seed2_valid.json.gz",
@@ -1115,6 +2371,8 @@
       "model": "OWLv2-L/14",
       "family": "open-vocab detector",
       "slug": "owlv2",
+      "experiment": null,
+      "input": "1008x1008 (padded square)",
       "arm": "full",
       "role": "full",
       "base_arm": "full",
@@ -1123,14 +2381,20 @@
       "image_size": "1008x1008 (OWLv2-L/14 native: processor pads to square bottom/right, resizes to 1008; 72x72=5184 tokens)",
       "model_id": "google/owlv2-large-patch14-ensemble",
       "selected_epoch": 12,
+      "epochs_run": 12,
+      "optimizer_steps": 1392,
+      "gpu": "RTX A6000 48GB (vast.ai, $0.535/h)",
       "meta_note": null,
       "trainable_params": 313220871,
       "total_params": 437610760,
       "trainable_fraction": 0.7157522155076809,
       "train_gpu_hours": 3.41,
-      "train_gpu_hours_key": "train_hours",
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": 1.87,
       "train_cost_key": "cost_usd",
+      "full_type": "c",
+      "full_type_note": "text tower frozen; vision tower at 5e-6 vs heads 1e-4",
+      "box_shared": true,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/owlv2_full_valid.json.gz",
@@ -1173,6 +2437,8 @@
       "model": "OWLv2-L/14",
       "family": "open-vocab detector",
       "slug": "owlv2",
+      "experiment": null,
+      "input": "1008x1008 (padded square)",
       "arm": "full_seed1",
       "role": "seed",
       "base_arm": "full",
@@ -1181,14 +2447,20 @@
       "image_size": "1008x1008 (OWLv2-L/14 native: processor pads to square bottom/right, resizes to 1008; 72x72=5184 tokens)",
       "model_id": "google/owlv2-large-patch14-ensemble",
       "selected_epoch": null,
+      "epochs_run": 12,
+      "optimizer_steps": 1392,
+      "gpu": "RTX A6000 48GB (vast.ai, same ffm-owlv2 box)",
       "meta_note": "no meta.json yet; params from full/meta.json",
       "trainable_params": 313220871,
       "total_params": 437610760,
       "trainable_fraction": 0.7157522155076809,
-      "train_gpu_hours": null,
-      "train_gpu_hours_key": null,
+      "train_gpu_hours": 3.304,
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": null,
       "train_cost_key": null,
+      "full_type": "c",
+      "full_type_note": null,
+      "box_shared": null,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/owlv2_full_seed1_valid.json.gz",
@@ -1226,11 +2498,79 @@
       "sibling_test_map_50_95": 0.6380534172058105
     },
     {
+      "row_id": "owlv2/mid",
+      "model_key": "owlv2",
+      "model": "OWLv2-L/14",
+      "family": "open-vocab detector",
+      "slug": "owlv2",
+      "experiment": "E4",
+      "input": "1008x1008 (padded square)",
+      "arm": "mid",
+      "role": "extra",
+      "base_arm": "mid",
+      "label": "mid: light + last 6 of 24 ViT layers at lr 5e-6",
+      "seed": 0,
+      "image_size": "1008x1008 (OWLv2-L/14 native: processor pads to square bottom/right, resizes to 1008; 72x72=5184 tokens)",
+      "model_id": "google/owlv2-large-patch14-ensemble",
+      "selected_epoch": 48,
+      "epochs_run": 60,
+      "optimizer_steps": 3480,
+      "gpu": "RTX A6000 48GB (vast.ai, $0.526/h)",
+      "meta_note": null,
+      "trainable_params": 80574215,
+      "total_params": 437610760,
+      "trainable_fraction": 0.18412302064967506,
+      "train_gpu_hours": 4.59,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 2.42,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/owlv2_mid_valid.json.gz",
+          "sha256_json": "18d4d3a2aec8e3ae3015fffad533d00c7de614eb6d66605555864b2c21abe52b"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/owlv2_mid_test.json.gz",
+          "sha256_json": "82f503e7aa5602e772efc0c814810fd383ee702f06297fd317b2a81a9f351a77"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.5402188301086426,
+        "mAP_50": 0.8928119540214539,
+        "mAP_75": 0.5975096225738525,
+        "per_class_ap50": {
+          "player": 0.9646542072296143,
+          "ball": 0.8345038294792175,
+          "referee": 0.8964695334434509,
+          "rim": 0.8537895083427429,
+          "number": 0.9146428108215332
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.5089390873908997,
+        "mAP_50": 0.8635839223861694,
+        "mAP_75": 0.5353750586509705,
+        "per_class_ap50": {
+          "player": 0.9618730545043945,
+          "ball": 0.7894271016120911,
+          "referee": 0.9532880187034607,
+          "rim": 0.7687770128250122,
+          "number": 0.844554603099823
+        }
+      },
+      "sibling_test_map_50_95": 0.5089390873908997
+    },
+    {
       "row_id": "deimv2_m/peft",
       "model_key": "deimv2_m",
       "model": "DEIMv2-M",
       "family": "frozen backbone + DETR head",
       "slug": "deimv2",
+      "experiment": null,
+      "input": "640",
       "arm": "peft",
       "role": "peft",
       "base_arm": "peft",
@@ -1239,14 +2579,20 @@
       "image_size": "640",
       "model_id": "DEIMv2-M (DINOv3-distilled ViT-Tiny+ backbone)",
       "selected_epoch": 103,
+      "epochs_run": 120,
+      "optimizer_steps": 3480,
+      "gpu": "RTX 4090 (vast.ai, instance 61025918, both arms concurrent)",
       "meta_note": null,
       "trainable_params": 8570000,
       "total_params": 18240000,
       "trainable_fraction": 0.46984649122807015,
-      "train_gpu_hours": 1.1519444444444444,
-      "train_gpu_hours_key": "train_wall",
+      "train_gpu_hours": 1.152,
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": 0.61,
       "train_cost_key": "cost_usd_train_box_share",
+      "full_type": "peft",
+      "full_type_note": null,
+      "box_shared": true,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/deimv2_peft_valid.json.gz",
@@ -1289,6 +2635,8 @@
       "model": "DEIMv2-M",
       "family": "frozen backbone + DETR head",
       "slug": "deimv2",
+      "experiment": null,
+      "input": "640",
       "arm": "full",
       "role": "full",
       "base_arm": "full",
@@ -1297,14 +2645,20 @@
       "image_size": "640",
       "model_id": "DEIMv2-M (DINOv3-distilled ViT-Tiny+ backbone)",
       "selected_epoch": 104,
+      "epochs_run": 120,
+      "optimizer_steps": 3480,
+      "gpu": "RTX 4090 (vast.ai, instance 61025918, both arms concurrent)",
       "meta_note": null,
       "trainable_params": 18240000,
       "total_params": 18240000,
       "trainable_fraction": 1.0,
-      "train_gpu_hours": 1.1613888888888888,
-      "train_gpu_hours_key": "train_wall",
+      "train_gpu_hours": 1.161,
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": 0.61,
       "train_cost_key": "cost_usd_train_box_share",
+      "full_type": "b",
+      "full_type_note": "backbone group at 1/20 (M) or 1/40 (L) of head lr",
+      "box_shared": true,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/deimv2_full_valid.json.gz",
@@ -1347,6 +2701,8 @@
       "model": "DEIMv2-L",
       "family": "frozen backbone + DETR head",
       "slug": "deimv2",
+      "experiment": null,
+      "input": "640",
       "arm": "l_peft",
       "role": "peft",
       "base_arm": "l_peft",
@@ -1355,14 +2711,20 @@
       "image_size": "640",
       "model_id": "DEIMv2-L (DINOv3 ViT-S/16 backbone)",
       "selected_epoch": 113,
+      "epochs_run": 120,
+      "optimizer_steps": 3480,
+      "gpu": "RTX A6000 48GB (vast.ai, instance 61030160, both arms concurrent)",
       "meta_note": null,
       "trainable_params": 10850000,
       "total_params": 32130000,
       "trainable_fraction": 0.33769063180827885,
-      "train_gpu_hours": 1.2005555555555556,
-      "train_gpu_hours_key": "train_wall",
+      "train_gpu_hours": 1.201,
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": 0.51,
       "train_cost_key": "cost_usd_train_box_share",
+      "full_type": "peft",
+      "full_type_note": null,
+      "box_shared": true,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/deimv2_l_peft_valid.json.gz",
@@ -1405,6 +2767,8 @@
       "model": "DEIMv2-L",
       "family": "frozen backbone + DETR head",
       "slug": "deimv2",
+      "experiment": null,
+      "input": "640",
       "arm": "l_full",
       "role": "full",
       "base_arm": "l_full",
@@ -1413,14 +2777,20 @@
       "image_size": "640",
       "model_id": "DEIMv2-L (DINOv3 ViT-S/16 backbone)",
       "selected_epoch": 116,
+      "epochs_run": 120,
+      "optimizer_steps": 3480,
+      "gpu": "RTX A6000 48GB (vast.ai, instance 61030160, both arms concurrent)",
       "meta_note": null,
       "trainable_params": 32130000,
       "total_params": 32130000,
       "trainable_fraction": 1.0,
-      "train_gpu_hours": 1.2719444444444443,
-      "train_gpu_hours_key": "train_wall",
+      "train_gpu_hours": 1.272,
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": 0.51,
       "train_cost_key": "cost_usd_train_box_share",
+      "full_type": "b",
+      "full_type_note": "backbone group at 1/20 (M) or 1/40 (L) of head lr",
+      "box_shared": true,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/deimv2_l_full_valid.json.gz",
@@ -1463,6 +2833,8 @@
       "model": "Florence-2-large",
       "family": "generative VLM",
       "slug": "florence2",
+      "experiment": null,
+      "input": "768x768 (squashed)",
       "arm": "peft",
       "role": "peft",
       "base_arm": "peft",
@@ -1471,14 +2843,20 @@
       "image_size": "768x768 (processor default; 1920x1080 frames resized without aspect preservation)",
       "model_id": "microsoft/Florence-2-large",
       "selected_epoch": 26,
+      "epochs_run": 34,
+      "optimizer_steps": 1972,
+      "gpu": "NVIDIA RTX A6000 48GB (vast.ai, $0.422/h)",
       "meta_note": null,
       "trainable_params": 6920192,
       "total_params": 781184000,
       "trainable_fraction": 0.008858594134032442,
       "train_gpu_hours": 0.57,
-      "train_gpu_hours_key": "train_hours",
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": 0.24,
       "train_cost_key": "cost_usd",
+      "full_type": "peft",
+      "full_type_note": null,
+      "box_shared": false,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/florence2_peft_valid.json",
@@ -1521,6 +2899,8 @@
       "model": "Florence-2-large",
       "family": "generative VLM",
       "slug": "florence2",
+      "experiment": null,
+      "input": "768x768 (squashed)",
       "arm": "full",
       "role": "full",
       "base_arm": "full",
@@ -1529,14 +2909,20 @@
       "image_size": "768x768 (processor default; 1920x1080 frames resized without aspect preservation)",
       "model_id": "microsoft/Florence-2-large",
       "selected_epoch": 16,
+      "epochs_run": 24,
+      "optimizer_steps": 1392,
+      "gpu": "NVIDIA RTX A6000 48GB (vast.ai, $0.422/h)",
       "meta_note": null,
       "trainable_params": 776465408,
       "total_params": 776465408,
       "trainable_fraction": 1.0,
       "train_gpu_hours": 0.572,
-      "train_gpu_hours_key": "train_hours",
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": 0.24,
       "train_cost_key": "cost_usd",
+      "full_type": "b",
+      "full_type_note": "DaViT at 3e-6 vs 1.5e-5 for the rest",
+      "box_shared": false,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/florence2_full_valid.json",
@@ -1579,6 +2965,8 @@
       "model": "Florence-2-large",
       "family": "generative VLM",
       "slug": "florence2",
+      "experiment": null,
+      "input": "768x768 (squashed)",
       "arm": "lora_all64",
       "role": "variant",
       "base_arm": "lora_all64",
@@ -1587,14 +2975,20 @@
       "image_size": "768x768 (processor default; 1920x1080 frames resized without aspect preservation)",
       "model_id": "microsoft/Florence-2-large",
       "selected_epoch": 40,
+      "epochs_run": 40,
+      "optimizer_steps": 2320,
+      "gpu": "NVIDIA RTX A6000 48GB (vast.ai, $0.517/h, instance 61041553, label ffm-florence2-mid)",
       "meta_note": null,
       "trainable_params": 36804608,
       "total_params": 811068416,
       "trainable_fraction": 0.04537793270450812,
       "train_gpu_hours": 0.75,
-      "train_gpu_hours_key": "train_hours",
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": 0.39,
       "train_cost_key": "cost_usd",
+      "full_type": "peft",
+      "full_type_note": null,
+      "box_shared": false,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/florence2_lora_all64_valid.json",
@@ -1637,6 +3031,8 @@
       "model": "Qwen3-VL (peft 8B, full 4B)",
       "family": "generative VLM",
       "slug": "qwen3vl",
+      "experiment": null,
+      "input": "native 1920x1088",
       "arm": "peft",
       "role": "peft",
       "base_arm": "peft",
@@ -1645,14 +3041,20 @@
       "image_size": "native 1920x1080 -> 1920x1088 (image_processor longest_edge=2,100,000 px; 2040 visual tokens; 2090 prompt tokens). Zero-shot row used 2x upscale (min_pixels 4.096M).",
       "model_id": "Qwen/Qwen3-VL-8B-Instruct",
       "selected_epoch": 5,
+      "epochs_run": 5,
+      "optimizer_steps": 290,
+      "gpu": "1x A100-SXM4-80GB (vast.ai, $1.362/h)",
       "meta_note": null,
       "trainable_params": 15335424,
       "total_params": 8782459120,
       "trainable_fraction": 0.0017461423720239303,
       "train_gpu_hours": 1.67,
-      "train_gpu_hours_key": "train_hours_wallclock",
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": null,
       "train_cost_key": null,
+      "full_type": "peft",
+      "full_type_note": null,
+      "box_shared": true,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/qwen3vl_peft_valid.json",
@@ -1695,6 +3097,8 @@
       "model": "Qwen3-VL (peft 8B, full 4B)",
       "family": "generative VLM",
       "slug": "qwen3vl",
+      "experiment": null,
+      "input": "native 1920x1088",
       "arm": "full",
       "role": "full",
       "base_arm": "full",
@@ -1703,14 +3107,20 @@
       "image_size": "native 1920x1080 -> 1920x1088 (image_processor longest_edge=2,100,000 px; 2040 visual tokens; 2090 prompt tokens). Zero-shot row used 2x upscale (min_pixels 4.096M).",
       "model_id": "Qwen/Qwen3-VL-4B-Instruct",
       "selected_epoch": 4,
+      "epochs_run": 4,
+      "optimizer_steps": 232,
+      "gpu": "1x A100-SXM4-80GB (vast.ai, $1.362/h)",
       "meta_note": null,
       "trainable_params": 4022468096,
       "total_params": 4437815808,
       "trainable_fraction": 0.9064071764197024,
       "train_gpu_hours": 0.63,
-      "train_gpu_hours_key": "train_hours_wallclock",
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": null,
       "train_cost_key": null,
+      "full_type": "c",
+      "full_type_note": "vision tower + mergers frozen (and 4B, not 8B)",
+      "box_shared": null,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/qwen3vl_full_valid.json",
@@ -1753,6 +3163,8 @@
       "model": "Qwen3-VL (peft 8B, full 4B)",
       "family": "generative VLM",
       "slug": "qwen3vl",
+      "experiment": null,
+      "input": "native 1920x1088",
       "arm": "peft_4b",
       "role": "variant",
       "base_arm": "peft_4b",
@@ -1761,14 +3173,20 @@
       "image_size": "native 1920x1080 -> 1920x1088 (image_processor longest_edge=2,100,000 px; 2040 visual tokens; 2090 prompt tokens). Zero-shot row used 2x upscale (min_pixels 4.096M).",
       "model_id": "Qwen/Qwen3-VL-4B-Instruct",
       "selected_epoch": 5,
+      "epochs_run": 5,
+      "optimizer_steps": 290,
+      "gpu": "1x A100-SXM4-80GB (vast.ai, $1.362/h)",
       "meta_note": null,
       "trainable_params": 11796480,
       "total_params": 4449612288,
       "trainable_fraction": 0.0026511253647454867,
       "train_gpu_hours": 1.41,
-      "train_gpu_hours_key": "train_hours_wallclock",
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": null,
       "train_cost_key": null,
+      "full_type": "peft",
+      "full_type_note": null,
+      "box_shared": true,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/qwen3vl_peft_4b_valid.json",
@@ -1806,11 +3224,145 @@
       "sibling_test_map_50_95": 0.5333302617073059
     },
     {
+      "row_id": "qwen3vl/peft_merger",
+      "model_key": "qwen3vl",
+      "model": "Qwen3-VL (peft 8B, full 4B)",
+      "family": "generative VLM",
+      "slug": "qwen3vl",
+      "experiment": "fix",
+      "input": "native 1920x1088",
+      "arm": "peft_merger",
+      "role": "extra",
+      "base_arm": "peft_merger",
+      "label": "8B LoRA + vision merger unfrozen (audit fix)",
+      "seed": 0,
+      "image_size": "native 1920x1080 -> 1920x1088 (image_processor longest_edge=2,100,000 px; 2040 visual tokens; 2090 prompt tokens). Zero-shot row used 2x upscale (min_pixels 4.096M).",
+      "model_id": "Qwen/Qwen3-VL-8B-Instruct",
+      "selected_epoch": 4,
+      "epochs_run": 5,
+      "optimizer_steps": null,
+      "gpu": "1x A100-SXM4-80GB (vast.ai, $1.117/h)",
+      "meta_note": null,
+      "trainable_params": 175832320,
+      "total_params": 8782459120,
+      "trainable_fraction": 0.020020852656129413,
+      "train_gpu_hours": 1.22,
+      "train_gpu_hours_key": "box_hours",
+      "train_cost_usd": null,
+      "train_cost_key": null,
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/qwen3vl_peft_merger_valid.json",
+          "sha256_json": "f7c7b6fb1b6d5c19e819bdd821dfa14b1da6d9c38cae865309c253a56153665c"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/qwen3vl_peft_merger_test.json",
+          "sha256_json": "aec0e0283b5f91ff3428ac5d866f73d270da8117870761e486b0e52e95a4597f"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.5544356107711792,
+        "mAP_50": 0.8661109805107117,
+        "mAP_75": 0.5877874493598938,
+        "per_class_ap50": {
+          "player": 0.9489260911941528,
+          "ball": 0.6453062295913696,
+          "referee": 0.9267873167991638,
+          "rim": 0.9387851357460022,
+          "number": 0.8707498908042908
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.5699347257614136,
+        "mAP_50": 0.8619888424873352,
+        "mAP_75": 0.6018667221069336,
+        "per_class_ap50": {
+          "player": 0.9463784694671631,
+          "ball": 0.6506026983261108,
+          "referee": 0.9564240574836731,
+          "rim": 0.9796656966209412,
+          "number": 0.7768732309341431
+        }
+      },
+      "sibling_test_map_50_95": 0.5699347257614136
+    },
+    {
+      "row_id": "qwen3vl/peft_4b_merger",
+      "model_key": "qwen3vl",
+      "model": "Qwen3-VL (peft 8B, full 4B)",
+      "family": "generative VLM",
+      "slug": "qwen3vl",
+      "experiment": "fix",
+      "input": "native 1920x1088",
+      "arm": "peft_4b_merger",
+      "role": "extra",
+      "base_arm": "peft_4b_merger",
+      "label": "4B LoRA + vision merger unfrozen (audit fix)",
+      "seed": 0,
+      "image_size": "native 1920x1080 -> 1920x1088 (image_processor longest_edge=2,100,000 px; 2040 visual tokens; 2090 prompt tokens). Zero-shot row used 2x upscale (min_pixels 4.096M).",
+      "model_id": "Qwen/Qwen3-VL-4B-Instruct",
+      "selected_epoch": 5,
+      "epochs_run": 5,
+      "optimizer_steps": null,
+      "gpu": "1x L40S (vast.ai, $0.796/h)",
+      "meta_note": null,
+      "trainable_params": 120901632,
+      "total_params": 4449612288,
+      "trainable_fraction": 0.027171273399719628,
+      "train_gpu_hours": 1.71,
+      "train_gpu_hours_key": "box_hours",
+      "train_cost_usd": null,
+      "train_cost_key": null,
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/qwen3vl_peft_4b_merger_valid.json",
+          "sha256_json": "0bcda95e9d4105cb03cf406eb1785ede2d7f1cec9cd8648e6890a0275e3837ed"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/qwen3vl_peft_4b_merger_test.json",
+          "sha256_json": "41f19e1a80b56829f98e0707ac2dd4a3e40f479c7997843729e09e84389b6f14"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.5526126027107239,
+        "mAP_50": 0.8441413640975952,
+        "mAP_75": 0.5686944723129272,
+        "per_class_ap50": {
+          "player": 0.9358049035072327,
+          "ball": 0.693310022354126,
+          "referee": 0.8674757480621338,
+          "rim": 0.8611047863960266,
+          "number": 0.8630114793777466
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.5880903005599976,
+        "mAP_50": 0.8650062084197998,
+        "mAP_75": 0.625341534614563,
+        "per_class_ap50": {
+          "player": 0.9668057560920715,
+          "ball": 0.6399537920951843,
+          "referee": 0.9496985077857971,
+          "rim": 0.9503850340843201,
+          "number": 0.818187952041626
+        }
+      },
+      "sibling_test_map_50_95": 0.5880903005599976
+    },
+    {
       "row_id": "paligemma2/peft",
       "model_key": "paligemma2",
       "model": "PaliGemma 2 3B-448",
       "family": "generative VLM",
       "slug": "paligemma2",
+      "experiment": null,
+      "input": "448x448 (squashed)",
       "arm": "peft",
       "role": "peft",
       "base_arm": "peft",
@@ -1819,14 +3371,20 @@
       "image_size": "448x448 (1920x1080 squashed, aspect not preserved)",
       "model_id": "google/paligemma2-3b-pt-448",
       "selected_epoch": 13,
+      "epochs_run": 15,
+      "optimizer_steps": 870,
+      "gpu": "1x A100 SXM4 80GB (vast.ai, $1.233/h incl. storage); arms run sequentially (peft used ~60 GB with eager attention, so full OOMed when run concurrently)",
       "meta_note": null,
       "trainable_params": 9046272,
       "total_params": 3042173424,
       "trainable_fraction": 0.0029736214012761686,
       "train_gpu_hours": 0.84,
-      "train_gpu_hours_key": "train_hours",
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": 1.04,
       "train_cost_key": "cost_usd_train_share",
+      "full_type": "peft",
+      "full_type_note": null,
+      "box_shared": false,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/paligemma2_peft_valid.json",
@@ -1869,6 +3427,8 @@
       "model": "PaliGemma 2 3B-448",
       "family": "generative VLM",
       "slug": "paligemma2",
+      "experiment": null,
+      "input": "448x448 (squashed)",
       "arm": "full",
       "role": "full",
       "base_arm": "full",
@@ -1877,14 +3437,20 @@
       "image_size": "448x448 (1920x1080 squashed, aspect not preserved)",
       "model_id": "google/paligemma2-3b-pt-448",
       "selected_epoch": 14,
+      "epochs_run": 15,
+      "optimizer_steps": 870,
+      "gpu": "1x A100 SXM4 80GB (vast.ai, $1.233/h incl. storage); arms run sequentially (peft used ~60 GB with eager attention, so full OOMed when run concurrently)",
       "meta_note": null,
       "trainable_params": 2619800064,
       "total_params": 3033127152,
       "trainable_fraction": 0.8637290600470019,
       "train_gpu_hours": 0.92,
-      "train_gpu_hours_key": "train_hours",
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": 1.13,
       "train_cost_key": "cost_usd_train_share",
+      "full_type": "c",
+      "full_type_note": "SigLIP frozen",
+      "box_shared": false,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/paligemma2_full_valid.json",
@@ -1922,11 +3488,79 @@
       "sibling_test_map_50_95": 0.2645456790924072
     },
     {
+      "row_id": "paligemma2/peft_896",
+      "model_key": "paligemma2",
+      "model": "PaliGemma 2 3B-448",
+      "family": "generative VLM",
+      "slug": "paligemma2",
+      "experiment": "fix",
+      "input": "896x896 (squashed)",
+      "arm": "peft_896",
+      "role": "extra",
+      "base_arm": "peft_896",
+      "label": "peft recipe at 896 px (audit fix)",
+      "seed": 0,
+      "image_size": "896x896 (1920x1080 squashed; 4096 image tokens)",
+      "model_id": "google/paligemma2-3b-pt-896",
+      "selected_epoch": 13,
+      "epochs_run": 15,
+      "optimizer_steps": null,
+      "gpu": "1x A100 SXM4 80GB (vast.ai, ~$1.11/h)",
+      "meta_note": null,
+      "trainable_params": 9046272,
+      "total_params": 3045712368,
+      "trainable_fraction": 0.002970166222866387,
+      "train_gpu_hours": 3.167,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 3.83,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/paligemma2_peft_896_valid.json",
+          "sha256_json": "99efeb3edba9789a4da8380a5a58669dc486d1ba308b811939b04ebdb2b3bb80"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/paligemma2_peft_896_test.json",
+          "sha256_json": "4faac09657f68fd3c7a533207467f7fb45240997255f6f1121b70b6a1b7b0b19"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.44648686051368713,
+        "mAP_50": 0.8000686764717102,
+        "mAP_75": 0.4004421830177307,
+        "per_class_ap50": {
+          "player": 0.8960516452789307,
+          "ball": 0.6046528816223145,
+          "referee": 0.8515495657920837,
+          "rim": 0.9584842324256897,
+          "number": 0.689605176448822
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.43206968903541565,
+        "mAP_50": 0.7734115719795227,
+        "mAP_75": 0.3895430564880371,
+        "per_class_ap50": {
+          "player": 0.9179521203041077,
+          "ball": 0.48881927132606506,
+          "referee": 0.8657898306846619,
+          "rim": 0.9786010980606079,
+          "number": 0.6158953905105591
+        }
+      },
+      "sibling_test_map_50_95": 0.43206968903541565
+    },
+    {
       "row_id": "smolvlm2/peft",
       "model_key": "smolvlm2",
       "model": "SmolVLM2-2.2B",
       "family": "generative VLM",
       "slug": "smolvlm2",
+      "experiment": null,
+      "input": "SigLIP tiles, pixel-shuffled",
       "arm": "peft",
       "role": "peft",
       "base_arm": "peft",
@@ -1935,14 +3569,20 @@
       "image_size": null,
       "model_id": "HuggingFaceTB/SmolVLM2-2.2B-Instruct",
       "selected_epoch": 4,
+      "epochs_run": 8,
+      "optimizer_steps": 260,
+      "gpu": "NVIDIA RTX A6000 48GB (vast.ai, $0.422/h); both arms concurrently",
       "meta_note": null,
       "trainable_params": 27525120,
       "total_params": 2274310000,
       "trainable_fraction": 0.012102624532275723,
       "train_gpu_hours": 3.0,
-      "train_gpu_hours_key": "train_hours",
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": 1.27,
       "train_cost_key": "cost_usd",
+      "full_type": "peft",
+      "full_type_note": null,
+      "box_shared": true,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/smolvlm2_peft_valid.json",
@@ -1985,6 +3625,8 @@
       "model": "SmolVLM2-2.2B",
       "family": "generative VLM",
       "slug": "smolvlm2",
+      "experiment": null,
+      "input": "SigLIP tiles, pixel-shuffled",
       "arm": "full",
       "role": "full",
       "base_arm": "full",
@@ -1993,14 +3635,20 @@
       "image_size": null,
       "model_id": "HuggingFaceTB/SmolVLM2-2.2B-Instruct",
       "selected_epoch": 6,
+      "epochs_run": 8,
+      "optimizer_steps": 240,
+      "gpu": "NVIDIA RTX A6000 48GB (vast.ai, $0.422/h); both arms concurrently",
       "meta_note": null,
       "trainable_params": 1833797632,
       "total_params": 2246784880,
       "trainable_fraction": 0.8161874544927505,
       "train_gpu_hours": 3.0,
-      "train_gpu_hours_key": "train_hours",
+      "train_gpu_hours_key": "TRAINING_SUMMARY.json",
       "train_cost_usd": 1.27,
       "train_cost_key": "cost_usd",
+      "full_type": "c",
+      "full_type_note": "SigLIP frozen",
+      "box_shared": true,
       "dumps": {
         "valid": {
           "path": "benchmarks/basketball/results/finetune/smolvlm2_full_valid.json",
@@ -2036,6 +3684,1276 @@
         }
       },
       "sibling_test_map_50_95": 0.00016665959265083075
+    },
+    {
+      "row_id": "yolo26m/default_s0",
+      "model_key": "yolo26m",
+      "model": "YOLO26m",
+      "family": "conventional detector",
+      "slug": "yolo26m",
+      "experiment": "E1",
+      "input": "640",
+      "arm": "default_s0",
+      "role": "extra",
+      "base_arm": "default_s0",
+      "label": "default recipe, seed 0 (taxonomy-ablation run)",
+      "seed": 0,
+      "image_size": null,
+      "model_id": null,
+      "selected_epoch": 222,
+      "epochs_run": 300,
+      "optimizer_steps": null,
+      "gpu": null,
+      "meta_note": null,
+      "trainable_params": null,
+      "total_params": null,
+      "trainable_fraction": null,
+      "train_gpu_hours": null,
+      "train_gpu_hours_key": null,
+      "train_cost_usd": null,
+      "train_cost_key": null,
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_default_s0_valid.json.gz",
+          "sha256_json": "a117d3e52102bd60ea7482fdbce38e25b032fbf9a14209ff7f394c4e2806b706"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_default_s0_test.json.gz",
+          "sha256_json": "9388781c756dc630fff814b1eb02fdf582d0ef89c27931a31ff0dd85ca3a6207"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7034888863563538,
+        "mAP_50": 0.9577943682670593,
+        "mAP_75": 0.8033285140991211,
+        "per_class_ap50": {
+          "player": 0.9763804078102112,
+          "ball": 0.8717699646949768,
+          "referee": 0.9867919683456421,
+          "rim": 0.9994927644729614,
+          "number": 0.9545368552207947
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7133973836898804,
+        "mAP_50": 0.9389856457710266,
+        "mAP_75": 0.8366189002990723,
+        "per_class_ap50": {
+          "player": 0.9778591394424438,
+          "ball": 0.8114261627197266,
+          "referee": 0.969344437122345,
+          "rim": 1.0,
+          "number": 0.9362985491752625
+        }
+      },
+      "sibling_test_map_50_95": 0.7133973836898804
+    },
+    {
+      "row_id": "yolo26m/default_s1",
+      "model_key": "yolo26m",
+      "model": "YOLO26m",
+      "family": "conventional detector",
+      "slug": "yolo26m",
+      "experiment": "E1",
+      "input": "640",
+      "arm": "default_s1",
+      "role": "extra",
+      "base_arm": "default_s1",
+      "label": "default recipe, seed 1 (taxonomy-ablation run)",
+      "seed": 1,
+      "image_size": null,
+      "model_id": null,
+      "selected_epoch": 215,
+      "epochs_run": 300,
+      "optimizer_steps": null,
+      "gpu": null,
+      "meta_note": null,
+      "trainable_params": null,
+      "total_params": null,
+      "trainable_fraction": null,
+      "train_gpu_hours": null,
+      "train_gpu_hours_key": null,
+      "train_cost_usd": null,
+      "train_cost_key": null,
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_default_s1_valid.json.gz",
+          "sha256_json": "5088c08c80f3c6d0f4a00dff10c6dbe94992e13082819a18339105a86374d683"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_default_s1_test.json.gz",
+          "sha256_json": "34a24cb21b6cb1f77a608c7875bf2a410451b0b82b1be8249b81794a52973116"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.6993805766105652,
+        "mAP_50": 0.9525483846664429,
+        "mAP_75": 0.7904876470565796,
+        "per_class_ap50": {
+          "player": 0.9775643348693848,
+          "ball": 0.8330422639846802,
+          "referee": 0.9969438314437866,
+          "rim": 0.9993999600410461,
+          "number": 0.9557916522026062
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7199633121490479,
+        "mAP_50": 0.9522716403007507,
+        "mAP_75": 0.8388583660125732,
+        "per_class_ap50": {
+          "player": 0.9796112775802612,
+          "ball": 0.8792459964752197,
+          "referee": 0.9686612486839294,
+          "rim": 0.9997893571853638,
+          "number": 0.9340503215789795
+        }
+      },
+      "sibling_test_map_50_95": 0.7199633121490479
+    },
+    {
+      "row_id": "yolo26m/default_s2",
+      "model_key": "yolo26m",
+      "model": "YOLO26m",
+      "family": "conventional detector",
+      "slug": "yolo26m",
+      "experiment": "E1",
+      "input": "640",
+      "arm": "default_s2",
+      "role": "extra",
+      "base_arm": "default_s2",
+      "label": "default recipe, seed 2 (taxonomy-ablation run)",
+      "seed": 2,
+      "image_size": null,
+      "model_id": null,
+      "selected_epoch": 235,
+      "epochs_run": 300,
+      "optimizer_steps": null,
+      "gpu": null,
+      "meta_note": null,
+      "trainable_params": null,
+      "total_params": null,
+      "trainable_fraction": null,
+      "train_gpu_hours": null,
+      "train_gpu_hours_key": null,
+      "train_cost_usd": null,
+      "train_cost_key": null,
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_default_s2_valid.json.gz",
+          "sha256_json": "e6191c86c937fc74f770ef68d17468f95e70b99eda6241f6d7a201443c652596"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_default_s2_test.json.gz",
+          "sha256_json": "a255229867149e79f9c0c5f9ebdc740db9548d729799c98487ce6e1c9f2d5d6d"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7041617631912231,
+        "mAP_50": 0.9546585083007812,
+        "mAP_75": 0.7997733354568481,
+        "per_class_ap50": {
+          "player": 0.9750370979309082,
+          "ball": 0.8594112992286682,
+          "referee": 0.9893779158592224,
+          "rim": 0.9995958805084229,
+          "number": 0.9498702883720398
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7149805426597595,
+        "mAP_50": 0.948637843132019,
+        "mAP_75": 0.8413591980934143,
+        "per_class_ap50": {
+          "player": 0.9781188368797302,
+          "ball": 0.8543444275856018,
+          "referee": 0.9698233604431152,
+          "rim": 0.9987998604774475,
+          "number": 0.9421027898788452
+        }
+      },
+      "sibling_test_map_50_95": 0.7149805426597595
+    },
+    {
+      "row_id": "yolo26m/yolo26m_e1_s0",
+      "model_key": "yolo26m",
+      "model": "YOLO26m",
+      "family": "conventional detector",
+      "slug": "yolo26m",
+      "experiment": "E1",
+      "input": "640",
+      "arm": "yolo26m_e1_s0",
+      "role": "extra",
+      "base_arm": "yolo26m_e1_s0",
+      "label": "E1 recipe (lr x2), seed 0",
+      "seed": 0,
+      "image_size": null,
+      "model_id": "yolo26m.pt (COCO-pretrained, Ultralytics release v8.4.0)",
+      "selected_epoch": 281,
+      "epochs_run": 300,
+      "optimizer_steps": 2175,
+      "gpu": "RTX 4090",
+      "meta_note": null,
+      "trainable_params": 21780598,
+      "total_params": 21780598,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 0.678,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.409,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_e1_s0_valid.json.gz",
+          "sha256_json": "2aad3306162a675a0619089ed80a62b41e549f8d5eaaa3960b72731401d0760d"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_e1_s0_test.json.gz",
+          "sha256_json": "87588ea9c8e3ebd747777b08b4c8505a0f5ac4a49d439d87a491e0e45b3edb4a"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.6941211819648743,
+        "mAP_50": 0.9528245329856873,
+        "mAP_75": 0.7881293296813965,
+        "per_class_ap50": {
+          "player": 0.9762108325958252,
+          "ball": 0.8557084798812866,
+          "referee": 0.9892007112503052,
+          "rim": 0.9992079138755798,
+          "number": 0.9437947273254395
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7112364768981934,
+        "mAP_50": 0.9395187497138977,
+        "mAP_75": 0.8135955929756165,
+        "per_class_ap50": {
+          "player": 0.9770130515098572,
+          "ball": 0.8121420741081238,
+          "referee": 0.9790467023849487,
+          "rim": 0.9995831251144409,
+          "number": 0.9298087358474731
+        }
+      },
+      "sibling_test_map_50_95": 0.7112364768981934
+    },
+    {
+      "row_id": "yolo26m/yolo26m_e1_s1",
+      "model_key": "yolo26m",
+      "model": "YOLO26m",
+      "family": "conventional detector",
+      "slug": "yolo26m",
+      "experiment": "E1",
+      "input": "640",
+      "arm": "yolo26m_e1_s1",
+      "role": "extra",
+      "base_arm": "yolo26m_e1_s1",
+      "label": "E1 recipe (lr x2), seed 1",
+      "seed": 1,
+      "image_size": null,
+      "model_id": "yolo26m.pt (COCO-pretrained, Ultralytics release v8.4.0)",
+      "selected_epoch": 263,
+      "epochs_run": 300,
+      "optimizer_steps": 2175,
+      "gpu": "RTX 4090",
+      "meta_note": null,
+      "trainable_params": 21780598,
+      "total_params": 21780598,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 0.654,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.46,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_e1_s1_valid.json.gz",
+          "sha256_json": "344029ee3b8377c2106370d128fd2b1cb13f92a3b29a2f7cc48124d955b7f576"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_e1_s1_test.json.gz",
+          "sha256_json": "8ac609f51820e4d48f147370b1370e8f0c0a2455aed6c812ddbee6b77db02596"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.6988961696624756,
+        "mAP_50": 0.9483789205551147,
+        "mAP_75": 0.7961199879646301,
+        "per_class_ap50": {
+          "player": 0.9775857925415039,
+          "ball": 0.8267016410827637,
+          "referee": 0.9887850284576416,
+          "rim": 1.0,
+          "number": 0.9488221406936646
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7217794060707092,
+        "mAP_50": 0.9477534294128418,
+        "mAP_75": 0.8474509119987488,
+        "per_class_ap50": {
+          "player": 0.9792421460151672,
+          "ball": 0.8597320914268494,
+          "referee": 0.9700486063957214,
+          "rim": 1.0,
+          "number": 0.9297442436218262
+        }
+      },
+      "sibling_test_map_50_95": 0.7217794060707092
+    },
+    {
+      "row_id": "yolo26m/yolo26m_e1_s2",
+      "model_key": "yolo26m",
+      "model": "YOLO26m",
+      "family": "conventional detector",
+      "slug": "yolo26m",
+      "experiment": "E1",
+      "input": "640",
+      "arm": "yolo26m_e1_s2",
+      "role": "extra",
+      "base_arm": "yolo26m_e1_s2",
+      "label": "E1 recipe (lr x2), seed 2",
+      "seed": 2,
+      "image_size": null,
+      "model_id": "yolo26m.pt (COCO-pretrained, Ultralytics release v8.4.0)",
+      "selected_epoch": 290,
+      "epochs_run": 300,
+      "optimizer_steps": 2175,
+      "gpu": "RTX 4090",
+      "meta_note": null,
+      "trainable_params": 21780598,
+      "total_params": 21780598,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 0.655,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.819,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_e1_s2_valid.json.gz",
+          "sha256_json": "3eb55d1f28eb47fdb460c0396160ebb8f2829465f5ffa6d91dd607efeeafd33a"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_e1_s2_test.json.gz",
+          "sha256_json": "31b3e082241ba7bd407bf004d357f441f5c44a9504b5aaa0c3e670c22af164cf"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7044864296913147,
+        "mAP_50": 0.9602987766265869,
+        "mAP_75": 0.7997497916221619,
+        "per_class_ap50": {
+          "player": 0.9764857888221741,
+          "ball": 0.8645265698432922,
+          "referee": 0.997700035572052,
+          "rim": 1.0,
+          "number": 0.962781548500061
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7232347130775452,
+        "mAP_50": 0.9494889378547668,
+        "mAP_75": 0.8384953737258911,
+        "per_class_ap50": {
+          "player": 0.9877495169639587,
+          "ball": 0.8385874629020691,
+          "referee": 0.9789150357246399,
+          "rim": 0.9994766712188721,
+          "number": 0.9427159428596497
+        }
+      },
+      "sibling_test_map_50_95": 0.7232347130775452
+    },
+    {
+      "row_id": "yolo26m/yolo26m_1280_s0",
+      "model_key": "yolo26m",
+      "model": "YOLO26m",
+      "family": "conventional detector",
+      "slug": "yolo26m",
+      "experiment": "E2",
+      "input": "1280",
+      "arm": "yolo26m_1280_s0",
+      "role": "extra",
+      "base_arm": "yolo26m_1280_s0",
+      "label": "E1 recipe @1280, seed 0",
+      "seed": 0,
+      "image_size": null,
+      "model_id": "yolo26m.pt (COCO-pretrained, Ultralytics release v8.4.0)",
+      "selected_epoch": 233,
+      "epochs_run": 300,
+      "optimizer_steps": 2175,
+      "gpu": "RTX 4090",
+      "meta_note": null,
+      "trainable_params": 21780598,
+      "total_params": 21780598,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 2.919,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.9,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_1280_s0_valid.json.gz",
+          "sha256_json": "a56c43804f179357a0d3f8f649a6d53673140714321f928f30ae27ffd537d726"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_1280_s0_test.json.gz",
+          "sha256_json": "5261fe70b339e25bd785a6bef131c782d52b495ce5fb647e597eafb3cfc3eb47"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7607446312904358,
+        "mAP_50": 0.9723907709121704,
+        "mAP_75": 0.8604462146759033,
+        "per_class_ap50": {
+          "player": 0.9774035215377808,
+          "ball": 0.9271364808082581,
+          "referee": 0.9869444370269775,
+          "rim": 1.0,
+          "number": 0.9704692959785461
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7722911238670349,
+        "mAP_50": 0.9661291837692261,
+        "mAP_75": 0.9052141308784485,
+        "per_class_ap50": {
+          "player": 0.9878753423690796,
+          "ball": 0.9182297587394714,
+          "referee": 0.9749759435653687,
+          "rim": 0.9993702173233032,
+          "number": 0.950194776058197
+        }
+      },
+      "sibling_test_map_50_95": 0.7722911238670349
+    },
+    {
+      "row_id": "yolo26m/yolo26m_1280_s1",
+      "model_key": "yolo26m",
+      "model": "YOLO26m",
+      "family": "conventional detector",
+      "slug": "yolo26m",
+      "experiment": "E2",
+      "input": "1280",
+      "arm": "yolo26m_1280_s1",
+      "role": "extra",
+      "base_arm": "yolo26m_1280_s1",
+      "label": "E1 recipe @1280, seed 1",
+      "seed": 1,
+      "image_size": null,
+      "model_id": "yolo26m.pt (COCO-pretrained, Ultralytics release v8.4.0)",
+      "selected_epoch": 271,
+      "epochs_run": 300,
+      "optimizer_steps": 2175,
+      "gpu": "RTX 4090",
+      "meta_note": null,
+      "trainable_params": 21780598,
+      "total_params": 21780598,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 1.38,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.834,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_1280_s1_valid.json.gz",
+          "sha256_json": "00f90654499da1da669f18bcdec8b137769247b4feb5a1a65c4bfbe752acb692"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_1280_s1_test.json.gz",
+          "sha256_json": "5ceffdb0e66224959dd32e6a4223b7e0c2f1e3370b03bf70641f14ea4ddff8eb"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7571831345558167,
+        "mAP_50": 0.9666113257408142,
+        "mAP_75": 0.8538268208503723,
+        "per_class_ap50": {
+          "player": 0.976526141166687,
+          "ball": 0.9454123973846436,
+          "referee": 0.9477280378341675,
+          "rim": 1.0,
+          "number": 0.9633899331092834
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.768060564994812,
+        "mAP_50": 0.9683866500854492,
+        "mAP_75": 0.90370774269104,
+        "per_class_ap50": {
+          "player": 0.9890281558036804,
+          "ball": 0.9314049482345581,
+          "referee": 0.9787205457687378,
+          "rim": 1.0,
+          "number": 0.9427797198295593
+        }
+      },
+      "sibling_test_map_50_95": 0.768060564994812
+    },
+    {
+      "row_id": "yolo26m/yolo26m_1280_s2",
+      "model_key": "yolo26m",
+      "model": "YOLO26m",
+      "family": "conventional detector",
+      "slug": "yolo26m",
+      "experiment": "E2",
+      "input": "1280",
+      "arm": "yolo26m_1280_s2",
+      "role": "extra",
+      "base_arm": "yolo26m_1280_s2",
+      "label": "E1 recipe @1280, seed 2",
+      "seed": 2,
+      "image_size": null,
+      "model_id": "yolo26m.pt (COCO-pretrained, Ultralytics release v8.4.0)",
+      "selected_epoch": 266,
+      "epochs_run": 300,
+      "optimizer_steps": 2175,
+      "gpu": "RTX 4090",
+      "meta_note": null,
+      "trainable_params": 21780598,
+      "total_params": 21780598,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 1.597,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.841,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_1280_s2_valid.json.gz",
+          "sha256_json": "a6f08bc27c762c57f6ea8ccb62f13fe37824737de830808813cdc27d5d820545"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_1280_s2_test.json.gz",
+          "sha256_json": "bdfec1d04d324e0b3954b74f3b85790b5392b1f4750b4f2fc1363cff7c676b4c"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7602775692939758,
+        "mAP_50": 0.9726032018661499,
+        "mAP_75": 0.844288170337677,
+        "per_class_ap50": {
+          "player": 0.9780972003936768,
+          "ball": 0.9418036341667175,
+          "referee": 0.9836380481719971,
+          "rim": 1.0,
+          "number": 0.9594770073890686
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.772189736366272,
+        "mAP_50": 0.9646146297454834,
+        "mAP_75": 0.8968749642372131,
+        "per_class_ap50": {
+          "player": 0.9884581565856934,
+          "ball": 0.9042413830757141,
+          "referee": 0.9785929322242737,
+          "rim": 1.0,
+          "number": 0.9517806768417358
+        }
+      },
+      "sibling_test_map_50_95": 0.772189736366272
+    },
+    {
+      "row_id": "yolo26m/yolo26m_frac25_d0",
+      "model_key": "yolo26m",
+      "model": "YOLO26m",
+      "family": "conventional detector",
+      "slug": "yolo26m",
+      "experiment": "E3",
+      "input": "640",
+      "arm": "yolo26m_frac25_d0",
+      "role": "extra",
+      "base_arm": "yolo26m_frac25_d0",
+      "label": "E1 recipe on frac25, draw 0",
+      "seed": 0,
+      "image_size": null,
+      "model_id": "yolo26m.pt (COCO-pretrained, Ultralytics release v8.4.0)",
+      "selected_epoch": 481,
+      "epochs_run": 498,
+      "optimizer_steps": 1307,
+      "gpu": "RTX 4090",
+      "meta_note": null,
+      "image_fraction": 0.35129310344827586,
+      "train_images": 163,
+      "subset_target_pct": 25,
+      "subset_draw": 0,
+      "trainable_params": 21780598,
+      "total_params": 21780598,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 0.525,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.336,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_frac25_d0_valid.json.gz",
+          "sha256_json": "cb545ab4989868b944752d11c76cc8501f3b9f249ad55f2c6a8228d65641f969"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_frac25_d0_test.json.gz",
+          "sha256_json": "e3d92128d22269c5064c5d636b0623398736e6229362f628632f7d6cb38f668d"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.6625527143478394,
+        "mAP_50": 0.9270052909851074,
+        "mAP_75": 0.7461538314819336,
+        "per_class_ap50": {
+          "player": 0.9526715874671936,
+          "ball": 0.7901805639266968,
+          "referee": 0.9749043583869934,
+          "rim": 0.9993938207626343,
+          "number": 0.9178763031959534
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.6866635084152222,
+        "mAP_50": 0.9053575396537781,
+        "mAP_75": 0.8034976124763489,
+        "per_class_ap50": {
+          "player": 0.9487628936767578,
+          "ball": 0.7544755339622498,
+          "referee": 0.9566969275474548,
+          "rim": 0.9997893571853638,
+          "number": 0.8670629858970642
+        }
+      },
+      "sibling_test_map_50_95": 0.6866635084152222
+    },
+    {
+      "row_id": "yolo26m/yolo26m_frac25_d1",
+      "model_key": "yolo26m",
+      "model": "YOLO26m",
+      "family": "conventional detector",
+      "slug": "yolo26m",
+      "experiment": "E3",
+      "input": "640",
+      "arm": "yolo26m_frac25_d1",
+      "role": "extra",
+      "base_arm": "yolo26m_frac25_d1",
+      "label": "E1 recipe on frac25, draw 1",
+      "seed": 0,
+      "image_size": null,
+      "model_id": "yolo26m.pt (COCO-pretrained, Ultralytics release v8.4.0)",
+      "selected_epoch": 176,
+      "epochs_run": 276,
+      "optimizer_steps": 621,
+      "gpu": "RTX 4090",
+      "meta_note": null,
+      "image_fraction": 0.30387931034482757,
+      "train_images": 141,
+      "subset_target_pct": 25,
+      "subset_draw": 1,
+      "trainable_params": 21780598,
+      "total_params": 21780598,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 0.277,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.357,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_frac25_d1_valid.json.gz",
+          "sha256_json": "c74e9ab053017963e574507606b78ef594a33217949f83e117ac5dafce35b9ed"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_frac25_d1_test.json.gz",
+          "sha256_json": "ee53f9bd810a5770ef7bdb770de5f7fc4477f76616096f7a882ddaae80c93836"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.6150790452957153,
+        "mAP_50": 0.9174415469169617,
+        "mAP_75": 0.6984618306159973,
+        "per_class_ap50": {
+          "player": 0.9554234743118286,
+          "ball": 0.7342661619186401,
+          "referee": 0.937877357006073,
+          "rim": 0.9997958540916443,
+          "number": 0.9598449468612671
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.6303781270980835,
+        "mAP_50": 0.9163035750389099,
+        "mAP_75": 0.7485947012901306,
+        "per_class_ap50": {
+          "player": 0.9661211371421814,
+          "ball": 0.7537879347801208,
+          "referee": 0.9530730247497559,
+          "rim": 0.9993680119514465,
+          "number": 0.9091675877571106
+        }
+      },
+      "sibling_test_map_50_95": 0.6303781270980835
+    },
+    {
+      "row_id": "yolo26m/yolo26m_frac50_d0",
+      "model_key": "yolo26m",
+      "model": "YOLO26m",
+      "family": "conventional detector",
+      "slug": "yolo26m",
+      "experiment": "E3",
+      "input": "640",
+      "arm": "yolo26m_frac50_d0",
+      "role": "extra",
+      "base_arm": "yolo26m_frac50_d0",
+      "label": "E1 recipe on frac50, draw 0",
+      "seed": 0,
+      "image_size": null,
+      "model_id": "yolo26m.pt (COCO-pretrained, Ultralytics release v8.4.0)",
+      "selected_epoch": 261,
+      "epochs_run": 327,
+      "optimizer_steps": 1308,
+      "gpu": "RTX 4090",
+      "meta_note": null,
+      "image_fraction": 0.5474137931034483,
+      "train_images": 254,
+      "subset_target_pct": 50,
+      "subset_draw": 0,
+      "trainable_params": 21780598,
+      "total_params": 21780598,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 0.531,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.44,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_frac50_d0_valid.json.gz",
+          "sha256_json": "e77f50540c98d258fe9d75f260f26c9d67f345d2f310e6a1fd3180bc8225ce1d"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_frac50_d0_test.json.gz",
+          "sha256_json": "0df9724596088b303dae2528a88aae332547d09698141bb6538979d767ad636c"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.6797500848770142,
+        "mAP_50": 0.9459770321846008,
+        "mAP_75": 0.7688165903091431,
+        "per_class_ap50": {
+          "player": 0.9706724882125854,
+          "ball": 0.8263983130455017,
+          "referee": 0.9820683598518372,
+          "rim": 0.9988352060317993,
+          "number": 0.9519107341766357
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7172023057937622,
+        "mAP_50": 0.93120938539505,
+        "mAP_75": 0.8449180126190186,
+        "per_class_ap50": {
+          "player": 0.9660782814025879,
+          "ball": 0.8140261173248291,
+          "referee": 0.9758018851280212,
+          "rim": 1.0,
+          "number": 0.9001405835151672
+        }
+      },
+      "sibling_test_map_50_95": 0.7172023057937622
+    },
+    {
+      "row_id": "yolo26m/yolo26m_frac50_d1",
+      "model_key": "yolo26m",
+      "model": "YOLO26m",
+      "family": "conventional detector",
+      "slug": "yolo26m",
+      "experiment": "E3",
+      "input": "640",
+      "arm": "yolo26m_frac50_d1",
+      "role": "extra",
+      "base_arm": "yolo26m_frac50_d1",
+      "label": "E1 recipe on frac50, draw 1",
+      "seed": 0,
+      "image_size": null,
+      "model_id": "yolo26m.pt (COCO-pretrained, Ultralytics release v8.4.0)",
+      "selected_epoch": 226,
+      "epochs_run": 326,
+      "optimizer_steps": 1304,
+      "gpu": "RTX 4090",
+      "meta_note": null,
+      "image_fraction": 0.5387931034482759,
+      "train_images": 250,
+      "subset_target_pct": 50,
+      "subset_draw": 1,
+      "trainable_params": 21780598,
+      "total_params": 21780598,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 0.494,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.374,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_frac50_d1_valid.json.gz",
+          "sha256_json": "c5b3c7e1c557c4a052cff316ee4267614f332860dde8ffe9c115aef57b93b637"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_frac50_d1_test.json.gz",
+          "sha256_json": "609ca2d3ab795ef8bde7a902dc2863f05106fca83ef6ed988369d51875c6f6ff"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.6419435143470764,
+        "mAP_50": 0.9294523596763611,
+        "mAP_75": 0.7456033229827881,
+        "per_class_ap50": {
+          "player": 0.9564782977104187,
+          "ball": 0.7618613243103027,
+          "referee": 0.9768692255020142,
+          "rim": 1.0,
+          "number": 0.9520530104637146
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.6841561198234558,
+        "mAP_50": 0.9372023940086365,
+        "mAP_75": 0.8112125396728516,
+        "per_class_ap50": {
+          "player": 0.9738883972167969,
+          "ball": 0.8156587481498718,
+          "referee": 0.9795396327972412,
+          "rim": 0.9997893571853638,
+          "number": 0.9171358346939087
+        }
+      },
+      "sibling_test_map_50_95": 0.6841561198234558
+    },
+    {
+      "row_id": "deimm/e1_s0",
+      "model_key": "deimm",
+      "model": "DEIM-M",
+      "family": "conventional detector",
+      "slug": "deimm",
+      "experiment": "E1",
+      "input": "640",
+      "arm": "e1_s0",
+      "role": "extra",
+      "base_arm": "e1_s0",
+      "label": "E1 recipe (lr x2), seed 0",
+      "seed": 0,
+      "image_size": "640",
+      "model_id": "DEIM (D-FINE) M, HGNetv2-B2",
+      "selected_epoch": 85,
+      "epochs_run": 120,
+      "optimizer_steps": 3480,
+      "gpu": "NVIDIA GeForce RTX 4090",
+      "meta_note": null,
+      "trainable_params": 19474487,
+      "total_params": 19474487,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 0.8186111111111111,
+      "train_gpu_hours_key": "train_seconds",
+      "train_cost_usd": 0.0,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/deimm_e1_s0_valid.json.gz",
+          "sha256_json": "4329f2f0d752fd3bf364a06b0c1aec5a24abb21348d5ed38acbd91eee056bd00"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/deimm_e1_s0_test.json.gz",
+          "sha256_json": "1d537bc1e00437440e3d9a3c4733adb24632ec14d5ad99238420af3d82c4a4d4"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7107514142990112,
+        "mAP_50": 0.972163736820221,
+        "mAP_75": 0.8165359497070312,
+        "per_class_ap50": {
+          "player": 0.9834977984428406,
+          "ball": 0.9149637222290039,
+          "referee": 0.9988994002342224,
+          "rim": 1.0,
+          "number": 0.9634577631950378
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.6942276954650879,
+        "mAP_50": 0.947131335735321,
+        "mAP_75": 0.7968332171440125,
+        "per_class_ap50": {
+          "player": 0.9834238886833191,
+          "ball": 0.8420446515083313,
+          "referee": 0.9928688406944275,
+          "rim": 1.0,
+          "number": 0.917319118976593
+        }
+      },
+      "sibling_test_map_50_95": 0.6942276954650879
+    },
+    {
+      "row_id": "deimm/e1_s1",
+      "model_key": "deimm",
+      "model": "DEIM-M",
+      "family": "conventional detector",
+      "slug": "deimm",
+      "experiment": "E1",
+      "input": "640",
+      "arm": "e1_s1",
+      "role": "extra",
+      "base_arm": "e1_s1",
+      "label": "E1 recipe (lr x2), seed 1",
+      "seed": 1,
+      "image_size": "640",
+      "model_id": "DEIM (D-FINE) M, HGNetv2-B2",
+      "selected_epoch": 85,
+      "epochs_run": 120,
+      "optimizer_steps": 3480,
+      "gpu": "NVIDIA GeForce RTX 4090",
+      "meta_note": null,
+      "trainable_params": 19474487,
+      "total_params": 19474487,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 0.9525,
+      "train_gpu_hours_key": "train_seconds",
+      "train_cost_usd": 0.54,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/deimm_e1_s1_valid.json.gz",
+          "sha256_json": "8203265ff7be07b32bc74fdcfa31dffc0d0a2e42753ff2e3148208e12e095fff"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/deimm_e1_s1_test.json.gz",
+          "sha256_json": "3c51a4dfb88a270a79d25b084d8a1e105f72037e5c222bb2fb2dad5eed341dfc"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.706471860408783,
+        "mAP_50": 0.9684664011001587,
+        "mAP_75": 0.816444456577301,
+        "per_class_ap50": {
+          "player": 0.9776983261108398,
+          "ball": 0.9109231233596802,
+          "referee": 0.9894830584526062,
+          "rim": 1.0,
+          "number": 0.9642273187637329
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.701687216758728,
+        "mAP_50": 0.9555846452713013,
+        "mAP_75": 0.8022233247756958,
+        "per_class_ap50": {
+          "player": 0.9846929311752319,
+          "ball": 0.8758058547973633,
+          "referee": 0.9929200410842896,
+          "rim": 1.0,
+          "number": 0.924504280090332
+        }
+      },
+      "sibling_test_map_50_95": 0.701687216758728
+    },
+    {
+      "row_id": "deimm/e1_s2",
+      "model_key": "deimm",
+      "model": "DEIM-M",
+      "family": "conventional detector",
+      "slug": "deimm",
+      "experiment": "E1",
+      "input": "640",
+      "arm": "e1_s2",
+      "role": "extra",
+      "base_arm": "e1_s2",
+      "label": "E1 recipe (lr x2), seed 2",
+      "seed": 2,
+      "image_size": "640",
+      "model_id": "DEIM (D-FINE) M, HGNetv2-B2",
+      "selected_epoch": 72,
+      "epochs_run": 120,
+      "optimizer_steps": 3480,
+      "gpu": "NVIDIA GeForce RTX 4090",
+      "meta_note": null,
+      "trainable_params": 19474487,
+      "total_params": 19474487,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 0.5636111111111111,
+      "train_gpu_hours_key": "train_seconds",
+      "train_cost_usd": 0.4,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/deimm_e1_s2_valid.json.gz",
+          "sha256_json": "efc39c3d65e3eeaea649c30f7d8baab82c5a4a838b99379f287eb01e116e64c1"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/deimm_e1_s2_test.json.gz",
+          "sha256_json": "67f1565ac535035f36e21566f313db7d9a8d4d44f76096eb6f8f4ba59cdcc6a5"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7046870589256287,
+        "mAP_50": 0.9660410284996033,
+        "mAP_75": 0.8176543116569519,
+        "per_class_ap50": {
+          "player": 0.9864805340766907,
+          "ball": 0.9140681624412537,
+          "referee": 0.9787608981132507,
+          "rim": 1.0,
+          "number": 0.9508956670761108
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7044316530227661,
+        "mAP_50": 0.9437462091445923,
+        "mAP_75": 0.8070573210716248,
+        "per_class_ap50": {
+          "player": 0.9856540560722351,
+          "ball": 0.8415974378585815,
+          "referee": 0.996565043926239,
+          "rim": 1.0,
+          "number": 0.8949145674705505
+        }
+      },
+      "sibling_test_map_50_95": 0.7044316530227661
+    },
+    {
+      "row_id": "deimm/1280_s0",
+      "model_key": "deimm",
+      "model": "DEIM-M",
+      "family": "conventional detector",
+      "slug": "deimm",
+      "experiment": "E2",
+      "input": "1280",
+      "arm": "1280_s0",
+      "role": "extra",
+      "base_arm": "1280_s0",
+      "label": "E1 recipe @1280, seed 0",
+      "seed": 0,
+      "image_size": "1280",
+      "model_id": "DEIM (D-FINE) M, HGNetv2-B2",
+      "selected_epoch": 95,
+      "epochs_run": 120,
+      "optimizer_steps": 3480,
+      "gpu": "NVIDIA A100-SXM4-80GB",
+      "meta_note": null,
+      "trainable_params": 19474487,
+      "total_params": 19474487,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 1.3927777777777777,
+      "train_gpu_hours_key": "train_seconds",
+      "train_cost_usd": 1.84,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/deimm_1280_s0_valid.json.gz",
+          "sha256_json": "490f9ebe23a56613dbbbd16458142c6754b1dbc6f4bc82bac97cc121c20bd900"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/deimm_1280_s0_test.json.gz",
+          "sha256_json": "54ef089316ee31fcdfe0bcee6c3595803b7792862d5e8001b00b66c77fa9906e"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7755593061447144,
+        "mAP_50": 0.9847280383110046,
+        "mAP_75": 0.8741488456726074,
+        "per_class_ap50": {
+          "player": 0.986016571521759,
+          "ball": 0.9558719396591187,
+          "referee": 0.9988513588905334,
+          "rim": 1.0,
+          "number": 0.9829003214836121
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7886759042739868,
+        "mAP_50": 0.9784423112869263,
+        "mAP_75": 0.9119480848312378,
+        "per_class_ap50": {
+          "player": 0.9861688017845154,
+          "ball": 0.9419844746589661,
+          "referee": 0.9898672699928284,
+          "rim": 1.0,
+          "number": 0.9741910696029663
+        }
+      },
+      "sibling_test_map_50_95": 0.7886759042739868
+    },
+    {
+      "row_id": "deimm/1280_s1",
+      "model_key": "deimm",
+      "model": "DEIM-M",
+      "family": "conventional detector",
+      "slug": "deimm",
+      "experiment": "E2",
+      "input": "1280",
+      "arm": "1280_s1",
+      "role": "extra",
+      "base_arm": "1280_s1",
+      "label": "E1 recipe @1280, seed 1",
+      "seed": 1,
+      "image_size": "1280",
+      "model_id": "DEIM (D-FINE) M, HGNetv2-B2",
+      "selected_epoch": 115,
+      "epochs_run": 120,
+      "optimizer_steps": 3480,
+      "gpu": "NVIDIA A100-SXM4-80GB",
+      "meta_note": null,
+      "trainable_params": 19474487,
+      "total_params": 19474487,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 2.87,
+      "train_gpu_hours_key": "train_seconds",
+      "train_cost_usd": 3.42,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/deimm_1280_s1_valid.json.gz",
+          "sha256_json": "5f04325f4d6d153e0b77eba7fa5d6fc1775250d036cf03dd3037afa0ab83c57f"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/deimm_1280_s1_test.json.gz",
+          "sha256_json": "c510b911d8fa352565f962cca9af89c2e454b8768e21f5f5ac2ced044b9443c8"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7750223875045776,
+        "mAP_50": 0.9826462864875793,
+        "mAP_75": 0.8821658492088318,
+        "per_class_ap50": {
+          "player": 0.986670732498169,
+          "ball": 0.9535996317863464,
+          "referee": 0.9893200993537903,
+          "rim": 1.0,
+          "number": 0.9836408495903015
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7876037359237671,
+        "mAP_50": 0.9734049439430237,
+        "mAP_75": 0.9224862456321716,
+        "per_class_ap50": {
+          "player": 0.9907298684120178,
+          "ball": 0.9336161613464355,
+          "referee": 0.9968323111534119,
+          "rim": 1.0,
+          "number": 0.9458463788032532
+        }
+      },
+      "sibling_test_map_50_95": 0.7876037359237671
+    },
+    {
+      "row_id": "deimm/1280_s2",
+      "model_key": "deimm",
+      "model": "DEIM-M",
+      "family": "conventional detector",
+      "slug": "deimm",
+      "experiment": "E2",
+      "input": "1280",
+      "arm": "1280_s2",
+      "role": "extra",
+      "base_arm": "1280_s2",
+      "label": "E1 recipe @1280, seed 2",
+      "seed": 2,
+      "image_size": "1280",
+      "model_id": "DEIM (D-FINE) M, HGNetv2-B2",
+      "selected_epoch": 100,
+      "epochs_run": 120,
+      "optimizer_steps": 3480,
+      "gpu": "NVIDIA A100-SXM4-80GB",
+      "meta_note": null,
+      "trainable_params": 19474487,
+      "total_params": 19474487,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 2.783888888888889,
+      "train_gpu_hours_key": "train_seconds",
+      "train_cost_usd": 3.85,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/deimm_1280_s2_valid.json.gz",
+          "sha256_json": "fe5486cb3cc121d23ad714c45ce19ddd87450dcfb007e794f985c7a010e52392"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/deimm_1280_s2_test.json.gz",
+          "sha256_json": "02df42f4fb22b3344f7f0872ac3be7992eb8efca68d60e24636cbef8bb49da1b"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7703478336334229,
+        "mAP_50": 0.9789194464683533,
+        "mAP_75": 0.8816413879394531,
+        "per_class_ap50": {
+          "player": 0.9800052046775818,
+          "ball": 0.9480559229850769,
+          "referee": 0.9923399090766907,
+          "rim": 1.0,
+          "number": 0.974196195602417
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.768801748752594,
+        "mAP_50": 0.9700842499732971,
+        "mAP_75": 0.8879156112670898,
+        "per_class_ap50": {
+          "player": 0.9880086183547974,
+          "ball": 0.9155307412147522,
+          "referee": 0.9882999658584595,
+          "rim": 1.0,
+          "number": 0.9585820436477661
+        }
+      },
+      "sibling_test_map_50_95": 0.768801748752594
     }
   ],
   "models": {
@@ -2043,6 +4961,8 @@
       "display": "LLMDet-large",
       "family": "open-vocab detector",
       "slug": "llmdet",
+      "baseline": false,
+      "light_trains": "fusion encoder, decoder, heads (Swin-L and BERT frozen)",
       "resolution": "short side 800, long cap 1333",
       "licence": "Apache-2.0",
       "redistribution": "permissive",
@@ -2098,6 +5018,8 @@
       "display": "MM-Grounding-DINO-B",
       "family": "open-vocab detector",
       "slug": "mmgdino",
+      "baseline": false,
+      "light_trains": "feature enhancer, decoder, heads (Swin-B and BERT frozen)",
       "resolution": "short side 800 (1422x800)",
       "licence": "Apache-2.0",
       "redistribution": "permissive",
@@ -2141,6 +5063,8 @@
       "display": "SAM 3",
       "family": "open-vocab detector",
       "slug": "sam3",
+      "baseline": false,
+      "light_trains": "fusion encoder, DETR decoder, heads (PE ViT trunk and text encoder frozen)",
       "resolution": "1008x1008",
       "licence": "SAM License (gated)",
       "redistribution": "gated",
@@ -2184,6 +5108,8 @@
       "display": "YOLOE-26x @1280",
       "family": "open-vocab detector",
       "slug": "yoloe",
+      "baseline": false,
+      "light_trains": "official linear probe: the last 1x1 conv of each class branch",
       "resolution": "1280",
       "licence": "AGPL-3.0",
       "redistribution": "agpl",
@@ -2227,6 +5153,8 @@
       "display": "YOLOE-26x @640",
       "family": "open-vocab detector",
       "slug": "yoloe",
+      "baseline": false,
+      "light_trains": "official linear probe: the last 1x1 conv of each class branch",
       "resolution": "640",
       "licence": "AGPL-3.0",
       "redistribution": "agpl",
@@ -2255,6 +5183,8 @@
       "display": "YOLO-World-v2-x @1280",
       "family": "open-vocab detector",
       "slug": "yoloe",
+      "baseline": false,
+      "light_trains": "WorldDetect head (backbone, neck and CLIP text encoder frozen)",
       "resolution": "1280",
       "licence": "AGPL-3.0",
       "redistribution": "agpl",
@@ -2298,6 +5228,8 @@
       "display": "OWLv2-L/14",
       "family": "open-vocab detector",
       "slug": "owlv2",
+      "baseline": false,
+      "light_trains": "detection heads + final layer norm (ViT-L and text tower frozen)",
       "resolution": "1008x1008 (padded square)",
       "licence": "Apache-2.0",
       "redistribution": "permissive",
@@ -2341,6 +5273,8 @@
       "display": "DEIMv2-M",
       "family": "frozen backbone + DETR head",
       "slug": "deimv2",
+      "baseline": false,
+      "light_trains": "STA adapter, hybrid encoder, decoder (DINOv3 backbone frozen)",
       "resolution": "640",
       "licence": "Apache-2.0 code, DINOv3 License weights",
       "redistribution": "gated",
@@ -2381,6 +5315,8 @@
       "display": "DEIMv2-L",
       "family": "frozen backbone + DETR head",
       "slug": "deimv2",
+      "baseline": false,
+      "light_trains": "STA adapter, hybrid encoder, decoder (DINOv3 backbone frozen)",
       "resolution": "640",
       "licence": "Apache-2.0 code, DINOv3 License weights",
       "redistribution": "gated",
@@ -2421,6 +5357,8 @@
       "display": "Florence-2-large",
       "family": "generative VLM",
       "slug": "florence2",
+      "baseline": false,
+      "light_trains": "LoRA r16 on language attention + connector (DaViT frozen)",
       "resolution": "768x768 (squashed)",
       "licence": "MIT",
       "redistribution": "permissive",
@@ -2481,6 +5419,8 @@
       "display": "Qwen3-VL (peft 8B, full 4B)",
       "family": "generative VLM",
       "slug": "qwen3vl",
+      "baseline": false,
+      "light_trains": "LoRA r16 on LLM attention (vision tower and mergers frozen)",
       "resolution": "native 1920x1088",
       "licence": "Apache-2.0",
       "redistribution": "permissive",
@@ -2512,7 +5452,7 @@
       },
       "latency_t4": [
         {
-          "arm": "unspecified",
+          "arm": "full",
           "runtime": "pytorch_fp16",
           "median_ms": 74712.41551311687,
           "tail_label": "p90",
@@ -2529,6 +5469,8 @@
       "display": "PaliGemma 2 3B-448",
       "family": "generative VLM",
       "slug": "paligemma2",
+      "baseline": false,
+      "light_trains": "LoRA r16 on Gemma attention + projector (SigLIP frozen)",
       "resolution": "448x448 (squashed)",
       "licence": "Gemma Terms of Use (gated)",
       "redistribution": "gated",
@@ -2572,6 +5514,8 @@
       "display": "SmolVLM2-2.2B",
       "family": "generative VLM",
       "slug": "smolvlm2",
+      "baseline": false,
+      "light_trains": "QLoRA r16 on LLM attention + connector (SigLIP frozen)",
       "resolution": "SigLIP tiles, pixel-shuffled",
       "licence": "Apache-2.0",
       "redistribution": "permissive",
@@ -2610,6 +5554,40 @@
           "notes": "peft arm; LoRA merged into fp16 base (trained under 4-bit QLoRA); greedy generation up to 1024 tokens is inside the timer; passes=1 (protocol default 3 cut to bound T4 time: autoregressive JSON output)"
         }
       ]
+    },
+    "yolo26m": {
+      "display": "YOLO26m",
+      "family": "conventional detector",
+      "slug": "yolo26m",
+      "baseline": true,
+      "light_trains": null,
+      "resolution": "640",
+      "licence": "AGPL-3.0",
+      "redistribution": "agpl",
+      "arms": {
+        "peft": null,
+        "full": null,
+        "variants": []
+      },
+      "zero_shot": null,
+      "latency_t4": []
+    },
+    "deimm": {
+      "display": "DEIM-M",
+      "family": "conventional detector",
+      "slug": "deimm",
+      "baseline": true,
+      "light_trains": null,
+      "resolution": "640",
+      "licence": "Apache-2.0",
+      "redistribution": "permissive",
+      "arms": {
+        "peft": null,
+        "full": null,
+        "variants": []
+      },
+      "zero_shot": null,
+      "latency_t4": []
     }
   },
   "costs": [
@@ -2617,61 +5595,169 @@
       "slug": "yoloe",
       "usd": 1.11,
       "complete": true,
-      "source": "docs/plans/yoloe.md, Cost table (all six arms, one failed box, T4)"
+      "source": "docs/plans/yoloe.md, Cost table (all six arms, one failed box, T4)",
+      "stage": "round1"
     },
     {
       "slug": "llmdet",
       "usd": 3.8,
       "complete": true,
-      "source": "docs/plans/llmdet.md: Cost table about $2.9 (both arms, seed 1, T4) + seed 2 section about $0.9"
+      "source": "docs/plans/llmdet.md: Cost table about $2.9 (both arms, seed 1, T4) + seed 2 section about $0.9",
+      "stage": "round1"
     },
     {
       "slug": "mmgdino",
       "usd": 3.97,
       "complete": true,
-      "source": "docs/plans/mmgdino.md: main arms + T4 about $2.31, peft seeds 1-2 about $1.66"
+      "source": "docs/plans/mmgdino.md: main arms + T4 about $2.31, peft seeds 1-2 about $1.66",
+      "stage": "round1"
     },
     {
       "slug": "owlv2",
       "usd": 4.64,
       "complete": true,
-      "source": "docs/plans/owlv2.md: A6000 7.74 h (both arms, sweeps, seeds) $4.47 + three T4 rentals $0.17"
+      "source": "docs/plans/owlv2.md: A6000 7.74 h (both arms, sweeps, seeds) $4.47 + three T4 rentals $0.17",
+      "stage": "round1"
     },
     {
       "slug": "sam3",
       "usd": 2.75,
       "complete": true,
-      "source": "docs/plans/sam3.md, Cost table (A100 both arms + T4)"
+      "source": "docs/plans/sam3.md, Cost table (A100 both arms + T4)",
+      "stage": "round1"
     },
     {
       "slug": "deimv2",
       "usd": 2.49,
       "complete": true,
-      "source": "docs/plans/deimv2.md, Cost table (M box, L box, T4)"
+      "source": "docs/plans/deimv2.md, Cost table (M box, L box, T4)",
+      "stage": "round1"
     },
     {
       "slug": "florence2",
       "usd": 1.49,
       "complete": true,
-      "source": "docs/plans/florence2.md: Cost table ~1.04 (both arms, 1024 exploration, T4) + lora_all64 box 0.45"
+      "source": "docs/plans/florence2.md: Cost table ~1.04 (both arms, 1024 exploration, T4) + lora_all64 box 0.45",
+      "stage": "round1"
     },
     {
       "slug": "qwen3vl",
       "usd": 6.5,
       "complete": true,
-      "source": "docs/plans/qwen3vl.md, Cost table: A100 5.86 + failed T4 0.13 + T4 latency 0.51"
+      "source": "docs/plans/qwen3vl.md, Cost table: A100 5.86 + failed T4 0.13 + T4 latency 0.51",
+      "stage": "round1"
     },
     {
       "slug": "paligemma2",
       "usd": 2.75,
       "complete": true,
-      "source": "docs/plans/paligemma2.md, Cost table (A100 + T4)"
+      "source": "docs/plans/paligemma2.md, Cost table (A100 + T4)",
+      "stage": "round1"
     },
     {
       "slug": "smolvlm2",
       "usd": 2.42,
       "complete": true,
-      "source": "docs/plans/smolvlm2.md: A6000 4.99 h $2.11 + T4 1.39 h $0.31"
+      "source": "docs/plans/smolvlm2.md: A6000 4.99 h $2.11 + T4 1.39 h $0.31",
+      "stage": "round1"
+    },
+    {
+      "slug": "yolo26m",
+      "usd": 11.0,
+      "complete": false,
+      "source": "docs/plans/yolo26m.md, Cost: about $11 on 4090 boxes (arms, sweep, ~$1.2 dead boots) plus a ~$0.04 T4 box",
+      "stage": "round2"
+    },
+    {
+      "slug": "deimm",
+      "usd": 13.72,
+      "complete": false,
+      "source": "results/deimm/costs_r2.tsv summed (11.88, incl. T4 boxes and failed boxes) + 1280_s0 box from its meta.json (1.84, not in the TSV)",
+      "stage": "round2"
+    },
+    {
+      "slug": "llmdet",
+      "usd": 2.94,
+      "complete": false,
+      "source": "docs/plans/llmdet.md, Round 2 cost table: box $ for frac25_d0 (0.62) and mid (1.36), train $ only for the other three",
+      "stage": "round2"
+    },
+    {
+      "slug": "mmgdino",
+      "usd": 3.19,
+      "complete": false,
+      "source": "docs/plans/mmgdino.md, Round 2 E3 table $ column + mid $0.97; the first launch that crashed (no pycocotools) is not included",
+      "stage": "round2"
+    },
+    {
+      "slug": "sam3",
+      "usd": 1.9,
+      "complete": true,
+      "source": "docs/plans/sam3.md, Round 2: mid 1.57 box-h, about $1.90",
+      "stage": "round2"
+    },
+    {
+      "slug": "owlv2",
+      "usd": 2.42,
+      "complete": true,
+      "source": "docs/plans/owlv2.md, Round 2: mid ~4.6 h, ~$2.42",
+      "stage": "round2"
+    },
+    {
+      "slug": "yoloe",
+      "usd": 1.25,
+      "complete": true,
+      "source": "docs/plans/yoloe.md, Round 2 cost table total ~$1.25",
+      "stage": "round2"
+    },
+    {
+      "slug": "llmdet",
+      "usd": 0.49,
+      "complete": true,
+      "source": "results/llmdet/latency_trt_t4.json cost_usd (T4 TensorRT box)",
+      "stage": "followup"
+    },
+    {
+      "slug": "mmgdino",
+      "usd": 1.05,
+      "complete": true,
+      "source": "results/mmgdino/latency_trt_t4.json cost_usd 0.40 (GridSample engine) + msda_plugin.cost_usd 0.65",
+      "stage": "followup"
+    },
+    {
+      "slug": "sam3",
+      "usd": 0.72,
+      "complete": true,
+      "source": "results/sam3/latency_trt_t4.json cost_usd 0.32 (round 1, invalid engine) + round2.cost_usd 0.40 (fixed engine)",
+      "stage": "followup"
+    },
+    {
+      "slug": "yoloe",
+      "usd": 0.4,
+      "complete": true,
+      "source": "results/yoloe/latency_trt_t4.json notes: Norway T4 1.37 h x $0.276 + ~$0.02",
+      "stage": "followup"
+    },
+    {
+      "slug": "paligemma2",
+      "usd": 4.43,
+      "complete": true,
+      "source": "results/paligemma2/peft_896/meta.json cost_usd 3.83 (A100 3.45 box-h) + NIGHT_LOG 20:55 test-predict box ~$0.6",
+      "stage": "followup"
+    },
+    {
+      "slug": "qwen3vl",
+      "usd": 2.72,
+      "complete": true,
+      "source": "NIGHT_LOG 21:17 and docs/plans/qwen3vl.md: two merger-unfrozen boxes, $1.36 each",
+      "stage": "followup"
+    },
+    {
+      "slug": "owlv2",
+      "usd": 0.0,
+      "complete": false,
+      "source": "OWLv2 TensorRT box (vast 61096023, T4 $0.155/h): no cost total recorded in the results files",
+      "stage": "followup"
     }
   ],
   "latency_anchor_t4": [
@@ -2711,6 +5797,862 @@
     "DAMO-YOLO-M": 6.70044,
     "RT-DETRv2-M": 7.93237
   },
+  "sweeps": [
+    {
+      "model_key": "yolo26m",
+      "arm": "yolo26m_e1_lr05",
+      "label": "lr0 x0.5",
+      "selected": false,
+      "valid": {
+        "mAP_50_95": 0.6865823864936829,
+        "mAP_50": 0.9483126997947693,
+        "mAP_75": 0.7804208993911743,
+        "per_class_ap50": {
+          "player": 0.9740563631057739,
+          "ball": 0.8383512496948242,
+          "referee": 0.9754958748817444,
+          "rim": 0.9992967844009399,
+          "number": 0.9543633460998535
+        }
+      },
+      "test": null
+    },
+    {
+      "model_key": "yolo26m",
+      "arm": "yolo26m_e1_lr1",
+      "label": "lr0 x1 (published recipe)",
+      "selected": false,
+      "valid": {
+        "mAP_50_95": 0.6880303621292114,
+        "mAP_50": 0.9501597285270691,
+        "mAP_75": 0.794317364692688,
+        "per_class_ap50": {
+          "player": 0.9749213457107544,
+          "ball": 0.8568386435508728,
+          "referee": 0.9681804180145264,
+          "rim": 0.9993999600410461,
+          "number": 0.9514583945274353
+        }
+      },
+      "test": null
+    },
+    {
+      "model_key": "yolo26m",
+      "arm": "yolo26m_e1_lr2",
+      "label": "lr0 x2",
+      "selected": true,
+      "valid": {
+        "mAP_50_95": 0.6941211819648743,
+        "mAP_50": 0.9528245329856873,
+        "mAP_75": 0.7881293296813965,
+        "per_class_ap50": {
+          "player": 0.9762108325958252,
+          "ball": 0.8557084798812866,
+          "referee": 0.9892007112503052,
+          "rim": 0.9992079138755798,
+          "number": 0.9437947273254395
+        }
+      },
+      "test": null
+    },
+    {
+      "model_key": "yolo26m",
+      "arm": "yolo26m_e1_ep450",
+      "label": "lr0 x1, 450 epochs (early-stopped at 374)",
+      "selected": false,
+      "valid": {
+        "mAP_50_95": 0.6906078457832336,
+        "mAP_50": 0.9451277852058411,
+        "mAP_75": 0.7790466547012329,
+        "per_class_ap50": {
+          "player": 0.9683154821395874,
+          "ball": 0.8392586708068848,
+          "referee": 0.961576521396637,
+          "rim": 1.0,
+          "number": 0.9564881920814514
+        }
+      },
+      "test": null
+    },
+    {
+      "model_key": "deimm",
+      "arm": "e1_lr05",
+      "label": "lr x0.5",
+      "selected": false,
+      "valid": {
+        "mAP_50_95": 0.6987487077713013,
+        "mAP_50": 0.9570471048355103,
+        "mAP_75": 0.8143724799156189,
+        "per_class_ap50": {
+          "player": 0.9856588840484619,
+          "ball": 0.8749946355819702,
+          "referee": 0.9868082404136658,
+          "rim": 1.0,
+          "number": 0.937773585319519
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.6792691349983215,
+        "mAP_50": 0.9449002742767334,
+        "mAP_75": 0.7630969882011414,
+        "per_class_ap50": {
+          "player": 0.988567054271698,
+          "ball": 0.821964681148529,
+          "referee": 0.993118405342102,
+          "rim": 1.0,
+          "number": 0.9208513498306274
+        }
+      }
+    },
+    {
+      "model_key": "deimm",
+      "arm": "e1_lr1",
+      "label": "lr x1 (published recipe, retrained on merged5)",
+      "selected": false,
+      "valid": {
+        "mAP_50_95": 0.7069172263145447,
+        "mAP_50": 0.9660400152206421,
+        "mAP_75": 0.8203240036964417,
+        "per_class_ap50": {
+          "player": 0.9822478890419006,
+          "ball": 0.9055444598197937,
+          "referee": 0.992973268032074,
+          "rim": 1.0,
+          "number": 0.9494345188140869
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.693220317363739,
+        "mAP_50": 0.9492053985595703,
+        "mAP_75": 0.7951398491859436,
+        "per_class_ap50": {
+          "player": 0.98903489112854,
+          "ball": 0.8299819231033325,
+          "referee": 0.9935937523841858,
+          "rim": 1.0,
+          "number": 0.9334163069725037
+        }
+      }
+    },
+    {
+      "model_key": "deimm",
+      "arm": "e1_lr2",
+      "label": "lr x2",
+      "selected": true,
+      "valid": {
+        "mAP_50_95": 0.7107514142990112,
+        "mAP_50": 0.972163736820221,
+        "mAP_75": 0.8165359497070312,
+        "per_class_ap50": {
+          "player": 0.9834977984428406,
+          "ball": 0.9149637222290039,
+          "referee": 0.9988994002342224,
+          "rim": 1.0,
+          "number": 0.9634577631950378
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.6942276954650879,
+        "mAP_50": 0.947131335735321,
+        "mAP_75": 0.7968332171440125,
+        "per_class_ap50": {
+          "player": 0.9834238886833191,
+          "ball": 0.8420446515083313,
+          "referee": 0.9928688406944275,
+          "rim": 1.0,
+          "number": 0.917319118976593
+        }
+      }
+    },
+    {
+      "model_key": "deimm",
+      "arm": "e1_long",
+      "label": "160 epochs, milestones x4/3",
+      "selected": false,
+      "valid": {
+        "mAP_50_95": 0.7039364576339722,
+        "mAP_50": 0.9659905433654785,
+        "mAP_75": 0.8132559657096863,
+        "per_class_ap50": {
+          "player": 0.9841406345367432,
+          "ball": 0.9158176183700562,
+          "referee": 0.9879973530769348,
+          "rim": 1.0,
+          "number": 0.9419971704483032
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.6962157487869263,
+        "mAP_50": 0.9436411261558533,
+        "mAP_75": 0.7916731238365173,
+        "per_class_ap50": {
+          "player": 0.9882637858390808,
+          "ball": 0.836068332195282,
+          "referee": 0.9923115372657776,
+          "rim": 1.0,
+          "number": 0.9015620946884155
+        }
+      }
+    }
+  ],
+  "groups": [
+    {
+      "key": "yolo26m_640_default",
+      "label": "YOLO26m @640, default recipe",
+      "input": "640",
+      "members": [
+        "yolo26m/default_s0",
+        "yolo26m/default_s1",
+        "yolo26m/default_s2"
+      ]
+    },
+    {
+      "key": "yolo26m_640_e1",
+      "label": "YOLO26m @640, E1 recipe",
+      "input": "640",
+      "members": [
+        "yolo26m/yolo26m_e1_s0",
+        "yolo26m/yolo26m_e1_s1",
+        "yolo26m/yolo26m_e1_s2"
+      ]
+    },
+    {
+      "key": "yolo26m_1280",
+      "label": "YOLO26m @1280, E1 recipe",
+      "input": "1280",
+      "members": [
+        "yolo26m/yolo26m_1280_s0",
+        "yolo26m/yolo26m_1280_s1",
+        "yolo26m/yolo26m_1280_s2"
+      ]
+    },
+    {
+      "key": "deimm_640_e1",
+      "label": "DEIM-M @640, E1 recipe",
+      "input": "640",
+      "members": [
+        "deimm/e1_s0",
+        "deimm/e1_s1",
+        "deimm/e1_s2"
+      ]
+    },
+    {
+      "key": "deimm_1280",
+      "label": "DEIM-M @1280, E1 recipe",
+      "input": "1280",
+      "members": [
+        "deimm/1280_s0",
+        "deimm/1280_s1",
+        "deimm/1280_s2"
+      ]
+    },
+    {
+      "key": "llmdet_peft",
+      "label": "LLMDet-large, light (peft)",
+      "input": "short side 800, long cap 1333",
+      "members": [
+        "llmdet/peft",
+        "llmdet/peft_s1",
+        "llmdet/peft_s2"
+      ]
+    },
+    {
+      "key": "mmgdino_peft",
+      "label": "MM-Grounding-DINO-B, light (peft)",
+      "input": "short side 800 (1422x800)",
+      "members": [
+        "mmgdino/peft",
+        "mmgdino/peft_s1",
+        "mmgdino/peft_s2"
+      ]
+    },
+    {
+      "key": "owlv2_peft",
+      "label": "OWLv2-L/14, light (peft)",
+      "input": "1008x1008",
+      "members": [
+        "owlv2/peft",
+        "owlv2/peft_seed1",
+        "owlv2/peft_seed2"
+      ]
+    }
+  ],
+  "tables": {
+    "headline": {
+      "entries": [
+        "deimm_1280",
+        "yolo26m_1280",
+        "llmdet_peft",
+        "llmdet/full",
+        "yoloe_1280/yoloe_full",
+        "yoloworld/yoloworld_full",
+        "mmgdino_peft",
+        "sam3/full",
+        "deimm_640_e1",
+        "yolo26m_640_e1",
+        "yoloe_640/yoloe_full_640"
+      ],
+      "pairs": [
+        [
+          "deimm_1280",
+          "llmdet_peft"
+        ],
+        [
+          "deimm_1280",
+          "llmdet/full"
+        ],
+        [
+          "yolo26m_1280",
+          "llmdet_peft"
+        ],
+        [
+          "yolo26m_1280",
+          "yoloe_1280/yoloe_full"
+        ],
+        [
+          "deimm_1280",
+          "yoloworld/yoloworld_full"
+        ],
+        [
+          "deimm_1280",
+          "mmgdino_peft"
+        ],
+        [
+          "llmdet_peft",
+          "yolo26m_640_e1"
+        ],
+        [
+          "llmdet_peft",
+          "deimm_640_e1"
+        ]
+      ]
+    },
+    "e1": {
+      "entries": [
+        "YOLO26m",
+        "yolo26m_640_default",
+        "yolo26m_640_e1",
+        "DEIM-M",
+        "deimm_640_e1",
+        "llmdet_peft"
+      ],
+      "pairs": [
+        [
+          "yolo26m_640_e1",
+          "yolo26m_640_default"
+        ],
+        [
+          "yolo26m_640_e1",
+          "YOLO26m"
+        ],
+        [
+          "deimm_640_e1",
+          "DEIM-M"
+        ],
+        [
+          "llmdet_peft",
+          "yolo26m_640_e1"
+        ],
+        [
+          "llmdet_peft",
+          "deimm_640_e1"
+        ]
+      ]
+    },
+    "e2": {
+      "entries": [
+        "yolo26m_640_e1",
+        "yolo26m_1280",
+        "deimm_640_e1",
+        "deimm_1280",
+        "yoloe_640/yoloe_full_640",
+        "yoloe_1280/yoloe_full",
+        "yoloe_640/yoloe_peft_640",
+        "yoloe_1280/yoloe_peft"
+      ],
+      "pairs": [
+        [
+          "yolo26m_1280",
+          "yolo26m_640_e1"
+        ],
+        [
+          "deimm_1280",
+          "deimm_640_e1"
+        ],
+        [
+          "yoloe_1280/yoloe_full",
+          "yoloe_640/yoloe_full_640"
+        ],
+        [
+          "yoloe_640/yoloe_full_640",
+          "yolo26m_640_e1"
+        ],
+        [
+          "yoloe_1280/yoloe_full",
+          "yolo26m_1280"
+        ]
+      ]
+    },
+    "e3": {
+      "entries": [],
+      "pairs": [
+        [
+          "llmdet/peft_frac25_d1",
+          "yolo26m/yolo26m_frac25_d1"
+        ],
+        [
+          "mmgdino/peft_frac25_d1",
+          "yolo26m/yolo26m_frac25_d1"
+        ],
+        [
+          "yoloe_640/yoloe_full_640_frac25_d1",
+          "yolo26m/yolo26m_frac25_d1"
+        ],
+        [
+          "llmdet/peft_frac25_d0",
+          "yolo26m/yolo26m_frac25_d0"
+        ],
+        [
+          "yoloe_640/yoloe_full_640_frac25_d0",
+          "yolo26m/yolo26m_frac25_d0"
+        ]
+      ]
+    }
+  },
+  "scaling": [
+    {
+      "label": "YOLO26m @640 (E1 recipe)",
+      "full": "yolo26m_640_e1",
+      "subsets": [
+        "yolo26m/yolo26m_frac25_d0",
+        "yolo26m/yolo26m_frac25_d1",
+        "yolo26m/yolo26m_frac50_d0",
+        "yolo26m/yolo26m_frac50_d1"
+      ]
+    },
+    {
+      "label": "YOLOE-26x @640 (full)",
+      "full": "yoloe_640/yoloe_full_640",
+      "subsets": [
+        "yoloe_640/yoloe_full_640_frac25_d0",
+        "yoloe_640/yoloe_full_640_frac25_d1",
+        "yoloe_640/yoloe_full_640_frac50_d0",
+        "yoloe_640/yoloe_full_640_frac50_d1"
+      ]
+    },
+    {
+      "label": "LLMDet-large (light)",
+      "full": "llmdet_peft",
+      "subsets": [
+        "llmdet/peft_frac25_d0",
+        "llmdet/peft_frac25_d1",
+        "llmdet/peft_frac50_d0",
+        "llmdet/peft_frac50_d1"
+      ]
+    },
+    {
+      "label": "MM-Grounding-DINO-B (light)",
+      "full": "mmgdino_peft",
+      "subsets": [
+        "mmgdino/peft_frac25_d0",
+        "mmgdino/peft_frac25_d1",
+        "mmgdino/peft_frac50_d0",
+        "mmgdino/peft_frac50_d1"
+      ]
+    }
+  ],
+  "fixes": [
+    {
+      "before": "paligemma2/peft",
+      "after": "paligemma2/peft_896",
+      "change": "input 448 -> 896 px (google/paligemma2-3b-pt-896), same LoRA + projector recipe",
+      "audit": "paligemma2"
+    },
+    {
+      "before": "qwen3vl/peft",
+      "after": "qwen3vl/peft_merger",
+      "change": "8B LoRA, vision merger + deepstack mergers unfrozen (upstream tune_mm_mlp)",
+      "audit": "qwen3vl"
+    },
+    {
+      "before": "qwen3vl/peft_4b",
+      "after": "qwen3vl/peft_4b_merger",
+      "change": "4B LoRA, vision merger + deepstack mergers unfrozen",
+      "audit": "qwen3vl"
+    }
+  ],
+  "audits": [
+    {
+      "slug": "owlv2",
+      "verdict": "REAL",
+      "title": "Audit: `owlv2`, arm `peft` (heads + final layer_norm, 1.1% trainable)",
+      "outcome": "Numbers stand. The light arm is capacity-limited (train fit 0.693 vs val 0.557).",
+      "path": "results/owlv2/audit/AUDIT.md"
+    },
+    {
+      "slug": "yoloe",
+      "verdict": "REAL",
+      "title": "Audit: yoloe linear probe (`yoloe_peft` 1280, `yoloe_peft_640`)",
+      "outcome": "Numbers stand. The linear probe cannot move a box; that is its ceiling.",
+      "path": "results/yoloe/audit/AUDIT.md"
+    },
+    {
+      "slug": "florence2",
+      "verdict": "REAL",
+      "title": "Audit: florence2 (`peft` test 0.499, `lora_all64` 0.492, `full` 0.655)",
+      "outcome": "Numbers stand. Frozen DaViT limits the LoRA arms, above all on the ball.",
+      "path": "results/florence2/audit/AUDIT.md"
+    },
+    {
+      "slug": "smolvlm2",
+      "verdict": "REAL",
+      "title": "smolvlm2 audit",
+      "outcome": "Numbers stand (about 0). The model does not fit its own training images (train 0.008 / 0.016).",
+      "path": "results/smolvlm2/audit/AUDIT.md"
+    },
+    {
+      "slug": "paligemma2",
+      "verdict": "RECIPE",
+      "title": "Audit: `paligemma2` (PaliGemma 2 3B, 448 px)",
+      "outcome": "Recipe fix run: 896 px input. Val 0.293 -> 0.447; test predicted once after user approval (0.278 -> 0.432).",
+      "path": "results/paligemma2/audit/AUDIT.md"
+    },
+    {
+      "slug": "qwen3vl",
+      "verdict": "RECIPE",
+      "title": "Audit: qwen3vl (`peft` 8B test 0.548, `peft_4b` 0.533, `full` 4B 0.541)",
+      "outcome": "Recipe fix run: merger unfrozen. Test predicted once each after user approval (8B 0.548 -> 0.570, 4B 0.533 -> 0.588).",
+      "path": "results/qwen3vl/audit/AUDIT.md"
+    }
+  ],
+  "trt_latency": [
+    {
+      "key": "yolo26m_640_published",
+      "label": "YOLO26m @640 (published engine)",
+      "input": "640x640",
+      "status": "current",
+      "applies_to": [
+        "yolo26m_640_e1",
+        "yolo26m_640_default",
+        "YOLO26m"
+      ],
+      "note": null,
+      "source": "published (results/latency/trt_fp16_toboxes.json)",
+      "gpu_ms": 5.84912,
+      "gpu_runs_ms": [],
+      "published": true
+    },
+    {
+      "key": "deimm_640_published",
+      "label": "DEIM-M @640 (published engine)",
+      "input": "640x640",
+      "status": "current",
+      "applies_to": [
+        "DEIM-M"
+      ],
+      "note": null,
+      "source": "published (results/latency/trt_fp16_toboxes.json)",
+      "gpu_ms": 6.61182,
+      "gpu_runs_ms": [],
+      "published": true
+    },
+    {
+      "key": "yolo26m_1280",
+      "label": "YOLO26m @1280 (1280_s0)",
+      "input": "1280x1280",
+      "status": "current",
+      "applies_to": [
+        "yolo26m_1280"
+      ],
+      "note": null,
+      "source": "yolo26m/latency_trt_t4.json",
+      "gpu_ms": 20.156240463256836,
+      "gpu_runs_ms": [
+        19.654208183288574,
+        20.156240463256836
+      ],
+      "e2e_ms": null,
+      "pytorch_ms": null,
+      "val_pytorch": null,
+      "val_trt": null,
+      "published": false
+    },
+    {
+      "key": "deimm_640",
+      "label": "DEIM-M @640 (e1_lr2)",
+      "input": "640x640",
+      "status": "current",
+      "applies_to": [
+        "deimm_640_e1",
+        "deimm/e1_s0"
+      ],
+      "note": null,
+      "source": "deimm/latency_t4/trt_deimm_e1_lr2_640.json",
+      "gpu_ms": 6.776832103729248,
+      "gpu_runs_ms": [
+        6.6657280921936035,
+        6.776832103729248
+      ],
+      "e2e_ms": null,
+      "pytorch_ms": null,
+      "val_pytorch": null,
+      "val_trt": null,
+      "published": false
+    },
+    {
+      "key": "deimm_1280",
+      "label": "DEIM-M @1280 (1280_s0)",
+      "input": "1280x1280",
+      "status": "current",
+      "applies_to": [
+        "deimm_1280"
+      ],
+      "note": null,
+      "source": "deimm/latency_t4/trt_deimm_1280_s0_1280.json",
+      "gpu_ms": 18.189919471740723,
+      "gpu_runs_ms": [
+        18.054224014282227,
+        18.189919471740723
+      ],
+      "e2e_ms": null,
+      "pytorch_ms": null,
+      "val_pytorch": null,
+      "val_trt": null,
+      "published": false
+    },
+    {
+      "key": "yoloe_full_640",
+      "label": "YOLOE-26x @640 (full)",
+      "input": "640x640",
+      "status": "current",
+      "applies_to": [
+        "yoloe_640/yoloe_full_640"
+      ],
+      "note": null,
+      "source": "yoloe/latency_trt_t4.json",
+      "gpu_ms": 11.294479846954346,
+      "gpu_runs_ms": [
+        11.300191879272461,
+        11.294479846954346
+      ],
+      "e2e_ms": 17.09187647793442,
+      "pytorch_ms": 28.93463196232915,
+      "val_pytorch": 0.7082423567771912,
+      "val_trt": 0.7083589434623718,
+      "published": false
+    },
+    {
+      "key": "yoloe_full",
+      "label": "YOLOE-26x @1280 (full)",
+      "input": "1280x1280",
+      "status": "current",
+      "applies_to": [
+        "yoloe_1280/yoloe_full"
+      ],
+      "note": "val gap is the square letterbox, not fp16 (an fp32 engine scores the same)",
+      "source": "yoloe/latency_trt_t4.json",
+      "gpu_ms": 39.04545593261719,
+      "gpu_runs_ms": [
+        38.789119720458984,
+        39.04545593261719
+      ],
+      "e2e_ms": 51.17796495324001,
+      "pytorch_ms": 57.28909102617763,
+      "val_pytorch": 0.7739776372909546,
+      "val_trt": 0.7675171494483948,
+      "published": false
+    },
+    {
+      "key": "yoloworld_full",
+      "label": "YOLO-World-v2-x @1280 (full)",
+      "input": "1280x1280",
+      "status": "current",
+      "applies_to": [
+        "yoloworld/yoloworld_full",
+        "yoloworld/yoloworld_peft"
+      ],
+      "note": "EfficientNMS in the engine",
+      "source": "yoloe/latency_trt_t4.json",
+      "gpu_ms": 50.74073600769043,
+      "gpu_runs_ms": [
+        50.631601333618164,
+        50.74073600769043
+      ],
+      "e2e_ms": 63.11106792418286,
+      "pytorch_ms": 80.58125647949055,
+      "val_pytorch": 0.7624379992485046,
+      "val_trt": 0.7592113018035889,
+      "published": false
+    },
+    {
+      "key": "deimv2_m",
+      "label": "DEIMv2-M (full)",
+      "input": "640x640",
+      "status": "current",
+      "applies_to": [
+        "deimv2_m/full",
+        "deimv2_m/peft"
+      ],
+      "note": null,
+      "source": "deimv2/latency_t4.json",
+      "gpu_ms": 11.08193588256836,
+      "gpu_runs_ms": [
+        10.945791721343994,
+        11.08193588256836
+      ],
+      "e2e_ms": null,
+      "pytorch_ms": 66.0408340045251,
+      "val_pytorch": null,
+      "val_trt": null,
+      "published": false
+    },
+    {
+      "key": "deimv2_l",
+      "label": "DEIMv2-L (l_full)",
+      "input": "640x640",
+      "status": "current",
+      "applies_to": [
+        "deimv2_l/l_full",
+        "deimv2_l/l_peft"
+      ],
+      "note": null,
+      "source": "deimv2/latency_t4.json",
+      "gpu_ms": 13.156527996063232,
+      "gpu_runs_ms": [
+        12.937967777252197,
+        13.156527996063232
+      ],
+      "e2e_ms": null,
+      "pytorch_ms": 70.64502203138545,
+      "val_pytorch": null,
+      "val_trt": null,
+      "published": false
+    },
+    {
+      "key": "mmgdino_msda",
+      "label": "MM-Grounding-DINO-B (peft), MSDA plugin",
+      "input": "800x1422",
+      "status": "current",
+      "applies_to": [
+        "mmgdino_peft",
+        "mmgdino/peft",
+        "mmgdino/full"
+      ],
+      "note": "GPU-compute runs 12% apart: quote the range; plugin precision loss not isolated",
+      "source": "mmgdino/latency_trt_t4.json",
+      "gpu_ms": 142.78480529785156,
+      "gpu_runs_ms": [
+        161.19395446777344,
+        142.78480529785156
+      ],
+      "e2e_ms": 197.40985799580812,
+      "pytorch_ms": 466.2,
+      "val_pytorch": 0.7103098630905151,
+      "val_trt": 0.6903313994407654,
+      "published": false
+    },
+    {
+      "key": "mmgdino_gridsample",
+      "label": "MM-Grounding-DINO-B (peft), ONNX GridSample",
+      "input": "800x1422",
+      "status": "superseded",
+      "applies_to": [],
+      "note": "superseded by the MSDA plugin engine; slower than PyTorch",
+      "source": "mmgdino/latency_trt_t4.json",
+      "gpu_ms": 593.4855041503906,
+      "gpu_runs_ms": [
+        602.8948059082031,
+        593.4855041503906
+      ],
+      "e2e_ms": 648.439500015229,
+      "pytorch_ms": 466.2,
+      "val_pytorch": 0.7103098630905151,
+      "val_trt": 0.6999236345291138,
+      "published": false
+    },
+    {
+      "key": "llmdet_msda",
+      "label": "LLMDet-large (peft), MSDA plugin",
+      "input": "750x1333",
+      "status": "current",
+      "applies_to": [
+        "llmdet_peft",
+        "llmdet/peft",
+        "llmdet/full"
+      ],
+      "note": "fp32 islands do not recover the fp16 loss; an fp32 engine scores -0.18 pt",
+      "source": "llmdet/latency_trt_t4.json",
+      "gpu_ms": 334.7501678466797,
+      "gpu_runs_ms": [
+        332.3233642578125,
+        334.7501678466797
+      ],
+      "e2e_ms": 344.3625885993242,
+      "pytorch_ms": 734.93,
+      "val_pytorch": 0.7392569184303284,
+      "val_trt": 0.7270957827568054,
+      "published": false
+    },
+    {
+      "key": "sam3_fixed",
+      "label": "SAM 3 (full), --attn-out-3d export",
+      "input": "1008x1008",
+      "status": "current",
+      "applies_to": [
+        "sam3/full",
+        "sam3/peft"
+      ],
+      "note": "round-1 engine gave val 0.000 (TRT 10.3 fp16 mis-computed the ViT attention projection on sm75); fixed by an export rewrite",
+      "source": "sam3/latency_trt_t4.json",
+      "gpu_ms": 432.0531921386719,
+      "gpu_runs_ms": [
+        423.4961700439453,
+        432.0531921386719
+      ],
+      "e2e_ms": 440.7759510213509,
+      "pytorch_ms": 1137.504578975495,
+      "val_pytorch": 0.7085256576538086,
+      "val_trt": 0.7001528739929199,
+      "published": false
+    },
+    {
+      "key": "owlv2_full",
+      "label": "OWLv2-L/14 (full)",
+      "input": "1008x1008",
+      "status": "current",
+      "applies_to": [
+        "owlv2/full",
+        "owlv2/peft",
+        "owlv2_peft"
+      ],
+      "note": "e2e with cv2 pre-processing; the HF image processor alone takes ~470 ms on the CPU",
+      "source": "owlv2/latency_trt_t4.json",
+      "gpu_ms": 424.9530944824219,
+      "gpu_runs_ms": [
+        423.14772033691406,
+        424.9530944824219
+      ],
+      "e2e_ms": 505.5314984929282,
+      "pytorch_ms": 1825.8681194856763,
+      "val_pytorch": 0.6235,
+      "val_trt": 0.6185,
+      "published": false
+    }
+  ],
+  "not_timed": [
+    {
+      "what": "PaliGemma 2 @896 (peft_896)",
+      "why": "T4 latency at 896 px was not measured (the 448 px peft arm took ~9.9 s/frame in PyTorch)"
+    },
+    {
+      "what": "Generative VLMs under TensorRT",
+      "why": "token-by-token generation needs TensorRT-LLM, not a TensorRT engine; VLMs are timed in PyTorch only"
+    },
+    {
+      "what": "YOLO26m / DEIM-M end to end at 1280",
+      "why": "only GPU compute was timed for the retrained baselines"
+    }
+  ],
   "missing": [
     "owlv2: owlv2/peft_seed1/meta.json",
     "owlv2: owlv2/peft_seed2/meta.json",

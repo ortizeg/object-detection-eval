@@ -167,9 +167,16 @@ def test_study_manifest_is_consistent() -> None:
     assert manifest.references == ["YOLO26m", "DEIM-M"]
     cost_slugs = {c.slug for c in manifest.costs}
     assert {m.slug for m in manifest.models} == cost_slugs
+    round1 = {c.slug for c in manifest.costs if c.stage == "round1"}
+    assert {m.slug for m in manifest.models if not m.baseline} == round1
     for model in manifest.models:
-        arms = [model.arms.peft, model.arms.full, *(v.arm for v in model.arms.variants)]
+        arms = [
+            *(a for a in (model.arms.peft, model.arms.full) if a is not None),
+            *(v.arm for v in model.arms.variants),
+            *(e.arm for e in model.extra),
+        ]
         assert len(arms) == len(set(arms))
+        assert model.baseline == (model.arms.peft is None)
         if model.zero_shot is not None:
             src = model.zero_shot
             assert src.key if src.source == "vlm_metrics" else src.path
@@ -189,3 +196,115 @@ def test_train_cost_skips_per_model_breakdown_object() -> None:
     """A dict under a cost key is a per-model breakdown, not a per-arm cost."""
     meta = {"cost_usd": {"model_total_usd": 6.5, "breakdown": "A100 4.3 h"}}
     assert wfr.train_cost(meta) == (None, None)
+
+
+def test_every_report_reference_resolves() -> None:
+    """Group members, table entries, pairs, series, fixes and TRT targets all name
+    a row the manifest produces, a group, or a reference detector."""
+    manifest = wfr.load_manifest(_MANIFEST)
+    row_ids = set()
+    for model in manifest.models:
+        for arm in (model.arms.peft, model.arms.full):
+            if arm is not None:
+                row_ids.add(f"{model.key}/{arm}")
+        row_ids |= {f"{model.key}/{v.arm}" for v in model.arms.variants}
+        row_ids |= {f"{model.key}/{e.arm}" for e in model.extra}
+    # Extra seed folders are discovered on disk; the manifest's groups name them.
+    row_ids |= {
+        "llmdet/peft_s1",
+        "llmdet/peft_s2",
+        "mmgdino/peft_s1",
+        "mmgdino/peft_s2",
+        "owlv2/peft_seed1",
+        "owlv2/peft_seed2",
+    }
+    assert wfr.unresolved_refs(manifest, row_ids) == []
+    assert wfr.unresolved_refs(manifest, set()) != []
+
+
+def test_hours_from_seconds_and_box_hours_fallback() -> None:
+    hours, key = wfr.train_hours({"train_seconds": 5400, "box_hours": 9})
+    assert (hours, key) == (1.5, "train_seconds")
+    assert wfr.train_hours({"box_hours": 1.22}) == (1.22, "box_hours")
+
+
+def test_epochs_and_steps_spellings() -> None:
+    assert wfr.epochs_run({"epochs_run": 20, "epochs": 30}) == 20
+    assert wfr.epochs_run({"epochs": 12}) == 12
+    assert wfr.epochs_run({}) is None
+    assert wfr.optimizer_steps({"steps_run": 4408}) == 4408
+    assert wfr.optimizer_steps({"optimizer_steps_run": 2244}) == 2244
+    assert wfr.optimizer_steps({"steps": "x"}) is None
+
+
+def test_subset_info_reads_actual_fraction_and_draw() -> None:
+    info = wfr.subset_info(
+        {"train_image_fraction": 0.351, "n_train_images": 163, "subset": "frac25_draw0"},
+        "peft_frac25_d0",
+    )
+    assert info == {
+        "image_fraction": 0.351,
+        "train_images": 163,
+        "subset_target_pct": 25,
+        "subset_draw": 0,
+    }
+    assert wfr.subset_info({"subset_id": None}, "yolo26m_frac50_d1")["subset_draw"] == 1
+    assert wfr.subset_info({"subset": {"id": "full"}}, "mid") == {}
+
+
+def test_dig_value_and_audit_verdict() -> None:
+    data = {"a": {"b": {"c": 1.5}}}
+    assert wfr.dig_value(data, ["a", "b", "c"]) == 1.5
+    assert wfr.dig_value(data, ["a", "x"]) is None
+    assert wfr.audit_verdict("# Audit\n\n## Verdict: RECIPE (no bug)") == "RECIPE"
+    assert wfr.audit_verdict("**Verdict: REAL.** The pipeline") == "REAL"
+    assert wfr.audit_verdict("no verdict here") is None
+
+
+def test_trt_records_resolve_paths_and_flag_missing(tmp_path: Path) -> None:
+    (tmp_path / "m").mkdir()
+    (tmp_path / "m" / "trt.json").write_text(
+        json.dumps(
+            {
+                "gpu": {"median": 142.8, "runs": [{"median_ms": 161.2}, {"median_ms": 142.8}]},
+                "val": {"pt": 0.71, "trt": 0.69},
+            }
+        )
+    )
+    (tmp_path / "m" / "pt.json").write_text(json.dumps({"reported_median_ms": 466.2}))
+    specs = [
+        wfr.TrtSpec(
+            key="m",
+            label="M",
+            input="800",
+            applies_to=["m/peft"],
+            file="m/trt.json",
+            gpu_ms=["gpu", "median"],
+            gpu_runs=["gpu", "runs"],
+            pytorch_ms=wfr.FileValue(file="m/pt.json", path=["reported_median_ms"]),
+            val_pt=["val", "pt"],
+            val_trt=["val", "trt"],
+        ),
+        wfr.TrtSpec(key="p", label="P", input="640", applies_to=[], published="YOLO26m"),
+        wfr.TrtSpec(
+            key="x", label="X", input="640", applies_to=[], file="m/none.json", gpu_ms=["a"]
+        ),
+    ]
+    missing: list[str] = []
+    out = wfr.trt_records(specs, tmp_path, {"YOLO26m": 5.85}, missing)
+    assert out[0]["gpu_ms"] == 142.8
+    assert out[0]["gpu_runs_ms"] == [161.2, 142.8]
+    assert out[0]["pytorch_ms"] == 466.2
+    assert (out[0]["val_pytorch"], out[0]["val_trt"]) == (0.71, 0.69)
+    assert out[1]["gpu_ms"] == 5.85 and out[1]["published"] is True
+    assert out[2]["gpu_ms"] is None
+    assert len(missing) == 1 and "trt x" in missing[0]
+
+
+def test_copy_dump_plain_copy_ends_with_newline(tmp_path: Path) -> None:
+    src = tmp_path / "src.json"
+    src.write_bytes(b'{"a": []}')
+    out = wfr.copy_dump(src, tmp_path / "out", "x", gzip_over_bytes=10_000)
+    assert out.read_bytes() == b'{"a": []}\n'
+    src.write_bytes(b'{"a": []}\n')
+    assert wfr.copy_dump(src, tmp_path / "out", "x", 10_000).read_bytes() == b'{"a": []}\n'

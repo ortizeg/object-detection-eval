@@ -17,13 +17,12 @@ from object_detection_eval.report.finetune import (
     fmt_trainable,
     latency_anchor_table,
     latency_pytorch_table,
-    latency_trt_table,
     licence_table,
     load_finetune_bootstrap,
     main_table,
-    peft_vs_full_table,
     pending_list,
     seed_table,
+    trt_table,
     verdict,
 )
 
@@ -172,7 +171,7 @@ def test_caveat_counts_ties_and_contrast() -> None:
     text = caveat_summary(_results(), _boot(), _boot())
     assert "94 test images = 3 video clips (33 / 31 / 30 frames)" in text
     assert "Of 2 main arms (peft and full, seed 0): **2 tie YOLO26m**, 0 above, 0 below" in text
-    assert "Of 4 all scored rows" in text
+    assert "Of 4 foundation-model rows" in text
     assert "1 above" in text
     assert "_The clip-clustered bootstrap is not committed yet" in caveat_summary(
         _results(), None, None
@@ -197,18 +196,13 @@ def test_contrast_table_lists_both_references() -> None:
     assert len(table.splitlines()) == 2 + 4
 
 
-def test_peft_vs_full_gap() -> None:
-    table = peft_vs_full_table(_results())
-    assert "+0.009" in table  # 0.785 - 0.776
-
-
 def test_latency_tables_keep_runtimes_apart() -> None:
     results = _results()
-    trt = latency_trt_table(results)
+    trt = trt_table(results)
     torch = latency_pytorch_table(results)
-    assert "11.08" in trt and "734.9" not in trt
     assert "734.9" in torch and "11.08" not in torch
-    assert "re-timed: vast.ai T4" in trt
+    assert "YOLOX-M (anchor re-time, vast.ai T4)" in trt
+    assert "5.68" in trt and "734.9" not in trt
     anchor = latency_anchor_table(results)
     assert "+2.8%" in anchor
 
@@ -217,7 +211,8 @@ def test_cost_table_totals_and_flags_partial() -> None:
     table = cost_table(_results())
     assert "**4.80** (partial)" in table
     assert "1.00 (partial)" in table
-    assert "partial: other" in table
+    assert "partial: other (round 1)" in table
+    assert "**round 1 subtotal**" in table
 
 
 def test_licence_and_pending() -> None:

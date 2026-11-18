@@ -20,7 +20,15 @@ The image-level run costs about a second per model per draw, so each model's 100
 draws are cached on disk keyed by the dump's sha256, n_boot and seed: the draws
 depend only on the seed and the image count (``run_bootstrap``), so a model scored
 alone produces the same array it would inside a joint run, and the pairing holds.
-Re-running after a new seed lands scores only the new row.
+Re-running after a new seed lands scores only the new row. Round-2 and follow-up rows
+(``role == "extra"``) get the clustered interval only: the image-level contrast is kept
+for the round-1 rows it was first published for.
+
+**Groups and pairs.** The results file also carries seed groups and the pairs each
+report table quotes (from ``finetune_study.yaml``). A group is scored on every clip
+resample as the mean of its members' scores on that resample, so its interval is the
+interval of the seed-averaged model; a pair is the paired difference of two entries
+(group, row or reference) over the same 10 resamples, with clips ahead.
 
 Usage::
 
@@ -104,6 +112,22 @@ def clips_ahead(per_clip: Mapping[str, Mapping[str, float]], row: str, ref: str)
     return f"{ahead} of {len(per_clip)}"
 
 
+def entry_values(
+    key: str,
+    groups: Mapping[str, Sequence[str]],
+    values: Mapping[str, NDArray[np.float64]],
+) -> NDArray[np.float64]:
+    """Per-draw scores of an entry: a row/reference itself, or a group's member mean."""
+    if key in groups:
+        return np.mean(np.stack([values[m] for m in groups[key]]), axis=0)
+    return values[key]
+
+
+def pair_key(a: str, b: str) -> str:
+    """Key of the ``a - b`` pair in the bootstrap file."""
+    return f"{a} - {b}"
+
+
 def _load_rows(results_path: Path) -> list[dict[str, Any]]:
     data = json.loads(results_path.read_text(encoding="utf-8"))
     return [r for r in data["rows"] if "test" in r.get("dumps", {})]
@@ -132,6 +156,8 @@ def _clustered(
     references: Sequence[str],
     preds: Mapping[str, dict[str, sv.Detections]],
     gt: dict[str, sv.Detections],
+    groups: Mapping[str, Sequence[str]] | None = None,
+    pairs: Sequence[tuple[str, str]] = (),
 ) -> dict[str, Any]:
     fns = sorted(gt)
     clusters = rcb.build_clusters(fns)
@@ -173,6 +199,29 @@ def _clustered(
             )
             entry["clips_ahead"] = clips_ahead(per_clip, rid, ref)
             comparisons[rid][ref] = entry
+
+    groups = dict(groups or {})
+    scored = {n: values(n) for n in names}
+    point_of = {n: point[f"{n}::{_METRIC}"] for n in names}
+    group_summary = {}
+    for key, members in groups.items():
+        draws_g = entry_values(key, groups, scored)
+        point_g = float(np.mean([point_of[m] for m in members]))
+        group_summary[key] = rcb.summarize(draws_g, weights, point_g)
+        for clip in per_clip.values():
+            clip[key] = float(np.mean([clip[m] for m in members]))
+    pair_stats_out = {}
+    for a, b in pairs:
+        point_a = group_summary[a]["point_estimate"] if a in groups else point_of[a]
+        point_b = group_summary[b]["point_estimate"] if b in groups else point_of[b]
+        entry = pair_stats(
+            entry_values(a, groups, scored),
+            entry_values(b, groups, scored),
+            weights,
+            point_a - point_b,
+        )
+        entry["clips_ahead"] = clips_ahead(per_clip, a, b)
+        pair_stats_out[pair_key(a, b)] = entry
     return {
         "config": {
             "resampling_unit": "clip",
@@ -193,6 +242,8 @@ def _clustered(
         "per_model": per_model,
         "row_minus_reference": comparisons,
         "per_clip": per_clip,
+        "groups": group_summary,
+        "pairs": pair_stats_out,
     }
 
 
@@ -287,7 +338,13 @@ def main(argv: list[str] | None = None) -> int:
     with tempfile.TemporaryDirectory() as tmp_name:
         preds, digests = _load_preds(rows, references, Path(tmp_name))
 
-    clustered = _clustered(rows, references, preds, gt)
+    groups = {g["key"]: g["members"] for g in data.get("groups", [])}
+    pairs: list[tuple[str, str]] = []
+    for table in data.get("tables", {}).values():
+        for a, b in table.get("pairs", []):
+            if (a, b) not in pairs:
+                pairs.append((a, b))
+    clustered = _clustered(rows, references, preds, gt, groups, pairs)
     _check_points(rows, clustered["per_model"])
     _OUT_DIR.mkdir(parents=True, exist_ok=True)
     _CLUSTERED_OUT.write_text(json.dumps(clustered, indent=2) + "\n", encoding="utf-8")
@@ -300,8 +357,17 @@ def main(argv: list[str] | None = None) -> int:
         )
 
     if not args.skip_image_level:
+        round1 = [r for r in rows if r.get("role") != "extra"]
+        keep = set(references) | {r["row_id"] for r in round1}
         image = _image_level(
-            rows, references, preds, digests, gt, args.cache_dir, args.n_boot, args.seed
+            round1,
+            references,
+            {k: v for k, v in preds.items() if k in keep},
+            digests,
+            gt,
+            args.cache_dir,
+            args.n_boot,
+            args.seed,
         )
         _IMAGE_OUT.write_text(json.dumps(image, indent=2) + "\n", encoding="utf-8")
         logger.info(f"wrote {_IMAGE_OUT}")

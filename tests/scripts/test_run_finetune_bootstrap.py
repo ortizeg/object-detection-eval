@@ -57,3 +57,11 @@ def test_clips_ahead_counts_strict_wins() -> None:
         "c": {"row": 0.6, "ref": 0.7},
     }
     assert rfb.clips_ahead(per_clip, "row", "ref") == "1 of 3"
+
+
+def test_entry_values_averages_group_members_per_draw() -> None:
+    values = {"a": np.array([0.7, 0.8]), "b": np.array([0.9, 0.6]), "r": np.array([0.5, 0.5])}
+    groups = {"g": ["a", "b"]}
+    assert rfb.entry_values("g", groups, values) == pytest.approx([0.8, 0.7])
+    assert rfb.entry_values("r", groups, values) is values["r"]
+    assert rfb.pair_key("g", "r") == "g - r"

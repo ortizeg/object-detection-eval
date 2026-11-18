@@ -1,6 +1,7 @@
 """Loaders and table renderers for the foundation-model fine-tuning report.
 
-``FOUNDATION_FINETUNE.md`` is rendered from three committed files only:
+``FOUNDATION_FINETUNE.md`` is rendered from three committed files only (plus the
+data-scaling PNG, drawn from the first of them by :func:`render_scaling_png`):
 
 - ``results/finetune/finetune_metrics_merged5.json`` (``write_finetune_results.py``):
   per-arm val/test metrics, params, cost, latency, zero-shot references;
@@ -16,6 +17,7 @@ them then says so instead of printing a number.
 from __future__ import annotations
 
 import json
+import re
 import statistics
 from collections.abc import Sequence
 from pathlib import Path
@@ -64,13 +66,27 @@ class FinetuneRow(BaseModel):
     role: str
     base_arm: str
     label: str
+    experiment: str | None = None
+    input: str | None = None
     seed: int | None = None
     image_size: str | None = None
     trainable_params: int | None = None
     total_params: int | None = None
     trainable_fraction: float | None = None
     train_gpu_hours: float | None = None
+    train_gpu_hours_key: str | None = None
     train_cost_usd: float | None = None
+    epochs_run: int | None = None
+    selected_epoch: int | None = None
+    optimizer_steps: int | None = None
+    gpu: str | None = None
+    box_shared: bool | None = None
+    full_type: str | None = None
+    full_type_note: str | None = None
+    image_fraction: float | None = None
+    train_images: int | None = None
+    subset_target_pct: int | None = None
+    subset_draw: int | None = None
     valid: SplitMetrics | None = None
     test: SplitMetrics
 
@@ -107,6 +123,8 @@ class FinetuneModel(BaseModel):
     display: str
     family: str
     slug: str
+    baseline: bool = False
+    light_trains: str | None = None
     resolution: str
     licence: str
     redistribution: str
@@ -124,6 +142,103 @@ class CostEntry(BaseModel):
     usd: float
     complete: bool
     source: str
+    stage: str = "round1"
+
+
+class SweepEntry(BaseModel):
+    """One E1 val-sweep configuration of a baseline."""
+
+    model_config = _LOOSE
+
+    model_key: str
+    arm: str
+    label: str
+    selected: bool = False
+    valid: SplitMetrics
+    test: SplitMetrics | None = None
+
+
+class GroupEntry(BaseModel):
+    """Seeds of one configuration (scored as their mean)."""
+
+    model_config = _LOOSE
+
+    key: str
+    label: str
+    input: str
+    members: list[str]
+
+
+class TableEntry(BaseModel):
+    """Which entries a report table shows and which pairs it quotes."""
+
+    model_config = _LOOSE
+
+    entries: list[str] = Field(default_factory=list)
+    pairs: list[tuple[str, str]] = Field(default_factory=list)
+
+
+class ScalingSeries(BaseModel):
+    """One model's E3 data-scaling series."""
+
+    model_config = _LOOSE
+
+    label: str
+    full: str
+    subsets: list[str]
+
+
+class FixEntry(BaseModel):
+    """An audit-driven recipe fix: the arm before and the arm after."""
+
+    model_config = _LOOSE
+
+    before: str
+    after: str
+    change: str
+    audit: str
+
+
+class AuditEntry(BaseModel):
+    """A parsed results/<slug>/audit/AUDIT.md."""
+
+    model_config = _LOOSE
+
+    slug: str
+    verdict: str | None = None
+    title: str
+    outcome: str
+    path: str
+
+
+class TrtEntry(BaseModel):
+    """One TensorRT fp16 engine on the T4."""
+
+    model_config = _LOOSE
+
+    key: str
+    label: str
+    input: str
+    status: str = "current"
+    applies_to: list[str] = Field(default_factory=list)
+    note: str | None = None
+    source: str
+    published: bool = False
+    gpu_ms: float | None = None
+    gpu_runs_ms: list[float] = Field(default_factory=list)
+    e2e_ms: float | None = None
+    pytorch_ms: float | None = None
+    val_pytorch: float | None = None
+    val_trt: float | None = None
+
+
+class NotTimedEntry(BaseModel):
+    """A latency this study does not have."""
+
+    model_config = _LOOSE
+
+    what: str
+    why: str
 
 
 class AnchorEntry(BaseModel):
@@ -149,6 +264,14 @@ class FinetuneResults(BaseModel):
     costs: list[CostEntry]
     latency_anchor_t4: list[AnchorEntry] = Field(default_factory=list)
     published_trt_fp16_ms: dict[str, float] = Field(default_factory=dict)
+    sweeps: list[SweepEntry] = Field(default_factory=list)
+    groups: list[GroupEntry] = Field(default_factory=list)
+    tables: dict[str, TableEntry] = Field(default_factory=dict)
+    scaling: list[ScalingSeries] = Field(default_factory=list)
+    fixes: list[FixEntry] = Field(default_factory=list)
+    audits: list[AuditEntry] = Field(default_factory=list)
+    trt_latency: list[TrtEntry] = Field(default_factory=list)
+    not_timed: list[NotTimedEntry] = Field(default_factory=list)
     missing: list[str] = Field(default_factory=list)
 
 
@@ -164,6 +287,16 @@ class PairDelta(BaseModel):
     clips_ahead: str | None = None
 
 
+class EntrySummary(BaseModel):
+    """Point estimate and clustered 95% CI of one row, reference or group."""
+
+    model_config = _LOOSE
+
+    point_estimate: float
+    ci_low: float = Field(alias="ci_2.5")
+    ci_high: float = Field(alias="ci_97.5")
+
+
 class FinetuneBootstrap(BaseModel):
     """Either bootstrap file (clustered or image-level)."""
 
@@ -172,6 +305,9 @@ class FinetuneBootstrap(BaseModel):
     config: dict[str, Any]
     row_minus_reference: dict[str, dict[str, PairDelta]]
     per_clip: dict[str, dict[str, float]] = Field(default_factory=dict)
+    per_model: dict[str, EntrySummary] = Field(default_factory=dict)
+    groups: dict[str, EntrySummary] = Field(default_factory=dict)
+    pairs: dict[str, PairDelta] = Field(default_factory=dict)
 
 
 def _read(path: Path) -> Any:
@@ -256,12 +392,19 @@ def _arm_text(row: FinetuneRow) -> str:
         return f"{row.role} (`{row.arm}`)" if row.arm != row.role else row.role
     if row.role == "seed":
         return f"{row.base_arm}, seed {row.seed}"
+    if row.role == "extra":
+        return row.label
     return f"`{row.arm}`: {row.label}"
 
 
 def main_rows(results: FinetuneResults) -> list[FinetuneRow]:
     """The seed-0 peft and full arm of every model, in manifest order."""
     return [r for r in results.rows if r.role in ("peft", "full")]
+
+
+def fm_rows(results: FinetuneResults) -> list[FinetuneRow]:
+    """Every scored row of a foundation model (the retrained baselines excluded)."""
+    return [r for r in results.rows if not results.models[r.model_key].baseline]
 
 
 def _zs_text(model: FinetuneModel, row: FinetuneRow) -> str:
@@ -308,7 +451,7 @@ def caveat_summary(
     ]
     for scope, rows in (
         ("main arms (peft and full, seed 0)", main_rows(results)),
-        ("all scored rows (seeds and variants included)", results.rows),
+        ("foundation-model rows (seeds, variants and round 2 included)", fm_rows(results)),
     ):
         verdicts = [verdict(d) for r in rows if (d := _delta(clustered, r.row_id, ref))]
         above, below = verdicts.count("above"), verdicts.count("below")
@@ -389,6 +532,8 @@ def contrast_table(
         header += [f"Δ vs {ref}, clustered CI", "image-level CI", "clips ahead"]
     rows = []
     for row in results.rows:
+        if row.role == "extra":
+            continue  # round-2 rows have the clustered interval only
         cells = [f"{row.model}, {_arm_text(row)}", _f3(row.test.map_50_95)]
         for ref in results.references:
             c = _delta(clustered, row.row_id, ref)
@@ -447,82 +592,6 @@ def seed_table(results: FinetuneResults) -> str:
     return _table(header, rows)
 
 
-def peft_vs_full_table(results: FinetuneResults) -> str:
-    """Light arm vs full fine-tune per model, with any middle level in between."""
-    header = [
-        "Family",
-        "Model",
-        "Light arm trains",
-        "Light test",
-        "Middle level (test)",
-        "Full test",
-        "Full - light, val",
-        "Full - light, test",
-    ]
-    rows = []
-    for key, model in results.models.items():
-        by_arm = {r.arm: r for r in results.rows if r.model_key == key}
-        light = by_arm.get(model.arms["peft"])
-        full = by_arm.get(model.arms["full"])
-        if light is None or full is None:
-            continue
-        middle = [r for r in results.rows if r.model_key == key and r.role == "variant"]
-        val_gap = (
-            _signed(full.valid.map_50_95 - light.valid.map_50_95)
-            if full.valid and light.valid
-            else _EM_DASH
-        )
-        rows.append(
-            [
-                model.family,
-                model.display,
-                fmt_trainable(light),
-                _f3(light.test.map_50_95),
-                "; ".join(f"`{m.arm}` {fmt_trainable(m)}: {_f3(m.test.map_50_95)}" for m in middle)
-                or _EM_DASH,
-                _f3(full.test.map_50_95),
-                val_gap,
-                _signed(full.test.map_50_95 - light.test.map_50_95),
-            ]
-        )
-    rows.sort(key=lambda r: r[0])
-    return _table(header, rows)
-
-
-def resolution_table(
-    results: FinetuneResults, clustered: FinetuneBootstrap | None, slug: str = "yoloe"
-) -> str:
-    """YOLOE at 640 and 1280: the resolution confound in one table."""
-    ref = results.references[0]
-    header = [
-        "Model",
-        "Arm",
-        "Input",
-        "Val",
-        "Test",
-        "ball AP50",
-        "number AP50",
-        f"Δ vs {ref} [clustered CI]",
-    ]
-    rows = []
-    for row in results.rows:
-        if row.slug != slug or row.role not in ("peft", "full"):
-            continue
-        rows.append(
-            [
-                row.model,
-                row.arm,
-                results.models[row.model_key].resolution,
-                _f3(row.valid.map_50_95 if row.valid else None),
-                _f3(row.test.map_50_95),
-                _f3(row.test.per_class_ap50.get("ball")),
-                _f3(row.test.per_class_ap50.get("number")),
-                fmt_delta(_delta(clustered, row.row_id, ref)),
-            ]
-        )
-    return _table(header, rows)
-
-
 def per_class_table(results: FinetuneResults) -> str:
     """Test AP50 per class for every row."""
     header = ["Row", "mAP@50", *_CLASSES]
@@ -544,43 +613,14 @@ def _test_of(results: FinetuneResults, key: str, arm: str) -> float | None:
     return None
 
 
-def latency_trt_table(results: FinetuneResults) -> str:
-    """TensorRT fp16 rows only: published detectors, anchors, fine-tuned exports."""
-    anchors = {a.model: a for a in results.latency_anchor_t4}
-    header = ["Model", "Measured on", "Median (ms)", "Test mAP@50:95"]
-    rows = []
-    for name, ms in results.published_trt_fp16_ms.items():
-        rows.append([name, "published: dedicated GCP T4, TensorRT 10.3", f"{ms:.2f}", _EM_DASH])
-        if name in anchors:
-            rows.append(
-                [
-                    name,
-                    "re-timed: vast.ai T4, pip TensorRT 10.3 (anchor)",
-                    f"{anchors[name].median_ms:.2f}",
-                    _EM_DASH,
-                ]
-            )
-    for key, model in results.models.items():
-        for lat in model.latency_t4:
-            if lat.runtime != "tensorrt_fp16":
-                continue
-            rows.append(
-                [
-                    f"{model.display} (`{lat.arm}`)",
-                    "vast.ai T4, pip TensorRT 10.3",
-                    f"{lat.median_ms:.2f}",
-                    _f3(_test_of(results, key, lat.arm)),
-                ]
-            )
-    return _table(header, rows)
-
-
 def latency_pytorch_table(results: FinetuneResults) -> str:
     """Native PyTorch fp16 end-to-end rows (PIL in, boxes out). Not comparable to TRT."""
     header = ["Model", "Arm timed", "Input", "Median (ms)", "Tail (ms)", "Test mAP@50:95"]
     rows = []
     pending = []
     for key, model in results.models.items():
+        if model.baseline:
+            continue
         entries = [lat for lat in model.latency_t4 if lat.runtime == "pytorch_fp16"]
         if not entries:
             pending.append(model.display)
@@ -620,37 +660,46 @@ def latency_anchor_table(results: FinetuneResults) -> str:
     return _table(header, rows)
 
 
+_STAGE_TEXT = {
+    "round1": "round 1",
+    "round2": "round 2 (E1-E4)",
+    "followup": "follow-ups (TensorRT, audit fixes)",
+}
+
+
 def cost_table(results: FinetuneResults) -> str:
-    """Whole-slug spend, summed GPU hours of the scored training runs, and the total."""
-    header = ["Slug", "Models", "vast.ai spend ($)", "Train GPU-h (scored runs)", "Source"]
+    """Whole-slug spend per stage, with stage subtotals and the study total."""
+    header = ["Stage", "Slug", "Models", "vast.ai spend ($)", "Source"]
     rows = []
-    total = 0.0
+    grand = 0.0
     incomplete = []
-    for cost in results.costs:
-        models = sorted({m.display for m in results.models.values() if m.slug == cost.slug})
-        hours = [
-            r.train_gpu_hours
-            for r in results.rows
-            if r.slug == cost.slug and r.train_gpu_hours is not None
-        ]
-        total += cost.usd
-        if not cost.complete:
-            incomplete.append(cost.slug)
-        rows.append(
-            [
-                cost.slug,
-                ", ".join(models),
-                f"{cost.usd:.2f}" + ("" if cost.complete else " (partial)"),
-                f"{sum(hours):.1f}" if hours else _EM_DASH,
-                cost.source,
-            ]
-        )
+    for stage in _STAGE_TEXT:
+        costs = [c for c in results.costs if c.stage == stage]
+        if not costs:
+            continue
+        subtotal = 0.0
+        for cost in costs:
+            models = sorted({m.display for m in results.models.values() if m.slug == cost.slug})
+            subtotal += cost.usd
+            if not cost.complete:
+                incomplete.append(f"{cost.slug} ({_STAGE_TEXT[stage]})")
+            rows.append(
+                [
+                    _STAGE_TEXT[stage],
+                    cost.slug,
+                    ", ".join(models),
+                    f"{cost.usd:.2f}" + ("" if cost.complete else " (partial)"),
+                    cost.source,
+                ]
+            )
+        grand += subtotal
+        rows.append(["", f"**{_STAGE_TEXT[stage]} subtotal**", "", f"**{subtotal:.2f}**", ""])
     rows.append(
         [
+            "",
             "**total**",
             "",
-            f"**{total:.2f}**" + (" (partial)" if incomplete else ""),
-            "",
+            f"**{grand:.2f}**" + (" (partial)" if incomplete else ""),
             ("partial: " + ", ".join(incomplete)) if incomplete else "",
         ]
     )
@@ -677,17 +726,616 @@ def pending_list(results: FinetuneResults) -> str:
 def clip_table(
     results: FinetuneResults, clustered: FinetuneBootstrap | None, rows: Sequence[str] | None = None
 ) -> str:
-    """Per-clip test mAP@50:95 of the main arms and the references."""
+    """Per-clip test mAP@50:95 of the references, the seed groups and the main arms.
+
+    Clip names contain ``|`` (``game-1-q1|07_41-07_34``), which would split a markdown
+    cell, so it is shown as a space in the header.
+    """
     if clustered is None or not clustered.per_clip:
         return _BOOTSTRAP_ABSENT
     clips = list(clustered.per_clip)
-    header = ["Row", *clips]
+    header = ["Row", *(c.replace("|", " ") for c in clips)]
     names: list[tuple[str, str]] = [(ref, ref) for ref in results.references]
+    names += [(g.key, f"{g.label} (seed mean)") for g in results.groups if rows is None]
     wanted = set(rows) if rows is not None else None
     for row in main_rows(results):
         if wanted is None or row.row_id in wanted:
             names.append((row.row_id, f"{row.model}, {_arm_text(row)}"))
     body = [
         [label, *(_f3(clustered.per_clip[c].get(name)) for c in clips)] for name, label in names
+    ]
+    return _table(header, body)
+
+
+# --------------------------------------------------------------------------- #
+# Round 2: entries (row, seed group or reference) and the tables built on them
+# --------------------------------------------------------------------------- #
+
+_REF_LABEL = "{} @640, published model (10-class training, scored on merged5)"
+
+
+class Entry(BaseModel):
+    """A report entry resolved to its member rows (empty for a reference detector)."""
+
+    model_config = ConfigDict(frozen=True)
+
+    key: str
+    label: str
+    input: str
+    members: list[FinetuneRow]
+    reference_test: float | None = None
+
+    @property
+    def n(self) -> int:
+        return len(self.members) or 1
+
+    def test_values(self) -> list[float]:
+        if not self.members:
+            return [] if self.reference_test is None else [self.reference_test]
+        return [r.test.map_50_95 for r in self.members]
+
+    def val_values(self) -> list[float]:
+        return [r.valid.map_50_95 for r in self.members if r.valid is not None]
+
+    def class_ap50(self, cls: str) -> float | None:
+        vals = [r.test.per_class_ap50[cls] for r in self.members if cls in r.test.per_class_ap50]
+        return statistics.mean(vals) if vals else None
+
+
+def resolve_entry(
+    results: FinetuneResults, key: str, clustered: FinetuneBootstrap | None = None
+) -> Entry:
+    """Resolve a group key, row id or reference name into an :class:`Entry`."""
+    by_id = {r.row_id: r for r in results.rows}
+    for group in results.groups:
+        if group.key == key:
+            return Entry(
+                key=key,
+                label=group.label,
+                input=group.input,
+                members=[by_id[m] for m in group.members],
+            )
+    if key in by_id:
+        row = by_id[key]
+        return Entry(
+            key=key,
+            label=f"{row.model}, {_arm_text(row)}",
+            input=row.input or results.models[row.model_key].resolution,
+            members=[row],
+        )
+    if key in results.references:
+        point = None
+        if clustered is not None and key in clustered.per_model:
+            point = clustered.per_model[key].point_estimate
+        return Entry(
+            key=key, label=_REF_LABEL.format(key), input="640", members=[], reference_test=point
+        )
+    msg = f"unknown report entry {key!r}"
+    raise KeyError(msg)
+
+
+def _mean_sd(values: Sequence[float]) -> str:
+    if not values:
+        return _EM_DASH
+    if len(values) == 1:
+        return f"{values[0]:.3f}"
+    return f"{statistics.mean(values):.3f} ± {statistics.stdev(values):.3f}"
+
+
+def _mean(values: Sequence[float]) -> str:
+    return _EM_DASH if not values else f"{statistics.mean(values):.3f}"
+
+
+def _entry_ci(clustered: FinetuneBootstrap | None, key: str) -> str:
+    if clustered is None:
+        return _EM_DASH
+    summary = clustered.groups.get(key) or clustered.per_model.get(key)
+    if summary is None:
+        return _EM_DASH
+    return f"[{summary.ci_low:.3f}, {summary.ci_high:.3f}]"
+
+
+def trt_for(results: FinetuneResults, key: str) -> TrtEntry | None:
+    """The current TensorRT engine that times ``key`` (same graph), if any."""
+    for trt in results.trt_latency:
+        if trt.status == "current" and key in trt.applies_to and trt.gpu_ms is not None:
+            return trt
+    return None
+
+
+def _trt_text(trt: TrtEntry | None) -> str:
+    if trt is None:
+        return "not timed"
+    return _gpu_text(trt)
+
+
+def _gpu_text(trt: TrtEntry) -> str:
+    if trt.gpu_ms is None:
+        return _EM_DASH
+    runs = trt.gpu_runs_ms
+    if len(runs) > 1 and max(runs) / min(runs) > 1.10:
+        return f"{min(runs):.0f}-{max(runs):.0f}"
+    return f"{trt.gpu_ms:.1f}" if trt.gpu_ms >= 10 else f"{trt.gpu_ms:.2f}"
+
+
+def entry_table(
+    results: FinetuneResults,
+    clustered: FinetuneBootstrap | None,
+    table: str,
+    classes: Sequence[str] = ("ball", "number"),
+) -> str:
+    """One line per entry of ``results.tables[table]``: seeds, val, test, CI, AP50, TRT."""
+    spec = results.tables.get(table)
+    if spec is None or not spec.entries:
+        return f"_No entries configured for table `{table}`._"
+    header = [
+        "Model / configuration",
+        "Input",
+        "Seeds",
+        "Val",
+        "Test (mean ± sd over seeds)",
+        "Test, clustered 95% CI",
+        *(f"{c} AP50" for c in classes),
+        "T4 TensorRT fp16 GPU (ms)",
+    ]
+    body = []
+    for key in spec.entries:
+        e = resolve_entry(results, key, clustered)
+        body.append(
+            [
+                e.label,
+                e.input,
+                str(e.n) if e.members else "1",
+                _mean(e.val_values()),
+                _mean_sd(e.test_values()),
+                _entry_ci(clustered, key),
+                *(_f3(e.class_ap50(c)) for c in classes),
+                _trt_text(trt_for(results, key)),
+            ]
+        )
+    return _table(header, body)
+
+
+def pair_table(results: FinetuneResults, clustered: FinetuneBootstrap | None, table: str) -> str:
+    """The paired clustered deltas a report table quotes (A minus B)."""
+    spec = results.tables.get(table)
+    if spec is None or not spec.pairs:
+        return f"_No pairs configured for table `{table}`._"
+    if clustered is None:
+        return _BOOTSTRAP_ABSENT
+    header = ["A", "B", "Test A - B [clustered 95% CI]", "Clips A ahead", "Reading"]
+    body = []
+    for a, b in spec.pairs:
+        delta = clustered.pairs.get(f"{a} - {b}")
+        body.append(
+            [
+                resolve_entry(results, a, clustered).label,
+                resolve_entry(results, b, clustered).label,
+                fmt_delta(delta),
+                (delta.clips_ahead or _EM_DASH) if delta else _EM_DASH,
+                _EM_DASH if delta is None else _reading(delta),
+            ]
+        )
+    return _table(header, body)
+
+
+def _reading(delta: PairDelta) -> str:
+    v = verdict(delta)
+    if v == "tie":
+        return "tie (CI includes 0)"
+    return f"A {v} B on every resample"
+
+
+def _short_gpu(gpu: str | None) -> str:
+    if not gpu:
+        return _EM_DASH
+    text = re.sub(r"\s*\(.*\)", "", gpu)
+    text = re.sub(r"^(1x\s+|NVIDIA\s+)+", "", text).replace("GeForce ", "")
+    return text.strip() or _EM_DASH
+
+
+_EXPERIMENT_TEXT = {"E1": "E1", "E2": "E2", "E3": "E3", "E4": "E4", "fix": "audit fix"}
+
+
+def _stage(row: FinetuneRow) -> str:
+    if row.role == "extra":
+        return _EXPERIMENT_TEXT.get(row.experiment or "", row.experiment or _EM_DASH)
+    return "round 1"
+
+
+def budget_table(results: FinetuneResults) -> str:
+    """Every scored row: what it trained, how long, what it cost, and how it scored."""
+    header = [
+        "Model",
+        "Arm",
+        "Stage",
+        "Input",
+        "Trainable",
+        "Val",
+        "Test",
+        "GPU",
+        "Epochs run (selected)",
+        "Opt. steps",
+        "Train h",
+        "Train $",
+    ]
+    body = []
+    for row in results.rows:
+        hours = _EM_DASH
+        if row.train_gpu_hours is not None:
+            hours = f"{row.train_gpu_hours:.2f}" + (
+                "†" if row.train_gpu_hours_key == "box_hours" else ""
+            )
+        cost = _EM_DASH if not row.train_cost_usd else f"{row.train_cost_usd:.2f}"
+        epochs = _EM_DASH if row.epochs_run is None else str(row.epochs_run)
+        if row.selected_epoch is not None:
+            epochs += f" ({row.selected_epoch})"
+        body.append(
+            [
+                row.model,
+                _arm_text(row),
+                _stage(row),
+                row.input or results.models[row.model_key].resolution,
+                fmt_trainable(row),
+                _f3(row.valid.map_50_95 if row.valid else None),
+                _f3(row.test.map_50_95),
+                _short_gpu(row.gpu),
+                epochs,
+                _EM_DASH if row.optimizer_steps is None else str(row.optimizer_steps),
+                hours,
+                cost,
+            ]
+        )
+    return _table(header, body)
+
+
+def sweep_table(results: FinetuneResults) -> str:
+    """E1: the baselines' val sweep (seed 0, 640). Test only where it was predicted."""
+    if not results.sweeps:
+        return "_No sweep configured._"
+    header = ["Model", "Configuration", "Val", "Test", "Selected on val"]
+    body = [
+        [
+            results.models[s.model_key].display,
+            f"`{s.arm}`: {s.label}",
+            _f3(s.valid.map_50_95),
+            "not predicted" if s.test is None else _f3(s.test.map_50_95),
+            "**yes**" if s.selected else "",
+        ]
+        for s in results.sweeps
+    ]
+    return _table(header, body)
+
+
+def _ladder_levels(results: FinetuneResults, key: str) -> dict[str, list[FinetuneRow]]:
+    model = results.models[key]
+    rows = [r for r in results.rows if r.model_key == key]
+    light = [
+        r
+        for r in rows
+        if r.arm == model.arms.get("peft")
+        or (r.role == "seed" and r.base_arm == model.arms.get("peft"))
+    ]
+    full = [
+        r
+        for r in rows
+        if r.arm == model.arms.get("full")
+        or (r.role == "seed" and r.base_arm == model.arms.get("full"))
+    ]
+    mid = [r for r in rows if r.role == "extra" and r.experiment == "E4"]
+    return {"light": light, "mid": mid, "full": full}
+
+
+def _level_text(rows: list[FinetuneRow]) -> tuple[str, str, str]:
+    if not rows:
+        return _EM_DASH, _EM_DASH, _EM_DASH
+    vals = [r.valid.map_50_95 for r in rows if r.valid]
+    tests = [r.test.map_50_95 for r in rows]
+    seeds = f" ({len(rows)} seeds)" if len(rows) > 1 else ""
+    return fmt_trainable(rows[0]), _mean(vals), _mean_sd(tests) + seeds
+
+
+def ladder_table(results: FinetuneResults) -> str:
+    """E4: light / mid / full per foundation model (val and test mAP@50:95)."""
+    header = [
+        "Model",
+        "Light: trainable",
+        "Light val / test",
+        "Mid: trainable",
+        "Mid val / test",
+        "Full: type, trainable",
+        "Full val / test",
+        "Full - light (test)",
+    ]
+    body = []
+    for key, model in results.models.items():
+        if model.baseline or model.arms.get("peft") is None:
+            continue
+        lv = _ladder_levels(results, key)
+        lt, lval, ltest = _level_text(lv["light"])
+        mt, mval, mtest = _level_text(lv["mid"])
+        ft, fval, ftest = _level_text(lv["full"])
+        ftype = lv["full"][0].full_type if lv["full"] and lv["full"][0].full_type else "?"
+        gap = _EM_DASH
+        if lv["light"] and lv["full"]:
+            gap = _signed(
+                statistics.mean(r.test.map_50_95 for r in lv["full"])
+                - statistics.mean(r.test.map_50_95 for r in lv["light"])
+            )
+        body.append(
+            [
+                model.display,
+                lt,
+                f"{lval} / {ltest}",
+                mt,
+                _EM_DASH if not lv["mid"] else f"{mval} / {mtest}",
+                f"({ftype}) {ft}",
+                f"{fval} / {ftest}",
+                gap,
+            ]
+        )
+    return _table(header, body)
+
+
+_FULL_TYPE_TEXT = {
+    "a": "(a) uniform: all weights, one recipe",
+    "b": "(b) discriminative lr: all weights, pretrained parts at reduced lr",
+    "c": "(c) partial: part of the foundation stays frozen",
+}
+
+
+def taxonomy_table(results: FinetuneResults) -> str:
+    """Section 3: what each level trains, per foundation model, with parameter counts."""
+    header = [
+        "Model",
+        "Light trains",
+        "Light",
+        "Mid adds",
+        "Mid",
+        "Full type",
+        "Full",
+        "Full-type detail",
+    ]
+    body = []
+    for key, model in results.models.items():
+        if model.baseline or model.arms.get("peft") is None:
+            continue
+        lv = _ladder_levels(results, key)
+        light = lv["light"][0] if lv["light"] else None
+        full = lv["full"][0] if lv["full"] else None
+        mid = lv["mid"][0] if lv["mid"] else None
+        body.append(
+            [
+                model.display,
+                model.light_trains or _EM_DASH,
+                fmt_trainable(light) if light else _EM_DASH,
+                mid.label.removeprefix("mid: ") if mid else _EM_DASH,
+                fmt_trainable(mid) if mid else _EM_DASH,
+                _FULL_TYPE_TEXT.get(full.full_type or "", full.full_type or "?")
+                if full
+                else _EM_DASH,
+                fmt_trainable(full) if full else _EM_DASH,
+                (full.full_type_note or _EM_DASH) if full else _EM_DASH,
+            ]
+        )
+    return _table(header, body)
+
+
+def _series_points(results: FinetuneResults, series: ScalingSeries) -> dict[str, Any]:
+    by_id = {r.row_id: r for r in results.rows}
+    full = resolve_entry(results, series.full)
+    subsets = [by_id[s] for s in series.subsets]
+    return {"full": full, "subsets": subsets}
+
+
+def _share(row: FinetuneRow) -> str:
+    return _EM_DASH if row.image_fraction is None else f"{100 * row.image_fraction:.0f}%"
+
+
+def scaling_table(results: FinetuneResults) -> str:
+    """E3: test mAP@50:95 on clip-grouped subsets, both draws, vs the full-data point."""
+    if not results.scaling:
+        return "_No scaling series configured._"
+    header = [
+        "Model",
+        "100% (test)",
+        "frac50 d0 / d1 (image share)",
+        "frac50 mean (Δ vs 100%)",
+        "frac25 d0 / d1 (image share)",
+        "frac25 mean (Δ vs 100%)",
+        "Draw gap at frac25",
+    ]
+    body = []
+    for series in results.scaling:
+        pts = _series_points(results, series)
+        full_tests = pts["full"].test_values()
+        full = statistics.mean(full_tests)
+        cells = [
+            series.label,
+            _mean_sd(full_tests) + (f" ({len(full_tests)} seeds)" if len(full_tests) > 1 else ""),
+        ]
+        gap25 = _EM_DASH
+        for pct in (50, 25):
+            rows = sorted(
+                (r for r in pts["subsets"] if r.subset_target_pct == pct),
+                key=lambda r: r.subset_draw or 0,
+            )
+            if not rows:
+                cells += [_EM_DASH, _EM_DASH]
+                continue
+            cells.append(" / ".join(f"{r.test.map_50_95:.3f} ({_share(r)})" for r in rows))
+            mean = statistics.mean(r.test.map_50_95 for r in rows)
+            cells.append(f"{mean:.3f} ({_signed(mean - full)})")
+            if pct == 25 and len(rows) > 1:
+                tests = [r.test.map_50_95 for r in rows]
+                gap25 = f"{max(tests) - min(tests):.3f}"
+        cells.append(gap25)
+        body.append(cells)
+    return _table(header, body)
+
+
+def render_scaling_png(results: FinetuneResults, path: Path) -> None:
+    """Draw the E3 data-scaling figure: test mAP vs actual image fraction, both draws.
+
+    ``matplotlib`` is imported here so the rest of the module stays light. The PNG is
+    written without a timestamp so re-running on unchanged data writes the same bytes.
+    """
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    fig, ax = plt.subplots(figsize=(7.5, 4.6))
+    colors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b"]
+    for color, series in zip(colors, results.scaling, strict=False):
+        pts = _series_points(results, series)
+        full_tests = pts["full"].test_values()
+        xs_mean, ys_mean = [], []
+        for pct in (25, 50):
+            rows = [r for r in pts["subsets"] if r.subset_target_pct == pct]
+            if not rows:
+                continue
+            xs = [r.image_fraction or pct / 100 for r in rows]
+            ys = [r.test.map_50_95 for r in rows]
+            for r, x, y in zip(rows, xs, ys, strict=True):
+                ax.scatter(
+                    x, y, color=color, marker="o" if r.subset_draw == 0 else "^", s=36, zorder=3
+                )
+            ax.plot(xs, ys, color=color, lw=0.8, alpha=0.5, ls=":")
+            xs_mean.append(statistics.mean(xs))
+            ys_mean.append(statistics.mean(ys))
+        xs_mean.append(1.0)
+        ys_mean.append(statistics.mean(full_tests))
+        sd = statistics.stdev(full_tests) if len(full_tests) > 1 else 0.0
+        ax.errorbar(1.0, ys_mean[-1], yerr=sd, color=color, fmt="s", ms=5, capsize=3, zorder=3)
+        ax.plot(xs_mean, ys_mean, color=color, lw=1.8, label=series.label)
+    ax.scatter([], [], color="grey", marker="o", label="draw 0")
+    ax.scatter([], [], color="grey", marker="^", label="draw 1")
+    ax.set_xlabel("share of the 464 training images (clip-grouped subsets)")
+    ax.set_ylabel("test mAP@50:95 (94 images, 3 clips)")
+    ax.set_title("E3 data scaling: lines join the mean of two draws; 100% = seed mean ± sd")
+    ax.set_xlim(0.25, 1.05)
+    ax.grid(alpha=0.3)
+    ax.legend(fontsize=8, loc="lower right")
+    fig.tight_layout()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(path, dpi=130, metadata={"Software": None})
+    plt.close(fig)
+
+
+def trt_table(results: FinetuneResults) -> str:
+    """Every TensorRT fp16 T4 number: published, anchors, and the fine-tuned engines."""
+    anchors = {a.model: a for a in results.latency_anchor_t4}
+    header = [
+        "Engine",
+        "Input",
+        "GPU compute (ms)",
+        "End to end (ms)",
+        "PyTorch fp16 e2e (ms)",
+        "Val PyTorch → TRT (Δ pt)",
+        "Status / note",
+    ]
+    body = []
+    for name, ms in results.published_trt_fp16_ms.items():
+        body.append(
+            [
+                f"{name} (published, GCP T4)",
+                "640x640",
+                f"{ms:.2f}",
+                _EM_DASH,
+                _EM_DASH,
+                _EM_DASH,
+                "published",
+            ]
+        )
+        if name in anchors:
+            a = anchors[name]
+            body.append(
+                [
+                    f"{name} (anchor re-time, vast.ai T4)",
+                    "640x640",
+                    f"{a.median_ms:.2f}",
+                    _EM_DASH,
+                    _EM_DASH,
+                    _EM_DASH,
+                    "anchor",
+                ]
+            )
+    for trt in results.trt_latency:
+        if trt.published:
+            continue
+        val = _EM_DASH
+        if trt.val_pytorch is not None and trt.val_trt is not None:
+            val = (
+                f"{trt.val_pytorch:.3f} → {trt.val_trt:.3f} "
+                f"({100 * (trt.val_trt - trt.val_pytorch):+.1f})"
+            )
+        note = trt.status if trt.status != "current" else ""
+        if trt.note:
+            note = f"{note}: {trt.note}" if note else trt.note
+        body.append(
+            [
+                trt.label,
+                trt.input,
+                _gpu_text(trt),
+                _EM_DASH if trt.e2e_ms is None else f"{trt.e2e_ms:.1f}",
+                _EM_DASH if trt.pytorch_ms is None else f"{trt.pytorch_ms:.1f}",
+                val,
+                note or _EM_DASH,
+            ]
+        )
+    return _table(header, body)
+
+
+def not_timed_list(results: FinetuneResults) -> str:
+    """Latencies this study does not have."""
+    if not results.not_timed:
+        return "_Every configured latency was measured._"
+    return "\n".join(f"- **{n.what}**: {n.why}." for n in results.not_timed)
+
+
+def fixes_table(results: FinetuneResults, clustered: FinetuneBootstrap | None) -> str:
+    """Generative-VLM recipe fixes from the audits: before vs after, val and test."""
+    by_id = {r.row_id: r for r in results.rows}
+    verdicts = {a.slug: a.verdict for a in results.audits}
+    ref = results.references[0]
+    header = [
+        "Model",
+        "Change",
+        "Audit verdict",
+        "Before: val / test",
+        "After: val / test",
+        "Δ test",
+        f"After vs {ref} [clustered CI]",
+    ]
+    body = []
+    for fix in results.fixes:
+        before, after = by_id[fix.before], by_id[fix.after]
+        body.append(
+            [
+                after.model,
+                fix.change,
+                verdicts.get(fix.audit) or _EM_DASH,
+                _val_test(before),
+                _val_test(after),
+                _signed(after.test.map_50_95 - before.test.map_50_95),
+                fmt_delta(_delta(clustered, after.row_id, ref)),
+            ]
+        )
+    return _table(header, body)
+
+
+def _val_test(row: FinetuneRow) -> str:
+    return f"{_f3(row.valid.map_50_95 if row.valid else None)} / {row.test.map_50_95:.3f}"
+
+
+def audits_table(results: FinetuneResults) -> str:
+    """Each audit's parsed verdict and what happened to the published numbers."""
+    if not results.audits:
+        return "_No audits recorded._"
+    header = ["Slug", "Audit", "Verdict", "Outcome", "File (fine-tuning repo)"]
+    body = [
+        [a.slug, a.title, f"**{a.verdict or '?'}**", a.outcome, f"`{a.path}`"]
+        for a in results.audits
     ]
     return _table(header, body)
