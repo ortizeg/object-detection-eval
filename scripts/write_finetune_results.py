@@ -90,7 +90,7 @@ class Arms(_Frozen):
     variants: list[Variant] = Field(default_factory=list)
 
 
-Experiment = Literal["E1", "E2", "E3", "E4", "E5", "fix"]
+Experiment = Literal["E1", "E2", "E3", "E4", "E5", "E6", "fix"]
 
 
 class ExtraArm(_Frozen):
@@ -120,6 +120,8 @@ class LatencySpec(_Frozen):
     path: str
     arm: str
     runtime: Runtime
+    #: Latency file under ``results/<slug>/``; ``None`` is the slug's ``latency_t4.json``.
+    file: str | None = None
 
 
 class ModelSpec(_Frozen):
@@ -892,11 +894,21 @@ def build_results(
             if spec.baseline:
                 pass  # retrained baselines are timed under TensorRT only (see `trt`)
             elif latency_path.is_file():
-                latency = extract_latency(_read_json(latency_path), spec.latency)
-                if not latency:
-                    missing.append(f"{spec.key}: latency_t4.json has no usable entry")
+                default_specs = (
+                    None if spec.latency is None else [s for s in spec.latency if s.file is None]
+                )
+                if default_specs is None or default_specs:
+                    latency = extract_latency(_read_json(latency_path), default_specs)
+                    if not latency:
+                        missing.append(f"{spec.key}: latency_t4.json has no usable entry")
             else:
                 missing.append(f"{spec.key}: {spec.slug}/latency_t4.json")
+            for extra_spec in [s for s in spec.latency or [] if s.file is not None]:
+                extra_path = slug_dir / str(extra_spec.file)
+                if extra_path.is_file():
+                    latency.extend(extract_latency(_read_json(extra_path), [extra_spec]))
+                else:
+                    missing.append(f"{spec.key}: {spec.slug}/{extra_spec.file}")
             sweeps.extend(sweep_records(spec, slug_dir, gt, missing))
             models[spec.key] = {
                 "display": spec.display,

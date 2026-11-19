@@ -624,6 +624,13 @@ def _test_of(results: FinetuneResults, key: str, arm: str) -> float | None:
     return None
 
 
+def _input_of(results: FinetuneResults, key: str, arm: str) -> str | None:
+    for row in results.rows:
+        if row.model_key == key and row.arm == arm:
+            return row.input
+    return None
+
+
 def latency_pytorch_table(results: FinetuneResults) -> str:
     """Native PyTorch fp16 end-to-end rows (PIL in, boxes out). Not comparable to TRT."""
     header = ["Model", "Arm timed", "Input", "Median (ms)", "Tail (ms)", "Test mAP@50:95"]
@@ -640,7 +647,7 @@ def latency_pytorch_table(results: FinetuneResults) -> str:
                 [
                     model.display,
                     lat.arm,
-                    model.resolution,
+                    _input_of(results, key, lat.arm) or model.resolution,
                     f"{lat.median_ms:.1f}",
                     _EM_DASH if lat.tail_ms is None else f"{lat.tail_label} {lat.tail_ms:.1f}",
                     _f3(_test_of(results, key, lat.arm)),
@@ -673,7 +680,7 @@ def latency_anchor_table(results: FinetuneResults) -> str:
 
 _STAGE_TEXT = {
     "round1": "round 1",
-    "round2": "round 2 (E1-E5)",
+    "round2": "round 2 (E1-E6)",
     "followup": "follow-ups (TensorRT, audit fixes)",
 }
 
@@ -931,7 +938,7 @@ def pair_table(results: FinetuneResults, clustered: FinetuneBootstrap | None, ta
 
 
 def parity_table(results: FinetuneResults, clustered: FinetuneBootstrap | None) -> str:
-    """E2 + E5: each model at the baselines' 640 input and at its higher input."""
+    """E2 + E5/E6: each model at the baselines' 640 input and at its higher input."""
     if not results.parity:
         return "_No parity lines configured._"
     header = [
@@ -988,6 +995,7 @@ _EXPERIMENT_TEXT = {
     "E3": "E3",
     "E4": "E4",
     "E5": "E5",
+    "E6": "E6",
     "fix": "audit fix",
 }
 

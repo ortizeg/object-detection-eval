@@ -51,6 +51,9 @@ models:
       - {arm: peft_640_s1, experiment: E5, label: "peft @640 (long side 640), seed 1", input: "640x360 (long side 640)"}
       - {arm: peft_640_s2, experiment: E5, label: "peft @640 (long side 640), seed 2", input: "640x360 (long side 640)"}
       - {arm: full_640_s0, experiment: E5, label: "full @640 (long side 640)", input: "640x360 (long side 640)"}
+      - {arm: peft_640aug_s0, experiment: E6, label: "peft @640 + matched multi-scale jitter, seed 0", input: "640x360 (long side 640); train short 230-384, cap 640"}
+      - {arm: peft_640aug_s1, experiment: E6, label: "peft @640 + matched multi-scale jitter, seed 1", input: "640x360 (long side 640); train short 230-384, cap 640"}
+      - {arm: peft_640aug_s2, experiment: E6, label: "peft @640 + matched multi-scale jitter, seed 2", input: "640x360 (long side 640); train short 230-384, cap 640"}
     zero_shot: {source: vlm_metrics, key: LLMDet-large}
     latency:
       - {path: per_arm.peft, arm: peft, runtime: pytorch_fp16}
@@ -76,6 +79,9 @@ models:
       - {arm: peft_640_s0, experiment: E5, label: "peft @640 (long side 640), seed 0", input: "640x360 (long side 640)"}
       - {arm: peft_640_s1, experiment: E5, label: "peft @640 (long side 640), seed 1", input: "640x360 (long side 640)"}
       - {arm: peft_640_s2, experiment: E5, label: "peft @640 (long side 640), seed 2", input: "640x360 (long side 640)"}
+      - {arm: peft_640aug_s0, experiment: E6, label: "peft @640 + matched multi-scale jitter, seed 0", input: "640x360 (long side 640); train short 302-403, cap 720"}
+      - {arm: peft_640aug_s1, experiment: E6, label: "peft @640 + matched multi-scale jitter, seed 1", input: "640x360 (long side 640); train short 302-403, cap 720"}
+      - {arm: peft_640aug_s2, experiment: E6, label: "peft @640 + matched multi-scale jitter, seed 2", input: "640x360 (long side 640); train short 302-403, cap 720"}
     zero_shot: {source: sibling, path: mmgdino/zeroshot_valid.json}
     expected_seed_arms: [peft_s1, peft_s2]
 
@@ -248,6 +254,7 @@ models:
     zero_shot: {source: sibling, path: paligemma2/zeroshot_mix448/valid.json}
     latency:
       - {path: "", arm: peft, runtime: pytorch_fp16}
+      - {path: "", arm: peft_896, runtime: pytorch_fp16, file: latency_t4_896.json}
 
   - key: smolvlm2
     display: SmolVLM2-2.2B
@@ -413,6 +420,16 @@ costs:
     usd: 1.24
     complete: true
     source: "docs/plans/mmgdino.md, E5 (640): three A6000 boxes $0.35 + $0.41 + $0.40 + T4 $0.08, about $1.24"
+  - slug: llmdet
+    stage: round2
+    usd: 1.53
+    complete: true
+    source: "E6 (640 + matched jitter): peft_640aug_s0-s2 meta.json cost_usd_box 0.48 + 0.48 + 0.57 (three A100 boxes); docs/plans/llmdet.md about $1.53"
+  - slug: mmgdino
+    stage: round2
+    usd: 1.23
+    complete: true
+    source: "E6 (640 + matched jitter): peft_640aug_s0-s2 meta.json cost_usd 0.39 + 0.39 + 0.45 (three A6000 boxes); docs/plans/mmgdino.md about $1.23"
   # ---- follow-ups: TensorRT boxes and the user-approved audit fixes
   - slug: llmdet
     stage: followup
@@ -439,6 +456,11 @@ costs:
     usd: 4.43
     complete: true
     source: "results/paligemma2/peft_896/meta.json cost_usd 3.83 (A100 3.45 box-h) + NIGHT_LOG 20:55 test-predict box ~$0.6"
+  - slug: paligemma2
+    stage: followup
+    usd: 0.48
+    complete: true
+    source: "docs/plans/paligemma2.md, T4 latency at 896: T4 box $0.21/h x 2.3 box-h, about $0.48"
   - slug: qwen3vl
     stage: followup
     usd: 2.72
@@ -468,6 +490,8 @@ groups:
   - {key: mmgdino_peft, label: "MM-Grounding-DINO-B, light (peft)", input: "short side 800 (1422x800)", members: [mmgdino/peft, mmgdino/peft_s1, mmgdino/peft_s2]}
   - {key: llmdet_peft_640, label: "LLMDet-large @640, light (peft)", input: "640x360 (long side 640)", members: [llmdet/peft_640_s0, llmdet/peft_640_s1, llmdet/peft_640_s2]}
   - {key: mmgdino_peft_640, label: "MM-Grounding-DINO-B @640, light (peft)", input: "640x360 (long side 640)", members: [mmgdino/peft_640_s0, mmgdino/peft_640_s1, mmgdino/peft_640_s2]}
+  - {key: llmdet_peft_640aug, label: "LLMDet-large @640 + matched jitter (E6), light (peft)", input: "640x360 (long side 640)", members: [llmdet/peft_640aug_s0, llmdet/peft_640aug_s1, llmdet/peft_640aug_s2]}
+  - {key: mmgdino_peft_640aug, label: "MM-Grounding-DINO-B @640 + matched jitter (E6), light (peft)", input: "640x360 (long side 640)", members: [mmgdino/peft_640aug_s0, mmgdino/peft_640aug_s1, mmgdino/peft_640aug_s2]}
   - {key: owlv2_peft, label: "OWLv2-L/14, light (peft)", input: "1008x1008", members: [owlv2/peft, owlv2/peft_seed1, owlv2/peft_seed2]}
 
 # Which entries each report table shows, and which paired clustered deltas it quotes.
@@ -492,7 +516,7 @@ tables:
       - [llmdet_peft, yolo26m_640_e1]
       - [llmdet_peft, deimm_640_e1]
   e2:
-    entries: [yolo26m_640_e1, yolo26m_1280, deimm_640_e1, deimm_1280, llmdet_peft_640, llmdet_peft, llmdet/full_640_s0, llmdet/full, mmgdino_peft_640, mmgdino_peft, yoloe_640/yoloe_full_640, yoloe_1280/yoloe_full, yoloe_640/yoloe_peft_640, yoloe_1280/yoloe_peft]
+    entries: [yolo26m_640_e1, yolo26m_1280, deimm_640_e1, deimm_1280, llmdet_peft_640, llmdet_peft_640aug, llmdet_peft, llmdet/full_640_s0, llmdet/full, mmgdino_peft_640, mmgdino_peft_640aug, mmgdino_peft, yoloe_640/yoloe_full_640, yoloe_1280/yoloe_full, yoloe_640/yoloe_peft_640, yoloe_1280/yoloe_peft]
     pairs:
       - [yolo26m_1280, yolo26m_640_e1]
       - [deimm_1280, deimm_640_e1]
@@ -507,6 +531,13 @@ tables:
       - [llmdet/full_640_s0, deimm_640_e1]
       - [mmgdino_peft_640, yolo26m_640_e1]
       - [mmgdino_peft_640, deimm_640_e1]
+      # E6: E5 with the round-1 multi-scale jitter restored at the 640 scale.
+      - [llmdet_peft_640aug, llmdet_peft_640]
+      - [mmgdino_peft_640aug, mmgdino_peft_640]
+      - [llmdet_peft_640aug, yolo26m_640_e1]
+      - [llmdet_peft_640aug, deimm_640_e1]
+      - [mmgdino_peft_640aug, yolo26m_640_e1]
+      - [mmgdino_peft_640aug, deimm_640_e1]
       - [yoloe_640/yoloe_full_640, yolo26m_640_e1]
       - [yoloe_1280/yoloe_full, yolo26m_1280]
   e3:
@@ -527,6 +558,8 @@ parity:
   - {label: "LLMDet-large, light (peft)", low: llmdet_peft_640, high: llmdet_peft}
   - {label: "LLMDet-large, full", low: llmdet/full_640_s0, high: llmdet/full}
   - {label: "MM-Grounding-DINO-B, light (peft)", low: mmgdino_peft_640, high: mmgdino_peft}
+  - {label: "LLMDet-large, light (peft), E6 matched jitter at 640", low: llmdet_peft_640aug, high: llmdet_peft}
+  - {label: "MM-Grounding-DINO-B, light (peft), E6 matched jitter at 640", low: mmgdino_peft_640aug, high: mmgdino_peft}
 
 # E3 data scaling: one series per model. `full` is the 100% point (a seed group or a
 # row); the subset rows carry their image fraction and draw in meta.json.
@@ -685,8 +718,8 @@ trt:
     e2e_ms: [e5_640, e2e_median_ms]
     val_pt: [e5_640, val_map_50_95_pytorch]
     val_trt: [e5_640, val_map_50_95_trt]
-    note: "E5; same export path as the native engine; a first timing pair right after the build was 12% apart, so the engine was re-timed and the stable pair is reported"
-    applies_to: [llmdet_peft_640, llmdet/peft_640_s0, llmdet/peft_640_s1, llmdet/peft_640_s2, llmdet/full_640_s0]
+    note: "E5 (E6 reuses it: same architecture and 360x640 engine input); same export path as the native engine; a first timing pair right after the build was 12% apart, so the engine was re-timed and the stable pair is reported"
+    applies_to: [llmdet_peft_640, llmdet/peft_640_s0, llmdet/peft_640_s1, llmdet/peft_640_s2, llmdet/full_640_s0, llmdet_peft_640aug, llmdet/peft_640aug_s0, llmdet/peft_640aug_s1, llmdet/peft_640aug_s2]
   - key: mmgdino_e5_640
     label: "MM-Grounding-DINO-B @640 (peft_640_s0), MSDA plugin"
     file: mmgdino/latency_trt_t4.json
@@ -696,8 +729,8 @@ trt:
     e2e_ms: [e5_640, e2e, reported_median_ms]
     val_pt: [e5_640, val_mAP_50_95, pytorch_fp32_engine_input_360x640]
     val_trt: [e5_640, val_mAP_50_95, trt_fp16_plugin]
-    note: "E5; the engine runs the unpadded 360x640 frame (PyTorch pads to 384x640); val PyTorch is fp32 at the engine's input"
-    applies_to: [mmgdino_peft_640, mmgdino/peft_640_s0, mmgdino/peft_640_s1, mmgdino/peft_640_s2]
+    note: "E5 (E6 reuses it: same architecture and engine input); the engine runs the unpadded 360x640 frame (PyTorch pads to 384x640); val PyTorch is fp32 at the engine's input"
+    applies_to: [mmgdino_peft_640, mmgdino/peft_640_s0, mmgdino/peft_640_s1, mmgdino/peft_640_s2, mmgdino_peft_640aug, mmgdino/peft_640aug_s0, mmgdino/peft_640aug_s1, mmgdino/peft_640aug_s2]
   - key: sam3_fixed
     label: "SAM 3 (full), --attn-out-3d export"
     file: sam3/latency_trt_t4.json
@@ -725,6 +758,5 @@ trt:
 
 # Timings this study does not have, listed in the report so their absence is explicit.
 not_timed:
-  - {what: "PaliGemma 2 @896 (peft_896)", why: "T4 latency at 896 px was not measured (the 448 px peft arm took ~9.9 s/frame in PyTorch)"}
   - {what: "Generative VLMs under TensorRT", why: "token-by-token generation needs TensorRT-LLM, not a TensorRT engine; VLMs are timed in PyTorch only"}
   - {what: "YOLO26m / DEIM-M end to end at 1280", why: "only GPU compute was timed for the retrained baselines"}

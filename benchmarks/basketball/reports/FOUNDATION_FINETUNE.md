@@ -30,11 +30,12 @@ drops to 0.695 ± 0.002 (light, 3 seeds; full 0.696), a clustered tie with DEIM-
 clips; CI -0.072 to +0.034). MM-Grounding-DINO drops to 0.574 ± 0.010, below both 640
 baselines on every clip (-14.4 points vs YOLO26m, -12.5 vs DEIM-M). At 640 the TensorRT
 engines are about 3x faster (LLMDet 106.6 ms, MM-Grounding-DINO 50.9 ms) and still 7-18x
-the 640 detectors. **Caveat:** under the 640 long-side cap the round-1 multi-scale train
-jitter collapses to one fixed scale for both grounding models, so their 640 drop
-includes the loss of scale augmentation as well as resolution. MM-Grounding-DINO's
--18 points should be read as an upper bound on the pure resolution effect; a
-jitter-matched rerun is listed in [section 12](#12-limitations-and-missing-experiments).
+the 640 detectors. E5 trained at one fixed scale, because the 640 cap collapsed the
+round-1 multi-scale jitter. **E6 restores that jitter**, rescaled to the 640 scale, and
+adds under 1 point: LLMDet-large 0.702 ± 0.004 (+0.7 points over E5, a clustered tie) and
+MM-Grounding-DINO 0.583 ± 0.012 (+0.9, a tie). So the 640 drop is resolution, not lost
+augmentation. With matched augmentation LLMDet still ties both 640 baselines, and
+MM-Grounding-DINO is still below both on every clip (see [section 6](#6-resolution-parity-640-vs-1280-e2)).
 
 <!-- TABLE:ft_headline START -->
 | Model / configuration | Input | Seeds | Val | Test (mean ± sd over seeds) | Test, clustered 95% CI | ball AP50 | number AP50 | T4 TensorRT fp16 GPU (ms) |
@@ -88,7 +89,7 @@ treats frames as independent, is kept in the appendix for contrast only.
 **94 test images = 3 video clips (30 / 33 / 31 frames).** The clip-clustered bootstrap enumerates all 10 distinct clip resamples.
 
 - Of 26 main arms (peft and full, seed 0): **7 tie YOLO26m**, 7 above, 12 below (clustered 95% CI). The image-level bootstrap would call 24 of 26 significant.
-- Of 62 foundation-model rows (seeds, variants and round 2 included): **20 tie YOLO26m**, 18 above, 24 below (clustered 95% CI). The image-level bootstrap would call 33 of 35 significant.
+- Of 68 foundation-model rows (seeds, variants and round 2 included): **23 tie YOLO26m**, 18 above, 27 below (clustered 95% CI). The image-level bootstrap would call 33 of 35 significant.
 
 **What "above" means with 3 clips.** 7 of the 7 main-arm rows called above YOLO26m won all 3 clips. With 3 clusters the percentile interval excludes zero when a row wins every clip by a margin no resample can reverse, and a one-sided sign test on 3 of 3 clips gives p = 1/8 = 0.125. So "above" reads as "ahead on every clip we have", not as significance at 5%; only more test clips can tighten it.
 <!-- TABLE:ft_caveat END -->
@@ -175,6 +176,9 @@ sweep's `e1_lr2`). Whole-study spend is in [Cost](#cost).
 | LLMDet-large | peft @640 (long side 640), seed 1 | E5 | 640x360 (long side 640) | 11.4% (39.0M / 343.1M) | 0.681 | 0.697 | A100-SXM4-80GB | 17 (12) | 1972 | 0.38 | 0.38 |
 | LLMDet-large | peft @640 (long side 640), seed 2 | E5 | 640x360 (long side 640) | 11.4% (39.0M / 343.1M) | 0.679 | 0.693 | A100-SXM4-80GB | 20 (17) | 2320 | 0.44 | 0.45 |
 | LLMDet-large | full @640 (long side 640) | E5 | 640x360 (long side 640) | 100.0% (343.1M / 343.1M) | 0.684 | 0.696 | A100-SXM4-80GB | 20 (17) | 2320 | 0.57 | 0.66 |
+| LLMDet-large | peft @640 + matched multi-scale jitter, seed 0 | E6 | 640x360 (long side 640); train short 230-384, cap 640 | 11.4% (39.0M / 343.1M) | 0.674 | 0.701 | A100 80GB PCIe | 17 (12) | 1972 | 0.39 | 0.34 |
+| LLMDet-large | peft @640 + matched multi-scale jitter, seed 1 | E6 | 640x360 (long side 640); train short 230-384, cap 640 | 11.4% (39.0M / 343.1M) | 0.673 | 0.707 | A100 80GB PCIe | 20 (19) | 2320 | 0.46 | 0.41 |
+| LLMDet-large | peft @640 + matched multi-scale jitter, seed 2 | E6 | 640x360 (long side 640); train short 230-384, cap 640 | 11.4% (39.0M / 343.1M) | 0.675 | 0.698 | A100-SXM4-80GB | 20 (19) | 2320 | 0.40 | 0.43 |
 | MM-Grounding-DINO-B | peft | round 1 | short side 800 (1422x800) | 16.0% (37.2M / 233.0M) | 0.713 | 0.749 | RTX A6000 48GB | 36 (26) | 4176 | 1.61 | 0.73 |
 | MM-Grounding-DINO-B | peft, seed 1 | round 1 | short side 800 (1422x800) | 16.0% (37.2M / 233.0M) | 0.719 | 0.761 | RTX A6000 48GB | 40 (36) | 4640 | 1.78 | 0.86 |
 | MM-Grounding-DINO-B | peft, seed 2 | round 1 | short side 800 (1422x800) | 16.0% (37.2M / 233.0M) | 0.717 | 0.747 | RTX A6000 48GB | 28 (18) | 3248 | 1.26 | 0.80 |
@@ -187,6 +191,9 @@ sweep's `e1_lr2`). Whole-study spend is in [Cost](#cost).
 | MM-Grounding-DINO-B | peft @640 (long side 640), seed 0 | E5 | 640x360 (long side 640) | 16.0% (37.2M / 233.0M) | 0.567 | 0.569 | RTX A6000 48GB | — (26) | — | 0.54 | 0.35 |
 | MM-Grounding-DINO-B | peft @640 (long side 640), seed 1 | E5 | 640x360 (long side 640) | 16.0% (37.2M / 233.0M) | 0.578 | 0.568 | RTX A6000 48GB | — (30) | — | 0.49 | 0.41 |
 | MM-Grounding-DINO-B | peft @640 (long side 640), seed 2 | E5 | 640x360 (long side 640) | 16.0% (37.2M / 233.0M) | 0.584 | 0.586 | RTX A6000 48GB | — (38) | — | 0.62 | 0.40 |
+| MM-Grounding-DINO-B | peft @640 + matched multi-scale jitter, seed 0 | E6 | 640x360 (long side 640); train short 302-403, cap 720 | 16.0% (37.2M / 233.0M) | 0.572 | 0.570 | RTX A6000 48GB | 40 (40) | — | 0.66 | 0.39 |
+| MM-Grounding-DINO-B | peft @640 + matched multi-scale jitter, seed 1 | E6 | 640x360 (long side 640); train short 302-403, cap 720 | 16.0% (37.2M / 233.0M) | 0.587 | 0.594 | RTX A6000 48GB | 40 (32) | — | 0.65 | 0.39 |
+| MM-Grounding-DINO-B | peft @640 + matched multi-scale jitter, seed 2 | E6 | 640x360 (long side 640); train short 302-403, cap 720 | 16.0% (37.2M / 233.0M) | 0.579 | 0.585 | RTX A6000 48GB | 40 (40) | — | 0.71 | 0.45 |
 | SAM 3 | peft | round 1 | 1008x1008 | 4.6% (38.5M / 838.2M) | 0.668 | 0.702 | A100-SXM4-80GB | 12 (7) | 2784 | 1.05 | 1.32 |
 | SAM 3 | full | round 1 | 1008x1008 | 100.0% (838.2M / 838.2M) | 0.709 | 0.737 | A100-SXM4-80GB | 20 (15) | 4640 | 1.90 | 2.39 |
 | SAM 3 | mid: light + last 8 of 32 ViT blocks (layer decay) | E4 | 1008x1008 | 17.9% (149.8M / 838.2M) | 0.695 | 0.707 | A100-SXM4-80GB | 20 (17) | 4640 | 1.57 | 1.90 |
@@ -310,10 +317,12 @@ them with TensorRT fp16 on a T4. YOLOE-26x has 640 and 1280 runs from round 1.
 | DEIM-M @640, E1 recipe | 640 | 3 | 0.707 | 0.700 ± 0.005 | [0.653, 0.733] | 0.853 | 0.912 | 6.78 |
 | DEIM-M @1280, E1 recipe | 1280 | 3 | 0.774 | 0.782 ± 0.011 | [0.762, 0.805] | 0.930 | 0.960 | 18.2 |
 | LLMDet-large @640, light (peft) | 640x360 (long side 640) | 3 | 0.681 | 0.695 ± 0.002 | [0.614, 0.772] | 0.905 | 0.929 | 106.6 |
+| LLMDet-large @640 + matched jitter (E6), light (peft) | 640x360 (long side 640) | 3 | 0.674 | 0.702 ± 0.004 | [0.643, 0.773] | 0.919 | 0.937 | 106.6 |
 | LLMDet-large, light (peft) | short side 800, long cap 1333 | 3 | 0.735 | 0.777 ± 0.008 | [0.740, 0.817] | 0.922 | 0.961 | 334.8 |
 | LLMDet-large, full @640 (long side 640) | 640x360 (long side 640) | 1 | 0.684 | 0.696 | [0.608, 0.776] | 0.868 | 0.929 | 106.6 |
 | LLMDet-large, full | short side 800, long cap 1333 | 1 | 0.739 | 0.785 | [0.766, 0.813] | 0.919 | 0.965 | 334.8 |
 | MM-Grounding-DINO-B @640, light (peft) | 640x360 (long side 640) | 3 | 0.576 | 0.574 ± 0.010 | [0.508, 0.637] | 0.792 | 0.846 | 50.9 |
+| MM-Grounding-DINO-B @640 + matched jitter (E6), light (peft) | 640x360 (long side 640) | 3 | 0.580 | 0.583 ± 0.012 | [0.514, 0.656] | 0.827 | 0.857 | 50.9 |
 | MM-Grounding-DINO-B, light (peft) | short side 800 (1422x800) | 3 | 0.716 | 0.752 ± 0.008 | [0.712, 0.801] | 0.921 | 0.968 | 143-161 |
 | YOLOE-26x @640, full (`yoloe_full_640`) | 640 | 1 | 0.708 | 0.737 | [0.712, 0.763] | 0.862 | 0.949 | 11.3 |
 | YOLOE-26x @1280, full (`yoloe_full`) | 1280 | 1 | 0.774 | 0.775 | [0.740, 0.802] | 0.879 | 0.972 | 39.0 |
@@ -336,6 +345,12 @@ them with TensorRT fp16 on a T4. YOLOE-26x has 640 and 1280 runs from round 1.
 | LLMDet-large, full @640 (long side 640) | DEIM-M @640, E1 recipe | -0.003 [-0.045, +0.043] | 1 of 3 | tie (CI includes 0) |
 | MM-Grounding-DINO-B @640, light (peft) | YOLO26m @640, E1 recipe | -0.144 [-0.178, -0.101] | 0 of 3 | A below B on every resample |
 | MM-Grounding-DINO-B @640, light (peft) | DEIM-M @640, E1 recipe | -0.125 [-0.145, -0.096] | 0 of 3 | A below B on every resample |
+| LLMDet-large @640 + matched jitter (E6), light (peft) | LLMDet-large @640, light (peft) | +0.007 [-0.003, +0.029] | 2 of 3 | tie (CI includes 0) |
+| MM-Grounding-DINO-B @640 + matched jitter (E6), light (peft) | MM-Grounding-DINO-B @640, light (peft) | +0.009 [-0.002, +0.019] | 2 of 3 | tie (CI includes 0) |
+| LLMDet-large @640 + matched jitter (E6), light (peft) | YOLO26m @640, E1 recipe | -0.016 [-0.043, +0.035] | 1 of 3 | tie (CI includes 0) |
+| LLMDet-large @640 + matched jitter (E6), light (peft) | DEIM-M @640, E1 recipe | +0.003 [-0.014, +0.040] | 1 of 3 | tie (CI includes 0) |
+| MM-Grounding-DINO-B @640 + matched jitter (E6), light (peft) | YOLO26m @640, E1 recipe | -0.135 [-0.172, -0.082] | 0 of 3 | A below B on every resample |
+| MM-Grounding-DINO-B @640 + matched jitter (E6), light (peft) | DEIM-M @640, E1 recipe | -0.117 [-0.139, -0.077] | 0 of 3 | A below B on every resample |
 | YOLOE-26x @640, full (`yoloe_full_640`) | YOLO26m @640, E1 recipe | +0.018 [+0.007, +0.026] | 3 of 3 | A above B on every resample |
 | YOLOE-26x @1280, full (`yoloe_full`) | YOLO26m @1280, E1 recipe | +0.004 [-0.007, +0.031] | 1 of 3 | tie (CI includes 0) |
 <!-- TABLE:ft_e2_pairs END -->
@@ -348,6 +363,8 @@ them with TensorRT fp16 on a T4. YOLOE-26x has 640 and 1280 runs from round 1.
 | LLMDet-large, light (peft) | 3 / 3 | 0.695 ± 0.002 | short side 800, long cap 1333 | 0.777 ± 0.008 | +0.082 | 106.6 | 334.8 |
 | LLMDet-large, full | 1 / 1 | 0.696 | short side 800, long cap 1333 | 0.785 | +0.089 | 106.6 | 334.8 |
 | MM-Grounding-DINO-B, light (peft) | 3 / 3 | 0.574 ± 0.010 | short side 800 (1422x800) | 0.752 ± 0.008 | +0.178 | 50.9 | 143-161 |
+| LLMDet-large, light (peft), E6 matched jitter at 640 | 3 / 3 | 0.702 ± 0.004 | short side 800, long cap 1333 | 0.777 ± 0.008 | +0.075 | 106.6 | 334.8 |
+| MM-Grounding-DINO-B, light (peft), E6 matched jitter at 640 | 3 / 3 | 0.583 ± 0.012 | short side 800 (1422x800) | 0.752 ± 0.008 | +0.169 | 50.9 | 143-161 |
 <!-- TABLE:ft_e2_parity END -->
 
 Going to 1280 adds about 5 test points to YOLO26m and 8 to DEIM-M, more than any
@@ -371,14 +388,32 @@ baselines: -0.4 points against DEIM-M and -2.3 against YOLO26m (1 of 3 clips, CI
 about 18 points and is below both 640 baselines on every clip (-14.4 vs YOLO26m, -12.5 vs
 DEIM-M). As with the baselines, most of the loss is on `ball` and `number`.
 
-**Caveat: E5 also removes scale augmentation.** The round-1 recipes train with multi-scale
-jitter (LLMDet short side 480-800, MM-Grounding-DINO 672-896). Every one of those scales
-needs a long side above 640, so under the 640 cap all of them resize to the same 640x360:
-the jitter collapses to one fixed scale (plus horizontal flip). The 640 drop therefore
-mixes resolution with the loss of scale augmentation. MM-Grounding-DINO's -18 points in
-particular should be read as an upper bound on the pure resolution effect. The baselines
-keep their own augmentation at 640, so the comparison at 640 is not perfectly matched
-either. A rerun with a 640-centred jitter is the follow-up (section 12).
+**Matched augmentation (E6).** The round-1 recipes train with multi-scale jitter (LLMDet
+short side 480-800, MM-Grounding-DINO 672-896). Every one of those scales needs a long side
+above 640, so in E5 all of them resized to the same 640x360 and the jitter collapsed to one
+fixed scale (plus horizontal flip). E6 repeats E5 with the round-1 jitter restored and
+rescaled by r = 640 / (round-1 eval long side): LLMDet r = 0.480, train short sides 230-384,
+long cap 640; MM-Grounding-DINO r = 0.45, short sides 302-403, long cap 720. Eval is
+unchanged (640x360), 3 seeds each, so the E5 TensorRT engines apply as they are.
+
+- **E6 vs E5 (the augmentation effect)**: LLMDet-large +0.007 [-0.003, +0.029] and
+  MM-Grounding-DINO-B +0.009 [-0.002, +0.019], each ahead on 2 of 3 clips. Both intervals
+  include 0, so both are ties: restoring matched augmentation adds under 1 point. The 640
+  drop (about 8 points for LLMDet, 17-18 for MM-Grounding-DINO, every clip) is resolution,
+  not lost augmentation.
+- **E6 vs the 640 baselines**: LLMDet-large ties both, -0.016 [-0.043, +0.035] against
+  YOLO26m and +0.003 [-0.014, +0.040] against DEIM-M (1 of 3 clips each).
+  MM-Grounding-DINO-B is below both on every resample, -0.135 [-0.172, -0.082] against
+  YOLO26m and -0.117 [-0.139, -0.077] against DEIM-M (0 of 3 clips).
+- **Training caveat.** Two of the three MM-Grounding-DINO E6 seeds selected their last
+  epoch (40 of 40), so those runs may be slightly under-trained at the round-1 epoch budget;
+  a longer schedule could add a little. LLMDet seeds 1 and 2 also selected epoch 19 of a
+  20-epoch cap. With 3 clips the best one-sided sign test is p = 1/8, so none of these
+  readings is significant at 5%.
+
+The baselines keep their own augmentation at 640, so the comparison at 640 is matched in
+input size and in the grounding models' own recipe, not in augmentation policy across
+architectures.
 
 The other foundation rows see more pixels than 640 too: SAM 3 and OWLv2 at 1008x1008,
 Qwen3-VL at native 1080p. Only YOLOE, LLMDet-large and MM-Grounding-DINO-B were run at
@@ -513,8 +548,8 @@ same footing as the published detectors.
 | MM-Grounding-DINO-B (peft), MSDA plugin | 800x1422 | 143-161 | 197.4 | 466.2 | 0.710 → 0.690 (-2.0) | GPU-compute runs 12% apart: quote the range; plugin precision loss not isolated |
 | MM-Grounding-DINO-B (peft), ONNX GridSample | 800x1422 | 593.5 | 648.4 | 466.2 | 0.710 → 0.700 (-1.0) | superseded: superseded by the MSDA plugin engine; slower than PyTorch |
 | LLMDet-large (peft), MSDA plugin | 750x1333 | 334.8 | 344.4 | 734.9 | 0.739 → 0.727 (-1.2) | fp32 islands do not recover the fp16 loss; an fp32 engine scores -0.18 pt |
-| LLMDet-large @640 (peft_640_s0), MSDA plugin | 360x640 | 106.6 | 112.8 | — | 0.682 → 0.675 (-0.7) | E5; same export path as the native engine; a first timing pair right after the build was 12% apart, so the engine was re-timed and the stable pair is reported |
-| MM-Grounding-DINO-B @640 (peft_640_s0), MSDA plugin | 360x640 | 50.9 | 82.0 | — | 0.568 → 0.565 (-0.3) | E5; the engine runs the unpadded 360x640 frame (PyTorch pads to 384x640); val PyTorch is fp32 at the engine's input |
+| LLMDet-large @640 (peft_640_s0), MSDA plugin | 360x640 | 106.6 | 112.8 | — | 0.682 → 0.675 (-0.7) | E5 (E6 reuses it: same architecture and 360x640 engine input); same export path as the native engine; a first timing pair right after the build was 12% apart, so the engine was re-timed and the stable pair is reported |
+| MM-Grounding-DINO-B @640 (peft_640_s0), MSDA plugin | 360x640 | 50.9 | 82.0 | — | 0.568 → 0.565 (-0.3) | E5 (E6 reuses it: same architecture and engine input); the engine runs the unpadded 360x640 frame (PyTorch pads to 384x640); val PyTorch is fp32 at the engine's input |
 | SAM 3 (full), --attn-out-3d export | 1008x1008 | 432.1 | 440.8 | 1137.5 | 0.709 → 0.700 (-0.8) | round-1 engine gave val 0.000 (TRT 10.3 fp16 mis-computed the ViT attention projection on sm75); fixed by an export rewrite |
 | OWLv2-L/14 (full) | 1008x1008 | 425.0 | 505.5 | 1825.9 | 0.624 → 0.619 (-0.5) | e2e with cv2 pre-processing; the HF image processor alone takes ~470 ms on the CPU |
 <!-- TABLE:ft_latency_trt END -->
@@ -540,7 +575,6 @@ same footing as the published detectors.
   detectors on a YOLO architecture, are the exception (39-51 ms at 1280).
 
 <!-- TABLE:ft_not_timed START -->
-- **PaliGemma 2 @896 (peft_896)**: T4 latency at 896 px was not measured (the 448 px peft arm took ~9.9 s/frame in PyTorch).
 - **Generative VLMs under TensorRT**: token-by-token generation needs TensorRT-LLM, not a TensorRT engine; VLMs are timed in PyTorch only.
 - **YOLO26m / DEIM-M end to end at 1280**: only GPU compute was timed for the retrained baselines.
 <!-- TABLE:ft_not_timed END -->
@@ -564,6 +598,7 @@ same footing as the published detectors.
 | Florence-2-large | peft | 768x768 (squashed) | 1274.6 | p90 1369.5 | 0.499 |
 | Qwen3-VL (peft 8B, full 4B) | full | native 1920x1088 | 74712.4 | p90 78616.2 | 0.541 |
 | PaliGemma 2 3B-448 | peft | 448x448 (squashed) | 9924.7 | p90 11432.0 | 0.278 |
+| PaliGemma 2 3B-448 | peft_896 | 896x896 (squashed) | 10539.4 | p90 11469.1 | 0.432 |
 | SmolVLM2-2.2B | peft | SigLIP tiles, pixel-shuffled | 21422.8 | p90 25776.1 | 0.000 |
 <!-- TABLE:ft_latency_pytorch END -->
 
@@ -572,6 +607,11 @@ generative VLMs nearly all of the time is autoregressive decoding; they would ne
 TensorRT-LLM, not a TensorRT engine. Qwen3-VL was timed on the first 20 test images in one
 pass (the full protocol ran over 2.7 h without finishing). OWLv2's time includes the HF
 image processor on the CPU.
+
+PaliGemma 2 `peft_896` (the audit-fix arm, 896x896, 4096 image tokens) was timed with
+the same protocol, script and pins as the 448 arm: 10,539 ms median, p90 11,469 ms (two
+runs within 0.1%). That is only about 6% slower than 448 (9,925 ms): decoding about 160
+output tokens dominates, so 4x the image tokens adds only prefill time.
 
 ## 10. Generative VLMs and the audit corrections
 
@@ -591,7 +631,8 @@ only, and its test was predicted once.
 
 - **PaliGemma 2:** the 448 px squash makes the ball and jersey numbers a few pixels
   wide. The same LoRA recipe on the 896 px checkpoint gains about 15 points on both val
-  and test (0.278 → 0.432). T4 latency at 896 was not measured.
+  and test (0.278 → 0.432) at almost no latency cost: 10,539 ms median on the T4 against
+  9,925 ms at 448 (section 9).
 - **Qwen3-VL:** every round-1 arm froze the vision-to-language merger, which upstream
   fine-tuning trains and the PRD's recipe ("connector unfrozen") intended. Unfreezing it
   lifts the 8B LoRA from 0.548 to 0.570 and the 4B LoRA from 0.533 to 0.588. One seed
@@ -636,12 +677,11 @@ section 10. No audit found a pipeline bug.
 - **Resolution was matched in both directions for YOLO26m, DEIM-M, YOLOE, LLMDet-large
   and MM-Grounding-DINO-B only.** SAM 3, OWLv2 and the generative VLMs were not run at
   640.
-- **E5 is not jitter-matched.** Under the 640 long-side cap the grounding models'
-  multi-scale train jitter collapses to a single scale, so their 640 drop includes an
-  augmentation change; MM-Grounding-DINO's -18 points is an upper bound on the
-  resolution effect. Follow-up: rerun both models at 640 with a 640-centred multi-scale
-  jitter. LLMDet full @640 has one seed.
-- **Latency gaps.** PaliGemma 2 at 896 has no T4 latency. MM-Grounding-DINO's plugin
+- **E5/E6 at 640.** E6 restored the jitter E5 lost and moved neither model by more than
+  1 point (clustered ties), so the 640 drop is resolution. Two of three MM-Grounding-DINO
+  E6 seeds selected their last epoch, so it may be slightly under-trained. LLMDet full
+  @640 has one seed and was not rerun with jitter.
+- **Latency gaps.** MM-Grounding-DINO's plugin
   engine loses 2.0 pt val and its two timing runs differ by 12%; the plugin precision was
   not isolated. LLMDet's fp16 engine loses 1.2 pt. The retrained baselines have GPU
   compute only, no end-to-end TensorRT timing.
@@ -669,25 +709,28 @@ section 10. No audit found a pipeline bug.
 | round 1 | paligemma2 | PaliGemma 2 3B-448 | 2.75 | docs/plans/paligemma2.md, Cost table (A100 + T4) |
 | round 1 | smolvlm2 | SmolVLM2-2.2B | 2.42 | docs/plans/smolvlm2.md: A6000 4.99 h $2.11 + T4 1.39 h $0.31 |
 |  | **round 1 subtotal** |  | **31.92** |  |
-| round 2 (E1-E5) | yolo26m | YOLO26m | 11.00 (partial) | docs/plans/yolo26m.md, Cost: about $11 on 4090 boxes (arms, sweep, ~$1.2 dead boots) plus a ~$0.04 T4 box |
-| round 2 (E1-E5) | deimm | DEIM-M | 13.72 (partial) | results/deimm/costs_r2.tsv summed (11.88, incl. T4 boxes and failed boxes) + 1280_s0 box from its meta.json (1.84, not in the TSV) |
-| round 2 (E1-E5) | llmdet | LLMDet-large | 2.94 (partial) | docs/plans/llmdet.md, Round 2 cost table: box $ for frac25_d0 (0.62) and mid (1.36), train $ only for the other three |
-| round 2 (E1-E5) | mmgdino | MM-Grounding-DINO-B | 3.19 (partial) | docs/plans/mmgdino.md, Round 2 E3 table $ column + mid $0.97; the first launch that crashed (no pycocotools) is not included |
-| round 2 (E1-E5) | sam3 | SAM 3 | 1.90 | docs/plans/sam3.md, Round 2: mid 1.57 box-h, about $1.90 |
-| round 2 (E1-E5) | owlv2 | OWLv2-L/14 | 2.42 | docs/plans/owlv2.md, Round 2: mid ~4.6 h, ~$2.42 |
-| round 2 (E1-E5) | yoloe | YOLO-World-v2-x @1280, YOLOE-26x @1280, YOLOE-26x @640 | 1.25 | docs/plans/yoloe.md, Round 2 cost table total ~$1.25 |
-| round 2 (E1-E5) | llmdet | LLMDet-large | 3.20 | docs/plans/llmdet.md, E5 (640) Cost: four A100 boxes (peft_640_s0-s2, full_640_s0) + T4 TensorRT box, about $3.2 |
-| round 2 (E1-E5) | mmgdino | MM-Grounding-DINO-B | 1.24 | docs/plans/mmgdino.md, E5 (640): three A6000 boxes $0.35 + $0.41 + $0.40 + T4 $0.08, about $1.24 |
-|  | **round 2 (E1-E5) subtotal** |  | **40.86** |  |
+| round 2 (E1-E6) | yolo26m | YOLO26m | 11.00 (partial) | docs/plans/yolo26m.md, Cost: about $11 on 4090 boxes (arms, sweep, ~$1.2 dead boots) plus a ~$0.04 T4 box |
+| round 2 (E1-E6) | deimm | DEIM-M | 13.72 (partial) | results/deimm/costs_r2.tsv summed (11.88, incl. T4 boxes and failed boxes) + 1280_s0 box from its meta.json (1.84, not in the TSV) |
+| round 2 (E1-E6) | llmdet | LLMDet-large | 2.94 (partial) | docs/plans/llmdet.md, Round 2 cost table: box $ for frac25_d0 (0.62) and mid (1.36), train $ only for the other three |
+| round 2 (E1-E6) | mmgdino | MM-Grounding-DINO-B | 3.19 (partial) | docs/plans/mmgdino.md, Round 2 E3 table $ column + mid $0.97; the first launch that crashed (no pycocotools) is not included |
+| round 2 (E1-E6) | sam3 | SAM 3 | 1.90 | docs/plans/sam3.md, Round 2: mid 1.57 box-h, about $1.90 |
+| round 2 (E1-E6) | owlv2 | OWLv2-L/14 | 2.42 | docs/plans/owlv2.md, Round 2: mid ~4.6 h, ~$2.42 |
+| round 2 (E1-E6) | yoloe | YOLO-World-v2-x @1280, YOLOE-26x @1280, YOLOE-26x @640 | 1.25 | docs/plans/yoloe.md, Round 2 cost table total ~$1.25 |
+| round 2 (E1-E6) | llmdet | LLMDet-large | 3.20 | docs/plans/llmdet.md, E5 (640) Cost: four A100 boxes (peft_640_s0-s2, full_640_s0) + T4 TensorRT box, about $3.2 |
+| round 2 (E1-E6) | mmgdino | MM-Grounding-DINO-B | 1.24 | docs/plans/mmgdino.md, E5 (640): three A6000 boxes $0.35 + $0.41 + $0.40 + T4 $0.08, about $1.24 |
+| round 2 (E1-E6) | llmdet | LLMDet-large | 1.53 | E6 (640 + matched jitter): peft_640aug_s0-s2 meta.json cost_usd_box 0.48 + 0.48 + 0.57 (three A100 boxes); docs/plans/llmdet.md about $1.53 |
+| round 2 (E1-E6) | mmgdino | MM-Grounding-DINO-B | 1.23 | E6 (640 + matched jitter): peft_640aug_s0-s2 meta.json cost_usd 0.39 + 0.39 + 0.45 (three A6000 boxes); docs/plans/mmgdino.md about $1.23 |
+|  | **round 2 (E1-E6) subtotal** |  | **43.62** |  |
 | follow-ups (TensorRT, audit fixes) | llmdet | LLMDet-large | 0.49 | results/llmdet/latency_trt_t4.json cost_usd (T4 TensorRT box) |
 | follow-ups (TensorRT, audit fixes) | mmgdino | MM-Grounding-DINO-B | 1.05 | results/mmgdino/latency_trt_t4.json cost_usd 0.40 (GridSample engine) + msda_plugin.cost_usd 0.65 |
 | follow-ups (TensorRT, audit fixes) | sam3 | SAM 3 | 0.72 | results/sam3/latency_trt_t4.json cost_usd 0.32 (round 1, invalid engine) + round2.cost_usd 0.40 (fixed engine) |
 | follow-ups (TensorRT, audit fixes) | yoloe | YOLO-World-v2-x @1280, YOLOE-26x @1280, YOLOE-26x @640 | 0.40 | results/yoloe/latency_trt_t4.json notes: Norway T4 1.37 h x $0.276 + ~$0.02 |
 | follow-ups (TensorRT, audit fixes) | paligemma2 | PaliGemma 2 3B-448 | 4.43 | results/paligemma2/peft_896/meta.json cost_usd 3.83 (A100 3.45 box-h) + NIGHT_LOG 20:55 test-predict box ~$0.6 |
+| follow-ups (TensorRT, audit fixes) | paligemma2 | PaliGemma 2 3B-448 | 0.48 | docs/plans/paligemma2.md, T4 latency at 896: T4 box $0.21/h x 2.3 box-h, about $0.48 |
 | follow-ups (TensorRT, audit fixes) | qwen3vl | Qwen3-VL (peft 8B, full 4B) | 2.72 | NIGHT_LOG 21:17 and docs/plans/qwen3vl.md: two merger-unfrozen boxes, $1.36 each |
 | follow-ups (TensorRT, audit fixes) | owlv2 | OWLv2-L/14 | 0.00 (partial) | OWLv2 TensorRT box (vast 61096023, T4 $0.155/h): no cost total recorded in the results files |
-|  | **follow-ups (TensorRT, audit fixes) subtotal** |  | **9.81** |  |
-|  | **total** |  | **82.59** (partial) | partial: yolo26m (round 2 (E1-E5)), deimm (round 2 (E1-E5)), llmdet (round 2 (E1-E5)), mmgdino (round 2 (E1-E5)), owlv2 (follow-ups (TensorRT, audit fixes)) |
+|  | **follow-ups (TensorRT, audit fixes) subtotal** |  | **10.29** |  |
+|  | **total** |  | **85.83** (partial) | partial: yolo26m (round 2 (E1-E6)), deimm (round 2 (E1-E6)), llmdet (round 2 (E1-E6)), mmgdino (round 2 (E1-E6)), owlv2 (follow-ups (TensorRT, audit fixes)) |
 <!-- TABLE:ft_cost END -->
 
 Spend is the vast.ai bill per model and stage, from each plan doc or results file named
@@ -747,6 +790,8 @@ than the reference.
 | MM-Grounding-DINO-B, light (peft) (seed mean) | 0.803 | 0.752 | 0.711 |
 | LLMDet-large @640, light (peft) (seed mean) | 0.775 | 0.718 | 0.612 |
 | MM-Grounding-DINO-B @640, light (peft) (seed mean) | 0.639 | 0.590 | 0.506 |
+| LLMDet-large @640 + matched jitter (E6), light (peft) (seed mean) | 0.776 | 0.715 | 0.642 |
+| MM-Grounding-DINO-B @640 + matched jitter (E6), light (peft) (seed mean) | 0.659 | 0.588 | 0.512 |
 | OWLv2-L/14, light (peft) (seed mean) | 0.642 | 0.578 | 0.446 |
 | LLMDet-large, peft | 0.817 | 0.782 | 0.739 |
 | LLMDet-large, full | 0.814 | 0.783 | 0.766 |
@@ -847,6 +892,9 @@ than the reference.
 | LLMDet-large, peft @640 (long side 640), seed 1 | 0.960 | 0.975 | 0.926 | 0.978 | 1.000 | 0.923 |
 | LLMDet-large, peft @640 (long side 640), seed 2 | 0.957 | 0.981 | 0.894 | 0.979 | 1.000 | 0.931 |
 | LLMDet-large, full @640 (long side 640) | 0.949 | 0.973 | 0.868 | 0.975 | 1.000 | 0.929 |
+| LLMDet-large, peft @640 + matched multi-scale jitter, seed 0 | 0.963 | 0.982 | 0.915 | 0.985 | 1.000 | 0.934 |
+| LLMDet-large, peft @640 + matched multi-scale jitter, seed 1 | 0.964 | 0.982 | 0.917 | 0.980 | 1.000 | 0.938 |
+| LLMDet-large, peft @640 + matched multi-scale jitter, seed 2 | 0.967 | 0.979 | 0.925 | 0.991 | 1.000 | 0.939 |
 | MM-Grounding-DINO-B, peft | 0.970 | 0.992 | 0.917 | 0.978 | 1.000 | 0.965 |
 | MM-Grounding-DINO-B, peft, seed 1 | 0.974 | 0.988 | 0.930 | 0.981 | 1.000 | 0.970 |
 | MM-Grounding-DINO-B, peft, seed 2 | 0.972 | 0.989 | 0.917 | 0.984 | 1.000 | 0.968 |
@@ -859,6 +907,9 @@ than the reference.
 | MM-Grounding-DINO-B, peft @640 (long side 640), seed 0 | 0.912 | 0.980 | 0.788 | 0.962 | 0.992 | 0.839 |
 | MM-Grounding-DINO-B, peft @640 (long side 640), seed 1 | 0.912 | 0.980 | 0.800 | 0.974 | 0.962 | 0.845 |
 | MM-Grounding-DINO-B, peft @640 (long side 640), seed 2 | 0.918 | 0.973 | 0.786 | 0.976 | 0.997 | 0.855 |
+| MM-Grounding-DINO-B, peft @640 + matched multi-scale jitter, seed 0 | 0.926 | 0.983 | 0.819 | 0.985 | 0.996 | 0.850 |
+| MM-Grounding-DINO-B, peft @640 + matched multi-scale jitter, seed 1 | 0.934 | 0.981 | 0.846 | 0.976 | 0.998 | 0.868 |
+| MM-Grounding-DINO-B, peft @640 + matched multi-scale jitter, seed 2 | 0.925 | 0.981 | 0.817 | 0.975 | 0.997 | 0.853 |
 | SAM 3, peft | 0.928 | 0.989 | 0.848 | 0.992 | 0.959 | 0.852 |
 | SAM 3, full | 0.963 | 0.990 | 0.924 | 0.985 | 1.000 | 0.916 |
 | SAM 3, mid: light + last 8 of 32 ViT blocks (layer decay) | 0.942 | 0.989 | 0.889 | 0.989 | 0.980 | 0.864 |

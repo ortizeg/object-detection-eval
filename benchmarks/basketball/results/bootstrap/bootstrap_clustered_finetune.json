@@ -29,6 +29,9 @@
       "llmdet/peft_640_s1",
       "llmdet/peft_640_s2",
       "llmdet/full_640_s0",
+      "llmdet/peft_640aug_s0",
+      "llmdet/peft_640aug_s1",
+      "llmdet/peft_640aug_s2",
       "mmgdino/peft",
       "mmgdino/peft_s1",
       "mmgdino/peft_s2",
@@ -41,6 +44,9 @@
       "mmgdino/peft_640_s0",
       "mmgdino/peft_640_s1",
       "mmgdino/peft_640_s2",
+      "mmgdino/peft_640aug_s0",
+      "mmgdino/peft_640aug_s1",
+      "mmgdino/peft_640aug_s2",
       "sam3/peft",
       "sam3/full",
       "sam3/mid",
@@ -206,6 +212,27 @@
       "ci_2.5": 0.6077781081199646,
       "ci_97.5": 0.7756871804594994
     },
+    "llmdet/peft_640aug_s0": {
+      "point_estimate": 0.7015209794044495,
+      "bootstrap_mean": 0.7044345096305564,
+      "bootstrap_std": 0.030023532480361978,
+      "ci_2.5": 0.6481476463377476,
+      "ci_97.5": 0.7711806677281856
+    },
+    "llmdet/peft_640aug_s1": {
+      "point_estimate": 0.7074230313301086,
+      "bootstrap_mean": 0.7087963201381541,
+      "bootstrap_std": 0.029643538045870402,
+      "ci_2.5": 0.645829401165247,
+      "ci_97.5": 0.7669497273862361
+    },
+    "llmdet/peft_640aug_s2": {
+      "point_estimate": 0.699521541595459,
+      "bootstrap_mean": 0.7033827790507563,
+      "bootstrap_std": 0.037070172347185154,
+      "ci_2.5": 0.636019641160965,
+      "ci_97.5": 0.7812275238335132
+    },
     "mmgdino/peft": {
       "point_estimate": 0.749769389629364,
       "bootstrap_mean": 0.751182927025689,
@@ -289,6 +316,27 @@
       "bootstrap_std": 0.028487722805127638,
       "ci_2.5": 0.5248123489320278,
       "ci_97.5": 0.6456119164824485
+    },
+    "mmgdino/peft_640aug_s0": {
+      "point_estimate": 0.5702138543128967,
+      "bootstrap_mean": 0.5717049826074528,
+      "bootstrap_std": 0.034160805301872835,
+      "ci_2.5": 0.5012769620865584,
+      "ci_97.5": 0.646981057524681
+    },
+    "mmgdino/peft_640aug_s1": {
+      "point_estimate": 0.594311535358429,
+      "bootstrap_mean": 0.5949600029874731,
+      "bootstrap_std": 0.03332829464867195,
+      "ci_2.5": 0.5247393041849137,
+      "ci_97.5": 0.66723478063941
+    },
+    "mmgdino/peft_640aug_s2": {
+      "point_estimate": 0.585628092288971,
+      "bootstrap_mean": 0.58590242156276,
+      "bootstrap_std": 0.033517023579300455,
+      "ci_2.5": 0.5155632555484772,
+      "ci_97.5": 0.6542253591120243
     },
     "sam3/peft": {
       "point_estimate": 0.702013373374939,
@@ -918,6 +966,60 @@
         "clips_ahead": "2 of 3"
       }
     },
+    "llmdet/peft_640aug_s0": {
+      "YOLO26m": {
+        "point_diff": -0.014004409313201904,
+        "mean_diff": -0.011829532958843089,
+        "ci_2.5": -0.05518788322806358,
+        "ci_97.5": 0.05721072331070898,
+        "ci_excludes_zero": false,
+        "clips_ahead": "1 of 3"
+      },
+      "DEIM-M": {
+        "point_diff": 0.015208899974822998,
+        "mean_diff": 0.01611643808859366,
+        "ci_2.5": -8.158013224601728e-05,
+        "ci_97.5": 0.03469134643673896,
+        "ci_excludes_zero": false,
+        "clips_ahead": "2 of 3"
+      }
+    },
+    "llmdet/peft_640aug_s1": {
+      "YOLO26m": {
+        "point_diff": -0.008102357387542725,
+        "mean_diff": -0.0074677224512453445,
+        "ci_2.5": -0.057506128400564197,
+        "ci_97.5": 0.05297978296875952,
+        "ci_excludes_zero": false,
+        "clips_ahead": "1 of 3"
+      },
+      "DEIM-M": {
+        "point_diff": 0.021110951900482178,
+        "mean_diff": 0.020478248596191406,
+        "ci_2.5": 0.010524129867553711,
+        "ci_97.5": 0.0304604060947895,
+        "ci_excludes_zero": true,
+        "clips_ahead": "3 of 3"
+      }
+    },
+    "llmdet/peft_640aug_s2": {
+      "YOLO26m": {
+        "point_diff": -0.016003847122192383,
+        "mean_diff": -0.012881263538643165,
+        "ci_2.5": -0.06731588840484619,
+        "ci_97.5": 0.06725757941603658,
+        "ci_excludes_zero": false,
+        "clips_ahead": "1 of 3"
+      },
+      "DEIM-M": {
+        "point_diff": 0.01320946216583252,
+        "mean_diff": 0.015064707508793582,
+        "ci_2.5": 0.0009829998016357422,
+        "ci_97.5": 0.04473820254206656,
+        "ci_excludes_zero": true,
+        "clips_ahead": "3 of 3"
+      }
+    },
     "mmgdino/peft": {
       "YOLO26m": {
         "point_diff": 0.034244000911712646,
@@ -1130,6 +1232,60 @@
         "mean_diff": -0.10025269455379911,
         "ci_2.5": -0.11087617427110671,
         "ci_97.5": -0.09067333638668061,
+        "ci_excludes_zero": true,
+        "clips_ahead": "0 of 3"
+      }
+    },
+    "mmgdino/peft_640aug_s0": {
+      "YOLO26m": {
+        "point_diff": -0.14531153440475464,
+        "mean_diff": -0.1445590599819466,
+        "ci_2.5": -0.20205856747925283,
+        "ci_97.5": -0.0669888868927956,
+        "ci_excludes_zero": true,
+        "clips_ahead": "0 of 3"
+      },
+      "DEIM-M": {
+        "point_diff": -0.11609822511672974,
+        "mean_diff": -0.11661308893450983,
+        "ci_2.5": -0.13527220487594604,
+        "ci_97.5": -0.08910890966653824,
+        "ci_excludes_zero": true,
+        "clips_ahead": "0 of 3"
+      }
+    },
+    "mmgdino/peft_640aug_s1": {
+      "YOLO26m": {
+        "point_diff": -0.12121385335922241,
+        "mean_diff": -0.12130403960192644,
+        "ci_2.5": -0.17859622538089753,
+        "ci_97.5": -0.04673516377806666,
+        "ci_excludes_zero": true,
+        "clips_ahead": "0 of 3"
+      },
+      "DEIM-M": {
+        "point_diff": -0.09200054407119751,
+        "mean_diff": -0.09335806855448969,
+        "ci_2.5": -0.11094178333878517,
+        "ci_97.5": -0.06919654011726381,
+        "ci_excludes_zero": true,
+        "clips_ahead": "0 of 3"
+      }
+    },
+    "mmgdino/peft_640aug_s2": {
+      "YOLO26m": {
+        "point_diff": -0.12989729642868042,
+        "mean_diff": -0.13036162102663956,
+        "ci_2.5": -0.18777227401733398,
+        "ci_97.5": -0.05974458530545237,
+        "ci_excludes_zero": true,
+        "clips_ahead": "0 of 3"
+      },
+      "DEIM-M": {
+        "point_diff": -0.10068398714065552,
+        "mean_diff": -0.10241564997920283,
+        "ci_2.5": -0.11910407021641731,
+        "ci_97.5": -0.08222127407789231,
         "ci_excludes_zero": true,
         "clips_ahead": "0 of 3"
       }
@@ -2160,6 +2316,9 @@
       "llmdet/peft_640_s1": 0.7749053239822388,
       "llmdet/peft_640_s2": 0.781888484954834,
       "llmdet/full_640_s0": 0.7781004905700684,
+      "llmdet/peft_640aug_s0": 0.7737254500389099,
+      "llmdet/peft_640aug_s1": 0.769117534160614,
+      "llmdet/peft_640aug_s2": 0.7838594913482666,
       "mmgdino/peft": 0.8051808476448059,
       "mmgdino/peft_s1": 0.806850790977478,
       "mmgdino/peft_s2": 0.7965160608291626,
@@ -2172,6 +2331,9 @@
       "mmgdino/peft_640_s0": 0.6275843381881714,
       "mmgdino/peft_640_s1": 0.6427174806594849,
       "mmgdino/peft_640_s2": 0.6481072306632996,
+      "mmgdino/peft_640aug_s0": 0.6502959132194519,
+      "mmgdino/peft_640aug_s1": 0.6703448295593262,
+      "mmgdino/peft_640aug_s2": 0.6567705273628235,
       "sam3/peft": 0.7644860744476318,
       "sam3/full": 0.7765404582023621,
       "sam3/mid": 0.7626437544822693,
@@ -2237,6 +2399,8 @@
       "mmgdino_peft": 0.8028492331504822,
       "llmdet_peft_640": 0.77473251024882,
       "mmgdino_peft_640": 0.6394696831703186,
+      "llmdet_peft_640aug": 0.7755674918492635,
+      "mmgdino_peft_640aug": 0.6591370900472006,
       "owlv2_peft": 0.6420153180758158
     },
     "boston-celtics-new-york-knicks-game-4-q1|05_06-05_01": {
@@ -2255,6 +2419,9 @@
       "llmdet/peft_640_s1": 0.7226536870002747,
       "llmdet/peft_640_s2": 0.7195154428482056,
       "llmdet/full_640_s0": 0.7181360125541687,
+      "llmdet/peft_640aug_s0": 0.7091624736785889,
+      "llmdet/peft_640aug_s1": 0.719954252243042,
+      "llmdet/peft_640aug_s2": 0.7163728475570679,
       "mmgdino/peft": 0.749434232711792,
       "mmgdino/peft_s1": 0.7523085474967957,
       "mmgdino/peft_s2": 0.7547488808631897,
@@ -2267,6 +2434,9 @@
       "mmgdino/peft_640_s0": 0.5844104290008545,
       "mmgdino/peft_640_s1": 0.5859470367431641,
       "mmgdino/peft_640_s2": 0.5983864665031433,
+      "mmgdino/peft_640aug_s0": 0.574732780456543,
+      "mmgdino/peft_640aug_s1": 0.5987190008163452,
+      "mmgdino/peft_640aug_s2": 0.5903176665306091,
       "sam3/peft": 0.7171505689620972,
       "sam3/full": 0.7618834972381592,
       "sam3/mid": 0.7292273044586182,
@@ -2332,6 +2502,8 @@
       "mmgdino_peft": 0.7521638870239258,
       "llmdet_peft_640": 0.7178989847501119,
       "mmgdino_peft_640": 0.589581310749054,
+      "llmdet_peft_640aug": 0.7151631911595663,
+      "mmgdino_peft_640aug": 0.5879231492678324,
       "owlv2_peft": 0.5778557856877645
     },
     "boston-celtics-orlando-magic-game-4-q1|11_44-11_36": {
@@ -2350,6 +2522,9 @@
       "llmdet/peft_640_s1": 0.6101243495941162,
       "llmdet/peft_640_s2": 0.6027147173881531,
       "llmdet/full_640_s0": 0.6050324440002441,
+      "llmdet/peft_640aug_s0": 0.6471554040908813,
+      "llmdet/peft_640aug_s1": 0.6443616151809692,
+      "llmdet/peft_640aug_s2": 0.634771466255188,
       "mmgdino/peft": 0.7091237902641296,
       "mmgdino/peft_s1": 0.7310529351234436,
       "mmgdino/peft_s2": 0.6927590370178223,
@@ -2362,6 +2537,9 @@
       "mmgdino/peft_640_s0": 0.5010392069816589,
       "mmgdino/peft_640_s1": 0.49385857582092285,
       "mmgdino/peft_640_s2": 0.5228305459022522,
+      "mmgdino/peft_640aug_s0": 0.4994173049926758,
+      "mmgdino/peft_640aug_s1": 0.5225340723991394,
+      "mmgdino/peft_640aug_s2": 0.5141904354095459,
       "sam3/peft": 0.6365789771080017,
       "sam3/full": 0.681674599647522,
       "sam3/mid": 0.6437376737594604,
@@ -2427,6 +2605,8 @@
       "mmgdino_peft": 0.7109785874684652,
       "llmdet_peft_640": 0.6118588050206503,
       "mmgdino_peft_640": 0.5059094429016113,
+      "llmdet_peft_640aug": 0.6420961618423462,
+      "mmgdino_peft_640aug": 0.512047270933787,
       "owlv2_peft": 0.44634204109509784
     }
   },
@@ -2493,6 +2673,20 @@
       "bootstrap_std": 0.030633906037582453,
       "ci_2.5": 0.5080124409248432,
       "ci_97.5": 0.6369458461801211
+    },
+    "llmdet_peft_640aug": {
+      "point_estimate": 0.7028218507766724,
+      "bootstrap_mean": 0.7055378696064889,
+      "bootstrap_std": 0.03219737453319162,
+      "ci_2.5": 0.6433322295546532,
+      "ci_97.5": 0.7731193063159784
+    },
+    "mmgdino_peft_640aug": {
+      "point_estimate": 0.5833844939867655,
+      "bootstrap_mean": 0.5841891357192287,
+      "bootstrap_std": 0.033644462865353934,
+      "ci_2.5": 0.5138598406066497,
+      "ci_97.5": 0.6561470657587051
     },
     "owlv2_peft": {
       "point_estimate": 0.5405615369478861,
@@ -2684,6 +2878,54 @@
       "mean_diff": -0.12564621847352858,
       "ci_2.5": -0.14510388808945815,
       "ci_97.5": -0.09614004542430242,
+      "ci_excludes_zero": true,
+      "clips_ahead": "0 of 3"
+    },
+    "llmdet_peft_640aug - llmdet_peft_640": {
+      "point_diff": 0.006716748078664181,
+      "mean_diff": 0.007880893018510606,
+      "ci_2.5": -0.0028121272722879675,
+      "ci_97.5": 0.02947797377904252,
+      "ci_excludes_zero": false,
+      "clips_ahead": "2 of 3"
+    },
+    "mmgdino_peft_640aug - mmgdino_peft_640": {
+      "point_diff": 0.008664508660634285,
+      "mean_diff": 0.008308693950558868,
+      "ci_2.5": -0.0015969189504782696,
+      "ci_97.5": 0.01945862943927447,
+      "ci_excludes_zero": false,
+      "clips_ahead": "2 of 3"
+    },
+    "llmdet_peft_640aug - yolo26m_640_e1": {
+      "point_diff": -0.015928467114766476,
+      "mean_diff": -0.01457402514822689,
+      "ci_2.5": -0.042801129321257264,
+      "ci_97.5": 0.03482002690434451,
+      "ci_excludes_zero": false,
+      "clips_ahead": "1 of 3"
+    },
+    "llmdet_peft_640aug - deimm_640_e1": {
+      "point_diff": 0.002706170082092285,
+      "mean_diff": 0.004011209364290599,
+      "ci_2.5": -0.014066338539123535,
+      "ci_97.5": 0.0400334147115548,
+      "ci_excludes_zero": false,
+      "clips_ahead": "1 of 3"
+    },
+    "mmgdino_peft_640aug - yolo26m_640_e1": {
+      "point_diff": -0.13536582390467333,
+      "mean_diff": -0.13592275903548723,
+      "ci_2.5": -0.17227351826926068,
+      "ci_97.5": -0.08215221365292869,
+      "ci_excludes_zero": true,
+      "clips_ahead": "0 of 3"
+    },
+    "mmgdino_peft_640aug - deimm_640_e1": {
+      "point_diff": -0.11673118670781457,
+      "mean_diff": -0.11733752452296974,
+      "ci_2.5": -0.139205925911665,
+      "ci_97.5": -0.0769388258457184,
       "ci_excludes_zero": true,
       "clips_ahead": "0 of 3"
     },
