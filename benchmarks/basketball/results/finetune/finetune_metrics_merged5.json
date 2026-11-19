@@ -618,6 +618,270 @@
       "sibling_test_map_50_95": 0.7516794204711914
     },
     {
+      "row_id": "llmdet/peft_640_s0",
+      "model_key": "llmdet",
+      "model": "LLMDet-large",
+      "family": "open-vocab detector",
+      "slug": "llmdet",
+      "experiment": "E5",
+      "input": "640x360 (long side 640)",
+      "arm": "peft_640_s0",
+      "role": "extra",
+      "base_arm": "peft_640_s0",
+      "label": "peft @640 (long side 640), seed 0",
+      "seed": 0,
+      "image_size": "train=long side 640, aspect kept: 1920x1080 -> 640x360 (--long-cap 640; the multi-scale short sides 480..800 all exceed 360, so the long cap always binds and multi-scale collapses to one scale), test=long side 640: 640x360 (--short 800 --long-cap 640), mmdet_equivalent=Resize scale=(640, 640) keep_ratio=True (mmcv rescale_size: long edge <= max(scale)=640, short edge <= min(scale)=640), train_short_side_list=480,512,544,576,608,640,672,704,736,768,800, long_cap=640",
+      "model_id": "iSEE-Laboratory/llmdet_large",
+      "selected_epoch": 17,
+      "epochs_run": 20,
+      "optimizer_steps": 2320,
+      "gpu": "NVIDIA A100 80GB PCIe (vast.ai)",
+      "meta_note": null,
+      "trainable_params": 38959779,
+      "total_params": 343052631,
+      "trainable_fraction": 0.1135679352944534,
+      "train_gpu_hours": 0.493,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.44,
+      "train_cost_key": "cost_usd_train_compute",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/llmdet_peft_640_s0_valid.json.gz",
+          "sha256_json": "b26187c34035619faefe5670981e32504384a9d1a2510549435643d2fbb5dcc8"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/llmdet_peft_640_s0_test.json.gz",
+          "sha256_json": "0f54a3dffbae63a17c637407f6a9598d3774c08a87cc85ead7d54276491ecc1b"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.682144045829773,
+        "mAP_50": 0.9615256786346436,
+        "mAP_75": 0.7800542712211609,
+        "per_class_ap50": {
+          "player": 0.9836539626121521,
+          "ball": 0.8826271295547485,
+          "referee": 0.9775123596191406,
+          "rim": 0.9921857118606567,
+          "number": 0.9716493487358093
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.6962161660194397,
+        "mAP_50": 0.9546980857849121,
+        "mAP_75": 0.7927215099334717,
+        "per_class_ap50": {
+          "player": 0.9768388867378235,
+          "ball": 0.8936180472373962,
+          "referee": 0.9702162742614746,
+          "rim": 1.0,
+          "number": 0.9328171610832214
+        }
+      },
+      "sibling_test_map_50_95": 0.6962161660194397
+    },
+    {
+      "row_id": "llmdet/peft_640_s1",
+      "model_key": "llmdet",
+      "model": "LLMDet-large",
+      "family": "open-vocab detector",
+      "slug": "llmdet",
+      "experiment": "E5",
+      "input": "640x360 (long side 640)",
+      "arm": "peft_640_s1",
+      "role": "extra",
+      "base_arm": "peft_640_s1",
+      "label": "peft @640 (long side 640), seed 1",
+      "seed": 1,
+      "image_size": "train=long side 640, aspect kept: 1920x1080 -> 640x360 (--long-cap 640; the multi-scale short sides 480..800 all exceed 360, so the long cap always binds and multi-scale collapses to one scale), test=long side 640: 640x360 (--short 800 --long-cap 640), mmdet_equivalent=Resize scale=(640, 640) keep_ratio=True (mmcv rescale_size: long edge <= max(scale)=640, short edge <= min(scale)=640), train_short_side_list=480,512,544,576,608,640,672,704,736,768,800, long_cap=640",
+      "model_id": "iSEE-Laboratory/llmdet_large",
+      "selected_epoch": 12,
+      "epochs_run": 17,
+      "optimizer_steps": 1972,
+      "gpu": "NVIDIA A100-SXM4-80GB (vast.ai)",
+      "meta_note": null,
+      "trainable_params": 38959779,
+      "total_params": 343052631,
+      "trainable_fraction": 0.1135679352944534,
+      "train_gpu_hours": 0.376,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.38,
+      "train_cost_key": "cost_usd_train_compute",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/llmdet_peft_640_s1_valid.json.gz",
+          "sha256_json": "59dc294396d5ae0481ba4922692318bf399aeca47ad51b773418bde7b5c76471"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/llmdet_peft_640_s1_test.json.gz",
+          "sha256_json": "1571a1c8481cc70bcd8e72f0ba94473e014172649e4a213c54c774c8b9db43d7"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.6809779405593872,
+        "mAP_50": 0.9617875218391418,
+        "mAP_75": 0.7814037799835205,
+        "per_class_ap50": {
+          "player": 0.9815238118171692,
+          "ball": 0.9051633477210999,
+          "referee": 0.9778599739074707,
+          "rim": 0.9763225317001343,
+          "number": 0.9680679440498352
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.6966826319694519,
+        "mAP_50": 0.9602267742156982,
+        "mAP_75": 0.7750188708305359,
+        "per_class_ap50": {
+          "player": 0.9747468829154968,
+          "ball": 0.9256950616836548,
+          "referee": 0.9777743220329285,
+          "rim": 1.0,
+          "number": 0.9229177236557007
+        }
+      },
+      "sibling_test_map_50_95": 0.6966826319694519
+    },
+    {
+      "row_id": "llmdet/peft_640_s2",
+      "model_key": "llmdet",
+      "model": "LLMDet-large",
+      "family": "open-vocab detector",
+      "slug": "llmdet",
+      "experiment": "E5",
+      "input": "640x360 (long side 640)",
+      "arm": "peft_640_s2",
+      "role": "extra",
+      "base_arm": "peft_640_s2",
+      "label": "peft @640 (long side 640), seed 2",
+      "seed": 2,
+      "image_size": "train=long side 640, aspect kept: 1920x1080 -> 640x360 (--long-cap 640; the multi-scale short sides 480..800 all exceed 360, so the long cap always binds and multi-scale collapses to one scale), test=long side 640: 640x360 (--short 800 --long-cap 640), mmdet_equivalent=Resize scale=(640, 640) keep_ratio=True (mmcv rescale_size: long edge <= max(scale)=640, short edge <= min(scale)=640), train_short_side_list=480,512,544,576,608,640,672,704,736,768,800, long_cap=640",
+      "model_id": "iSEE-Laboratory/llmdet_large",
+      "selected_epoch": 17,
+      "epochs_run": 20,
+      "optimizer_steps": 2320,
+      "gpu": "NVIDIA A100-SXM4-80GB (vast.ai)",
+      "meta_note": null,
+      "trainable_params": 38959779,
+      "total_params": 343052631,
+      "trainable_fraction": 0.1135679352944534,
+      "train_gpu_hours": 0.439,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.45,
+      "train_cost_key": "cost_usd_train_compute",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/llmdet_peft_640_s2_valid.json.gz",
+          "sha256_json": "29b677a345c8f062ec12ea549192b11903e4b0c65ca752580ef51223ed89e5bd"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/llmdet_peft_640_s2_test.json.gz",
+          "sha256_json": "b1af088cd514658bb9e0fcd4bd8c1d76198adf1c0ac14b047f58b7fb91090887"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.6792528629302979,
+        "mAP_50": 0.9614230990409851,
+        "mAP_75": 0.7657352685928345,
+        "per_class_ap50": {
+          "player": 0.9852091073989868,
+          "ball": 0.8971312642097473,
+          "referee": 0.9860779047012329,
+          "rim": 0.9593384265899658,
+          "number": 0.9793586730957031
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.6932126879692078,
+        "mAP_50": 0.9571878910064697,
+        "mAP_75": 0.7576199769973755,
+        "per_class_ap50": {
+          "player": 0.9810919761657715,
+          "ball": 0.8942208886146545,
+          "referee": 0.9791648983955383,
+          "rim": 1.0,
+          "number": 0.9314616322517395
+        }
+      },
+      "sibling_test_map_50_95": 0.6932126879692078
+    },
+    {
+      "row_id": "llmdet/full_640_s0",
+      "model_key": "llmdet",
+      "model": "LLMDet-large",
+      "family": "open-vocab detector",
+      "slug": "llmdet",
+      "experiment": "E5",
+      "input": "640x360 (long side 640)",
+      "arm": "full_640_s0",
+      "role": "extra",
+      "base_arm": "full_640_s0",
+      "label": "full @640 (long side 640)",
+      "seed": 0,
+      "image_size": "train=long side 640, aspect kept: 1920x1080 -> 640x360 (--long-cap 640; the multi-scale short sides 480..800 all exceed 360, so the long cap always binds and multi-scale collapses to one scale), test=long side 640: 640x360 (--short 800 --long-cap 640), mmdet_equivalent=Resize scale=(640, 640) keep_ratio=True (mmcv rescale_size: long edge <= max(scale)=640, short edge <= min(scale)=640), train_short_side_list=480,512,544,576,608,640,672,704,736,768,800, long_cap=640",
+      "model_id": "iSEE-Laboratory/llmdet_large",
+      "selected_epoch": 17,
+      "epochs_run": 20,
+      "optimizer_steps": 2320,
+      "gpu": "NVIDIA A100-SXM4-80GB (vast.ai)",
+      "meta_note": null,
+      "trainable_params": 343052631,
+      "total_params": 343052631,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 0.573,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.66,
+      "train_cost_key": "cost_usd_train_compute",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/llmdet_full_640_s0_valid.json.gz",
+          "sha256_json": "d100754527979fb578eb153418c1fa4fe6fa0f8013f930d136555dc9d3760728"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/llmdet_full_640_s0_test.json.gz",
+          "sha256_json": "aa8f0dc5d1bc12f52ca7d842a15eed9f56d4174148cb90734c581619ee11b036"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.6841102838516235,
+        "mAP_50": 0.9686311483383179,
+        "mAP_75": 0.7847464084625244,
+        "per_class_ap50": {
+          "player": 0.9831969141960144,
+          "ball": 0.9119665026664734,
+          "referee": 0.9735305309295654,
+          "rim": 1.0,
+          "number": 0.9744617938995361
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.696267306804657,
+        "mAP_50": 0.9491273760795593,
+        "mAP_75": 0.7941891551017761,
+        "per_class_ap50": {
+          "player": 0.9726313352584839,
+          "ball": 0.868446946144104,
+          "referee": 0.9750726222991943,
+          "rim": 1.0,
+          "number": 0.929486095905304
+        }
+      },
+      "sibling_test_map_50_95": 0.696267306804657
+    },
+    {
       "row_id": "mmgdino/peft",
       "model_key": "mmgdino",
       "model": "MM-Grounding-DINO-B",
@@ -1226,6 +1490,204 @@
         }
       },
       "sibling_test_map_50_95": 0.6943634152412415
+    },
+    {
+      "row_id": "mmgdino/peft_640_s0",
+      "model_key": "mmgdino",
+      "model": "MM-Grounding-DINO-B",
+      "family": "open-vocab detector",
+      "slug": "mmgdino",
+      "experiment": "E5",
+      "input": "640x360 (long side 640)",
+      "arm": "peft_640_s0",
+      "role": "extra",
+      "base_arm": "peft_640_s0",
+      "label": "peft @640 (long side 640), seed 0",
+      "seed": 0,
+      "image_size": "long side 640, aspect kept, no upscaling (1920x1080 -> 640x360, batch tensor padded to 384x640) for train, in-loop val and predict (--max-size 640). The round-1 train scales (short side 672..896) all exceed the 640 cap, so train is a fixed 640x360 + hflip (the round-1 multi-scale jitter collapses); eval_short 800 is likewise capped to 640x360.",
+      "model_id": "openmmlab-community/mm_grounding_dino_base_all",
+      "selected_epoch": 26,
+      "epochs_run": null,
+      "optimizer_steps": null,
+      "gpu": "1x RTX A6000 48GB (vast.ai)",
+      "meta_note": null,
+      "trainable_params": 37204515,
+      "total_params": 232976283,
+      "trainable_fraction": 0.15969228507263977,
+      "train_gpu_hours": 0.537,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.35,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/mmgdino_peft_640_s0_valid.json.gz",
+          "sha256_json": "5b1e3e9b53a8652701fcabb5815823dd4de8d000529a87acca09398637f26694"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/mmgdino_peft_640_s0_test.json.gz",
+          "sha256_json": "bf9a370edb24c588b4b948afd95b15282f9776bba81b01f74e6f166bc31af0a7"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.5669870376586914,
+        "mAP_50": 0.91987544298172,
+        "mAP_75": 0.5643507838249207,
+        "per_class_ap50": {
+          "player": 0.9755628705024719,
+          "ball": 0.8400292992591858,
+          "referee": 0.9522556066513062,
+          "rim": 0.967326283454895,
+          "number": 0.8642033338546753
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.5689637064933777,
+        "mAP_50": 0.912106454372406,
+        "mAP_75": 0.5645929574966431,
+        "per_class_ap50": {
+          "player": 0.9797389507293701,
+          "ball": 0.7884699702262878,
+          "referee": 0.9618018865585327,
+          "rim": 0.9916554689407349,
+          "number": 0.8388659358024597
+        }
+      },
+      "sibling_test_map_50_95": 0.5689637064933777
+    },
+    {
+      "row_id": "mmgdino/peft_640_s1",
+      "model_key": "mmgdino",
+      "model": "MM-Grounding-DINO-B",
+      "family": "open-vocab detector",
+      "slug": "mmgdino",
+      "experiment": "E5",
+      "input": "640x360 (long side 640)",
+      "arm": "peft_640_s1",
+      "role": "extra",
+      "base_arm": "peft_640_s1",
+      "label": "peft @640 (long side 640), seed 1",
+      "seed": 1,
+      "image_size": "long side 640, aspect kept, no upscaling (1920x1080 -> 640x360, batch tensor padded to 384x640) for train, in-loop val and predict (--max-size 640). The round-1 train scales (short side 672..896) all exceed the 640 cap, so train is a fixed 640x360 + hflip (the round-1 multi-scale jitter collapses); eval_short 800 is likewise capped to 640x360.",
+      "model_id": "openmmlab-community/mm_grounding_dino_base_all",
+      "selected_epoch": 30,
+      "epochs_run": null,
+      "optimizer_steps": null,
+      "gpu": "1x RTX A6000 48GB (vast.ai)",
+      "meta_note": null,
+      "trainable_params": 37204515,
+      "total_params": 232976283,
+      "trainable_fraction": 0.15969228507263977,
+      "train_gpu_hours": 0.49,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.41,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/mmgdino_peft_640_s1_valid.json.gz",
+          "sha256_json": "956dbfb729ba175fe8465e0d51ee820a50691babc151a5041f9a9ff0f9067d02"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/mmgdino_peft_640_s1_test.json.gz",
+          "sha256_json": "85c662d75a852c32530d5bb2f01037e10ec52f0c719802f4737f0c85e0f27153"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.5779759883880615,
+        "mAP_50": 0.9271652102470398,
+        "mAP_75": 0.5918401479721069,
+        "per_class_ap50": {
+          "player": 0.9743430018424988,
+          "ball": 0.8314983248710632,
+          "referee": 0.9560254812240601,
+          "rim": 0.9796823263168335,
+          "number": 0.8942769765853882
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.5677430629730225,
+        "mAP_50": 0.9120663404464722,
+        "mAP_75": 0.55995774269104,
+        "per_class_ap50": {
+          "player": 0.9800455570220947,
+          "ball": 0.8001517653465271,
+          "referee": 0.9735056757926941,
+          "rim": 0.9620916247367859,
+          "number": 0.8445370197296143
+        }
+      },
+      "sibling_test_map_50_95": 0.5677430629730225
+    },
+    {
+      "row_id": "mmgdino/peft_640_s2",
+      "model_key": "mmgdino",
+      "model": "MM-Grounding-DINO-B",
+      "family": "open-vocab detector",
+      "slug": "mmgdino",
+      "experiment": "E5",
+      "input": "640x360 (long side 640)",
+      "arm": "peft_640_s2",
+      "role": "extra",
+      "base_arm": "peft_640_s2",
+      "label": "peft @640 (long side 640), seed 2",
+      "seed": 2,
+      "image_size": "long side 640, aspect kept, no upscaling (1920x1080 -> 640x360, batch tensor padded to 384x640) for train, in-loop val and predict (--max-size 640). The round-1 train scales (short side 672..896) all exceed the 640 cap, so train is a fixed 640x360 + hflip (the round-1 multi-scale jitter collapses); eval_short 800 is likewise capped to 640x360.",
+      "model_id": "openmmlab-community/mm_grounding_dino_base_all",
+      "selected_epoch": 38,
+      "epochs_run": null,
+      "optimizer_steps": null,
+      "gpu": "1x RTX A6000 48GB (vast.ai)",
+      "meta_note": null,
+      "trainable_params": 37204515,
+      "total_params": 232976283,
+      "trainable_fraction": 0.15969228507263977,
+      "train_gpu_hours": 0.617,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.4,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/mmgdino_peft_640_s2_valid.json.gz",
+          "sha256_json": "f11ac810a68c304befb17aeaab60a6c87b71a09a0f18349e6d13254be0050e6c"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/mmgdino_peft_640_s2_test.json.gz",
+          "sha256_json": "191e7ecc79fe0018c198d644b3b809a5f15f3b73a55a9642365eead8772a577f"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.5843578577041626,
+        "mAP_50": 0.9267018437385559,
+        "mAP_75": 0.6228950023651123,
+        "per_class_ap50": {
+          "player": 0.9787225723266602,
+          "ball": 0.8508644104003906,
+          "referee": 0.9384455680847168,
+          "rim": 0.9798886179924011,
+          "number": 0.8855879306793213
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.5863189697265625,
+        "mAP_50": 0.9176431894302368,
+        "mAP_75": 0.6063006520271301,
+        "per_class_ap50": {
+          "player": 0.9733211398124695,
+          "ball": 0.7859443426132202,
+          "referee": 0.9760861396789551,
+          "rim": 0.9974796772003174,
+          "number": 0.8553845882415771
+        }
+      },
+      "sibling_test_map_50_95": 0.5863189697265625
     },
     {
       "row_id": "sam3/peft",
@@ -5712,6 +6174,20 @@
     },
     {
       "slug": "llmdet",
+      "usd": 3.2,
+      "complete": true,
+      "source": "docs/plans/llmdet.md, E5 (640) Cost: four A100 boxes (peft_640_s0-s2, full_640_s0) + T4 TensorRT box, about $3.2",
+      "stage": "round2"
+    },
+    {
+      "slug": "mmgdino",
+      "usd": 1.24,
+      "complete": true,
+      "source": "docs/plans/mmgdino.md, E5 (640): three A6000 boxes $0.35 + $0.41 + $0.40 + T4 $0.08, about $1.24",
+      "stage": "round2"
+    },
+    {
+      "slug": "llmdet",
       "usd": 0.49,
       "complete": true,
       "source": "results/llmdet/latency_trt_t4.json cost_usd (T4 TensorRT box)",
@@ -6067,6 +6543,26 @@
       ]
     },
     {
+      "key": "llmdet_peft_640",
+      "label": "LLMDet-large @640, light (peft)",
+      "input": "640x360 (long side 640)",
+      "members": [
+        "llmdet/peft_640_s0",
+        "llmdet/peft_640_s1",
+        "llmdet/peft_640_s2"
+      ]
+    },
+    {
+      "key": "mmgdino_peft_640",
+      "label": "MM-Grounding-DINO-B @640, light (peft)",
+      "input": "640x360 (long side 640)",
+      "members": [
+        "mmgdino/peft_640_s0",
+        "mmgdino/peft_640_s1",
+        "mmgdino/peft_640_s2"
+      ]
+    },
+    {
       "key": "owlv2_peft",
       "label": "OWLv2-L/14, light (peft)",
       "input": "1008x1008",
@@ -6090,7 +6586,10 @@
         "sam3/full",
         "deimm_640_e1",
         "yolo26m_640_e1",
-        "yoloe_640/yoloe_full_640"
+        "yoloe_640/yoloe_full_640",
+        "llmdet_peft_640",
+        "llmdet/full_640_s0",
+        "mmgdino_peft_640"
       ],
       "pairs": [
         [
@@ -6165,6 +6664,12 @@
         "yolo26m_1280",
         "deimm_640_e1",
         "deimm_1280",
+        "llmdet_peft_640",
+        "llmdet_peft",
+        "llmdet/full_640_s0",
+        "llmdet/full",
+        "mmgdino_peft_640",
+        "mmgdino_peft",
         "yoloe_640/yoloe_full_640",
         "yoloe_1280/yoloe_full",
         "yoloe_640/yoloe_peft_640",
@@ -6180,8 +6685,44 @@
           "deimm_640_e1"
         ],
         [
+          "llmdet_peft",
+          "llmdet_peft_640"
+        ],
+        [
+          "llmdet/full",
+          "llmdet/full_640_s0"
+        ],
+        [
+          "mmgdino_peft",
+          "mmgdino_peft_640"
+        ],
+        [
           "yoloe_1280/yoloe_full",
           "yoloe_640/yoloe_full_640"
+        ],
+        [
+          "llmdet_peft_640",
+          "yolo26m_640_e1"
+        ],
+        [
+          "llmdet_peft_640",
+          "deimm_640_e1"
+        ],
+        [
+          "llmdet/full_640_s0",
+          "yolo26m_640_e1"
+        ],
+        [
+          "llmdet/full_640_s0",
+          "deimm_640_e1"
+        ],
+        [
+          "mmgdino_peft_640",
+          "yolo26m_640_e1"
+        ],
+        [
+          "mmgdino_peft_640",
+          "deimm_640_e1"
         ],
         [
           "yoloe_640/yoloe_full_640",
@@ -6259,6 +6800,33 @@
         "mmgdino/peft_frac50_d0",
         "mmgdino/peft_frac50_d1"
       ]
+    }
+  ],
+  "parity": [
+    {
+      "label": "DEIM-M (E1 recipe)",
+      "low": "deimm_640_e1",
+      "high": "deimm_1280"
+    },
+    {
+      "label": "YOLO26m (E1 recipe)",
+      "low": "yolo26m_640_e1",
+      "high": "yolo26m_1280"
+    },
+    {
+      "label": "LLMDet-large, light (peft)",
+      "low": "llmdet_peft_640",
+      "high": "llmdet_peft"
+    },
+    {
+      "label": "LLMDet-large, full",
+      "low": "llmdet/full_640_s0",
+      "high": "llmdet/full"
+    },
+    {
+      "label": "MM-Grounding-DINO-B, light (peft)",
+      "low": "mmgdino_peft_640",
+      "high": "mmgdino_peft"
     }
   ],
   "fixes": [
@@ -6591,6 +7159,56 @@
       "pytorch_ms": 734.93,
       "val_pytorch": 0.7392569184303284,
       "val_trt": 0.7270957827568054,
+      "published": false
+    },
+    {
+      "key": "llmdet_e5_640",
+      "label": "LLMDet-large @640 (peft_640_s0), MSDA plugin",
+      "input": "360x640",
+      "status": "current",
+      "applies_to": [
+        "llmdet_peft_640",
+        "llmdet/peft_640_s0",
+        "llmdet/peft_640_s1",
+        "llmdet/peft_640_s2",
+        "llmdet/full_640_s0"
+      ],
+      "note": "E5; same export path as the native engine; a first timing pair right after the build was 12% apart, so the engine was re-timed and the stable pair is reported",
+      "source": "llmdet/latency_trt_t4.json",
+      "gpu_ms": 106.56840133666992,
+      "gpu_runs_ms": [
+        104.85236740112305,
+        106.56840133666992
+      ],
+      "e2e_ms": 112.83553764224052,
+      "pytorch_ms": null,
+      "val_pytorch": 0.682144045829773,
+      "val_trt": 0.6746860146522522,
+      "published": false
+    },
+    {
+      "key": "mmgdino_e5_640",
+      "label": "MM-Grounding-DINO-B @640 (peft_640_s0), MSDA plugin",
+      "input": "360x640",
+      "status": "current",
+      "applies_to": [
+        "mmgdino_peft_640",
+        "mmgdino/peft_640_s0",
+        "mmgdino/peft_640_s1",
+        "mmgdino/peft_640_s2"
+      ],
+      "note": "E5; the engine runs the unpadded 360x640 frame (PyTorch pads to 384x640); val PyTorch is fp32 at the engine's input",
+      "source": "mmgdino/latency_trt_t4.json",
+      "gpu_ms": 50.9040641784668,
+      "gpu_runs_ms": [
+        50.641136169433594,
+        50.85515213012695,
+        50.9040641784668
+      ],
+      "e2e_ms": 81.99320640414953,
+      "pytorch_ms": null,
+      "val_pytorch": 0.5680603981018066,
+      "val_trt": 0.5648324489593506,
       "published": false
     },
     {

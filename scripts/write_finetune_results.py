@@ -90,7 +90,7 @@ class Arms(_Frozen):
     variants: list[Variant] = Field(default_factory=list)
 
 
-Experiment = Literal["E1", "E2", "E3", "E4", "fix"]
+Experiment = Literal["E1", "E2", "E3", "E4", "E5", "fix"]
 
 
 class ExtraArm(_Frozen):
@@ -162,6 +162,14 @@ class TableSpec(_Frozen):
     pairs: list[tuple[str, str]] = Field(default_factory=list)
 
 
+class ParitySpec(_Frozen):
+    """One model's resolution-parity line: the same recipe at 640 and at the higher input."""
+
+    label: str
+    low: str
+    high: str
+
+
 class ScalingSpec(_Frozen):
     label: str
     full: str
@@ -220,6 +228,7 @@ class StudyManifest(_Frozen):
     groups: list[GroupSpec] = Field(default_factory=list)
     tables: dict[str, TableSpec] = Field(default_factory=dict)
     scaling: list[ScalingSpec] = Field(default_factory=list)
+    parity: list[ParitySpec] = Field(default_factory=list)
     fixes: list[FixSpec] = Field(default_factory=list)
     audits: list[AuditSpec] = Field(default_factory=list)
     trt: list[TrtSpec] = Field(default_factory=list)
@@ -611,6 +620,7 @@ def unresolved_refs(manifest: StudyManifest, row_ids: set[str]) -> list[str]:
         refs += table.entries + [side for pair in table.pairs for side in pair]
     for series in manifest.scaling:
         refs += [series.full, *series.subsets]
+    refs += [r for line in manifest.parity for r in (line.low, line.high)]
     refs += [r for fix in manifest.fixes for r in (fix.before, fix.after)]
     refs += [r for spec in manifest.trt for r in spec.applies_to]
     return sorted({r for r in refs if r not in known})
@@ -943,6 +953,7 @@ def build_results(
         "groups": [g.model_dump() for g in manifest.groups],
         "tables": {k: v.model_dump() for k, v in manifest.tables.items()},
         "scaling": [s.model_dump() for s in manifest.scaling],
+        "parity": [p.model_dump() for p in manifest.parity],
         "fixes": [f.model_dump() for f in manifest.fixes],
         "audits": audit_records(manifest.audits, results, missing),
         "trt_latency": trt_records(manifest.trt, results, published, missing),

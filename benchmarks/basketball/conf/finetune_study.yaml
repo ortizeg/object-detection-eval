@@ -47,6 +47,10 @@ models:
       - {arm: peft_frac25_d1, experiment: E3, label: "peft on frac25, draw 1"}
       - {arm: peft_frac50_d0, experiment: E3, label: "peft on frac50, draw 0"}
       - {arm: peft_frac50_d1, experiment: E3, label: "peft on frac50, draw 1"}
+      - {arm: peft_640_s0, experiment: E5, label: "peft @640 (long side 640), seed 0", input: "640x360 (long side 640)"}
+      - {arm: peft_640_s1, experiment: E5, label: "peft @640 (long side 640), seed 1", input: "640x360 (long side 640)"}
+      - {arm: peft_640_s2, experiment: E5, label: "peft @640 (long side 640), seed 2", input: "640x360 (long side 640)"}
+      - {arm: full_640_s0, experiment: E5, label: "full @640 (long side 640)", input: "640x360 (long side 640)"}
     zero_shot: {source: vlm_metrics, key: LLMDet-large}
     latency:
       - {path: per_arm.peft, arm: peft, runtime: pytorch_fp16}
@@ -69,6 +73,9 @@ models:
       - {arm: peft_frac25_d1, experiment: E3, label: "peft on frac25, draw 1"}
       - {arm: peft_frac50_d0, experiment: E3, label: "peft on frac50, draw 0"}
       - {arm: peft_frac50_d1, experiment: E3, label: "peft on frac50, draw 1"}
+      - {arm: peft_640_s0, experiment: E5, label: "peft @640 (long side 640), seed 0", input: "640x360 (long side 640)"}
+      - {arm: peft_640_s1, experiment: E5, label: "peft @640 (long side 640), seed 1", input: "640x360 (long side 640)"}
+      - {arm: peft_640_s2, experiment: E5, label: "peft @640 (long side 640), seed 2", input: "640x360 (long side 640)"}
     zero_shot: {source: sibling, path: mmgdino/zeroshot_valid.json}
     expected_seed_arms: [peft_s1, peft_s2]
 
@@ -396,6 +403,16 @@ costs:
     usd: 1.25
     complete: true
     source: "docs/plans/yoloe.md, Round 2 cost table total ~$1.25"
+  - slug: llmdet
+    stage: round2
+    usd: 3.20
+    complete: true
+    source: "docs/plans/llmdet.md, E5 (640) Cost: four A100 boxes (peft_640_s0-s2, full_640_s0) + T4 TensorRT box, about $3.2"
+  - slug: mmgdino
+    stage: round2
+    usd: 1.24
+    complete: true
+    source: "docs/plans/mmgdino.md, E5 (640): three A6000 boxes $0.35 + $0.41 + $0.40 + T4 $0.08, about $1.24"
   # ---- follow-ups: TensorRT boxes and the user-approved audit fixes
   - slug: llmdet
     stage: followup
@@ -449,12 +466,14 @@ groups:
   - {key: deimm_1280, label: "DEIM-M @1280, E1 recipe", input: "1280", members: [deimm/1280_s0, deimm/1280_s1, deimm/1280_s2]}
   - {key: llmdet_peft, label: "LLMDet-large, light (peft)", input: "short side 800, long cap 1333", members: [llmdet/peft, llmdet/peft_s1, llmdet/peft_s2]}
   - {key: mmgdino_peft, label: "MM-Grounding-DINO-B, light (peft)", input: "short side 800 (1422x800)", members: [mmgdino/peft, mmgdino/peft_s1, mmgdino/peft_s2]}
+  - {key: llmdet_peft_640, label: "LLMDet-large @640, light (peft)", input: "640x360 (long side 640)", members: [llmdet/peft_640_s0, llmdet/peft_640_s1, llmdet/peft_640_s2]}
+  - {key: mmgdino_peft_640, label: "MM-Grounding-DINO-B @640, light (peft)", input: "640x360 (long side 640)", members: [mmgdino/peft_640_s0, mmgdino/peft_640_s1, mmgdino/peft_640_s2]}
   - {key: owlv2_peft, label: "OWLv2-L/14, light (peft)", input: "1008x1008", members: [owlv2/peft, owlv2/peft_seed1, owlv2/peft_seed2]}
 
 # Which entries each report table shows, and which paired clustered deltas it quotes.
 tables:
   headline:
-    entries: [deimm_1280, yolo26m_1280, llmdet_peft, llmdet/full, yoloe_1280/yoloe_full, yoloworld/yoloworld_full, mmgdino_peft, sam3/full, deimm_640_e1, yolo26m_640_e1, yoloe_640/yoloe_full_640]
+    entries: [deimm_1280, yolo26m_1280, llmdet_peft, llmdet/full, yoloe_1280/yoloe_full, yoloworld/yoloworld_full, mmgdino_peft, sam3/full, deimm_640_e1, yolo26m_640_e1, yoloe_640/yoloe_full_640, llmdet_peft_640, llmdet/full_640_s0, mmgdino_peft_640]
     pairs:
       - [deimm_1280, llmdet_peft]
       - [deimm_1280, llmdet/full]
@@ -473,11 +492,21 @@ tables:
       - [llmdet_peft, yolo26m_640_e1]
       - [llmdet_peft, deimm_640_e1]
   e2:
-    entries: [yolo26m_640_e1, yolo26m_1280, deimm_640_e1, deimm_1280, yoloe_640/yoloe_full_640, yoloe_1280/yoloe_full, yoloe_640/yoloe_peft_640, yoloe_1280/yoloe_peft]
+    entries: [yolo26m_640_e1, yolo26m_1280, deimm_640_e1, deimm_1280, llmdet_peft_640, llmdet_peft, llmdet/full_640_s0, llmdet/full, mmgdino_peft_640, mmgdino_peft, yoloe_640/yoloe_full_640, yoloe_1280/yoloe_full, yoloe_640/yoloe_peft_640, yoloe_1280/yoloe_peft]
     pairs:
       - [yolo26m_1280, yolo26m_640_e1]
       - [deimm_1280, deimm_640_e1]
+      - [llmdet_peft, llmdet_peft_640]
+      - [llmdet/full, llmdet/full_640_s0]
+      - [mmgdino_peft, mmgdino_peft_640]
       - [yoloe_1280/yoloe_full, yoloe_640/yoloe_full_640]
+      # E5: every model at the baselines' 640 input.
+      - [llmdet_peft_640, yolo26m_640_e1]
+      - [llmdet_peft_640, deimm_640_e1]
+      - [llmdet/full_640_s0, yolo26m_640_e1]
+      - [llmdet/full_640_s0, deimm_640_e1]
+      - [mmgdino_peft_640, yolo26m_640_e1]
+      - [mmgdino_peft_640, deimm_640_e1]
       - [yoloe_640/yoloe_full_640, yolo26m_640_e1]
       - [yoloe_1280/yoloe_full, yolo26m_1280]
   e3:
@@ -488,6 +517,16 @@ tables:
       - [yoloe_640/yoloe_full_640_frac25_d1, yolo26m/yolo26m_frac25_d1]
       - [llmdet/peft_frac25_d0, yolo26m/yolo26m_frac25_d0]
       - [yoloe_640/yoloe_full_640_frac25_d0, yolo26m/yolo26m_frac25_d0]
+
+# E2 + E5 resolution parity in both directions: one line per model, the same recipe at
+# the baselines' 640 input (`low`) and at the higher input (`high`: 1280 for the
+# baselines, the round-1 native input for the grounding models).
+parity:
+  - {label: "DEIM-M (E1 recipe)", low: deimm_640_e1, high: deimm_1280}
+  - {label: "YOLO26m (E1 recipe)", low: yolo26m_640_e1, high: yolo26m_1280}
+  - {label: "LLMDet-large, light (peft)", low: llmdet_peft_640, high: llmdet_peft}
+  - {label: "LLMDet-large, full", low: llmdet/full_640_s0, high: llmdet/full}
+  - {label: "MM-Grounding-DINO-B, light (peft)", low: mmgdino_peft_640, high: mmgdino_peft}
 
 # E3 data scaling: one series per model. `full` is the 100% point (a seed group or a
 # row); the subset rows carry their image fraction and draw in meta.json.
@@ -637,6 +676,28 @@ trt:
     val_trt: [val_map_50_95_trt]
     note: "fp32 islands do not recover the fp16 loss; an fp32 engine scores -0.18 pt"
     applies_to: [llmdet_peft, llmdet/peft, llmdet/full]
+  - key: llmdet_e5_640
+    label: "LLMDet-large @640 (peft_640_s0), MSDA plugin"
+    file: llmdet/latency_trt_t4.json
+    input: "360x640"
+    gpu_ms: [e5_640, gpu_compute_median_ms]
+    gpu_runs: [e5_640, gpu_compute, runs]
+    e2e_ms: [e5_640, e2e_median_ms]
+    val_pt: [e5_640, val_map_50_95_pytorch]
+    val_trt: [e5_640, val_map_50_95_trt]
+    note: "E5; same export path as the native engine; a first timing pair right after the build was 12% apart, so the engine was re-timed and the stable pair is reported"
+    applies_to: [llmdet_peft_640, llmdet/peft_640_s0, llmdet/peft_640_s1, llmdet/peft_640_s2, llmdet/full_640_s0]
+  - key: mmgdino_e5_640
+    label: "MM-Grounding-DINO-B @640 (peft_640_s0), MSDA plugin"
+    file: mmgdino/latency_trt_t4.json
+    input: "360x640"
+    gpu_ms: [e5_640, gpu_compute, reported_median_ms]
+    gpu_runs: [e5_640, gpu_compute, runs]
+    e2e_ms: [e5_640, e2e, reported_median_ms]
+    val_pt: [e5_640, val_mAP_50_95, pytorch_fp32_engine_input_360x640]
+    val_trt: [e5_640, val_mAP_50_95, trt_fp16_plugin]
+    note: "E5; the engine runs the unpadded 360x640 frame (PyTorch pads to 384x640); val PyTorch is fp32 at the engine's input"
+    applies_to: [mmgdino_peft_640, mmgdino/peft_640_s0, mmgdino/peft_640_s1, mmgdino/peft_640_s2]
   - key: sam3_fixed
     label: "SAM 3 (full), --attn-out-3d export"
     file: sam3/latency_trt_t4.json

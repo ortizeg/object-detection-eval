@@ -188,6 +188,16 @@ class ScalingSeries(BaseModel):
     subsets: list[str]
 
 
+class ParityEntry(BaseModel):
+    """One model at the baselines' 640 input (``low``) and at its higher input (``high``)."""
+
+    model_config = _LOOSE
+
+    label: str
+    low: str
+    high: str
+
+
 class FixEntry(BaseModel):
     """An audit-driven recipe fix: the arm before and the arm after."""
 
@@ -268,6 +278,7 @@ class FinetuneResults(BaseModel):
     groups: list[GroupEntry] = Field(default_factory=list)
     tables: dict[str, TableEntry] = Field(default_factory=dict)
     scaling: list[ScalingSeries] = Field(default_factory=list)
+    parity: list[ParityEntry] = Field(default_factory=list)
     fixes: list[FixEntry] = Field(default_factory=list)
     audits: list[AuditEntry] = Field(default_factory=list)
     trt_latency: list[TrtEntry] = Field(default_factory=list)
@@ -662,7 +673,7 @@ def latency_anchor_table(results: FinetuneResults) -> str:
 
 _STAGE_TEXT = {
     "round1": "round 1",
-    "round2": "round 2 (E1-E4)",
+    "round2": "round 2 (E1-E5)",
     "followup": "follow-ups (TensorRT, audit fixes)",
 }
 
@@ -919,6 +930,43 @@ def pair_table(results: FinetuneResults, clustered: FinetuneBootstrap | None, ta
     return _table(header, body)
 
 
+def parity_table(results: FinetuneResults, clustered: FinetuneBootstrap | None) -> str:
+    """E2 + E5: each model at the baselines' 640 input and at its higher input."""
+    if not results.parity:
+        return "_No parity lines configured._"
+    header = [
+        "Model / recipe",
+        "Seeds (640 / high)",
+        "Test @640 (mean ± sd)",
+        "Higher input",
+        "Test @higher input (mean ± sd)",
+        "Δ test (higher - 640)",
+        "T4 TRT fp16 GPU @640 (ms)",
+        "T4 TRT fp16 GPU @higher input (ms)",
+    ]
+    body = []
+    for line in results.parity:
+        low = resolve_entry(results, line.low, clustered)
+        high = resolve_entry(results, line.high, clustered)
+        lows, highs = low.test_values(), high.test_values()
+        delta = _EM_DASH
+        if lows and highs:
+            delta = _signed(statistics.mean(highs) - statistics.mean(lows))
+        body.append(
+            [
+                line.label,
+                f"{low.n} / {high.n}",
+                _mean_sd(lows),
+                high.input,
+                _mean_sd(highs),
+                delta,
+                _trt_text(trt_for(results, line.low)),
+                _trt_text(trt_for(results, line.high)),
+            ]
+        )
+    return _table(header, body)
+
+
 def _reading(delta: PairDelta) -> str:
     v = verdict(delta)
     if v == "tie":
@@ -934,7 +982,14 @@ def _short_gpu(gpu: str | None) -> str:
     return text.strip() or _EM_DASH
 
 
-_EXPERIMENT_TEXT = {"E1": "E1", "E2": "E2", "E3": "E3", "E4": "E4", "fix": "audit fix"}
+_EXPERIMENT_TEXT = {
+    "E1": "E1",
+    "E2": "E2",
+    "E3": "E3",
+    "E4": "E4",
+    "E5": "E5",
+    "fix": "audit fix",
+}
 
 
 def _stage(row: FinetuneRow) -> str:

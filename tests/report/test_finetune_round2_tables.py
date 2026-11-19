@@ -10,6 +10,7 @@ import pytest
 from object_detection_eval.report.finetune import (
     FinetuneBootstrap,
     FinetuneResults,
+    ParityEntry,
     audits_table,
     budget_table,
     clip_table,
@@ -17,6 +18,7 @@ from object_detection_eval.report.finetune import (
     fixes_table,
     ladder_table,
     pair_table,
+    parity_table,
     render_scaling_png,
     resolve_entry,
     scaling_table,
@@ -273,6 +275,20 @@ def test_pair_table_reads_tie_and_needs_bootstrap() -> None:
     assert "tie (CI includes 0)" in table
     assert "2 of 3" in table
     assert "not committed yet" in pair_table(_results(), None, "headline")
+
+
+def test_parity_table_pairs_640_with_higher_input() -> None:
+    line = ParityEntry(label="FM light", low="base_640", high="fm_peft")
+    results = _results().model_copy(update={"parity": [line]})
+    table = parity_table(results, _boot())
+    lines = table.splitlines()
+    assert len(lines) == 3
+    assert "2 / 3" in lines[2]
+    assert "0.710 ± 0.014" in lines[2]  # 640 seeds: 0.70, 0.72
+    assert "0.777 ± 0.008" in lines[2]
+    assert "+0.067" in lines[2]  # mean(high) - mean(low)
+    assert "| 6.78 | 143-161 |" in lines[2]
+    assert parity_table(_results(), None).startswith("_No parity")
 
 
 def test_budget_table_has_every_row_and_marks_box_hours() -> None:
