@@ -112,10 +112,38 @@ LLMDet-large, reaches 0.264.
 - **Qwen3-VL box-in-text prompting and crop-refine:** this needs a rented GPU.
   Ask before spending.
 
+## Results (`benchmarks/basketball/results/vlm/prompt_search/visual_prompts/log.json`)
+
+mAP@50:95, with the paired image-bootstrap CI of arm − T (1,000 resamples, seed 0).
+
+| Row | Arm | Val | Test | Test Δ vs T [95% CI] |
+| --- | --- | ---: | ---: | --- |
+| OWLv2 | T (published text query) | 0.288 | 0.315 | |
+| OWLv2 | **V2 bank, adopted zero-shot** | 0.373 | **0.398** | +0.083 [+0.074, +0.092] |
+| OWLv2 | V1 self-prompt (deviation, see below) | 0.356 | 0.369 | +0.055 [+0.043, +0.066] |
+| OWLv2 | F-TV, Astra's two frames (few-shot) | 0.366 | 0.411 | +0.097 [+0.085, +0.110] |
+| YOLOE | T | 0.261 | 0.278 | |
+| YOLOE | **V2 bank, adopted zero-shot** | 0.284 | **0.288** | +0.010 [+0.005, +0.015] |
+| YOLOE | F-TV (few-shot) | 0.313 | 0.322 | +0.044 [+0.035, +0.054] |
+
+- Both rows adopt **V2**, the prototype bank built from unlabelled train images. OWLv2 gains 8 points and passes
+  LLMDet-large (0.388), the best text-only open-weights row. YOLOE gains 1 point.
+- The within-image self-prompt (V1) helps OWLv2 but hurts YOLOE on val (−0.012). Stacking V1 on V2 is worse than
+  V2 alone for both rows.
+- Rim stays near zero in every arm, so crop-refine is still where the rim headroom is.
+- Few-shot recall at 95% precision: no OWLv2 arm reached 95% precision on val. YOLOE F-TV reaches 0.191 on test,
+  against Astra's 0.951.
+- Deviations (also in log.json): OWLv2 V1 ran on test before the bank arms existed. It is kept and disclosed, but
+  the full rule picks V2. OWLv2's few-shot pick fell back to list order (F-V) because no arm reached 95% precision.
+  It was re-picked by the val-mAP tie-break before any test score; the mis-picked test run was stopped unscored.
+
+Prediction files: the test dumps are committed gzipped (`*_test.json.gz`, 35 MB in total against 120 MB raw); the val dumps are
+regenerable and gitignored. Decompress a test dump before scoring it.
+
 ## Status
 
-- [ ] Rules written (this doc), committed before the first score
-- [ ] OWLv2 V-arms implemented; T reproduces the published adapter on val
-- [ ] YOLOE V-arms implemented; T reproduces the published adapter on val
-- [ ] Val results and adoption
-- [ ] Test, once per adopted row
+- [x] Rules written (this doc), committed before the first score
+- [x] OWLv2 V-arms implemented; T reproduces the published adapter on val
+- [x] YOLOE V-arms implemented; T reproduces the published adapter on val
+- [x] Val results and adoption (V2 for both rows)
+- [x] Test, once per adopted row

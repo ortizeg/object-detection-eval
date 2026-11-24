@@ -1,0 +1,412 @@
+{
+  "rule": "Pre-registered 2026-10-28 (docs/plans/openweights-visual-prompting-2026-10.md): zero-shot arm adopted only if best of ('V1', 'V2', 'V2+V1') beats T on val by more than 0.01 mAP@50:95 and its paired bootstrap CI vs T excludes zero. Few-shot: the F arm with the higher val recall@95%P runs once on test. Test touched once per row.",
+  "valid": {
+    "owlv2": {
+      "arms": {
+        "T": {
+          "mAP_50_95": 0.2875,
+          "mAP_50": 0.4627,
+          "per_class_ap50": {
+            "player": 0.878,
+            "ball": 0.593,
+            "referee": 0.3,
+            "rim": 0.011,
+            "number": 0.532
+          },
+          "recall_at_p95": {
+            "threshold": 0.84,
+            "recall": 0.0102,
+            "precision": 1.0
+          },
+          "boxes_per_image": 504.6
+        },
+        "V1": {
+          "mAP_50_95": 0.3559,
+          "mAP_50": 0.5613,
+          "per_class_ap50": {
+            "player": 0.904,
+            "ball": 0.605,
+            "referee": 0.566,
+            "rim": 0.001,
+            "number": 0.731
+          },
+          "recall_at_p95": null,
+          "boxes_per_image": 1914.1,
+          "delta_vs_T": {
+            "mean": 0.0691,
+            "ci95": [
+              0.0578,
+              0.0812
+            ]
+          }
+        },
+        "V2": {
+          "mAP_50_95": 0.3725,
+          "mAP_50": 0.5856,
+          "per_class_ap50": {
+            "player": 0.906,
+            "ball": 0.602,
+            "referee": 0.698,
+            "rim": 0.038,
+            "number": 0.684
+          },
+          "recall_at_p95": null,
+          "boxes_per_image": 2407.5,
+          "delta_vs_T": {
+            "mean": 0.0854,
+            "ci95": [
+              0.076,
+              0.0949
+            ]
+          }
+        },
+        "V2+V1": {
+          "mAP_50_95": 0.3463,
+          "mAP_50": 0.5418,
+          "per_class_ap50": {
+            "player": 0.912,
+            "ball": 0.576,
+            "referee": 0.492,
+            "rim": 0.005,
+            "number": 0.725
+          },
+          "recall_at_p95": null,
+          "boxes_per_image": 2442.2,
+          "delta_vs_T": {
+            "mean": 0.0597,
+            "ci95": [
+              0.0495,
+              0.071
+            ]
+          }
+        },
+        "F-V": {
+          "mAP_50_95": 0.2373,
+          "mAP_50": 0.452,
+          "per_class_ap50": {
+            "player": 0.763,
+            "ball": 0.461,
+            "referee": 0.244,
+            "rim": 0.005,
+            "number": 0.788
+          },
+          "recall_at_p95": null,
+          "boxes_per_image": 5091.3,
+          "delta_vs_T": {
+            "mean": -0.0495,
+            "ci95": [
+              -0.0618,
+              -0.0373
+            ]
+          }
+        },
+        "F-TV": {
+          "mAP_50_95": 0.3657,
+          "mAP_50": 0.5909,
+          "per_class_ap50": {
+            "player": 0.914,
+            "ball": 0.632,
+            "referee": 0.606,
+            "rim": 0.018,
+            "number": 0.783
+          },
+          "recall_at_p95": null,
+          "boxes_per_image": 3480.1,
+          "delta_vs_T": {
+            "mean": 0.0788,
+            "ci95": [
+              0.07,
+              0.0882
+            ]
+          }
+        }
+      },
+      "adopted_zero_shot": "V2",
+      "few_shot_pick": "F-TV",
+      "few_shot_pick_superseded": {
+        "was": "F-V",
+        "reason": "no few-shot arm reached 95% precision on val; the original key fell back to list order. Re-picked by the val mAP tie-break before any test score. The mis-picked test run was stopped at 59/94 images, unscored."
+      },
+      "deviation": "V1 was run on test after the first val sweep (T, V1, F-V, F-TV), before the bank arms existed. The full sweep adopts V2, not V1. The V1 test result is kept and disclosed; it was not chosen by the full rule."
+    },
+    "yoloe": {
+      "arms": {
+        "T": {
+          "mAP_50_95": 0.2607,
+          "mAP_50": 0.3924,
+          "per_class_ap50": {
+            "player": 0.941,
+            "ball": 0.331,
+            "referee": 0.456,
+            "rim": 0.0,
+            "number": 0.233
+          },
+          "recall_at_p95": {
+            "threshold": 0.78,
+            "recall": 0.0067,
+            "precision": 1.0
+          },
+          "boxes_per_image": 155.7
+        },
+        "V1": {
+          "mAP_50_95": 0.2493,
+          "mAP_50": 0.3647,
+          "per_class_ap50": {
+            "player": 0.891,
+            "ball": 0.281,
+            "referee": 0.454,
+            "rim": 0.0,
+            "number": 0.197
+          },
+          "recall_at_p95": null,
+          "boxes_per_image": 207.0,
+          "delta_vs_T": {
+            "mean": -0.0123,
+            "ci95": [
+              -0.0202,
+              -0.0042
+            ]
+          }
+        },
+        "V2": {
+          "mAP_50_95": 0.2843,
+          "mAP_50": 0.4235,
+          "per_class_ap50": {
+            "player": 0.904,
+            "ball": 0.345,
+            "referee": 0.528,
+            "rim": 0.0,
+            "number": 0.34
+          },
+          "recall_at_p95": {
+            "threshold": 0.96,
+            "recall": 0.0456,
+            "precision": 0.957
+          },
+          "boxes_per_image": 238.5,
+          "delta_vs_T": {
+            "mean": 0.0218,
+            "ci95": [
+              0.0157,
+              0.0271
+            ]
+          }
+        },
+        "V2+V1": {
+          "mAP_50_95": 0.2548,
+          "mAP_50": 0.3817,
+          "per_class_ap50": {
+            "player": 0.855,
+            "ball": 0.271,
+            "referee": 0.48,
+            "rim": 0.0,
+            "number": 0.303
+          },
+          "recall_at_p95": null,
+          "boxes_per_image": 194.1,
+          "delta_vs_T": {
+            "mean": -0.0068,
+            "ci95": [
+              -0.0166,
+              0.0031
+            ]
+          }
+        },
+        "F-V": {
+          "mAP_50_95": 0.2837,
+          "mAP_50": 0.4711,
+          "per_class_ap50": {
+            "player": 0.851,
+            "ball": 0.324,
+            "referee": 0.566,
+            "rim": 0.201,
+            "number": 0.414
+          },
+          "recall_at_p95": {
+            "threshold": 0.96,
+            "recall": 0.0952,
+            "precision": 0.9789
+          },
+          "boxes_per_image": 184.7,
+          "delta_vs_T": {
+            "mean": 0.0219,
+            "ci95": [
+              0.0065,
+              0.0368
+            ]
+          }
+        },
+        "F-TV": {
+          "mAP_50_95": 0.3132,
+          "mAP_50": 0.4882,
+          "per_class_ap50": {
+            "player": 0.916,
+            "ball": 0.348,
+            "referee": 0.702,
+            "rim": 0.108,
+            "number": 0.368
+          },
+          "recall_at_p95": {
+            "threshold": 0.94,
+            "recall": 0.2934,
+            "precision": 0.9502
+          },
+          "boxes_per_image": 259.6,
+          "delta_vs_T": {
+            "mean": 0.0514,
+            "ci95": [
+              0.0432,
+              0.0593
+            ]
+          }
+        }
+      },
+      "adopted_zero_shot": "V2",
+      "few_shot_pick": "F-TV"
+    }
+  },
+  "test": {
+    "yoloe": {
+      "F-TV": {
+        "mAP_50_95": 0.3217,
+        "mAP_50": 0.4635,
+        "per_class_ap50": {
+          "player": 0.928,
+          "ball": 0.295,
+          "referee": 0.705,
+          "rim": 0.136,
+          "number": 0.253
+        },
+        "recall_at_p95": {
+          "threshold": 0.96,
+          "recall": 0.1914,
+          "precision": 0.9668
+        },
+        "boxes_per_image": 259.5,
+        "delta_vs_T": {
+          "mean": 0.044,
+          "ci95": [
+            0.0353,
+            0.0537
+          ]
+        }
+      },
+      "T": {
+        "mAP_50_95": 0.2777,
+        "mAP_50": 0.385,
+        "per_class_ap50": {
+          "player": 0.935,
+          "ball": 0.295,
+          "referee": 0.516,
+          "rim": 0.0,
+          "number": 0.179
+        },
+        "recall_at_p95": {
+          "threshold": 0.72,
+          "recall": 0.0056,
+          "precision": 1.0
+        },
+        "boxes_per_image": 150.2
+      },
+      "V2": {
+        "mAP_50_95": 0.2882,
+        "mAP_50": 0.3953,
+        "per_class_ap50": {
+          "player": 0.911,
+          "ball": 0.319,
+          "referee": 0.528,
+          "rim": 0.0,
+          "number": 0.218
+        },
+        "recall_at_p95": null,
+        "boxes_per_image": 241.3,
+        "delta_vs_T": {
+          "mean": 0.0097,
+          "ci95": [
+            0.0046,
+            0.0152
+          ]
+        }
+      }
+    },
+    "owlv2": {
+      "F-TV": {
+        "mAP_50_95": 0.4114,
+        "mAP_50": 0.6193,
+        "per_class_ap50": {
+          "player": 0.911,
+          "ball": 0.629,
+          "referee": 0.758,
+          "rim": 0.022,
+          "number": 0.777
+        },
+        "recall_at_p95": null,
+        "boxes_per_image": 3698.0,
+        "delta_vs_T": {
+          "mean": 0.0971,
+          "ci95": [
+            0.0846,
+            0.1101
+          ]
+        }
+      },
+      "T": {
+        "mAP_50_95": 0.3148,
+        "mAP_50": 0.476,
+        "per_class_ap50": {
+          "player": 0.901,
+          "ball": 0.583,
+          "referee": 0.388,
+          "rim": 0.002,
+          "number": 0.505
+        },
+        "recall_at_p95": {
+          "threshold": 0.82,
+          "recall": 0.0126,
+          "precision": 0.9615
+        },
+        "boxes_per_image": 579.9
+      },
+      "V1": {
+        "mAP_50_95": 0.369,
+        "mAP_50": 0.5414,
+        "per_class_ap50": {
+          "player": 0.904,
+          "ball": 0.523,
+          "referee": 0.57,
+          "rim": 0.0,
+          "number": 0.71
+        },
+        "recall_at_p95": null,
+        "boxes_per_image": 1967.7,
+        "delta_vs_T": {
+          "mean": 0.0553,
+          "ci95": [
+            0.0432,
+            0.0662
+          ]
+        }
+      },
+      "V2": {
+        "mAP_50_95": 0.398,
+        "mAP_50": 0.5787,
+        "per_class_ap50": {
+          "player": 0.907,
+          "ball": 0.588,
+          "referee": 0.72,
+          "rim": 0.011,
+          "number": 0.668
+        },
+        "recall_at_p95": null,
+        "boxes_per_image": 2532.5,
+        "delta_vs_T": {
+          "mean": 0.0831,
+          "ci95": [
+            0.0742,
+            0.0923
+          ]
+        }
+      }
+    }
+  }
+}

@@ -64,3 +64,6 @@ benchmarks/basketball/results/vlm/owlv2*_valid.json
 
 # Text encoders ultralytics downloads next to YOLO-World / YOLOE weights.
 mobileclip*.ts
+# Visual-prompt val dumps: large, regenerable (docs/plans/openweights-visual-prompting-2026-10.md)
+benchmarks/basketball/results/vlm/prompt_search/visual_prompts/*_valid.json
+benchmarks/basketball/results/vlm/prompt_search/visual_prompts/*_test.json
