@@ -1,0 +1,921 @@
+# finetune_study.yaml -- the foundation-model fine-tuning study (FOUNDATION_FINETUNE.md).
+#
+# The runs live in the sibling `foundation-finetune` repo (results/<slug>/<arm>/).
+# This manifest says which of its arm folders are rows of the report, what each row
+# is, and the few facts the sibling repo keeps only in prose (docs/plans/<slug>.md):
+# the per-slug vast.ai spend, the input resolution, the licence of the weights.
+#
+# Everything measured (val/test mAP, per-class AP, params, per-arm GPU hours and $,
+# T4 latency) is read from the sibling repo's files by
+# scripts/write_finetune_results.py, never typed here.
+#
+# Seeds need not be listed: any folder named `<arm>_s<N>` or `<arm>_seed<N>` next to a
+# listed arm is picked up as another seed of that arm when its test.json exists.
+#
+# zero_shot: the same checkpoint before fine-tuning.
+#   source: vlm_metrics  -> the published row in results/vlm/vlm_metrics_merged5.json
+#                           (test split; `key` is the row label)
+#   source: sibling      -> a val-only zero-shot dump in the sibling repo (`path`,
+#                           relative to its results/); rescored here
+# latency: where the slug's results/<slug>/latency_t4.json keeps each timed arm.
+#   `path` is a dot path into that file; omitted -> the generic layout (top-level
+#   reported_median_ms, per_arm.*, other_arms.*) is used.
+
+sibling_repo_default: "/Users/ortizeg/1Projects/⛹️‍♂️ Next Play/code/foundation-finetune"
+
+references:
+  # Fine-tuned conventional detectors every row is compared with. Names are
+  # reproduction_640.yaml entries; their test predictions come from that manifest.
+  - YOLO26m
+  - DEIM-M
+
+models:
+  - key: llmdet
+    display: LLMDet-large
+    family: open-vocab detector
+    slug: llmdet
+    resolution: "short side 800, long cap 1333"
+    licence: Apache-2.0
+    redistribution: permissive
+    light_trains: "fusion encoder, decoder, heads (Swin-L and BERT frozen)"
+    arms:
+      peft: peft
+      full: full
+    extra:
+      - {arm: mid, experiment: E4, label: "mid: light + Swin-L stage 4 at lr x0.1"}
+      - {arm: peft_frac25_d0, experiment: E3, label: "peft on frac25, draw 0"}
+      - {arm: peft_frac25_d1, experiment: E3, label: "peft on frac25, draw 1"}
+      - {arm: peft_frac50_d0, experiment: E3, label: "peft on frac50, draw 0"}
+      - {arm: peft_frac50_d1, experiment: E3, label: "peft on frac50, draw 1"}
+      - {arm: peft_640_s0, experiment: E5, label: "peft @640 (long side 640), seed 0", input: "640x360 (long side 640)"}
+      - {arm: peft_640_s1, experiment: E5, label: "peft @640 (long side 640), seed 1", input: "640x360 (long side 640)"}
+      - {arm: peft_640_s2, experiment: E5, label: "peft @640 (long side 640), seed 2", input: "640x360 (long side 640)"}
+      - {arm: full_640_s0, experiment: E5, label: "full @640 (long side 640)", input: "640x360 (long side 640)"}
+      - {arm: peft_640aug_s0, experiment: E6, label: "peft @640 + matched multi-scale jitter, seed 0", input: "640x360 (long side 640); train short 230-384, cap 640"}
+      - {arm: peft_640aug_s1, experiment: E6, label: "peft @640 + matched multi-scale jitter, seed 1", input: "640x360 (long side 640); train short 230-384, cap 640"}
+      - {arm: peft_640aug_s2, experiment: E6, label: "peft @640 + matched multi-scale jitter, seed 2", input: "640x360 (long side 640); train short 230-384, cap 640"}
+    zero_shot: {source: vlm_metrics, key: LLMDet-large}
+    latency:
+      - {path: per_arm.peft, arm: peft, runtime: pytorch_fp16}
+      - {path: per_arm.full, arm: full, runtime: pytorch_fp16}
+
+  - key: mmgdino
+    display: MM-Grounding-DINO-B
+    family: open-vocab detector
+    slug: mmgdino
+    resolution: "short side 800 (1422x800)"
+    licence: Apache-2.0
+    redistribution: permissive
+    light_trains: "feature enhancer, decoder, heads (Swin-B and BERT frozen)"
+    arms:
+      peft: peft
+      full: full
+    extra:
+      - {arm: mid, experiment: E4, label: "mid: light + Swin-B stage 4 at lr x0.1"}
+      - {arm: peft_frac25_d0, experiment: E3, label: "peft on frac25, draw 0"}
+      - {arm: peft_frac25_d1, experiment: E3, label: "peft on frac25, draw 1"}
+      - {arm: peft_frac50_d0, experiment: E3, label: "peft on frac50, draw 0"}
+      - {arm: peft_frac50_d1, experiment: E3, label: "peft on frac50, draw 1"}
+      - {arm: peft_640_s0, experiment: E5, label: "peft @640 (long side 640), seed 0", input: "640x360 (long side 640)"}
+      - {arm: peft_640_s1, experiment: E5, label: "peft @640 (long side 640), seed 1", input: "640x360 (long side 640)"}
+      - {arm: peft_640_s2, experiment: E5, label: "peft @640 (long side 640), seed 2", input: "640x360 (long side 640)"}
+      - {arm: peft_640aug_s0, experiment: E6, label: "peft @640 + matched multi-scale jitter, seed 0", input: "640x360 (long side 640); train short 302-403, cap 720"}
+      - {arm: peft_640aug_s1, experiment: E6, label: "peft @640 + matched multi-scale jitter, seed 1", input: "640x360 (long side 640); train short 302-403, cap 720"}
+      - {arm: peft_640aug_s2, experiment: E6, label: "peft @640 + matched multi-scale jitter, seed 2", input: "640x360 (long side 640); train short 302-403, cap 720"}
+    zero_shot: {source: sibling, path: mmgdino/zeroshot_valid.json}
+    expected_seed_arms: [peft_s1, peft_s2]
+
+  - key: sam3
+    display: SAM 3
+    family: open-vocab detector
+    slug: sam3
+    resolution: "1008x1008"
+    licence: SAM License (gated)
+    redistribution: gated
+    light_trains: "fusion encoder, DETR decoder, heads (PE ViT trunk and text encoder frozen)"
+    arms:
+      peft: peft
+      full: full
+    extra:
+      - {arm: mid, experiment: E4, label: "mid: light + last 8 of 32 ViT blocks (layer decay)"}
+    zero_shot: {source: sibling, path: sam3/zeroshot/valid.json}
+    latency:
+      - {path: "", arm: full, runtime: pytorch_fp16}
+
+  - key: yoloe_1280
+    display: YOLOE-26x @1280
+    family: open-vocab detector
+    slug: yoloe
+    resolution: "1280"
+    licence: AGPL-3.0
+    redistribution: agpl
+    light_trains: "official linear probe: the last 1x1 conv of each class branch"
+    arms:
+      peft: yoloe_peft
+      full: yoloe_full
+    zero_shot: {source: vlm_metrics, key: YOLOE}
+    latency:
+      - {path: runs.yoloe_full_1280, arm: yoloe_full, runtime: pytorch_fp16}
+
+  - key: yoloe_640
+    display: YOLOE-26x @640
+    family: open-vocab detector
+    slug: yoloe
+    resolution: "640"
+    licence: AGPL-3.0
+    redistribution: agpl
+    light_trains: "official linear probe: the last 1x1 conv of each class branch"
+    arms:
+      peft: yoloe_peft_640
+      full: yoloe_full_640
+    extra:
+      - {arm: yoloe_mid_640, experiment: E4, label: "mid: backbone frozen, neck + head train"}
+      - {arm: yoloe_full_640_frac25_d0, experiment: E3, label: "full on frac25, draw 0"}
+      - {arm: yoloe_full_640_frac25_d1, experiment: E3, label: "full on frac25, draw 1"}
+      - {arm: yoloe_full_640_frac50_d0, experiment: E3, label: "full on frac50, draw 0"}
+      - {arm: yoloe_full_640_frac50_d1, experiment: E3, label: "full on frac50, draw 1"}
+    latency:
+      - {path: runs.yoloe_full_640, arm: yoloe_full_640, runtime: pytorch_fp16}
+
+  - key: yoloworld
+    display: YOLO-World-v2-x @1280
+    family: open-vocab detector
+    slug: yoloe
+    resolution: "1280"
+    licence: AGPL-3.0
+    redistribution: agpl
+    light_trains: "WorldDetect head (backbone, neck and CLIP text encoder frozen)"
+    arms:
+      peft: yoloworld_peft
+      full: yoloworld_full
+    zero_shot: {source: vlm_metrics, key: YOLO-World}
+    latency:
+      - {path: runs.yoloworld_full_1280, arm: yoloworld_full, runtime: pytorch_fp16}
+
+  - key: owlv2
+    display: OWLv2-L/14
+    family: open-vocab detector
+    slug: owlv2
+    resolution: "1008x1008 (padded square)"
+    licence: Apache-2.0
+    redistribution: permissive
+    light_trains: "detection heads + final layer norm (ViT-L and text tower frozen)"
+    arms:
+      peft: peft
+      full: full
+    extra:
+      - {arm: mid, experiment: E4, label: "mid: light + last 6 of 24 ViT layers at lr 5e-6"}
+    zero_shot: {source: vlm_metrics, key: OWLv2}
+    latency:
+      - {path: "", arm: peft, runtime: pytorch_fp16}
+
+  - key: deimv2_m
+    display: DEIMv2-M
+    family: frozen backbone + DETR head
+    slug: deimv2
+    resolution: "640"
+    licence: Apache-2.0 code, DINOv3 License weights
+    redistribution: gated
+    light_trains: "STA adapter, hybrid encoder, decoder (DINOv3 backbone frozen)"
+    arms:
+      peft: peft
+      full: full
+    latency:
+      - {path: "pytorch_fp16.DEIMv2-M (full)", arm: full, runtime: pytorch_fp16}
+      - {path: "tensorrt_fp16.DEIMv2-M (full)", arm: full, runtime: tensorrt_fp16}
+
+  - key: deimv2_l
+    display: DEIMv2-L
+    family: frozen backbone + DETR head
+    slug: deimv2
+    resolution: "640"
+    licence: Apache-2.0 code, DINOv3 License weights
+    redistribution: gated
+    light_trains: "STA adapter, hybrid encoder, decoder (DINOv3 backbone frozen)"
+    arms:
+      peft: l_peft
+      full: l_full
+    latency:
+      - {path: "pytorch_fp16.DEIMv2-L (l_full)", arm: l_full, runtime: pytorch_fp16}
+      - {path: "tensorrt_fp16.DEIMv2-L (l_full)", arm: l_full, runtime: tensorrt_fp16}
+
+  - key: florence2
+    display: Florence-2-large
+    family: generative VLM
+    slug: florence2
+    resolution: "768x768 (squashed)"
+    licence: MIT
+    redistribution: permissive
+    light_trains: "LoRA r16 on language attention + connector (DaViT frozen)"
+    arms:
+      peft: peft
+      full: full
+      variants:
+        - {arm: lora_all64, label: "LoRA r64, all language-side linear layers"}
+    zero_shot: {source: vlm_metrics, key: Florence-2}
+    latency:
+      - {path: "", arm: full, runtime: pytorch_fp16}
+      - {path: other_arms.peft, arm: peft, runtime: pytorch_fp16}
+
+  - key: qwen3vl
+    display: Qwen3-VL (peft 8B, full 4B)
+    family: generative VLM
+    slug: qwen3vl
+    resolution: "native 1920x1088"
+    licence: Apache-2.0
+    redistribution: permissive
+    light_trains: "LoRA r16 on LLM attention (vision tower and mergers frozen)"
+    arms:
+      peft: peft
+      full: full
+      variants:
+        - {arm: peft_4b, label: "LoRA on the 4B (like-for-like with full)"}
+    extra:
+      - {arm: peft_merger, experiment: fix, label: "8B LoRA + vision merger unfrozen (audit fix)"}
+      - {arm: peft_4b_merger, experiment: fix, label: "4B LoRA + vision merger unfrozen (audit fix)"}
+    zero_shot: {source: vlm_metrics, key: Qwen3-VL}
+    # 4B full arm, first 20 test images, one pass (the full protocol ran >2.7 h).
+    latency:
+      - {path: "", arm: full, runtime: pytorch_fp16}
+
+  - key: paligemma2
+    display: PaliGemma 2 3B-448
+    family: generative VLM
+    slug: paligemma2
+    resolution: "448x448 (squashed)"
+    licence: Gemma Terms of Use (gated)
+    redistribution: gated
+    light_trains: "LoRA r16 on Gemma attention + projector (SigLIP frozen)"
+    arms:
+      peft: peft
+      full: full
+    extra:
+      - {arm: peft_896, experiment: fix, label: "peft recipe at 896 px (audit fix)", input: "896x896 (squashed)"}
+    zero_shot: {source: sibling, path: paligemma2/zeroshot_mix448/valid.json}
+    latency:
+      - {path: "", arm: peft, runtime: pytorch_fp16}
+      - {path: "", arm: peft_896, runtime: pytorch_fp16, file: latency_t4_896.json}
+
+  - key: smolvlm2
+    display: SmolVLM2-2.2B
+    family: generative VLM
+    slug: smolvlm2
+    resolution: "SigLIP tiles, pixel-shuffled"
+    licence: Apache-2.0
+    redistribution: permissive
+    light_trains: "QLoRA r16 on LLM attention + connector (SigLIP frozen)"
+    arms:
+      peft: peft
+      full: full
+    zero_shot: {source: sibling, path: smolvlm2/zeroshot/valid.json}
+
+  # ---- Round 2 baselines: the two best published 640 px detectors, retrained under
+  # the same protocol (E1 equal-effort tuning, E2 1280 px, E3 data scaling). They are
+  # conventional detectors, not foundation models: `baseline: true` keeps them out of
+  # the light/full tables and the PyTorch latency list.
+  - key: yolo26m
+    display: YOLO26m
+    family: conventional detector
+    baseline: true
+    slug: yolo26m
+    resolution: "640"
+    licence: AGPL-3.0
+    redistribution: agpl
+    arms: {}
+    extra:
+      - {arm: default_s0, experiment: E1, label: "default recipe, seed 0 (taxonomy-ablation run)"}
+      - {arm: default_s1, experiment: E1, label: "default recipe, seed 1 (taxonomy-ablation run)"}
+      - {arm: default_s2, experiment: E1, label: "default recipe, seed 2 (taxonomy-ablation run)"}
+      - {arm: yolo26m_e1_s0, experiment: E1, label: "E1 recipe (lr x2), seed 0"}
+      - {arm: yolo26m_e1_s1, experiment: E1, label: "E1 recipe (lr x2), seed 1"}
+      - {arm: yolo26m_e1_s2, experiment: E1, label: "E1 recipe (lr x2), seed 2"}
+      - {arm: yolo26m_1280_s0, experiment: E2, label: "E1 recipe @1280, seed 0", input: "1280"}
+      - {arm: yolo26m_1280_s1, experiment: E2, label: "E1 recipe @1280, seed 1", input: "1280"}
+      - {arm: yolo26m_1280_s2, experiment: E2, label: "E1 recipe @1280, seed 2", input: "1280"}
+      - {arm: yolo26m_frac25_d0, experiment: E3, label: "E1 recipe on frac25, draw 0"}
+      - {arm: yolo26m_frac25_d1, experiment: E3, label: "E1 recipe on frac25, draw 1"}
+      - {arm: yolo26m_frac50_d0, experiment: E3, label: "E1 recipe on frac50, draw 0"}
+      - {arm: yolo26m_frac50_d1, experiment: E3, label: "E1 recipe on frac50, draw 1"}
+      # Matched recipe search, stage B (val winner sw_s800_lr1_mx50: train 800, predict
+      # 640, lr0 x1, mixup 0.5; 3 seeds, test once; A100, unlike the 4090 E1/E2 arms).
+      - {arm: yolo26m_e1b_s0, experiment: E1, label: "tuned recipe (train 800, mixup 0.5), seed 0", input: "640 (train 800)"}
+      - {arm: yolo26m_e1b_s1, experiment: E1, label: "tuned recipe (train 800, mixup 0.5), seed 1", input: "640 (train 800)"}
+      - {arm: yolo26m_e1b_s2, experiment: E1, label: "tuned recipe (train 800, mixup 0.5), seed 2", input: "640 (train 800)"}
+      - {arm: yolo26m_e1b_1280_s0, experiment: E2, label: "tuned recipe x2 @1280, seed 0", input: "1280 (train 1600)"}
+      - {arm: yolo26m_e1b_1280_s1, experiment: E2, label: "tuned recipe x2 @1280, seed 1", input: "1280 (train 1600)"}
+      - {arm: yolo26m_e1b_1280_s2, experiment: E2, label: "tuned recipe x2 @1280, seed 2", input: "1280 (train 1600)"}
+    # E1 val sweep (seed 0, 640). Selected on val; YOLO26m sweep configs were never
+    # predicted on test.
+    sweep:
+      - {arm: yolo26m_e1_lr05, label: "lr0 x0.5"}
+      - {arm: yolo26m_e1_lr1, label: "lr0 x1 (published recipe)"}
+      - {arm: yolo26m_e1_lr2, label: "lr0 x2", selected: true}
+      - {arm: yolo26m_e1_ep450, label: "lr0 x1, 450 epochs (early-stopped at 374)"}
+
+  - key: deimm
+    display: DEIM-M
+    family: conventional detector
+    baseline: true
+    slug: deimm
+    resolution: "640"
+    licence: Apache-2.0
+    redistribution: permissive
+    arms: {}
+    extra:
+      - {arm: e1_s0, experiment: E1, label: "E1 recipe (lr x2), seed 0"}
+      - {arm: e1_s1, experiment: E1, label: "E1 recipe (lr x2), seed 1"}
+      - {arm: e1_s2, experiment: E1, label: "E1 recipe (lr x2), seed 2"}
+      - {arm: 1280_s0, experiment: E2, label: "E1 recipe @1280, seed 0", input: "1280"}
+      - {arm: 1280_s1, experiment: E2, label: "E1 recipe @1280, seed 1", input: "1280"}
+      - {arm: 1280_s2, experiment: E2, label: "E1 recipe @1280, seed 2", input: "1280"}
+    # E1 val sweep (seed 0, 640). Every DEIM-M sweep config was also predicted on
+    # test once, after training; selection used val only. e1_lr2 is the same run as e1_s0.
+    sweep:
+      - {arm: e1_lr05, label: "lr x0.5"}
+      - {arm: e1_lr1, label: "lr x1 (published recipe, retrained on merged5)"}
+      - {arm: e1_lr2, label: "lr x2", selected: true}
+      - {arm: e1_long, label: "160 epochs, milestones x4/3"}
+
+  # The third conventional baseline of FINAL_COMPARISON_640.md (with YOLO26m and
+  # DEIM-M). The 640 seeds are the taxonomy-ablation merged5 runs of the published
+  # recipe (train 800 multi-scale 640-960, predict 640), imported, not retrained.
+  - key: yolox
+    display: YOLOX-M
+    family: conventional detector
+    baseline: true
+    slug: yolox
+    resolution: "640"
+    licence: Apache-2.0
+    redistribution: permissive
+    arms: {}
+    extra:
+      - {arm: yolox_640_s0, experiment: E1, label: "published recipe, seed 0 (taxonomy-ablation run)", input: "640 (train 800, multi-scale 640-960)"}
+      - {arm: yolox_640_s1, experiment: E1, label: "published recipe, seed 1 (taxonomy-ablation run)", input: "640 (train 800, multi-scale 640-960)"}
+      - {arm: yolox_640_s2, experiment: E1, label: "published recipe, seed 2 (taxonomy-ablation run)", input: "640 (train 800, multi-scale 640-960)"}
+      - {arm: yolox_1280_s0, experiment: E2, label: "published recipe x2 @1280, seed 0", input: "1280 (train 1600, multi-scale 1280-1920)"}
+      - {arm: yolox_1280_s1, experiment: E2, label: "published recipe x2 @1280, seed 1", input: "1280 (train 1600, multi-scale 1280-1920)"}
+      - {arm: yolox_1280_s2, experiment: E2, label: "published recipe x2 @1280, seed 2", input: "1280 (train 1600, multi-scale 1280-1920)"}
+      # Matched recipe search, stage B (val winner sw_s800_lr4_mx50: train 800, predict
+      # 640, lr x4, mixup 0.5; 3 seeds, test once).
+      - {arm: yolox_e1_s0, experiment: E1, label: "tuned recipe (lr x4), seed 0", input: "640 (train 800, multi-scale 640-960)"}
+      - {arm: yolox_e1_s1, experiment: E1, label: "tuned recipe (lr x4), seed 1", input: "640 (train 800, multi-scale 640-960)"}
+      - {arm: yolox_e1_s2, experiment: E1, label: "tuned recipe (lr x4), seed 2", input: "640 (train 800, multi-scale 640-960)"}
+      - {arm: yolox_e1_1280_s0, experiment: E2, label: "tuned recipe x2 @1280, seed 0", input: "1280 (train 1600, multi-scale 1280-1920)"}
+      - {arm: yolox_e1_1280_s1, experiment: E2, label: "tuned recipe x2 @1280, seed 1", input: "1280 (train 1600, multi-scale 1280-1920)"}
+      - {arm: yolox_e1_1280_s2, experiment: E2, label: "tuned recipe x2 @1280, seed 2", input: "1280 (train 1600, multi-scale 1280-1920)"}
+
+# Whole-slug vast.ai spend (training boxes, failed rentals, T4 latency boxes), from the
+# sibling repo's plan docs. `complete: false` marks a total that is known to miss a box
+# or is the doc's own approximation; the report flags it. `stage`: round1 (the
+# overnight runs), round2 (E1-E4), followup (TensorRT boxes, audit fixes).
+costs:
+  - slug: yoloe
+    usd: 1.11
+    complete: true
+    source: "docs/plans/yoloe.md, Cost table (all six arms, one failed box, T4)"
+  - slug: llmdet
+    usd: 3.80
+    complete: true
+    source: "docs/plans/llmdet.md: Cost table about $2.9 (both arms, seed 1, T4) + seed 2 section about $0.9"
+  - slug: mmgdino
+    usd: 3.97
+    complete: true
+    source: "docs/plans/mmgdino.md: main arms + T4 about $2.31, peft seeds 1-2 about $1.66"
+  - slug: owlv2
+    usd: 4.64
+    complete: true
+    source: "docs/plans/owlv2.md: A6000 7.74 h (both arms, sweeps, seeds) $4.47 + three T4 rentals $0.17"
+  - slug: sam3
+    usd: 2.75
+    complete: true
+    source: "docs/plans/sam3.md, Cost table (A100 both arms + T4)"
+  - slug: deimv2
+    usd: 2.49
+    complete: true
+    source: "docs/plans/deimv2.md, Cost table (M box, L box, T4)"
+  - slug: florence2
+    usd: 1.49
+    complete: true
+    source: "docs/plans/florence2.md: Cost table ~1.04 (both arms, 1024 exploration, T4) + lora_all64 box 0.45"
+  - slug: qwen3vl
+    usd: 6.50
+    complete: true
+    source: "docs/plans/qwen3vl.md, Cost table: A100 5.86 + failed T4 0.13 + T4 latency 0.51"
+  - slug: paligemma2
+    usd: 2.75
+    complete: true
+    source: "docs/plans/paligemma2.md, Cost table (A100 + T4)"
+  - slug: smolvlm2
+    usd: 2.42
+    complete: true
+    source: "docs/plans/smolvlm2.md: A6000 4.99 h $2.11 + T4 1.39 h $0.31"
+
+  # ---- round 2 (E1-E4)
+  - slug: yolo26m
+    stage: round2
+    usd: 11.0
+    complete: false
+    source: "docs/plans/yolo26m.md, Cost: about $11 on 4090 boxes (arms, sweep, ~$1.2 dead boots) plus a ~$0.04 T4 box"
+  - slug: deimm
+    stage: round2
+    usd: 13.72
+    complete: false
+    source: "results/deimm/costs_r2.tsv summed (11.88, incl. T4 boxes and failed boxes) + 1280_s0 box from its meta.json (1.84, not in the TSV)"
+  - slug: llmdet
+    stage: round2
+    usd: 2.94
+    complete: false
+    source: "docs/plans/llmdet.md, Round 2 cost table: box $ for frac25_d0 (0.62) and mid (1.36), train $ only for the other three"
+  - slug: mmgdino
+    stage: round2
+    usd: 3.19
+    complete: false
+    source: "docs/plans/mmgdino.md, Round 2 E3 table $ column + mid $0.97; the first launch that crashed (no pycocotools) is not included"
+  - slug: sam3
+    stage: round2
+    usd: 1.90
+    complete: true
+    source: "docs/plans/sam3.md, Round 2: mid 1.57 box-h, about $1.90"
+  - slug: owlv2
+    stage: round2
+    usd: 2.42
+    complete: true
+    source: "docs/plans/owlv2.md, Round 2: mid ~4.6 h, ~$2.42"
+  - slug: yoloe
+    stage: round2
+    usd: 1.25
+    complete: true
+    source: "docs/plans/yoloe.md, Round 2 cost table total ~$1.25"
+  - slug: llmdet
+    stage: round2
+    usd: 3.20
+    complete: true
+    source: "docs/plans/llmdet.md, E5 (640) Cost: four A100 boxes (peft_640_s0-s2, full_640_s0) + T4 TensorRT box, about $3.2"
+  - slug: mmgdino
+    stage: round2
+    usd: 1.24
+    complete: true
+    source: "docs/plans/mmgdino.md, E5 (640): three A6000 boxes $0.35 + $0.41 + $0.40 + T4 $0.08, about $1.24"
+  - slug: llmdet
+    stage: round2
+    usd: 1.53
+    complete: true
+    source: "E6 (640 + matched jitter): peft_640aug_s0-s2 meta.json cost_usd_box 0.48 + 0.48 + 0.57 (three A100 boxes); docs/plans/llmdet.md about $1.53"
+  - slug: mmgdino
+    stage: round2
+    usd: 1.23
+    complete: true
+    source: "E6 (640 + matched jitter): peft_640aug_s0-s2 meta.json cost_usd 0.39 + 0.39 + 0.45 (three A6000 boxes); docs/plans/mmgdino.md about $1.23"
+  # Matched recipe search (YOLOX-M vs YOLO26m) and the YOLOX-M baseline.
+  - slug: yolox
+    stage: round2
+    usd: 58.22
+    complete: true
+    source: "docs/plans/yolox.md, vast invoices for all 27 instances: published x2 @1280 ~$5.9, stage-A sweep ~$19.7 (of which $10.7 = 3 boxes that never trained), stage B $33.8 (~$26 of it finished boxes left idling), T4 $1.45. The imported @640 seeds are not included"
+  - slug: yolo26m
+    stage: round2
+    usd: 13.5
+    complete: false
+    source: "docs/plans/yolo26m.md, matched search: sweep ~$6 (7 logged sw_* arms $3.34 + 3 skipped arms and failed boots) + stage B ~$7.5 (e1b meta.json $7.11 + one replaced box), about $13-14"
+  # ---- follow-ups: TensorRT boxes and the user-approved audit fixes
+  - slug: llmdet
+    stage: followup
+    usd: 0.49
+    complete: true
+    source: "results/llmdet/latency_trt_t4.json cost_usd (T4 TensorRT box)"
+  - slug: mmgdino
+    stage: followup
+    usd: 1.05
+    complete: true
+    source: "results/mmgdino/latency_trt_t4.json cost_usd 0.40 (GridSample engine) + msda_plugin.cost_usd 0.65"
+  - slug: sam3
+    stage: followup
+    usd: 0.72
+    complete: true
+    source: "results/sam3/latency_trt_t4.json cost_usd 0.32 (round 1, invalid engine) + round2.cost_usd 0.40 (fixed engine)"
+  - slug: yoloe
+    stage: followup
+    usd: 0.40
+    complete: true
+    source: "results/yoloe/latency_trt_t4.json notes: Norway T4 1.37 h x $0.276 + ~$0.02"
+  - slug: paligemma2
+    stage: followup
+    usd: 4.43
+    complete: true
+    source: "results/paligemma2/peft_896/meta.json cost_usd 3.83 (A100 3.45 box-h) + NIGHT_LOG 20:55 test-predict box ~$0.6"
+  - slug: paligemma2
+    stage: followup
+    usd: 0.48
+    complete: true
+    source: "docs/plans/paligemma2.md, T4 latency at 896: T4 box $0.21/h x 2.3 box-h, about $0.48"
+  - slug: qwen3vl
+    stage: followup
+    usd: 2.72
+    complete: true
+    source: "NIGHT_LOG 21:17 and docs/plans/qwen3vl.md: two merger-unfrozen boxes, $1.36 each"
+  - slug: owlv2
+    stage: followup
+    usd: 0.0
+    complete: false
+    source: "OWLv2 TensorRT box (vast 61096023, T4 $0.155/h): no cost total recorded in the results files"
+
+# --------------------------------------------------------------------------- #
+# Round 2 report structure. Everything below names rows; no number is typed here.
+# A "ref" is a group key, a row id (`<model key>/<arm folder>`), or a reference
+# detector name (YOLO26m, DEIM-M: the published 640 px predictions).
+# --------------------------------------------------------------------------- #
+
+# Seed groups: the bootstrap scores a group as the per-draw mean of its members, so a
+# group's clustered CI is the CI of the seed-averaged model.
+groups:
+  - {key: yolo26m_640_default, label: "YOLO26m @640, default recipe", input: "640", members: [yolo26m/default_s0, yolo26m/default_s1, yolo26m/default_s2]}
+  - {key: yolo26m_640_e1, label: "YOLO26m @640, E1 recipe", input: "640", members: [yolo26m/yolo26m_e1_s0, yolo26m/yolo26m_e1_s1, yolo26m/yolo26m_e1_s2]}
+  - {key: yolo26m_1280, label: "YOLO26m @1280, E1 recipe", input: "1280", members: [yolo26m/yolo26m_1280_s0, yolo26m/yolo26m_1280_s1, yolo26m/yolo26m_1280_s2]}
+  - {key: deimm_640_e1, label: "DEIM-M @640, E1 recipe", input: "640", members: [deimm/e1_s0, deimm/e1_s1, deimm/e1_s2]}
+  - {key: deimm_1280, label: "DEIM-M @1280, E1 recipe", input: "1280", members: [deimm/1280_s0, deimm/1280_s1, deimm/1280_s2]}
+  - {key: llmdet_peft, label: "LLMDet-large, light (peft)", input: "short side 800, long cap 1333", members: [llmdet/peft, llmdet/peft_s1, llmdet/peft_s2]}
+  - {key: mmgdino_peft, label: "MM-Grounding-DINO-B, light (peft)", input: "short side 800 (1422x800)", members: [mmgdino/peft, mmgdino/peft_s1, mmgdino/peft_s2]}
+  - {key: llmdet_peft_640, label: "LLMDet-large @640, light (peft)", input: "640x360 (long side 640)", members: [llmdet/peft_640_s0, llmdet/peft_640_s1, llmdet/peft_640_s2]}
+  - {key: mmgdino_peft_640, label: "MM-Grounding-DINO-B @640, light (peft)", input: "640x360 (long side 640)", members: [mmgdino/peft_640_s0, mmgdino/peft_640_s1, mmgdino/peft_640_s2]}
+  - {key: llmdet_peft_640aug, label: "LLMDet-large @640 + matched jitter (E6), light (peft)", input: "640x360 (long side 640)", members: [llmdet/peft_640aug_s0, llmdet/peft_640aug_s1, llmdet/peft_640aug_s2]}
+  - {key: mmgdino_peft_640aug, label: "MM-Grounding-DINO-B @640 + matched jitter (E6), light (peft)", input: "640x360 (long side 640)", members: [mmgdino/peft_640aug_s0, mmgdino/peft_640aug_s1, mmgdino/peft_640aug_s2]}
+  - {key: owlv2_peft, label: "OWLv2-L/14, light (peft)", input: "1008x1008", members: [owlv2/peft, owlv2/peft_seed1, owlv2/peft_seed2]}
+  - {key: yolox_640, label: "YOLOX-M @640, published recipe", input: "640", members: [yolox/yolox_640_s0, yolox/yolox_640_s1, yolox/yolox_640_s2]}
+  - {key: yolox_1280, label: "YOLOX-M @1280, published recipe x2", input: "1280", members: [yolox/yolox_1280_s0, yolox/yolox_1280_s1, yolox/yolox_1280_s2]}
+  # Matched recipe search, stage B: each model's val winner, 3 seeds, test once. (A group
+  # can carry `pending: true` while its seeds are still training.)
+  - {key: yolox_e1, label: "YOLOX-M @640, tuned recipe (sw_s800_lr4_mx50)", input: "640", members: [yolox/yolox_e1_s0, yolox/yolox_e1_s1, yolox/yolox_e1_s2]}
+  - {key: yolox_e1_1280, label: "YOLOX-M @1280, tuned recipe x2", input: "1280", members: [yolox/yolox_e1_1280_s0, yolox/yolox_e1_1280_s1, yolox/yolox_e1_1280_s2]}
+  - {key: yolo26m_e1b, label: "YOLO26m @640, tuned recipe (sw_s800_lr1_mx50)", input: "640", members: [yolo26m/yolo26m_e1b_s0, yolo26m/yolo26m_e1b_s1, yolo26m/yolo26m_e1b_s2]}
+  - {key: yolo26m_e1b_1280, label: "YOLO26m @1280, tuned recipe x2", input: "1280", members: [yolo26m/yolo26m_e1b_1280_s0, yolo26m/yolo26m_e1b_1280_s1, yolo26m/yolo26m_e1b_1280_s2]}
+
+# Which entries each report table shows, and which paired clustered deltas it quotes.
+tables:
+  headline:
+    entries: [yolo26m_e1b_1280, deimm_1280, yolo26m_1280, yolox_1280, yolox_e1_1280, llmdet_peft, llmdet/full, yoloe_1280/yoloe_full, yoloworld/yoloworld_full, mmgdino_peft, sam3/full, yolo26m_e1b, deimm_640_e1, yolo26m_640_e1, yolox_e1, yolox_640, yoloe_640/yoloe_full_640, llmdet_peft_640, llmdet/full_640_s0, mmgdino_peft_640]
+    pairs:
+      # Matched recipe search, stage B: the tuned YOLO26m @1280 against the best
+      # foundation models at their native inputs, and the tuned baselines head to head.
+      - [yolo26m_e1b_1280, llmdet_peft]
+      - [yolo26m_e1b_1280, llmdet/full]
+      - [yolo26m_e1b_1280, yoloe_1280/yoloe_full]
+      - [yolo26m_e1b_1280, yoloworld/yoloworld_full]
+      - [yolo26m_e1b_1280, mmgdino_peft]
+      - [yolo26m_e1b_1280, deimm_1280]
+      - [yolo26m_e1b_1280, yolox_e1_1280]
+      - [deimm_1280, yolox_e1_1280]
+      - [yolo26m_e1b, yolox_e1]
+      - [deimm_640_e1, yolox_e1]
+      - [yolo26m_1280, yolox_1280]
+      - [yolo26m_640_e1, yolox_640]
+      - [deimm_1280, llmdet_peft]
+      - [deimm_1280, llmdet/full]
+      - [yolo26m_1280, llmdet_peft]
+      - [yolo26m_1280, yoloe_1280/yoloe_full]
+      - [deimm_1280, yoloworld/yoloworld_full]
+      - [deimm_1280, mmgdino_peft]
+      - [llmdet_peft, yolo26m_640_e1]
+      - [llmdet_peft, deimm_640_e1]
+  e1:
+    entries: [YOLO26m, yolo26m_640_default, yolo26m_640_e1, DEIM-M, deimm_640_e1, yolox_640, llmdet_peft]
+    pairs:
+      - [yolo26m_640_e1, yolo26m_640_default]
+      - [yolo26m_640_e1, YOLO26m]
+      - [deimm_640_e1, DEIM-M]
+      # YOLOX-M: both YOLO26m 640 recipes (the default-recipe seeds are the same
+      # taxonomy-ablation set as the YOLOX-M seeds) and DEIM-M.
+      - [yolo26m_640_default, yolox_640]
+      - [yolo26m_640_e1, yolox_640]
+      - [deimm_640_e1, yolox_640]
+      - [llmdet_peft, yolo26m_640_e1]
+      - [llmdet_peft, deimm_640_e1]
+  e2:
+    entries: [yolo26m_640_e1, yolo26m_1280, yolo26m_e1b, yolo26m_e1b_1280, deimm_640_e1, deimm_1280, yolox_640, yolox_1280, yolox_e1, yolox_e1_1280, llmdet_peft_640, llmdet_peft_640aug, llmdet_peft, llmdet/full_640_s0, llmdet/full, mmgdino_peft_640, mmgdino_peft_640aug, mmgdino_peft, yoloe_640/yoloe_full_640, yoloe_1280/yoloe_full, yoloe_640/yoloe_peft_640, yoloe_1280/yoloe_peft]
+    pairs:
+      - [yolo26m_1280, yolo26m_640_e1]
+      - [deimm_1280, deimm_640_e1]
+      - [llmdet_peft, llmdet_peft_640]
+      - [llmdet/full, llmdet/full_640_s0]
+      - [mmgdino_peft, mmgdino_peft_640]
+      - [yoloe_1280/yoloe_full, yoloe_640/yoloe_full_640]
+      # E5: every model at the baselines' 640 input.
+      - [llmdet_peft_640, yolo26m_640_e1]
+      - [llmdet_peft_640, deimm_640_e1]
+      - [llmdet/full_640_s0, yolo26m_640_e1]
+      - [llmdet/full_640_s0, deimm_640_e1]
+      - [mmgdino_peft_640, yolo26m_640_e1]
+      - [mmgdino_peft_640, deimm_640_e1]
+      # E6: E5 with the round-1 multi-scale jitter restored at the 640 scale.
+      - [llmdet_peft_640aug, llmdet_peft_640]
+      - [mmgdino_peft_640aug, mmgdino_peft_640]
+      - [llmdet_peft_640aug, yolo26m_640_e1]
+      - [llmdet_peft_640aug, deimm_640_e1]
+      - [mmgdino_peft_640aug, yolo26m_640_e1]
+      - [mmgdino_peft_640aug, deimm_640_e1]
+      - [yoloe_640/yoloe_full_640, yolo26m_640_e1]
+      - [yoloe_1280/yoloe_full, yolo26m_1280]
+      # YOLOX-M, the third conventional baseline: 640 vs 1280, vs the other two
+      # baselines at 1280, and vs the grounding models wherever YOLO26m / DEIM-M are.
+      - [yolox_1280, yolox_640]
+      - [yolo26m_1280, yolox_1280]
+      - [deimm_1280, yolox_1280]
+      - [yolox_1280, llmdet_peft]
+      - [yolox_1280, llmdet/full]
+      - [yolox_1280, mmgdino_peft]
+      - [llmdet_peft_640, yolox_640]
+      - [llmdet/full_640_s0, yolox_640]
+      - [mmgdino_peft_640, yolox_640]
+      - [llmdet_peft_640aug, yolox_640]
+      - [mmgdino_peft_640aug, yolox_640]
+  # Matched recipe search, stage B: each model's val-selected recipe, 3 seeds, at 640 and
+  # x2 at 1280, next to its published-recipe seeds. Pending groups are listed under the
+  # table until they land.
+  matched:
+    entries: [yolo26m_640_default, yolox_640, yolo26m_e1b, yolox_e1, yolo26m_1280, yolox_1280, yolo26m_e1b_1280, yolox_e1_1280]
+    pairs:
+      - [yolo26m_640_default, yolox_640]
+      - [yolo26m_e1b, yolox_e1]
+      - [yolo26m_e1b_1280, yolox_e1_1280]
+      - [yolox_e1, yolox_640]
+      - [yolo26m_e1b, yolo26m_640_e1]
+      - [yolox_e1_1280, yolox_1280]
+      - [yolo26m_e1b_1280, yolo26m_1280]
+      - [yolo26m_e1b_1280, yolo26m_e1b]
+      - [yolox_e1_1280, yolox_e1]
+      - [deimm_640_e1, yolox_e1]
+      - [deimm_1280, yolox_e1_1280]
+  e3:
+    entries: []
+    pairs:
+      - [llmdet/peft_frac25_d1, yolo26m/yolo26m_frac25_d1]
+      - [mmgdino/peft_frac25_d1, yolo26m/yolo26m_frac25_d1]
+      - [yoloe_640/yoloe_full_640_frac25_d1, yolo26m/yolo26m_frac25_d1]
+      - [llmdet/peft_frac25_d0, yolo26m/yolo26m_frac25_d0]
+      - [yoloe_640/yoloe_full_640_frac25_d0, yolo26m/yolo26m_frac25_d0]
+
+# E2 + E5 resolution parity in both directions: one line per model, the same recipe at
+# the baselines' 640 input (`low`) and at the higher input (`high`: 1280 for the
+# baselines, the round-1 native input for the grounding models).
+parity:
+  - {label: "DEIM-M (E1 recipe)", low: deimm_640_e1, high: deimm_1280}
+  - {label: "YOLO26m (E1 recipe)", low: yolo26m_640_e1, high: yolo26m_1280}
+  - {label: "LLMDet-large, light (peft)", low: llmdet_peft_640, high: llmdet_peft}
+  - {label: "LLMDet-large, full", low: llmdet/full_640_s0, high: llmdet/full}
+  - {label: "MM-Grounding-DINO-B, light (peft)", low: mmgdino_peft_640, high: mmgdino_peft}
+  - {label: "LLMDet-large, light (peft), E6 matched jitter at 640", low: llmdet_peft_640aug, high: llmdet_peft}
+  - {label: "MM-Grounding-DINO-B, light (peft), E6 matched jitter at 640", low: mmgdino_peft_640aug, high: mmgdino_peft}
+  - {label: "YOLOX-M (published recipe; 1280 trains at 1600)", low: yolox_640, high: yolox_1280}
+  - {label: "YOLOX-M (tuned recipe, stage B)", low: yolox_e1, high: yolox_e1_1280}
+  - {label: "YOLO26m (tuned recipe, stage B)", low: yolo26m_e1b, high: yolo26m_e1b_1280}
+
+# Matched recipe search, YOLOX-M vs YOLO26m (section 5): the identical grid for both,
+# train scale {640, 800 (predicted at 640)} x lr {x1, x2, x4 of the published recipe}
+# x mixup {0, 0.5}, seed 0, val only. Every cell is listed, including the three per
+# model that never ran. `published: true` marks the model's published recipe.
+matched_search:
+  - model: yolox
+    predict_size: 640
+    configs:
+      - {arm: sw_s640_lr1_mx0, train_scale: 640, lr_mult: 1, mixup: 0.0, run: never_ran, note: "box never started training (setup lost its connection) and idled until the overnight credit stop"}
+      - {arm: sw_s640_lr1_mx50, train_scale: 640, lr_mult: 1, mixup: 0.5, run: new}
+      - {arm: sw_s640_lr2_mx0, train_scale: 640, lr_mult: 2, mixup: 0.0, run: new}
+      - {arm: sw_s640_lr2_mx50, train_scale: 640, lr_mult: 2, mixup: 0.5, run: never_ran, note: "box never started training (setup lost its connection) and idled until the overnight credit stop"}
+      - {arm: sw_s640_lr4_mx0, train_scale: 640, lr_mult: 4, mixup: 0.0, run: new}
+      - {arm: sw_s640_lr4_mx50, train_scale: 640, lr_mult: 4, mixup: 0.5, run: never_ran, note: "box never started training (setup lost its connection) and idled until the overnight credit stop"}
+      - {arm: sw_s800_lr1_mx0, train_scale: 800, lr_mult: 1, mixup: 0.0, run: new}
+      - {arm: sw_s800_lr1_mx50, train_scale: 800, lr_mult: 1, mixup: 0.5, run: new, published: true}
+      - {arm: sw_s800_lr2_mx0, train_scale: 800, lr_mult: 2, mixup: 0.0, run: new}
+      - {arm: sw_s800_lr2_mx50, train_scale: 800, lr_mult: 2, mixup: 0.5, run: new}
+      - {arm: sw_s800_lr4_mx0, train_scale: 800, lr_mult: 4, mixup: 0.0, run: new}
+      - {arm: sw_s800_lr4_mx50, train_scale: 800, lr_mult: 4, mixup: 0.5, run: new}
+  - model: yolo26m
+    predict_size: 640
+    configs:
+      - {arm: yolo26m_e1_lr1, train_scale: 640, lr_mult: 1, mixup: 0.0, run: reused, published: true, note: "E1 sweep arm, identical recipe"}
+      - {arm: sw_s640_lr1_mx50, train_scale: 640, lr_mult: 1, mixup: 0.5, run: new}
+      - {arm: yolo26m_e1_lr2, train_scale: 640, lr_mult: 2, mixup: 0.0, run: reused, note: "E1 sweep winner, identical recipe"}
+      - {arm: sw_s640_lr2_mx50, train_scale: 640, lr_mult: 2, mixup: 0.5, run: new}
+      - {arm: sw_s640_lr4_mx0, train_scale: 640, lr_mult: 4, mixup: 0.0, run: new}
+      - {arm: sw_s640_lr4_mx50, train_scale: 640, lr_mult: 4, mixup: 0.5, run: never_ran, note: "box stopped when the vast.ai account ran out of credit"}
+      - {arm: sw_s800_lr1_mx0, train_scale: 800, lr_mult: 1, mixup: 0.0, run: never_ran, note: "box stopped when the vast.ai account ran out of credit"}
+      - {arm: sw_s800_lr1_mx50, train_scale: 800, lr_mult: 1, mixup: 0.5, run: new}
+      - {arm: sw_s800_lr2_mx0, train_scale: 800, lr_mult: 2, mixup: 0.0, run: new}
+      - {arm: sw_s800_lr2_mx50, train_scale: 800, lr_mult: 2, mixup: 0.5, run: new}
+      - {arm: sw_s800_lr4_mx0, train_scale: 800, lr_mult: 4, mixup: 0.0, run: never_ran, note: "box stopped when the vast.ai account ran out of credit"}
+      - {arm: sw_s800_lr4_mx50, train_scale: 800, lr_mult: 4, mixup: 0.5, run: new}
+
+# E3 data scaling: one series per model. `full` is the 100% point (a seed group or a
+# row); the subset rows carry their image fraction and draw in meta.json.
+scaling:
+  - {label: "YOLO26m @640 (E1 recipe)", full: yolo26m_640_e1, subsets: [yolo26m/yolo26m_frac25_d0, yolo26m/yolo26m_frac25_d1, yolo26m/yolo26m_frac50_d0, yolo26m/yolo26m_frac50_d1]}
+  - {label: "YOLOE-26x @640 (full)", full: yoloe_640/yoloe_full_640, subsets: [yoloe_640/yoloe_full_640_frac25_d0, yoloe_640/yoloe_full_640_frac25_d1, yoloe_640/yoloe_full_640_frac50_d0, yoloe_640/yoloe_full_640_frac50_d1]}
+  - {label: "LLMDet-large (light)", full: llmdet_peft, subsets: [llmdet/peft_frac25_d0, llmdet/peft_frac25_d1, llmdet/peft_frac50_d0, llmdet/peft_frac50_d1]}
+  - {label: "MM-Grounding-DINO-B (light)", full: mmgdino_peft, subsets: [mmgdino/peft_frac25_d0, mmgdino/peft_frac25_d1, mmgdino/peft_frac50_d0, mmgdino/peft_frac50_d1]}
+
+# Generative-VLM recipe fixes found in audit (user-approved; test predicted once each).
+fixes:
+  - {before: paligemma2/peft, after: paligemma2/peft_896, change: "input 448 -> 896 px (google/paligemma2-3b-pt-896), same LoRA + projector recipe", audit: paligemma2}
+  - {before: qwen3vl/peft, after: qwen3vl/peft_merger, change: "8B LoRA, vision merger + deepstack mergers unfrozen (upstream tune_mm_mlp)", audit: qwen3vl}
+  - {before: qwen3vl/peft_4b, after: qwen3vl/peft_4b_merger, change: "4B LoRA, vision merger + deepstack mergers unfrozen", audit: qwen3vl}
+
+# Audits (results/<slug>/audit/AUDIT.md). The verdict word is parsed from the file;
+# `outcome` says what happened to the published numbers.
+audits:
+  - {slug: owlv2, outcome: "Numbers stand. The light arm is capacity-limited (train fit 0.693 vs val 0.557)."}
+  - {slug: yoloe, outcome: "Numbers stand. The linear probe cannot move a box; that is its ceiling."}
+  - {slug: florence2, outcome: "Numbers stand. Frozen DaViT limits the LoRA arms, above all on the ball."}
+  - {slug: smolvlm2, outcome: "Numbers stand (about 0). The model does not fit its own training images (train 0.008 / 0.016)."}
+  - {slug: paligemma2, outcome: "Recipe fix run: 896 px input. Val 0.293 -> 0.447; test predicted once after user approval (0.278 -> 0.432)."}
+  - {slug: qwen3vl, outcome: "Recipe fix run: merger unfrozen. Test predicted once each after user approval (8B 0.548 -> 0.570, 4B 0.533 -> 0.588)."}
+
+# TensorRT fp16 engines on a rented T4 (TensorRT 10.3). Value paths are key lists into
+# `file` (relative to the sibling results/), or {file, path} for a value kept in another
+# file. `applies_to`: the report entries this engine times (same graph).
+# status: current | superseded (kept to show what changed) | invalid.
+trt:
+  - key: yolo26m_640_published
+    label: "YOLO26m @640 (published engine)"
+    published: YOLO26m
+    input: "640x640"
+    applies_to: [yolo26m_640_e1, yolo26m_640_default, YOLO26m, yolo26m_e1b]
+  - key: yolox_640
+    label: "YOLOX-M @640 (published ONNX), scaled to the reference T4"
+    file: yolox/latency_trt_t4.json
+    input: "640x640"
+    gpu_ms: [scaled_to_reference_box_ms, "640"]
+    gpu_runs: ["640", runs]
+    note: "measured 5.20 ms on a T4 about 11% faster than the anchor box; x 5.84/5.20 = the anchor re-time (published GCP T4: 5.68)"
+    applies_to: [yolox_640, yolox_e1]
+  - key: deimm_640_published
+    label: "DEIM-M @640 (published engine)"
+    published: DEIM-M
+    input: "640x640"
+    applies_to: [DEIM-M]
+  - key: yolo26m_1280
+    label: "YOLO26m @1280 (1280_s0)"
+    file: yolo26m/latency_trt_t4.json
+    input: "1280x1280"
+    gpu_ms: [reported_median_ms]
+    gpu_runs: [runs]
+    applies_to: [yolo26m_1280, yolo26m_e1b_1280]
+  - key: yolox_1280
+    label: "YOLOX-M @1280 (yolox_e1_1280_s0), scaled to the reference T4"
+    file: yolox/latency_trt_t4.json
+    input: "1280x1280"
+    gpu_ms: [scaled_to_reference_box_ms, "1280"]
+    gpu_runs: ["1280", runs]
+    note: "measured 16.83 ms on the same faster T4, scaled by 5.84/5.20; one graph for every 1280 arm"
+    applies_to: [yolox_1280, yolox_e1_1280]
+  - key: deimm_640
+    label: "DEIM-M @640 (e1_lr2)"
+    file: deimm/latency_t4/trt_deimm_e1_lr2_640.json
+    input: "640x640"
+    gpu_ms: [reported_median_ms]
+    gpu_runs: [runs]
+    applies_to: [deimm_640_e1, deimm/e1_s0]
+  - key: deimm_1280
+    label: "DEIM-M @1280 (1280_s0)"
+    file: deimm/latency_t4/trt_deimm_1280_s0_1280.json
+    input: "1280x1280"
+    gpu_ms: [reported_median_ms]
+    gpu_runs: [runs]
+    applies_to: [deimm_1280]
+  - key: yoloe_full_640
+    label: "YOLOE-26x @640 (full)"
+    file: yoloe/latency_trt_t4.json
+    input: "640x640"
+    gpu_ms: [arms, yoloe_full_640, gpu_compute, median_ms]
+    gpu_runs: [arms, yoloe_full_640, gpu_compute, runs]
+    e2e_ms: [arms, yoloe_full_640, e2e, median_ms]
+    pytorch_ms: {file: yoloe/latency_t4.json, path: [runs, yoloe_full_640, reported_median_ms]}
+    val_pt: [arms, yoloe_full_640, valid_mAP_50_95, pytorch]
+    val_trt: [arms, yoloe_full_640, valid_mAP_50_95, trt_fp16]
+    applies_to: [yoloe_640/yoloe_full_640]
+  - key: yoloe_full
+    label: "YOLOE-26x @1280 (full)"
+    file: yoloe/latency_trt_t4.json
+    input: "1280x1280"
+    gpu_ms: [arms, yoloe_full, gpu_compute, median_ms]
+    gpu_runs: [arms, yoloe_full, gpu_compute, runs]
+    e2e_ms: [arms, yoloe_full, e2e, median_ms]
+    pytorch_ms: {file: yoloe/latency_t4.json, path: [runs, yoloe_full_1280, reported_median_ms]}
+    val_pt: [arms, yoloe_full, valid_mAP_50_95, pytorch]
+    val_trt: [arms, yoloe_full, valid_mAP_50_95, trt_fp16]
+    note: "val gap is the square letterbox, not fp16 (an fp32 engine scores the same)"
+    applies_to: [yoloe_1280/yoloe_full]
+  - key: yoloworld_full
+    label: "YOLO-World-v2-x @1280 (full)"
+    file: yoloe/latency_trt_t4.json
+    input: "1280x1280"
+    gpu_ms: [arms, yoloworld_full, gpu_compute, median_ms]
+    gpu_runs: [arms, yoloworld_full, gpu_compute, runs]
+    e2e_ms: [arms, yoloworld_full, e2e, median_ms]
+    pytorch_ms: {file: yoloe/latency_t4.json, path: [runs, yoloworld_full_1280, reported_median_ms]}
+    val_pt: [arms, yoloworld_full, valid_mAP_50_95, pytorch]
+    val_trt: [arms, yoloworld_full, valid_mAP_50_95, trt_fp16]
+    note: "EfficientNMS in the engine"
+    applies_to: [yoloworld/yoloworld_full, yoloworld/yoloworld_peft]
+  - key: deimv2_m
+    label: "DEIMv2-M (full)"
+    file: deimv2/latency_t4.json
+    input: "640x640"
+    gpu_ms: [tensorrt_fp16, "DEIMv2-M (full)", reported_median_ms]
+    gpu_runs: [tensorrt_fp16, "DEIMv2-M (full)", runs]
+    pytorch_ms: [pytorch_fp16, "DEIMv2-M (full)", reported_median_ms]
+    applies_to: [deimv2_m/full, deimv2_m/peft]
+  - key: deimv2_l
+    label: "DEIMv2-L (l_full)"
+    file: deimv2/latency_t4.json
+    input: "640x640"
+    gpu_ms: [tensorrt_fp16, "DEIMv2-L (l_full)", reported_median_ms]
+    gpu_runs: [tensorrt_fp16, "DEIMv2-L (l_full)", runs]
+    pytorch_ms: [pytorch_fp16, "DEIMv2-L (l_full)", reported_median_ms]
+    applies_to: [deimv2_l/l_full, deimv2_l/l_peft]
+  - key: mmgdino_msda
+    label: "MM-Grounding-DINO-B (peft), MSDA plugin"
+    file: mmgdino/latency_trt_t4.json
+    input: "800x1422"
+    gpu_ms: [msda_plugin, gpu_compute, reported_median_ms]
+    gpu_runs: [msda_plugin, gpu_compute, runs]
+    e2e_ms: [msda_plugin, e2e, reported_median_ms]
+    pytorch_ms: [pytorch_fp16_e2e_median_ms]
+    val_pt: [msda_plugin, val_mAP_50_95, pytorch_fp32_engine_input]
+    val_trt: [msda_plugin, val_mAP_50_95, trt_fp16_plugin]
+    note: "GPU-compute runs 12% apart: quote the range; plugin precision loss not isolated"
+    applies_to: [mmgdino_peft, mmgdino/peft, mmgdino/full]
+  - key: mmgdino_gridsample
+    label: "MM-Grounding-DINO-B (peft), ONNX GridSample"
+    status: superseded
+    file: mmgdino/latency_trt_t4.json
+    input: "800x1422"
+    gpu_ms: [gpu_compute, reported_median_ms]
+    gpu_runs: [gpu_compute, runs]
+    e2e_ms: [e2e, reported_median_ms]
+    pytorch_ms: [pytorch_fp16_e2e_median_ms]
+    val_pt: [val_mAP_50_95, pytorch_fp32_engine_input]
+    val_trt: [val_mAP_50_95, trt_fp16]
+    note: "superseded by the MSDA plugin engine; slower than PyTorch"
+    applies_to: []
+  - key: llmdet_msda
+    label: "LLMDet-large (peft), MSDA plugin"
+    file: llmdet/latency_trt_t4.json
+    input: "750x1333"
+    gpu_ms: [gpu_compute_median_ms]
+    gpu_runs: [variants, plugin_fp16, gpu_compute, runs]
+    e2e_ms: [e2e_median_ms]
+    pytorch_ms: [pytorch_fp16_t4_e2e_median_ms]
+    val_pt: [val_map_50_95_pytorch]
+    val_trt: [val_map_50_95_trt]
+    note: "fp32 islands do not recover the fp16 loss; an fp32 engine scores -0.18 pt"
+    applies_to: [llmdet_peft, llmdet/peft, llmdet/full]
+  - key: llmdet_e5_640
+    label: "LLMDet-large @640 (peft_640_s0), MSDA plugin"
+    file: llmdet/latency_trt_t4.json
+    input: "360x640"
+    gpu_ms: [e5_640, gpu_compute_median_ms]
+    gpu_runs: [e5_640, gpu_compute, runs]
+    e2e_ms: [e5_640, e2e_median_ms]
+    val_pt: [e5_640, val_map_50_95_pytorch]
+    val_trt: [e5_640, val_map_50_95_trt]
+    note: "E5 (E6 reuses it: same architecture and 360x640 engine input); same export path as the native engine; a first timing pair right after the build was 12% apart, so the engine was re-timed and the stable pair is reported"
+    applies_to: [llmdet_peft_640, llmdet/peft_640_s0, llmdet/peft_640_s1, llmdet/peft_640_s2, llmdet/full_640_s0, llmdet_peft_640aug, llmdet/peft_640aug_s0, llmdet/peft_640aug_s1, llmdet/peft_640aug_s2]
+  - key: mmgdino_e5_640
+    label: "MM-Grounding-DINO-B @640 (peft_640_s0), MSDA plugin"
+    file: mmgdino/latency_trt_t4.json
+    input: "360x640"
+    gpu_ms: [e5_640, gpu_compute, reported_median_ms]
+    gpu_runs: [e5_640, gpu_compute, runs]
+    e2e_ms: [e5_640, e2e, reported_median_ms]
+    val_pt: [e5_640, val_mAP_50_95, pytorch_fp32_engine_input_360x640]
+    val_trt: [e5_640, val_mAP_50_95, trt_fp16_plugin]
+    note: "E5 (E6 reuses it: same architecture and engine input); the engine runs the unpadded 360x640 frame (PyTorch pads to 384x640); val PyTorch is fp32 at the engine's input"
+    applies_to: [mmgdino_peft_640, mmgdino/peft_640_s0, mmgdino/peft_640_s1, mmgdino/peft_640_s2, mmgdino_peft_640aug, mmgdino/peft_640aug_s0, mmgdino/peft_640aug_s1, mmgdino/peft_640aug_s2]
+  - key: sam3_fixed
+    label: "SAM 3 (full), --attn-out-3d export"
+    file: sam3/latency_trt_t4.json
+    input: "1008x1008"
+    gpu_ms: [round2, reported, gpu_compute_median_ms]
+    gpu_runs: [round2, gpu_compute_runs]
+    e2e_ms: [round2, reported, e2e_median_ms]
+    pytorch_ms: [pytorch_fp16_reference_ms, e2e_median]
+    val_pt: [round2, val_mAP_50_95, pytorch_bf16]
+    val_trt: [round2, val_mAP_50_95, trt_fp16]
+    note: "round-1 engine gave val 0.000 (TRT 10.3 fp16 mis-computed the ViT attention projection on sm75); fixed by an export rewrite"
+    applies_to: [sam3/full, sam3/peft]
+  - key: owlv2_full
+    label: "OWLv2-L/14 (full)"
+    file: owlv2/latency_trt_t4.json
+    input: "1008x1008"
+    gpu_ms: [gpu_compute, reported_median_ms]
+    gpu_runs: [gpu_compute, runs]
+    e2e_ms: [e2e, cv2pre, median_ms]
+    pytorch_ms: {file: owlv2/latency_t4.json, path: [reported_median_ms]}
+    val_pt: [val_mAP_50_95, pytorch]
+    val_trt: [val_mAP_50_95, trt_fp16_cv2pre]
+    note: "e2e with cv2 pre-processing; the HF image processor alone takes ~470 ms on the CPU"
+    applies_to: [owlv2/full, owlv2/peft, owlv2_peft]
+
+# Timings this study does not have, listed in the report so their absence is explicit.
+not_timed:
+  - {what: "Generative VLMs under TensorRT", why: "token-by-token generation needs TensorRT-LLM, not a TensorRT engine; VLMs are timed in PyTorch only"}
+  - {what: "YOLO26m / DEIM-M end to end at 1280", why: "only GPU compute was timed for the retrained baselines"}
