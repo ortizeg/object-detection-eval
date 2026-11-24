@@ -25,7 +25,8 @@ Re-running after a new seed lands scores only the new row. Round-2 and follow-up
 for the round-1 rows it was first published for.
 
 **Groups and pairs.** The results file also carries seed groups and the pairs each
-report table quotes (from ``finetune_study.yaml``). A group is scored on every clip
+report table quotes (from ``finetune_study.yaml``); pairs that name a pending group
+(still training) are skipped. A group is scored on every clip
 resample as the mean of its members' scores on that resample, so its interval is the
 interval of the seed-averaged model; a pair is the paired difference of two entries
 (group, row or reference) over the same 10 resamples, with clips ahead.
@@ -339,10 +340,12 @@ def main(argv: list[str] | None = None) -> int:
         preds, digests = _load_preds(rows, references, Path(tmp_name))
 
     groups = {g["key"]: g["members"] for g in data.get("groups", [])}
+    # Groups still training (``pending: true`` in the manifest) have no scored rows yet.
+    pending = {g["key"] for g in data.get("pending_groups", [])}
     pairs: list[tuple[str, str]] = []
     for table in data.get("tables", {}).values():
         for a, b in table.get("pairs", []):
-            if (a, b) not in pairs:
+            if (a, b) not in pairs and not {a, b} & pending:
                 pairs.append((a, b))
     clustered = _clustered(rows, references, preds, gt, groups, pairs)
     _check_points(rows, clustered["per_model"])

@@ -2,9 +2,9 @@
 
 [VLM_VS_FINETUNED.md](VLM_VS_FINETUNED.md) scored open-weights foundation models
 zero-shot. This report fine-tunes them, and a few more, on the same 464 training images,
-then retrains the two best conventional detectors from
-[FINAL_COMPARISON_640.md](FINAL_COMPARISON_640.md) under the same protocol and at the
-same input resolution. Every number below was selected on `valid`, predicted on `test`
+then retrains the top three conventional detectors from
+[FINAL_COMPARISON_640.md](FINAL_COMPARISON_640.md) (YOLO26m, DEIM-M and YOLOX-M) under
+the same protocol and at the same input resolution. Every number below was selected on `valid`, predicted on `test`
 once, and scored with the scorer every published row uses. Every table is generated
 from committed results files (see [Reproducing](#reproducing-these-numbers)); prose
 numbers are copied from those tables.
@@ -18,10 +18,26 @@ and YOLOE / YOLO-World at 1280. Retrained at 1280 with the same equal-effort rec
 18.2 ms TensorRT fp16 on a T4, and YOLO26m 0.771 ± 0.002 at 20.2 ms**. The best
 foundation models are in the same place: LLMDet-large 0.777 ± 0.008 (light arm, 3 seeds)
 and 0.785 (full), at 335 ms; YOLOE-26x and YOLO-World-v2-x at 1280, 0.775 and 0.776
-(39 and 51 ms). Every matched-resolution pair below is a clustered-CI tie: the largest
-gaps are DEIM-M @1280 ahead of MM-Grounding-DINO by 2.9 points (2 of 3 clips) and ahead
+(39 and 51 ms). Every matched-resolution pair of DEIM-M or YOLO26m with a foundation model below is a
+clustered-CI tie: the largest gaps are DEIM-M @1280 ahead of MM-Grounding-DINO by 2.9 points (2 of 3 clips) and ahead
 of YOLO-World by 0.5 points on all 3 clips, an interval that touches zero. Against the
 640 px baselines, LLMDet at its native input is 6-8 points ahead on every clip.
+
+**YOLOX-M, the third conventional baseline.** FINAL_COMPARISON_640.md ranks YOLO26m,
+DEIM-M and YOLOX-M as the top three detectors at 640, with YOLO26m's 4.4-point lead over
+YOLOX-M inside a clip-level CI of [-0.7, +7.4] points. Here YOLOX-M's published recipe,
+3 seeds on merged5, scores 0.672 ± 0.009 at 640 (5.68 ms TensorRT) and 0.750 ± 0.005
+with the recipe doubled to 1280 (T4 timing pending). The point gap to YOLO26m is the same
+4.4 at 640 and 2.1 at 1280, but with three seeds per side the clustered intervals no
+longer cross zero: YOLO26m is ahead on all 3 clips at both sizes (+0.046 [+0.025, +0.075]
+against its E1 seeds at 640, +0.021 [+0.004, +0.031] at 1280), and so is DEIM-M (+0.028
+and +0.032). Three of three clips is p = 1/8, not significance at 5%, so this is a
+consistent lead on the clips we have, not a crowned winner. A matched recipe search
+(section 5) gave both models the same grid; tuning adds 1.5-2.5 val points to each and
+leaves the gap in place. At 640 YOLOX-M ties LLMDet-large @640 (LLMDet +0.024 [-0.031,
++0.060]) and is above MM-Grounding-DINO @640 on every clip; at 1280 it is below
+LLMDet-large at its native input on every clip (-0.027 [-0.050, -0.007]) and ties
+MM-Grounding-DINO (-0.002 [-0.034, +0.022]).
 
 **The other direction (E5).** Retrained and evaluated at the baselines' 640 input (long
 side 640, so a 1080p frame is 640x360), the grounding models lose that lead. LLMDet-large
@@ -42,6 +58,7 @@ MM-Grounding-DINO is still below both on every clip (see [section 6](#6-resoluti
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | DEIM-M @1280, E1 recipe | 1280 | 3 | 0.774 | 0.782 ± 0.011 | [0.762, 0.805] | 0.930 | 0.960 | 18.2 |
 | YOLO26m @1280, E1 recipe | 1280 | 3 | 0.759 | 0.771 ± 0.002 | [0.741, 0.805] | 0.918 | 0.948 | 20.2 |
+| YOLOX-M @1280, published recipe x2 | 1280 | 3 | 0.745 | 0.750 ± 0.005 | [0.716, 0.775] | 0.887 | 0.958 | pending |
 | LLMDet-large, light (peft) | short side 800, long cap 1333 | 3 | 0.735 | 0.777 ± 0.008 | [0.740, 0.817] | 0.922 | 0.961 | 334.8 |
 | LLMDet-large, full | short side 800, long cap 1333 | 1 | 0.739 | 0.785 | [0.766, 0.813] | 0.919 | 0.965 | 334.8 |
 | YOLOE-26x @1280, full (`yoloe_full`) | 1280 | 1 | 0.774 | 0.775 | [0.740, 0.802] | 0.879 | 0.972 | 39.0 |
@@ -50,6 +67,7 @@ MM-Grounding-DINO is still below both on every clip (see [section 6](#6-resoluti
 | SAM 3, full | 1008x1008 | 1 | 0.709 | 0.737 | [0.684, 0.776] | 0.924 | 0.916 | 432.1 |
 | DEIM-M @640, E1 recipe | 640 | 3 | 0.707 | 0.700 ± 0.005 | [0.653, 0.733] | 0.853 | 0.912 | 6.78 |
 | YOLO26m @640, E1 recipe | 640 | 3 | 0.699 | 0.719 ± 0.007 | [0.686, 0.745] | 0.837 | 0.934 | 5.85 |
+| YOLOX-M @640, published recipe | 640 | 3 | 0.650 | 0.672 ± 0.009 | [0.645, 0.712] | 0.833 | 0.903 | 5.68 |
 | YOLOE-26x @640, full (`yoloe_full_640`) | 640 | 1 | 0.708 | 0.737 | [0.712, 0.763] | 0.862 | 0.949 | 11.3 |
 | LLMDet-large @640, light (peft) | 640x360 (long side 640) | 3 | 0.681 | 0.695 ± 0.002 | [0.614, 0.772] | 0.905 | 0.929 | 106.6 |
 | LLMDet-large, full @640 (long side 640) | 640x360 (long side 640) | 1 | 0.684 | 0.696 | [0.608, 0.776] | 0.868 | 0.929 | 106.6 |
@@ -59,6 +77,8 @@ MM-Grounding-DINO is still below both on every clip (see [section 6](#6-resoluti
 <!-- TABLE:ft_headline_pairs START -->
 | A | B | Test A - B [clustered 95% CI] | Clips A ahead | Reading |
 | --- | --- | --- | --- | --- |
+| YOLO26m @1280, E1 recipe | YOLOX-M @1280, published recipe x2 | +0.021 [+0.004, +0.031] | 3 of 3 | A above B on every resample |
+| YOLO26m @640, E1 recipe | YOLOX-M @640, published recipe | +0.046 [+0.025, +0.075] | 3 of 3 | A above B on every resample |
 | DEIM-M @1280, E1 recipe | LLMDet-large, light (peft) | +0.005 [-0.019, +0.024] | 2 of 3 | tie (CI includes 0) |
 | DEIM-M @1280, E1 recipe | LLMDet-large, full | -0.004 [-0.015, +0.022] | 1 of 3 | tie (CI includes 0) |
 | YOLO26m @1280, E1 recipe | LLMDet-large, light (peft) | -0.006 [-0.047, +0.024] | 2 of 3 | tie (CI includes 0) |
@@ -250,6 +270,12 @@ sweep's `e1_lr2`). Whole-study spend is in [Cost](#cost).
 | DEIM-M | E1 recipe @1280, seed 0 | E2 | 1280 | 100.0% (19.5M / 19.5M) | 0.776 | 0.789 | A100-SXM4-80GB | 120 (95) | 3480 | 1.39 | 1.84 |
 | DEIM-M | E1 recipe @1280, seed 1 | E2 | 1280 | 100.0% (19.5M / 19.5M) | 0.775 | 0.788 | A100-SXM4-80GB | 120 (115) | 3480 | 2.87 | 3.42 |
 | DEIM-M | E1 recipe @1280, seed 2 | E2 | 1280 | 100.0% (19.5M / 19.5M) | 0.770 | 0.769 | A100-SXM4-80GB | 120 (100) | 3480 | 2.78 | 3.85 |
+| YOLOX-M | published recipe, seed 0 (taxonomy-ablation run) | E1 | 640 (train 800, multi-scale 640-960) | 100.0% (25.3M / 25.3M) | 0.646 | 0.674 | RTX 4090, vast 58021864 | 200 (174) | 5800 | 0.55 | 0.26 |
+| YOLOX-M | published recipe, seed 1 (taxonomy-ablation run) | E1 | 640 (train 800, multi-scale 640-960) | 100.0% (25.3M / 25.3M) | 0.649 | 0.663 | RTX 4090, vast 58021864 | 200 (187) | 5800 | 0.52 | 0.24 |
+| YOLOX-M | published recipe, seed 2 (taxonomy-ablation run) | E1 | 640 (train 800, multi-scale 640-960) | 100.0% (25.3M / 25.3M) | 0.656 | 0.680 | RTX 4090, vast 58021864 | 200 (180) | 5800 | 0.57 | 0.27 |
+| YOLOX-M | published recipe x2 @1280, seed 0 | E2 | 1280 (train 1600, multi-scale 1280-1920) | 100.0% (25.3M / 25.3M) | 0.748 | 0.748 | A100 SXM4 80GB | 200 (135) | 5800 | 1.29 | 2.12 |
+| YOLOX-M | published recipe x2 @1280, seed 1 | E2 | 1280 (train 1600, multi-scale 1280-1920) | 100.0% (25.3M / 25.3M) | 0.742 | 0.746 | A100 SXM4 80GB | 200 (180) | 5800 | 1.55 | 2.20 |
+| YOLOX-M | published recipe x2 @1280, seed 2 | E2 | 1280 (train 1600, multi-scale 1280-1920) | 100.0% (25.3M / 25.3M) | 0.744 | 0.756 | A100 PCIE 80GB | 200 (175) | 5800 | 1.18 | 1.36 |
 <!-- TABLE:ft_budget END -->
 
 ## 5. Equal effort for the baselines (E1)
@@ -280,6 +306,7 @@ YOLO26m and DEIM-M the same budget: a 4-configuration val sweep at 640 (learning
 | YOLO26m @640, E1 recipe | 640 | 3 | 0.699 | 0.719 ± 0.007 | [0.686, 0.745] | 0.837 | 0.934 | 5.85 |
 | DEIM-M @640, published model (10-class training, scored on merged5) | 640 | 1 | — | 0.686 | [0.628, 0.736] | — | — | 6.61 |
 | DEIM-M @640, E1 recipe | 640 | 3 | 0.707 | 0.700 ± 0.005 | [0.653, 0.733] | 0.853 | 0.912 | 6.78 |
+| YOLOX-M @640, published recipe | 640 | 3 | 0.650 | 0.672 ± 0.009 | [0.645, 0.712] | 0.833 | 0.903 | 5.68 |
 | LLMDet-large, light (peft) | short side 800, long cap 1333 | 3 | 0.735 | 0.777 ± 0.008 | [0.740, 0.817] | 0.922 | 0.961 | 334.8 |
 <!-- TABLE:ft_e1 END -->
 
@@ -289,6 +316,9 @@ YOLO26m and DEIM-M the same budget: a 4-configuration val sweep at 640 (learning
 | YOLO26m @640, E1 recipe | YOLO26m @640, default recipe | +0.003 [0.000, +0.005] | 3 of 3 | A above B on every resample |
 | YOLO26m @640, E1 recipe | YOLO26m @640, published model (10-class training, scored on merged5) | +0.003 [-0.017, +0.024] | 2 of 3 | tie (CI includes 0) |
 | DEIM-M @640, E1 recipe | DEIM-M @640, published model (10-class training, scored on merged5) | +0.014 [-0.003, +0.025] | 2 of 3 | tie (CI includes 0) |
+| YOLO26m @640, default recipe | YOLOX-M @640, published recipe | +0.044 [+0.020, +0.070] | 3 of 3 | A above B on every resample |
+| YOLO26m @640, E1 recipe | YOLOX-M @640, published recipe | +0.046 [+0.025, +0.075] | 3 of 3 | A above B on every resample |
+| DEIM-M @640, E1 recipe | YOLOX-M @640, published recipe | +0.028 [+0.007, +0.055] | 3 of 3 | A above B on every resample |
 | LLMDet-large, light (peft) | YOLO26m @640, E1 recipe | +0.058 [+0.036, +0.079] | 3 of 3 | A above B on every resample |
 | LLMDet-large, light (peft) | DEIM-M @640, E1 recipe | +0.077 [+0.056, +0.088] | 3 of 3 | A above B on every resample |
 <!-- TABLE:ft_e1_pairs END -->
@@ -304,10 +334,138 @@ lower on val than on the old stack; E1 recovers roughly that and nothing more. D
 10-class model scored on merged5. So the 640 px gap to the foundation models is real at
 640, and it is not a tuning gap.
 
+### Matched recipe search, YOLOX-M vs YOLO26m
+
+YOLOX-M is the third of the top three conventional detectors in
+[FINAL_COMPARISON_640.md](FINAL_COMPARISON_640.md), where it trails YOLO26m by 4.4
+points at 640 with a clip-level CI of [-0.7, +7.4] points: a tie. Its rows here are the
+published recipe (train 800 with multi-scale 640-960, predict 640) on merged5: the 640
+seeds are the taxonomy-ablation runs, imported rather than retrained, and the 1280 seeds
+double every size (train 1600 with multi-scale 1280-1920, predict 1280).
+
+To give the two models equal effort, both get the **identical grid**: train scale {640,
+800 trained then predicted at 640} × learning rate {×1, ×2, ×4 of the published recipe}
+× mixup {0, 0.5}, seed 0, scored on val only. YOLO26m reuses its two E1 sweep arms that
+are exactly a grid cell (`lr0 x1` and `lr0 x2` at 640, no mixup).
+
+**Coverage.** 3 of the 12 cells never ran for each model. The YOLOX-M boxes for
+`s640_lr1_mx0`, `s640_lr2_mx50` and `s640_lr4_mx50` were lost to a network outage during
+setup; the YOLO26m boxes for `s640_lr4_mx50`, `s800_lr1_mx0` and `s800_lr4_mx0` stopped
+when the vast.ai account ran out of credit overnight. The longer-schedule variant (E1's
+fourth configuration) was skipped for both models. So each model has 9 of 12 cells, and
+the missing cells differ between them.
+
+<!-- TABLE:ft_matched_summary START -->
+| Model | Cells run / grid | Published recipe: val (ball AP50) | Best cell | Best: val (ball AP50) | Gain (val pt) | Best ball AP50 in grid |
+| --- | --- | --- | --- | --- | --- | --- |
+| YOLOX-M | 9 / 12 | 0.655 (0.883) | `sw_s800_lr4_mx50` | 0.670 (0.888) | +1.5 | 0.910 |
+| YOLO26m | 9 / 12 | 0.688 (0.857) | `sw_s800_lr1_mx50` | 0.713 (0.865) | +2.5 | 0.883 |
+
+Val gap YOLO26m - YOLOX-M: +3.3 pt at each model's published recipe, +4.2 pt between the best cells.
+<!-- TABLE:ft_matched_summary END -->
+
+**YOLOX-M** (published recipe = `sw_s800_lr1_mx50`; YOLOX scales lr per image, ×1 =
+6.25e-6 × batch 16; `s640` trains at 640 with multi-scale 512-768):
+
+<!-- TABLE:ft_matched_yolox START -->
+| Train scale (predict) | lr | mixup | Configuration | Val mAP@50:95 | Δ vs published recipe (val pt) | Val ball AP50 | Run | Box $ |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 640 (640) | x1 | 0 | `sw_s640_lr1_mx0` | — | — | — | never ran: box lost to a network outage during setup | — |
+| 640 (640) | x1 | 0.5 | `sw_s640_lr1_mx50` | 0.652 | -0.3 | 0.877 | new | 0.97 |
+| 640 (640) | x2 | 0 | `sw_s640_lr2_mx0` | 0.656 | +0.1 | 0.881 | new | 0.46 |
+| 640 (640) | x2 | 0.5 | `sw_s640_lr2_mx50` | — | — | — | never ran: box lost to a network outage during setup | — |
+| 640 (640) | x4 | 0 | `sw_s640_lr4_mx0` | 0.656 | +0.1 | 0.869 | new | 0.57 |
+| 640 (640) | x4 | 0.5 | `sw_s640_lr4_mx50` | — | — | — | never ran: box lost to a network outage during setup | — |
+| 800 (640) | x1 | 0 | `sw_s800_lr1_mx0` | 0.643 | -1.2 | 0.910 | new | 0.83 |
+| 800 (640) | x1 | 0.5 | `sw_s800_lr1_mx50` (published recipe) | 0.655 | — | 0.883 | new | 0.83 |
+| 800 (640) | x2 | 0 | `sw_s800_lr2_mx0` | 0.662 | +0.7 | 0.909 | new | 0.82 |
+| 800 (640) | x2 | 0.5 | `sw_s800_lr2_mx50` | 0.663 | +0.8 | 0.865 | new | 0.47 |
+| 800 (640) | x4 | 0 | `sw_s800_lr4_mx0` | 0.667 | +1.2 | 0.909 | new | 0.59 |
+| 800 (640) | x4 | 0.5 | `sw_s800_lr4_mx50` (**best on val**) | 0.670 | +1.5 | 0.888 | new | 0.46 |
+<!-- TABLE:ft_matched_yolox END -->
+
+**YOLO26m** (published recipe = `lr0 x1` at 640 without mixup, Ultralytics' default; same
+newer torch stack as the E1 runs):
+
+<!-- TABLE:ft_matched_yolo26m START -->
+| Train scale (predict) | lr | mixup | Configuration | Val mAP@50:95 | Δ vs published recipe (val pt) | Val ball AP50 | Run | Box $ |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 640 (640) | x1 | 0 | `yolo26m_e1_lr1` (published recipe) | 0.688 | — | 0.857 | reused: E1 sweep arm, identical recipe | — |
+| 640 (640) | x1 | 0.5 | `sw_s640_lr1_mx50` | 0.710 | +2.2 | 0.831 | new | 0.61 |
+| 640 (640) | x2 | 0 | `yolo26m_e1_lr2` | 0.694 | +0.6 | 0.856 | reused: E1 sweep winner, identical recipe | — |
+| 640 (640) | x2 | 0.5 | `sw_s640_lr2_mx50` | 0.708 | +2.0 | 0.866 | new | 0.52 |
+| 640 (640) | x4 | 0 | `sw_s640_lr4_mx0` | 0.694 | +0.6 | 0.834 | new | 0.31 |
+| 640 (640) | x4 | 0.5 | `sw_s640_lr4_mx50` | — | — | — | never ran: box stopped when the vast.ai account ran out of credit | — |
+| 800 (640) | x1 | 0 | `sw_s800_lr1_mx0` | — | — | — | never ran: box stopped when the vast.ai account ran out of credit | — |
+| 800 (640) | x1 | 0.5 | `sw_s800_lr1_mx50` (**best on val**) | 0.713 | +2.5 | 0.865 | new | 0.55 |
+| 800 (640) | x2 | 0 | `sw_s800_lr2_mx0` | 0.697 | +0.9 | 0.848 | new | 0.42 |
+| 800 (640) | x2 | 0.5 | `sw_s800_lr2_mx50` | 0.711 | +2.3 | 0.864 | new | 0.55 |
+| 800 (640) | x4 | 0 | `sw_s800_lr4_mx0` | — | — | — | never ran: box stopped when the vast.ai account ran out of credit | — |
+| 800 (640) | x4 | 0.5 | `sw_s800_lr4_mx50` | 0.706 | +1.8 | 0.883 | new | 0.38 |
+<!-- TABLE:ft_matched_yolo26m END -->
+
+What the grid shows (val, seed 0, so a single cell can move by about a point on seed
+noise alone):
+
+- **Tuning gains are small and similar.** The best cell beats the published recipe by
+  1.5 val points for YOLOX-M (`sw_s800_lr4_mx50`, 0.670 vs 0.655) and 2.5 for YOLO26m
+  (`sw_s800_lr1_mx50`, 0.713 vs 0.688; 1.9 over E1's `lr0 x2` winner, 0.694).
+- **The val gap at 640 does not close.** YOLO26m leads by 3.3 val points at the
+  published recipes and by 4.2 between the best cells. Tuning both equally widens it a
+  little rather than narrowing it.
+- **Mixup 0.5 helps YOLO26m, so E1's recipe was not its best.** In all three cells where
+  both mixup settings ran, mixup 0.5 adds 1.4 to 2.2 val points (640 ×1: 0.688 → 0.710;
+  640 ×2: 0.694 → 0.708; 800 ×2: 0.697 → 0.711). Ultralytics' default is mixup 0, and E1
+  only swept lr. For YOLOX-M (whose published recipe already has mixup 0.5) the effect is
+  +0.2 to +1.2 in the three 800 cells; no 640 pair ran.
+- **The residual gap is not the ball.** YOLOX-M reaches ball AP50 0.909-0.910 in its
+  three no-mixup 800 cells (0.888 for its best cell), above every YOLO26m cell (best
+  0.883, 0.865 for its best cell). Between the two best cells YOLOX-M is behind on
+  mAP@50 by 1.2 points (0.951 vs 0.963) but on mAP@75 by 5.5 (0.759 vs 0.814), and on
+  player AP50 (0.940 vs 0.978): the gap is box tightness, mostly on players, not missed
+  balls.
+- **At 1280 the gap narrows.** With the published recipe doubled, YOLOX-M scores 0.750 ±
+  0.005 on test (3 seeds) against YOLO26m @1280's 0.771 ± 0.002, a 2.1-point gap (+0.021
+  [+0.004, +0.031], YOLO26m ahead on 3 of 3 clips) against 4.4 at 640. The recipes differ
+  (YOLOX-M trains at 1600 with multi-scale; YOLO26m @1280 is its E1 recipe at 1280);
+  stage B puts both on the ×2 rule.
+
+**Test, published recipes, 3 seeds each.** YOLO26m's default-recipe seeds and YOLOX-M's
+seeds are the same taxonomy-ablation set (merged5, same stack): YOLO26m leads by
++0.044 [+0.020, +0.070] and is ahead on all 3 clips. That is narrower than the published
+single-model comparison ([-0.7, +7.4] points), because averaging three seeds removes
+training noise from both sides; with 3 clips it is still the best a sign test can give,
+p = 1/8, so it reads as "ahead on every clip we have", not as significant at 5%.
+
+**Stage B (still training).** Each model's val winner is being retrained with 3 seeds and
+predicted on test once, at 640 and ×2 at 1280 (train 1600, predict 1280): YOLOX-M
+`sw_s800_lr4_mx50`, YOLO26m `sw_s800_lr1_mx50`. Until they land the table below holds the
+published-recipe seeds only, and the tuned groups are listed as pending.
+
+<!-- TABLE:ft_matched START -->
+| Model / configuration | Input | Seeds | Val | Test (mean ± sd over seeds) | Test, clustered 95% CI | ball AP50 | number AP50 | T4 TensorRT fp16 GPU (ms) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| YOLO26m @640, default recipe | 640 | 3 | 0.702 | 0.716 ± 0.003 | [0.685, 0.740] | 0.848 | 0.937 | 5.85 |
+| YOLOX-M @640, published recipe | 640 | 3 | 0.650 | 0.672 ± 0.009 | [0.645, 0.712] | 0.833 | 0.903 | 5.68 |
+| YOLO26m @1280, E1 recipe | 1280 | 3 | 0.759 | 0.771 ± 0.002 | [0.741, 0.805] | 0.918 | 0.948 | 20.2 |
+| YOLOX-M @1280, published recipe x2 | 1280 | 3 | 0.745 | 0.750 ± 0.005 | [0.716, 0.775] | 0.887 | 0.958 | pending |
+
+_Pending, still training (not in this table yet): YOLO26m @640, tuned recipe (sw_s800_lr1_mx50); YOLOX-M @640, tuned recipe (sw_s800_lr4_mx50); YOLO26m @1280, tuned recipe x2; YOLOX-M @1280, tuned recipe x2. Re-running `pixi run finetune-report` after they land fills them in._
+<!-- TABLE:ft_matched END -->
+
+<!-- TABLE:ft_matched_pairs START -->
+| A | B | Test A - B [clustered 95% CI] | Clips A ahead | Reading |
+| --- | --- | --- | --- | --- |
+| YOLO26m @640, default recipe | YOLOX-M @640, published recipe | +0.044 [+0.020, +0.070] | 3 of 3 | A above B on every resample |
+
+_Pending, still training (not in this table yet): YOLO26m @640, tuned recipe (sw_s800_lr1_mx50); YOLOX-M @640, tuned recipe (sw_s800_lr4_mx50); YOLO26m @1280, tuned recipe x2; YOLOX-M @1280, tuned recipe x2. Re-running `pixi run finetune-report` after they land fills them in._
+<!-- TABLE:ft_matched_pairs END -->
+
 ## 6. Resolution parity: 640 vs 1280 (E2)
 
 E2 retrains YOLO26m and DEIM-M at 1280 with the E1 recipe, 3 seeds each, and times
-them with TensorRT fp16 on a T4. YOLOE-26x has 640 and 1280 runs from round 1.
+them with TensorRT fp16 on a T4. YOLOX-M has its published recipe doubled to 1280 (3
+seeds; T4 timing pending). YOLOE-26x has 640 and 1280 runs from round 1.
 
 <!-- TABLE:ft_e2 START -->
 | Model / configuration | Input | Seeds | Val | Test (mean ± sd over seeds) | Test, clustered 95% CI | ball AP50 | number AP50 | T4 TensorRT fp16 GPU (ms) |
@@ -316,6 +474,8 @@ them with TensorRT fp16 on a T4. YOLOE-26x has 640 and 1280 runs from round 1.
 | YOLO26m @1280, E1 recipe | 1280 | 3 | 0.759 | 0.771 ± 0.002 | [0.741, 0.805] | 0.918 | 0.948 | 20.2 |
 | DEIM-M @640, E1 recipe | 640 | 3 | 0.707 | 0.700 ± 0.005 | [0.653, 0.733] | 0.853 | 0.912 | 6.78 |
 | DEIM-M @1280, E1 recipe | 1280 | 3 | 0.774 | 0.782 ± 0.011 | [0.762, 0.805] | 0.930 | 0.960 | 18.2 |
+| YOLOX-M @640, published recipe | 640 | 3 | 0.650 | 0.672 ± 0.009 | [0.645, 0.712] | 0.833 | 0.903 | 5.68 |
+| YOLOX-M @1280, published recipe x2 | 1280 | 3 | 0.745 | 0.750 ± 0.005 | [0.716, 0.775] | 0.887 | 0.958 | pending |
 | LLMDet-large @640, light (peft) | 640x360 (long side 640) | 3 | 0.681 | 0.695 ± 0.002 | [0.614, 0.772] | 0.905 | 0.929 | 106.6 |
 | LLMDet-large @640 + matched jitter (E6), light (peft) | 640x360 (long side 640) | 3 | 0.674 | 0.702 ± 0.004 | [0.643, 0.773] | 0.919 | 0.937 | 106.6 |
 | LLMDet-large, light (peft) | short side 800, long cap 1333 | 3 | 0.735 | 0.777 ± 0.008 | [0.740, 0.817] | 0.922 | 0.961 | 334.8 |
@@ -353,6 +513,17 @@ them with TensorRT fp16 on a T4. YOLOE-26x has 640 and 1280 runs from round 1.
 | MM-Grounding-DINO-B @640 + matched jitter (E6), light (peft) | DEIM-M @640, E1 recipe | -0.117 [-0.139, -0.077] | 0 of 3 | A below B on every resample |
 | YOLOE-26x @640, full (`yoloe_full_640`) | YOLO26m @640, E1 recipe | +0.018 [+0.007, +0.026] | 3 of 3 | A above B on every resample |
 | YOLOE-26x @1280, full (`yoloe_full`) | YOLO26m @1280, E1 recipe | +0.004 [-0.007, +0.031] | 1 of 3 | tie (CI includes 0) |
+| YOLOX-M @1280, published recipe x2 | YOLOX-M @640, published recipe | +0.077 [+0.054, +0.104] | 3 of 3 | A above B on every resample |
+| YOLO26m @1280, E1 recipe | YOLOX-M @1280, published recipe x2 | +0.021 [+0.004, +0.031] | 3 of 3 | A above B on every resample |
+| DEIM-M @1280, E1 recipe | YOLOX-M @1280, published recipe x2 | +0.032 [+0.024, +0.047] | 3 of 3 | A above B on every resample |
+| YOLOX-M @1280, published recipe x2 | LLMDet-large, light (peft) | -0.027 [-0.050, -0.007] | 0 of 3 | A below B on every resample |
+| YOLOX-M @1280, published recipe x2 | LLMDet-large, full | -0.035 [-0.051, -0.009] | 0 of 3 | A below B on every resample |
+| YOLOX-M @1280, published recipe x2 | MM-Grounding-DINO-B, light (peft) | -0.002 [-0.034, +0.022] | 2 of 3 | tie (CI includes 0) |
+| LLMDet-large @640, light (peft) | YOLOX-M @640, published recipe | +0.024 [-0.031, +0.060] | 2 of 3 | tie (CI includes 0) |
+| LLMDet-large, full @640 (long side 640) | YOLOX-M @640, published recipe | +0.024 [-0.038, +0.063] | 2 of 3 | tie (CI includes 0) |
+| MM-Grounding-DINO-B @640, light (peft) | YOLOX-M @640, published recipe | -0.098 [-0.137, -0.076] | 0 of 3 | A below B on every resample |
+| LLMDet-large @640 + matched jitter (E6), light (peft) | YOLOX-M @640, published recipe | +0.030 [-0.002, +0.061] | 2 of 3 | tie (CI includes 0) |
+| MM-Grounding-DINO-B @640 + matched jitter (E6), light (peft) | YOLOX-M @640, published recipe | -0.089 [-0.131, -0.056] | 0 of 3 | A below B on every resample |
 <!-- TABLE:ft_e2_pairs END -->
 
 <!-- TABLE:ft_e2_parity START -->
@@ -365,6 +536,9 @@ them with TensorRT fp16 on a T4. YOLOE-26x has 640 and 1280 runs from round 1.
 | MM-Grounding-DINO-B, light (peft) | 3 / 3 | 0.574 ± 0.010 | short side 800 (1422x800) | 0.752 ± 0.008 | +0.178 | 50.9 | 143-161 |
 | LLMDet-large, light (peft), E6 matched jitter at 640 | 3 / 3 | 0.702 ± 0.004 | short side 800, long cap 1333 | 0.777 ± 0.008 | +0.075 | 106.6 | 334.8 |
 | MM-Grounding-DINO-B, light (peft), E6 matched jitter at 640 | 3 / 3 | 0.583 ± 0.012 | short side 800 (1422x800) | 0.752 ± 0.008 | +0.169 | 50.9 | 143-161 |
+| YOLOX-M (published recipe; 1280 trains at 1600) | 3 / 3 | 0.672 ± 0.009 | 1280 | 0.750 ± 0.005 | +0.077 | 5.68 | pending |
+
+_Pending, still training (not in this table yet): YOLOX-M @640, tuned recipe (sw_s800_lr4_mx50); YOLOX-M @1280, tuned recipe x2; YOLO26m @640, tuned recipe (sw_s800_lr1_mx50); YOLO26m @1280, tuned recipe x2. Re-running `pixi run finetune-report` after they land fills them in._
 <!-- TABLE:ft_e2_parity END -->
 
 Going to 1280 adds about 5 test points to YOLO26m and 8 to DEIM-M, more than any
@@ -414,6 +588,15 @@ unchanged (640x360), 3 seeds each, so the E5 TensorRT engines apply as they are.
 The baselines keep their own augmentation at 640, so the comparison at 640 is matched in
 input size and in the grounding models' own recipe, not in augmentation policy across
 architectures.
+
+**YOLOX-M (published recipe).** 1280 adds 7.7 points (+0.077 [+0.054, +0.104], every
+clip), between YOLO26m's +5.2 and DEIM-M's +8.2. At 1280 YOLOX-M is behind YOLO26m
+(+0.021 [+0.004, +0.031]) and DEIM-M (+0.032 [+0.024, +0.047]) on every clip, behind
+LLMDet-large's light and full arms on every clip, and ties MM-Grounding-DINO. At 640 it
+ties LLMDet-large @640 (E5 +0.024, E6 +0.030 [-0.002, +0.061], both 2 of 3 clips) and the
+full arm, and is above MM-Grounding-DINO @640 on every clip (E5 -0.098, E6 -0.089 from
+MM-Grounding-DINO's side). Its 1280 run trains at 1600 with multi-scale, unlike YOLO26m and
+DEIM-M @1280; its 1280 T4 engine has not been timed yet.
 
 The other foundation rows see more pixels than 640 too: SAM 3 and OWLv2 at 1008x1008,
 Qwen3-VL at native 1080p. Only YOLOE, LLMDet-large and MM-Grounding-DINO-B were run at
@@ -538,6 +721,7 @@ same footing as the published detectors.
 | DAMO-YOLO-M (published, GCP T4) | 640x640 | 6.70 | — | — | — | published |
 | RT-DETRv2-M (published, GCP T4) | 640x640 | 7.93 | — | — | — | published |
 | YOLO26m @1280 (1280_s0) | 1280x1280 | 20.2 | — | — | — | — |
+| YOLOX-M @1280 (yolox_1280_s0) | 1280x1280 | — | — | — | — | pending: the T4 box has not run yet (no T4 offer at launch) |
 | DEIM-M @640 (e1_lr2) | 640x640 | 6.78 | — | — | — | — |
 | DEIM-M @1280 (1280_s0) | 1280x1280 | 18.2 | — | — | — | — |
 | YOLOE-26x @640 (full) | 640x640 | 11.3 | 17.1 | 28.9 | 0.708 → 0.708 (+0.0) | — |
@@ -674,8 +858,8 @@ section 10. No audit found a pipeline bug.
 - **E3 has two draws per fraction**, and the draw effect is as large as the size
   effect. More draws would separate them. The E3 comparison also mixes input
   resolutions (YOLO26m at 640 vs LLMDet / MM-Grounding-DINO at 800).
-- **Resolution was matched in both directions for YOLO26m, DEIM-M, YOLOE, LLMDet-large
-  and MM-Grounding-DINO-B only.** SAM 3, OWLv2 and the generative VLMs were not run at
+- **Resolution was matched in both directions for YOLO26m, DEIM-M, YOLOX-M, YOLOE,
+  LLMDet-large and MM-Grounding-DINO-B only.** SAM 3, OWLv2 and the generative VLMs were not run at
   640.
 - **E5/E6 at 640.** E6 restored the jitter E5 lost and moved neither model by more than
   1 point (clustered ties), so the 640 drop is resolution. Two of three MM-Grounding-DINO
@@ -685,6 +869,13 @@ section 10. No audit found a pipeline bug.
   engine loses 2.0 pt val and its two timing runs differ by 12%; the plugin precision was
   not isolated. LLMDet's fp16 engine loses 1.2 pt. The retrained baselines have GPU
   compute only, no end-to-end TensorRT timing.
+- **Matched recipe search.** 9 of 12 grid cells per model ran (seed 0, val only), and
+  the missing cells differ between the models; the longer-schedule variant was skipped
+  for both. The tuned-recipe seeds (stage B) are still training, so no tuned-recipe test
+  number is reported yet. YOLOX-M @1280 has no T4 timing yet.
+- **YOLOX-M @1280 is not the YOLO26m @1280 recipe.** YOLOX-M doubles its published
+  recipe (train 1600 with multi-scale, predict 1280); YOLO26m @1280 trains and predicts at
+  1280 with its E1 recipe.
 - **Stack effect.** The round-2 YOLO26m runs used a newer torch stack on which the
   published recipe scores about 1.5 pt lower on val; round-2 YOLO26m rows should be
   compared with each other.
@@ -720,7 +911,9 @@ section 10. No audit found a pipeline bug.
 | round 2 (E1-E6) | mmgdino | MM-Grounding-DINO-B | 1.24 | docs/plans/mmgdino.md, E5 (640): three A6000 boxes $0.35 + $0.41 + $0.40 + T4 $0.08, about $1.24 |
 | round 2 (E1-E6) | llmdet | LLMDet-large | 1.53 | E6 (640 + matched jitter): peft_640aug_s0-s2 meta.json cost_usd_box 0.48 + 0.48 + 0.57 (three A100 boxes); docs/plans/llmdet.md about $1.53 |
 | round 2 (E1-E6) | mmgdino | MM-Grounding-DINO-B | 1.23 | E6 (640 + matched jitter): peft_640aug_s0-s2 meta.json cost_usd 0.39 + 0.39 + 0.45 (three A6000 boxes); docs/plans/mmgdino.md about $1.23 |
-|  | **round 2 (E1-E6) subtotal** |  | **43.62** |  |
+| round 2 (E1-E6) | yolox | YOLOX-M | 11.68 (partial) | YOLOX-M: yolox_1280_s0-s2 meta.json cost_usd 2.12 + 2.20 + 1.36 = 5.68; nine sweep boxes sw_*/box.json cost_usd sum 6.00; no T4 box yet (no T4 offer at launch); the three boxes lost in the outage recorded no cost |
+| round 2 (E1-E6) | yolo26m | YOLO26m | 3.34 (partial) | YOLO26m matched search: seven new sw_*/meta.json cost_usd sum 3.34 (the two reused E1 sweep arms are in the $11 above); the three boxes stopped by the credit outage recorded no cost |
+|  | **round 2 (E1-E6) subtotal** |  | **58.64** |  |
 | follow-ups (TensorRT, audit fixes) | llmdet | LLMDet-large | 0.49 | results/llmdet/latency_trt_t4.json cost_usd (T4 TensorRT box) |
 | follow-ups (TensorRT, audit fixes) | mmgdino | MM-Grounding-DINO-B | 1.05 | results/mmgdino/latency_trt_t4.json cost_usd 0.40 (GridSample engine) + msda_plugin.cost_usd 0.65 |
 | follow-ups (TensorRT, audit fixes) | sam3 | SAM 3 | 0.72 | results/sam3/latency_trt_t4.json cost_usd 0.32 (round 1, invalid engine) + round2.cost_usd 0.40 (fixed engine) |
@@ -730,11 +923,15 @@ section 10. No audit found a pipeline bug.
 | follow-ups (TensorRT, audit fixes) | qwen3vl | Qwen3-VL (peft 8B, full 4B) | 2.72 | NIGHT_LOG 21:17 and docs/plans/qwen3vl.md: two merger-unfrozen boxes, $1.36 each |
 | follow-ups (TensorRT, audit fixes) | owlv2 | OWLv2-L/14 | 0.00 (partial) | OWLv2 TensorRT box (vast 61096023, T4 $0.155/h): no cost total recorded in the results files |
 |  | **follow-ups (TensorRT, audit fixes) subtotal** |  | **10.29** |  |
-|  | **total** |  | **85.83** (partial) | partial: yolo26m (round 2 (E1-E6)), deimm (round 2 (E1-E6)), llmdet (round 2 (E1-E6)), mmgdino (round 2 (E1-E6)), owlv2 (follow-ups (TensorRT, audit fixes)) |
+|  | **total** |  | **100.85** (partial) | partial: yolo26m (round 2 (E1-E6)), deimm (round 2 (E1-E6)), llmdet (round 2 (E1-E6)), mmgdino (round 2 (E1-E6)), yolox (round 2 (E1-E6)), yolo26m (round 2 (E1-E6)), owlv2 (follow-ups (TensorRT, audit fixes)) |
 <!-- TABLE:ft_cost END -->
 
 Spend is the vast.ai bill per model and stage, from each plan doc or results file named
-in the source column. The fine-tuning repo's running account log also included a
+in the source column. The overnight outage of the matched recipe search stopped 6 boxes
+(3 per model: the YOLO26m account ran out of credit, the YOLOX-M boxes lost the network
+during setup); none of them wrote a `meta.json` or `box.json`, so whatever they cost is
+not in these totals. No YOLOX-M T4 box has run yet: the 640 latency is the anchor re-time
+of the published ONNX, and the 1280 engine is pending. The fine-tuning repo's running account log also included a
 ComfyUI box that was not part of this project; it is excluded.
 
 ## Appendix A: round-1 rows against the published 640 px detectors
@@ -793,6 +990,8 @@ than the reference.
 | LLMDet-large @640 + matched jitter (E6), light (peft) (seed mean) | 0.776 | 0.715 | 0.642 |
 | MM-Grounding-DINO-B @640 + matched jitter (E6), light (peft) (seed mean) | 0.659 | 0.588 | 0.512 |
 | OWLv2-L/14, light (peft) (seed mean) | 0.642 | 0.578 | 0.446 |
+| YOLOX-M @640, published recipe (seed mean) | 0.714 | 0.669 | 0.645 |
+| YOLOX-M @1280, published recipe x2 (seed mean) | 0.767 | 0.775 | 0.714 |
 | LLMDet-large, peft | 0.817 | 0.782 | 0.739 |
 | LLMDet-large, full | 0.814 | 0.783 | 0.766 |
 | MM-Grounding-DINO-B, peft | 0.805 | 0.749 | 0.709 |
@@ -966,6 +1165,12 @@ than the reference.
 | DEIM-M, E1 recipe @1280, seed 0 | 0.978 | 0.986 | 0.942 | 0.990 | 1.000 | 0.974 |
 | DEIM-M, E1 recipe @1280, seed 1 | 0.973 | 0.991 | 0.934 | 0.997 | 1.000 | 0.946 |
 | DEIM-M, E1 recipe @1280, seed 2 | 0.970 | 0.988 | 0.916 | 0.988 | 1.000 | 0.959 |
+| YOLOX-M, published recipe, seed 0 (taxonomy-ablation run) | 0.932 | 0.940 | 0.829 | 0.989 | 1.000 | 0.901 |
+| YOLOX-M, published recipe, seed 1 (taxonomy-ablation run) | 0.927 | 0.940 | 0.812 | 0.990 | 1.000 | 0.891 |
+| YOLOX-M, published recipe, seed 2 (taxonomy-ablation run) | 0.941 | 0.940 | 0.859 | 0.986 | 1.000 | 0.917 |
+| YOLOX-M, published recipe x2 @1280, seed 0 | 0.951 | 0.940 | 0.877 | 0.980 | 1.000 | 0.959 |
+| YOLOX-M, published recipe x2 @1280, seed 1 | 0.959 | 0.940 | 0.904 | 0.989 | 1.000 | 0.960 |
+| YOLOX-M, published recipe x2 @1280, seed 2 | 0.951 | 0.940 | 0.879 | 0.979 | 1.000 | 0.954 |
 <!-- TABLE:ft_per_class END -->
 
 ### Deviations and caveats, per model (round 1)
@@ -1053,7 +1258,8 @@ pixi run python scripts/generate_report.py --check   # fails if a table drifted
 ```
 
 `write_finetune_results.py` reads the fine-tuning repo (`foundation-finetune`, branch
-`overnight-study` at `857fae1` for this version). To rescore only what is committed,
+`overnight-study`: `3f8ba2b` for E6 and earlier; the YOLOX-M rows and the matched recipe
+search were read from its working tree after that commit, before they were committed). To rescore only what is committed,
 decompress a dump (`gunzip -k`) and run
 `scripts/score_finetune_dump.py --pred <dump> --split test --data-root <dataset>`. The
 bootstrap also needs the YOLO26m and DEIM-M test predictions that `reproduction_640.yaml`
@@ -1083,6 +1289,7 @@ licence of its base weights:
 | SmolVLM2-2.2B | Apache-2.0 | licence allows it; not published yet (private HF repo) |
 | YOLO26m | AGPL-3.0 | no: AGPL-3.0 weights are not redistributed by this repo |
 | DEIM-M | Apache-2.0 | licence allows it; not published yet (private HF repo) |
+| YOLOX-M | Apache-2.0 | licence allows it; not published yet (private HF repo) |
 <!-- TABLE:ft_licence END -->
 
 ## Pending inputs
@@ -1094,4 +1301,21 @@ picks them up.
 - owlv2: owlv2/peft_seed1/meta.json
 - owlv2: owlv2/peft_seed2/meta.json
 - owlv2: owlv2/full_seed1/meta.json
+- yolo26m: yolo26m/yolo26m_e1b_s0 (no test.json/meta.json)
+- yolo26m: yolo26m/yolo26m_e1b_s1 (no test.json/meta.json)
+- yolo26m: yolo26m/yolo26m_e1b_s2 (no test.json/meta.json)
+- yolo26m: yolo26m/yolo26m_e1b_1280_s0 (no test.json/meta.json)
+- yolo26m: yolo26m/yolo26m_e1b_1280_s1 (no test.json/meta.json)
+- yolo26m: yolo26m/yolo26m_e1b_1280_s2 (no test.json/meta.json)
+- yolox: yolox/yolox_e1_s0 (no test.json/meta.json)
+- yolox: yolox/yolox_e1_s1 (no test.json/meta.json)
+- yolox: yolox/yolox_e1_s2 (no test.json/meta.json)
+- yolox: yolox/yolox_e1_1280_s0 (no test.json/meta.json)
+- yolox: yolox/yolox_e1_1280_s1 (no test.json/meta.json)
+- yolox: yolox/yolox_e1_1280_s2 (no test.json/meta.json)
+- group yolox_e1 (YOLOX-M @640, tuned recipe (sw_s800_lr4_mx50)): pending, 0 of 3 seeds scored
+- group yolox_e1_1280 (YOLOX-M @1280, tuned recipe x2): pending, 0 of 3 seeds scored
+- group yolo26m_e1b (YOLO26m @640, tuned recipe (sw_s800_lr1_mx50)): pending, 0 of 3 seeds scored
+- group yolo26m_e1b_1280 (YOLO26m @1280, tuned recipe x2): pending, 0 of 3 seeds scored
+- trt yolox_1280: GPU-compute median not found in yolox/latency_trt_t4.json
 <!-- TABLE:ft_pending END -->

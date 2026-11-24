@@ -5812,6 +5812,402 @@
         }
       },
       "sibling_test_map_50_95": 0.768801748752594
+    },
+    {
+      "row_id": "yolox/yolox_640_s0",
+      "model_key": "yolox",
+      "model": "YOLOX-M",
+      "family": "conventional detector",
+      "slug": "yolox",
+      "experiment": "E1",
+      "input": "640 (train 800, multi-scale 640-960)",
+      "arm": "yolox_640_s0",
+      "role": "extra",
+      "base_arm": "yolox_640_s0",
+      "label": "published recipe, seed 0 (taxonomy-ablation run)",
+      "seed": 0,
+      "image_size": null,
+      "model_id": "yolox_m.pth (official COCO, release 0.1.1rc0, sha256 60076992...)",
+      "selected_epoch": 174,
+      "epochs_run": 200,
+      "optimizer_steps": 5800,
+      "gpu": "RTX 4090 (48 GB variant), vast 58021864",
+      "meta_note": null,
+      "trainable_params": 25282000,
+      "total_params": 25282000,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 0.551,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.258,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolox_yolox_640_s0_valid.json.gz",
+          "sha256_json": "fb30c84c689a7e5449bcc2b3e8488a9f5481819c45cbaa1d83f4c5570c8551b0"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolox_yolox_640_s0_test.json.gz",
+          "sha256_json": "9e00a51d5f6735b81dfa92c4a1c3afe13664a6c7b591688676dacbdfd3ea2933"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.6464171409606934,
+        "mAP_50": 0.9402280449867249,
+        "mAP_75": 0.7330679297447205,
+        "per_class_ap50": {
+          "player": 0.9489423632621765,
+          "ball": 0.8642392754554749,
+          "referee": 0.9498900771141052,
+          "rim": 1.0,
+          "number": 0.9380684494972229
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.6743795275688171,
+        "mAP_50": 0.9316733479499817,
+        "mAP_75": 0.7733176946640015,
+        "per_class_ap50": {
+          "player": 0.9397714734077454,
+          "ball": 0.8291119337081909,
+          "referee": 0.9887346029281616,
+          "rim": 1.0,
+          "number": 0.9007487297058105
+        }
+      },
+      "sibling_test_map_50_95": 0.6743795275688171
+    },
+    {
+      "row_id": "yolox/yolox_640_s1",
+      "model_key": "yolox",
+      "model": "YOLOX-M",
+      "family": "conventional detector",
+      "slug": "yolox",
+      "experiment": "E1",
+      "input": "640 (train 800, multi-scale 640-960)",
+      "arm": "yolox_640_s1",
+      "role": "extra",
+      "base_arm": "yolox_640_s1",
+      "label": "published recipe, seed 1 (taxonomy-ablation run)",
+      "seed": 1,
+      "image_size": null,
+      "model_id": "yolox_m.pth (official COCO, release 0.1.1rc0, sha256 60076992...)",
+      "selected_epoch": 187,
+      "epochs_run": 200,
+      "optimizer_steps": 5800,
+      "gpu": "RTX 4090 (48 GB variant), vast 58021864",
+      "meta_note": null,
+      "trainable_params": 25282000,
+      "total_params": 25282000,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 0.524,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.245,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolox_yolox_640_s1_valid.json.gz",
+          "sha256_json": "d7dfd486badb4d7064952456e7145eace2b858f2ecbdae3d52a32d583c3372d0"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolox_yolox_640_s1_test.json.gz",
+          "sha256_json": "9d7878c10e458eafb07bb40c11cb6e5f2a86d3a365a0a40872fb2b78ab215aaa"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.6485891342163086,
+        "mAP_50": 0.948237419128418,
+        "mAP_75": 0.7246303558349609,
+        "per_class_ap50": {
+          "player": 0.9400662183761597,
+          "ball": 0.8832474946975708,
+          "referee": 0.979854166507721,
+          "rim": 1.0,
+          "number": 0.9380193948745728
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.6626676321029663,
+        "mAP_50": 0.9266866445541382,
+        "mAP_75": 0.7569351196289062,
+        "per_class_ap50": {
+          "player": 0.9402723908424377,
+          "ball": 0.8121690154075623,
+          "referee": 0.9897068738937378,
+          "rim": 1.0,
+          "number": 0.8912849426269531
+        }
+      },
+      "sibling_test_map_50_95": 0.6626676321029663
+    },
+    {
+      "row_id": "yolox/yolox_640_s2",
+      "model_key": "yolox",
+      "model": "YOLOX-M",
+      "family": "conventional detector",
+      "slug": "yolox",
+      "experiment": "E1",
+      "input": "640 (train 800, multi-scale 640-960)",
+      "arm": "yolox_640_s2",
+      "role": "extra",
+      "base_arm": "yolox_640_s2",
+      "label": "published recipe, seed 2 (taxonomy-ablation run)",
+      "seed": 2,
+      "image_size": null,
+      "model_id": "yolox_m.pth (official COCO, release 0.1.1rc0, sha256 60076992...)",
+      "selected_epoch": 180,
+      "epochs_run": 200,
+      "optimizer_steps": 5800,
+      "gpu": "RTX 4090 (48 GB variant), vast 58021864",
+      "meta_note": null,
+      "trainable_params": 25282000,
+      "total_params": 25282000,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 0.566,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.265,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolox_yolox_640_s2_valid.json.gz",
+          "sha256_json": "29d2066c6a5d172b552083d0a6d733fce8bd58b92ee9e42b1a2682f2c4593cb0"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolox_yolox_640_s2_test.json.gz",
+          "sha256_json": "25cc2ba244cd9a578856629bdf47cb4594e9fd8d898ca4c906b0eea4c98d3935"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.6557317972183228,
+        "mAP_50": 0.9470155239105225,
+        "mAP_75": 0.749139666557312,
+        "per_class_ap50": {
+          "player": 0.9388247728347778,
+          "ball": 0.8704248070716858,
+          "referee": 0.9797126650810242,
+          "rim": 1.0,
+          "number": 0.9461153149604797
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.6803754568099976,
+        "mAP_50": 0.9405897259712219,
+        "mAP_75": 0.7908871173858643,
+        "per_class_ap50": {
+          "player": 0.9401929974555969,
+          "ball": 0.8589588403701782,
+          "referee": 0.9864993691444397,
+          "rim": 1.0,
+          "number": 0.9172974228858948
+        }
+      },
+      "sibling_test_map_50_95": 0.6803754568099976
+    },
+    {
+      "row_id": "yolox/yolox_1280_s0",
+      "model_key": "yolox",
+      "model": "YOLOX-M",
+      "family": "conventional detector",
+      "slug": "yolox",
+      "experiment": "E2",
+      "input": "1280 (train 1600, multi-scale 1280-1920)",
+      "arm": "yolox_1280_s0",
+      "role": "extra",
+      "base_arm": "yolox_1280_s0",
+      "label": "published recipe x2 @1280, seed 0",
+      "seed": 0,
+      "image_size": null,
+      "model_id": "yolox_m.pth (official COCO, release 0.1.1rc0, sha256 60076992...)",
+      "selected_epoch": 135,
+      "epochs_run": 200,
+      "optimizer_steps": 5800,
+      "gpu": "A100 SXM4 80GB",
+      "meta_note": null,
+      "trainable_params": 25282000,
+      "total_params": 25282000,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 1.288,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 2.12,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolox_yolox_1280_s0_valid.json.gz",
+          "sha256_json": "8d58a44856f4e8efa69c8be08e8abc4348b7421b8407bb06382a6fb1a103deb9"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolox_yolox_1280_s0_test.json.gz",
+          "sha256_json": "ad8f20badb2ba558f28beb79eb73d704a8a4d1cb8373da765ddb777aa6669d70"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7484695315361023,
+        "mAP_50": 0.9640970826148987,
+        "mAP_75": 0.8595436811447144,
+        "per_class_ap50": {
+          "player": 0.9404171705245972,
+          "ball": 0.926157534122467,
+          "referee": 0.9898286461830139,
+          "rim": 1.0,
+          "number": 0.9640819430351257
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7478898763656616,
+        "mAP_50": 0.9512274861335754,
+        "mAP_75": 0.8634564280509949,
+        "per_class_ap50": {
+          "player": 0.940462052822113,
+          "ball": 0.8773396015167236,
+          "referee": 0.9795535206794739,
+          "rim": 1.0,
+          "number": 0.9587822556495667
+        }
+      },
+      "sibling_test_map_50_95": 0.7478898763656616
+    },
+    {
+      "row_id": "yolox/yolox_1280_s1",
+      "model_key": "yolox",
+      "model": "YOLOX-M",
+      "family": "conventional detector",
+      "slug": "yolox",
+      "experiment": "E2",
+      "input": "1280 (train 1600, multi-scale 1280-1920)",
+      "arm": "yolox_1280_s1",
+      "role": "extra",
+      "base_arm": "yolox_1280_s1",
+      "label": "published recipe x2 @1280, seed 1",
+      "seed": 1,
+      "image_size": null,
+      "model_id": "yolox_m.pth (official COCO, release 0.1.1rc0, sha256 60076992...)",
+      "selected_epoch": 180,
+      "epochs_run": 200,
+      "optimizer_steps": 5800,
+      "gpu": "A100 SXM4 80GB",
+      "meta_note": null,
+      "trainable_params": 25282000,
+      "total_params": 25282000,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 1.548,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 2.199,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolox_yolox_1280_s1_valid.json.gz",
+          "sha256_json": "3e4894fe568fe35579df6c93169f97b45bf11138bc18432be7252dc0b719644e"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolox_yolox_1280_s1_test.json.gz",
+          "sha256_json": "b264cd0e24516221ae6305b73ffc13dab8d4513fbc059fe61cea1f790732fa69"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7421700358390808,
+        "mAP_50": 0.9627548456192017,
+        "mAP_75": 0.8559187054634094,
+        "per_class_ap50": {
+          "player": 0.940341591835022,
+          "ball": 0.945245087146759,
+          "referee": 0.9603605270385742,
+          "rim": 1.0,
+          "number": 0.9678271412849426
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.746158242225647,
+        "mAP_50": 0.9587196707725525,
+        "mAP_75": 0.8805779814720154,
+        "per_class_ap50": {
+          "player": 0.9404606223106384,
+          "ball": 0.9044132828712463,
+          "referee": 0.9889647364616394,
+          "rim": 1.0,
+          "number": 0.9597598314285278
+        }
+      },
+      "sibling_test_map_50_95": 0.746158242225647
+    },
+    {
+      "row_id": "yolox/yolox_1280_s2",
+      "model_key": "yolox",
+      "model": "YOLOX-M",
+      "family": "conventional detector",
+      "slug": "yolox",
+      "experiment": "E2",
+      "input": "1280 (train 1600, multi-scale 1280-1920)",
+      "arm": "yolox_1280_s2",
+      "role": "extra",
+      "base_arm": "yolox_1280_s2",
+      "label": "published recipe x2 @1280, seed 2",
+      "seed": 2,
+      "image_size": null,
+      "model_id": "yolox_m.pth (official COCO, release 0.1.1rc0, sha256 60076992...)",
+      "selected_epoch": 175,
+      "epochs_run": 200,
+      "optimizer_steps": 5800,
+      "gpu": "A100 PCIE 80GB",
+      "meta_note": null,
+      "trainable_params": 25282000,
+      "total_params": 25282000,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 1.175,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 1.361,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolox_yolox_1280_s2_valid.json.gz",
+          "sha256_json": "4a9c5505e95862ad1dc22357923359dda7a7875c73e0a134fe91a6df5678e8cd"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolox_yolox_1280_s2_test.json.gz",
+          "sha256_json": "5bf0e2b9df046aea43e5422c0d7da7686cee08a28504f1d9c91623e192df0f30"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.743829071521759,
+        "mAP_50": 0.9663906693458557,
+        "mAP_75": 0.8418599963188171,
+        "per_class_ap50": {
+          "player": 0.9496018290519714,
+          "ball": 0.9338051676750183,
+          "referee": 0.9798874855041504,
+          "rim": 1.0,
+          "number": 0.9686589241027832
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7556227445602417,
+        "mAP_50": 0.9505770206451416,
+        "mAP_75": 0.8791118264198303,
+        "per_class_ap50": {
+          "player": 0.9401934146881104,
+          "ball": 0.879233717918396,
+          "referee": 0.9792705178260803,
+          "rim": 1.0,
+          "number": 0.9541875123977661
+        }
+      },
+      "sibling_test_map_50_95": 0.7556227445602417
     }
   ],
   "models": {
@@ -6458,6 +6854,23 @@
       },
       "zero_shot": null,
       "latency_t4": []
+    },
+    "yolox": {
+      "display": "YOLOX-M",
+      "family": "conventional detector",
+      "slug": "yolox",
+      "baseline": true,
+      "light_trains": null,
+      "resolution": "640",
+      "licence": "Apache-2.0",
+      "redistribution": "permissive",
+      "arms": {
+        "peft": null,
+        "full": null,
+        "variants": []
+      },
+      "zero_shot": null,
+      "latency_t4": []
     }
   },
   "costs": [
@@ -6606,6 +7019,20 @@
       "usd": 1.23,
       "complete": true,
       "source": "E6 (640 + matched jitter): peft_640aug_s0-s2 meta.json cost_usd 0.39 + 0.39 + 0.45 (three A6000 boxes); docs/plans/mmgdino.md about $1.23",
+      "stage": "round2"
+    },
+    {
+      "slug": "yolox",
+      "usd": 11.68,
+      "complete": false,
+      "source": "YOLOX-M: yolox_1280_s0-s2 meta.json cost_usd 2.12 + 2.20 + 1.36 = 5.68; nine sweep boxes sw_*/box.json cost_usd sum 6.00; no T4 box yet (no T4 offer at launch); the three boxes lost in the outage recorded no cost",
+      "stage": "round2"
+    },
+    {
+      "slug": "yolo26m",
+      "usd": 3.34,
+      "complete": false,
+      "source": "YOLO26m matched search: seven new sw_*/meta.json cost_usd sum 3.34 (the two reused E1 sweep arms are in the $11 above); the three boxes stopped by the credit outage recorded no cost",
       "stage": "round2"
     },
     {
@@ -6909,7 +7336,8 @@
         "yolo26m/default_s0",
         "yolo26m/default_s1",
         "yolo26m/default_s2"
-      ]
+      ],
+      "pending": false
     },
     {
       "key": "yolo26m_640_e1",
@@ -6919,7 +7347,8 @@
         "yolo26m/yolo26m_e1_s0",
         "yolo26m/yolo26m_e1_s1",
         "yolo26m/yolo26m_e1_s2"
-      ]
+      ],
+      "pending": false
     },
     {
       "key": "yolo26m_1280",
@@ -6929,7 +7358,8 @@
         "yolo26m/yolo26m_1280_s0",
         "yolo26m/yolo26m_1280_s1",
         "yolo26m/yolo26m_1280_s2"
-      ]
+      ],
+      "pending": false
     },
     {
       "key": "deimm_640_e1",
@@ -6939,7 +7369,8 @@
         "deimm/e1_s0",
         "deimm/e1_s1",
         "deimm/e1_s2"
-      ]
+      ],
+      "pending": false
     },
     {
       "key": "deimm_1280",
@@ -6949,7 +7380,8 @@
         "deimm/1280_s0",
         "deimm/1280_s1",
         "deimm/1280_s2"
-      ]
+      ],
+      "pending": false
     },
     {
       "key": "llmdet_peft",
@@ -6959,7 +7391,8 @@
         "llmdet/peft",
         "llmdet/peft_s1",
         "llmdet/peft_s2"
-      ]
+      ],
+      "pending": false
     },
     {
       "key": "mmgdino_peft",
@@ -6969,7 +7402,8 @@
         "mmgdino/peft",
         "mmgdino/peft_s1",
         "mmgdino/peft_s2"
-      ]
+      ],
+      "pending": false
     },
     {
       "key": "llmdet_peft_640",
@@ -6979,7 +7413,8 @@
         "llmdet/peft_640_s0",
         "llmdet/peft_640_s1",
         "llmdet/peft_640_s2"
-      ]
+      ],
+      "pending": false
     },
     {
       "key": "mmgdino_peft_640",
@@ -6989,7 +7424,8 @@
         "mmgdino/peft_640_s0",
         "mmgdino/peft_640_s1",
         "mmgdino/peft_640_s2"
-      ]
+      ],
+      "pending": false
     },
     {
       "key": "llmdet_peft_640aug",
@@ -6999,7 +7435,8 @@
         "llmdet/peft_640aug_s0",
         "llmdet/peft_640aug_s1",
         "llmdet/peft_640aug_s2"
-      ]
+      ],
+      "pending": false
     },
     {
       "key": "mmgdino_peft_640aug",
@@ -7009,7 +7446,8 @@
         "mmgdino/peft_640aug_s0",
         "mmgdino/peft_640aug_s1",
         "mmgdino/peft_640aug_s2"
-      ]
+      ],
+      "pending": false
     },
     {
       "key": "owlv2_peft",
@@ -7019,7 +7457,76 @@
         "owlv2/peft",
         "owlv2/peft_seed1",
         "owlv2/peft_seed2"
-      ]
+      ],
+      "pending": false
+    },
+    {
+      "key": "yolox_640",
+      "label": "YOLOX-M @640, published recipe",
+      "input": "640",
+      "members": [
+        "yolox/yolox_640_s0",
+        "yolox/yolox_640_s1",
+        "yolox/yolox_640_s2"
+      ],
+      "pending": false
+    },
+    {
+      "key": "yolox_1280",
+      "label": "YOLOX-M @1280, published recipe x2",
+      "input": "1280",
+      "members": [
+        "yolox/yolox_1280_s0",
+        "yolox/yolox_1280_s1",
+        "yolox/yolox_1280_s2"
+      ],
+      "pending": false
+    }
+  ],
+  "pending_groups": [
+    {
+      "key": "yolox_e1",
+      "label": "YOLOX-M @640, tuned recipe (sw_s800_lr4_mx50)",
+      "input": "640",
+      "members": [
+        "yolox/yolox_e1_s0",
+        "yolox/yolox_e1_s1",
+        "yolox/yolox_e1_s2"
+      ],
+      "pending": true
+    },
+    {
+      "key": "yolox_e1_1280",
+      "label": "YOLOX-M @1280, tuned recipe x2",
+      "input": "1280",
+      "members": [
+        "yolox/yolox_e1_1280_s0",
+        "yolox/yolox_e1_1280_s1",
+        "yolox/yolox_e1_1280_s2"
+      ],
+      "pending": true
+    },
+    {
+      "key": "yolo26m_e1b",
+      "label": "YOLO26m @640, tuned recipe (sw_s800_lr1_mx50)",
+      "input": "640",
+      "members": [
+        "yolo26m/yolo26m_e1b_s0",
+        "yolo26m/yolo26m_e1b_s1",
+        "yolo26m/yolo26m_e1b_s2"
+      ],
+      "pending": true
+    },
+    {
+      "key": "yolo26m_e1b_1280",
+      "label": "YOLO26m @1280, tuned recipe x2",
+      "input": "1280",
+      "members": [
+        "yolo26m/yolo26m_e1b_1280_s0",
+        "yolo26m/yolo26m_e1b_1280_s1",
+        "yolo26m/yolo26m_e1b_1280_s2"
+      ],
+      "pending": true
     }
   ],
   "tables": {
@@ -7027,6 +7534,7 @@
       "entries": [
         "deimm_1280",
         "yolo26m_1280",
+        "yolox_1280",
         "llmdet_peft",
         "llmdet/full",
         "yoloe_1280/yoloe_full",
@@ -7035,12 +7543,21 @@
         "sam3/full",
         "deimm_640_e1",
         "yolo26m_640_e1",
+        "yolox_640",
         "yoloe_640/yoloe_full_640",
         "llmdet_peft_640",
         "llmdet/full_640_s0",
         "mmgdino_peft_640"
       ],
       "pairs": [
+        [
+          "yolo26m_1280",
+          "yolox_1280"
+        ],
+        [
+          "yolo26m_640_e1",
+          "yolox_640"
+        ],
         [
           "deimm_1280",
           "llmdet_peft"
@@ -7082,6 +7599,7 @@
         "yolo26m_640_e1",
         "DEIM-M",
         "deimm_640_e1",
+        "yolox_640",
         "llmdet_peft"
       ],
       "pairs": [
@@ -7096,6 +7614,18 @@
         [
           "deimm_640_e1",
           "DEIM-M"
+        ],
+        [
+          "yolo26m_640_default",
+          "yolox_640"
+        ],
+        [
+          "yolo26m_640_e1",
+          "yolox_640"
+        ],
+        [
+          "deimm_640_e1",
+          "yolox_640"
         ],
         [
           "llmdet_peft",
@@ -7113,6 +7643,8 @@
         "yolo26m_1280",
         "deimm_640_e1",
         "deimm_1280",
+        "yolox_640",
+        "yolox_1280",
         "llmdet_peft_640",
         "llmdet_peft_640aug",
         "llmdet_peft",
@@ -7205,6 +7737,92 @@
         ],
         [
           "yoloe_1280/yoloe_full",
+          "yolo26m_1280"
+        ],
+        [
+          "yolox_1280",
+          "yolox_640"
+        ],
+        [
+          "yolo26m_1280",
+          "yolox_1280"
+        ],
+        [
+          "deimm_1280",
+          "yolox_1280"
+        ],
+        [
+          "yolox_1280",
+          "llmdet_peft"
+        ],
+        [
+          "yolox_1280",
+          "llmdet/full"
+        ],
+        [
+          "yolox_1280",
+          "mmgdino_peft"
+        ],
+        [
+          "llmdet_peft_640",
+          "yolox_640"
+        ],
+        [
+          "llmdet/full_640_s0",
+          "yolox_640"
+        ],
+        [
+          "mmgdino_peft_640",
+          "yolox_640"
+        ],
+        [
+          "llmdet_peft_640aug",
+          "yolox_640"
+        ],
+        [
+          "mmgdino_peft_640aug",
+          "yolox_640"
+        ]
+      ]
+    },
+    "matched": {
+      "entries": [
+        "yolo26m_640_default",
+        "yolox_640",
+        "yolo26m_e1b",
+        "yolox_e1",
+        "yolo26m_1280",
+        "yolox_1280",
+        "yolo26m_e1b_1280",
+        "yolox_e1_1280"
+      ],
+      "pairs": [
+        [
+          "yolo26m_640_default",
+          "yolox_640"
+        ],
+        [
+          "yolo26m_e1b",
+          "yolox_e1"
+        ],
+        [
+          "yolo26m_e1b_1280",
+          "yolox_e1_1280"
+        ],
+        [
+          "yolox_e1",
+          "yolox_640"
+        ],
+        [
+          "yolo26m_e1b",
+          "yolo26m_640_e1"
+        ],
+        [
+          "yolox_e1_1280",
+          "yolox_1280"
+        ],
+        [
+          "yolo26m_e1b_1280",
           "yolo26m_1280"
         ]
       ]
@@ -7312,6 +7930,561 @@
       "label": "MM-Grounding-DINO-B, light (peft), E6 matched jitter at 640",
       "low": "mmgdino_peft_640aug",
       "high": "mmgdino_peft"
+    },
+    {
+      "label": "YOLOX-M (published recipe; 1280 trains at 1600)",
+      "low": "yolox_640",
+      "high": "yolox_1280"
+    },
+    {
+      "label": "YOLOX-M (tuned recipe, stage B)",
+      "low": "yolox_e1",
+      "high": "yolox_e1_1280"
+    },
+    {
+      "label": "YOLO26m (tuned recipe, stage B)",
+      "low": "yolo26m_e1b",
+      "high": "yolo26m_e1b_1280"
+    }
+  ],
+  "matched_search": [
+    {
+      "model_key": "yolox",
+      "predict_size": 640,
+      "configs": [
+        {
+          "arm": "sw_s640_lr1_mx0",
+          "train_scale": 640,
+          "lr_mult": 1,
+          "mixup": 0.0,
+          "run": "never_ran",
+          "published": false,
+          "note": "box lost to a network outage during setup",
+          "valid": null
+        },
+        {
+          "arm": "sw_s640_lr1_mx50",
+          "train_scale": 640,
+          "lr_mult": 1,
+          "mixup": 0.5,
+          "run": "new",
+          "published": false,
+          "note": null,
+          "valid": {
+            "mAP_50_95": 0.6516166925430298,
+            "mAP_50": 0.9537205696105957,
+            "mAP_75": 0.7428704500198364,
+            "per_class_ap50": {
+              "player": 0.9492408633232117,
+              "ball": 0.8766215443611145,
+              "referee": 0.9993040561676025,
+              "rim": 1.0,
+              "number": 0.9434362649917603
+            }
+          },
+          "cost_source": "box.json",
+          "cost_usd": 0.966,
+          "box_hours": 1.716,
+          "gpu": "A100 SXM4",
+          "selected_epoch": null
+        },
+        {
+          "arm": "sw_s640_lr2_mx0",
+          "train_scale": 640,
+          "lr_mult": 2,
+          "mixup": 0.0,
+          "run": "new",
+          "published": false,
+          "note": null,
+          "valid": {
+            "mAP_50_95": 0.6561089754104614,
+            "mAP_50": 0.9508691430091858,
+            "mAP_75": 0.753215491771698,
+            "per_class_ap50": {
+              "player": 0.9400820732116699,
+              "ball": 0.8806923627853394,
+              "referee": 0.9992068409919739,
+              "rim": 1.0,
+              "number": 0.934364378452301
+            }
+          },
+          "cost_source": "box.json",
+          "cost_usd": 0.463,
+          "box_hours": 0.736,
+          "gpu": "A100 PCIE",
+          "selected_epoch": null
+        },
+        {
+          "arm": "sw_s640_lr2_mx50",
+          "train_scale": 640,
+          "lr_mult": 2,
+          "mixup": 0.5,
+          "run": "never_ran",
+          "published": false,
+          "note": "box lost to a network outage during setup",
+          "valid": null
+        },
+        {
+          "arm": "sw_s640_lr4_mx0",
+          "train_scale": 640,
+          "lr_mult": 4,
+          "mixup": 0.0,
+          "run": "new",
+          "published": false,
+          "note": null,
+          "valid": {
+            "mAP_50_95": 0.6559883952140808,
+            "mAP_50": 0.9443386197090149,
+            "mAP_75": 0.7490747570991516,
+            "per_class_ap50": {
+              "player": 0.9391488432884216,
+              "ball": 0.8688058257102966,
+              "referee": 0.9800930619239807,
+              "rim": 1.0,
+              "number": 0.9336454272270203
+            }
+          },
+          "cost_source": "box.json",
+          "cost_usd": 0.572,
+          "box_hours": 1.016,
+          "gpu": "A100 SXM4",
+          "selected_epoch": null
+        },
+        {
+          "arm": "sw_s640_lr4_mx50",
+          "train_scale": 640,
+          "lr_mult": 4,
+          "mixup": 0.5,
+          "run": "never_ran",
+          "published": false,
+          "note": "box lost to a network outage during setup",
+          "valid": null
+        },
+        {
+          "arm": "sw_s800_lr1_mx0",
+          "train_scale": 800,
+          "lr_mult": 1,
+          "mixup": 0.0,
+          "run": "new",
+          "published": false,
+          "note": null,
+          "valid": {
+            "mAP_50_95": 0.6431378722190857,
+            "mAP_50": 0.9514284729957581,
+            "mAP_75": 0.7226085662841797,
+            "per_class_ap50": {
+              "player": 0.9404287934303284,
+              "ball": 0.9100721478462219,
+              "referee": 0.9771896004676819,
+              "rim": 1.0,
+              "number": 0.9294520020484924
+            }
+          },
+          "cost_source": "box.json",
+          "cost_usd": 0.83,
+          "box_hours": 1.746,
+          "gpu": "RTX 4090",
+          "selected_epoch": null
+        },
+        {
+          "arm": "sw_s800_lr1_mx50",
+          "train_scale": 800,
+          "lr_mult": 1,
+          "mixup": 0.5,
+          "run": "new",
+          "published": true,
+          "note": null,
+          "valid": {
+            "mAP_50_95": 0.6547864675521851,
+            "mAP_50": 0.9514101147651672,
+            "mAP_75": 0.7440357208251953,
+            "per_class_ap50": {
+              "player": 0.9402830600738525,
+              "ball": 0.8829404711723328,
+              "referee": 0.9799917340278625,
+              "rim": 1.0,
+              "number": 0.9538351893424988
+            }
+          },
+          "cost_source": "box.json",
+          "cost_usd": 0.828,
+          "box_hours": 1.741,
+          "gpu": "RTX 4090",
+          "selected_epoch": null
+        },
+        {
+          "arm": "sw_s800_lr2_mx0",
+          "train_scale": 800,
+          "lr_mult": 2,
+          "mixup": 0.0,
+          "run": "new",
+          "published": false,
+          "note": null,
+          "valid": {
+            "mAP_50_95": 0.6615185141563416,
+            "mAP_50": 0.9568604826927185,
+            "mAP_75": 0.749937891960144,
+            "per_class_ap50": {
+              "player": 0.9401196837425232,
+              "ball": 0.9093188643455505,
+              "referee": 0.9900643825531006,
+              "rim": 1.0,
+              "number": 0.9447996020317078
+            }
+          },
+          "cost_source": "box.json",
+          "cost_usd": 0.82,
+          "box_hours": 1.724,
+          "gpu": "RTX 4090",
+          "selected_epoch": null
+        },
+        {
+          "arm": "sw_s800_lr2_mx50",
+          "train_scale": 800,
+          "lr_mult": 2,
+          "mixup": 0.5,
+          "run": "new",
+          "published": false,
+          "note": null,
+          "valid": {
+            "mAP_50_95": 0.6631442904472351,
+            "mAP_50": 0.9386044144630432,
+            "mAP_75": 0.7433632612228394,
+            "per_class_ap50": {
+              "player": 0.9295575022697449,
+              "ball": 0.8653291463851929,
+              "referee": 0.9598342180252075,
+              "rim": 1.0,
+              "number": 0.9383010864257812
+            }
+          },
+          "cost_source": "box.json",
+          "cost_usd": 0.471,
+          "box_hours": 0.749,
+          "gpu": "A100 PCIE",
+          "selected_epoch": null
+        },
+        {
+          "arm": "sw_s800_lr4_mx0",
+          "train_scale": 800,
+          "lr_mult": 4,
+          "mixup": 0.0,
+          "run": "new",
+          "published": false,
+          "note": null,
+          "valid": {
+            "mAP_50_95": 0.6666978597640991,
+            "mAP_50": 0.9513118267059326,
+            "mAP_75": 0.7638214230537415,
+            "per_class_ap50": {
+              "player": 0.9400750398635864,
+              "ball": 0.9090569615364075,
+              "referee": 0.979361355304718,
+              "rim": 1.0,
+              "number": 0.9280656576156616
+            }
+          },
+          "cost_source": "box.json",
+          "cost_usd": 0.59,
+          "box_hours": 1.063,
+          "gpu": "RTX 4090",
+          "selected_epoch": null
+        },
+        {
+          "arm": "sw_s800_lr4_mx50",
+          "train_scale": 800,
+          "lr_mult": 4,
+          "mixup": 0.5,
+          "run": "new",
+          "published": false,
+          "note": null,
+          "valid": {
+            "mAP_50_95": 0.6701394319534302,
+            "mAP_50": 0.9508733749389648,
+            "mAP_75": 0.759108304977417,
+            "per_class_ap50": {
+              "player": 0.9400798678398132,
+              "ball": 0.8877747654914856,
+              "referee": 0.9798868894577026,
+              "rim": 1.0,
+              "number": 0.9466254115104675
+            }
+          },
+          "cost_source": "box.json",
+          "cost_usd": 0.461,
+          "box_hours": 0.759,
+          "gpu": "RTX 4090",
+          "selected_epoch": null
+        }
+      ]
+    },
+    {
+      "model_key": "yolo26m",
+      "predict_size": 640,
+      "configs": [
+        {
+          "arm": "yolo26m_e1_lr1",
+          "train_scale": 640,
+          "lr_mult": 1,
+          "mixup": 0.0,
+          "run": "reused",
+          "published": true,
+          "note": "E1 sweep arm, identical recipe",
+          "valid": {
+            "mAP_50_95": 0.6880303621292114,
+            "mAP_50": 0.9501597285270691,
+            "mAP_75": 0.794317364692688,
+            "per_class_ap50": {
+              "player": 0.9749213457107544,
+              "ball": 0.8568386435508728,
+              "referee": 0.9681804180145264,
+              "rim": 0.9993999600410461,
+              "number": 0.9514583945274353
+            }
+          },
+          "cost_usd": null,
+          "box_hours": null,
+          "gpu": null,
+          "selected_epoch": null
+        },
+        {
+          "arm": "sw_s640_lr1_mx50",
+          "train_scale": 640,
+          "lr_mult": 1,
+          "mixup": 0.5,
+          "run": "new",
+          "published": false,
+          "note": null,
+          "valid": {
+            "mAP_50_95": 0.7101565599441528,
+            "mAP_50": 0.9557217359542847,
+            "mAP_75": 0.8049930930137634,
+            "per_class_ap50": {
+              "player": 0.9854964017868042,
+              "ball": 0.8308329582214355,
+              "referee": 0.998354971408844,
+              "rim": 1.0,
+              "number": 0.9639243483543396
+            }
+          },
+          "cost_source": "meta.json",
+          "cost_usd": 0.614,
+          "box_hours": 1.307,
+          "gpu": "RTX 4090",
+          "selected_epoch": 252
+        },
+        {
+          "arm": "yolo26m_e1_lr2",
+          "train_scale": 640,
+          "lr_mult": 2,
+          "mixup": 0.0,
+          "run": "reused",
+          "published": false,
+          "note": "E1 sweep winner, identical recipe",
+          "valid": {
+            "mAP_50_95": 0.6941211819648743,
+            "mAP_50": 0.9528245329856873,
+            "mAP_75": 0.7881293296813965,
+            "per_class_ap50": {
+              "player": 0.9762108325958252,
+              "ball": 0.8557084798812866,
+              "referee": 0.9892007112503052,
+              "rim": 0.9992079138755798,
+              "number": 0.9437947273254395
+            }
+          },
+          "cost_usd": null,
+          "box_hours": null,
+          "gpu": null,
+          "selected_epoch": null
+        },
+        {
+          "arm": "sw_s640_lr2_mx50",
+          "train_scale": 640,
+          "lr_mult": 2,
+          "mixup": 0.5,
+          "run": "new",
+          "published": false,
+          "note": null,
+          "valid": {
+            "mAP_50_95": 0.708492636680603,
+            "mAP_50": 0.9612712860107422,
+            "mAP_75": 0.80751633644104,
+            "per_class_ap50": {
+              "player": 0.9828124642372131,
+              "ball": 0.8658236861228943,
+              "referee": 0.9945231676101685,
+              "rim": 1.0,
+              "number": 0.9631971716880798
+            }
+          },
+          "cost_source": "meta.json",
+          "cost_usd": 0.515,
+          "box_hours": 1.087,
+          "gpu": "RTX 4090",
+          "selected_epoch": 283
+        },
+        {
+          "arm": "sw_s640_lr4_mx0",
+          "train_scale": 640,
+          "lr_mult": 4,
+          "mixup": 0.0,
+          "run": "new",
+          "published": false,
+          "note": null,
+          "valid": {
+            "mAP_50_95": 0.6938604116439819,
+            "mAP_50": 0.9500880241394043,
+            "mAP_75": 0.7878990173339844,
+            "per_class_ap50": {
+              "player": 0.9747332334518433,
+              "ball": 0.8335264921188354,
+              "referee": 0.9861767292022705,
+              "rim": 1.0,
+              "number": 0.956003725528717
+            }
+          },
+          "cost_source": "meta.json",
+          "cost_usd": 0.306,
+          "box_hours": 0.801,
+          "gpu": "RTX 4090",
+          "selected_epoch": 243
+        },
+        {
+          "arm": "sw_s640_lr4_mx50",
+          "train_scale": 640,
+          "lr_mult": 4,
+          "mixup": 0.5,
+          "run": "never_ran",
+          "published": false,
+          "note": "box stopped when the vast.ai account ran out of credit",
+          "valid": null
+        },
+        {
+          "arm": "sw_s800_lr1_mx0",
+          "train_scale": 800,
+          "lr_mult": 1,
+          "mixup": 0.0,
+          "run": "never_ran",
+          "published": false,
+          "note": "box stopped when the vast.ai account ran out of credit",
+          "valid": null
+        },
+        {
+          "arm": "sw_s800_lr1_mx50",
+          "train_scale": 800,
+          "lr_mult": 1,
+          "mixup": 0.5,
+          "run": "new",
+          "published": false,
+          "note": null,
+          "valid": {
+            "mAP_50_95": 0.7126308679580688,
+            "mAP_50": 0.9626003503799438,
+            "mAP_75": 0.8143740296363831,
+            "per_class_ap50": {
+              "player": 0.9782224893569946,
+              "ball": 0.8649009466171265,
+              "referee": 0.9996000528335571,
+              "rim": 0.9990196824073792,
+              "number": 0.9712584614753723
+            }
+          },
+          "cost_source": "meta.json",
+          "cost_usd": 0.554,
+          "box_hours": 1.172,
+          "gpu": "RTX 4090",
+          "selected_epoch": 287
+        },
+        {
+          "arm": "sw_s800_lr2_mx0",
+          "train_scale": 800,
+          "lr_mult": 2,
+          "mixup": 0.0,
+          "run": "new",
+          "published": false,
+          "note": null,
+          "valid": {
+            "mAP_50_95": 0.6971899271011353,
+            "mAP_50": 0.9560413360595703,
+            "mAP_75": 0.8054947853088379,
+            "per_class_ap50": {
+              "player": 0.9772267937660217,
+              "ball": 0.847507894039154,
+              "referee": 0.998836874961853,
+              "rim": 0.9997958540916443,
+              "number": 0.9568391442298889
+            }
+          },
+          "cost_source": "meta.json",
+          "cost_usd": 0.425,
+          "box_hours": 0.946,
+          "gpu": "RTX 4090",
+          "selected_epoch": 246
+        },
+        {
+          "arm": "sw_s800_lr2_mx50",
+          "train_scale": 800,
+          "lr_mult": 2,
+          "mixup": 0.5,
+          "run": "new",
+          "published": false,
+          "note": null,
+          "valid": {
+            "mAP_50_95": 0.710980236530304,
+            "mAP_50": 0.9619684815406799,
+            "mAP_75": 0.8105042576789856,
+            "per_class_ap50": {
+              "player": 0.9788041710853577,
+              "ball": 0.8644943833351135,
+              "referee": 0.9995364546775818,
+              "rim": 0.9992079138755798,
+              "number": 0.9677994251251221
+            }
+          },
+          "cost_source": "meta.json",
+          "cost_usd": 0.55,
+          "box_hours": 1.162,
+          "gpu": "RTX 4090",
+          "selected_epoch": 254
+        },
+        {
+          "arm": "sw_s800_lr4_mx0",
+          "train_scale": 800,
+          "lr_mult": 4,
+          "mixup": 0.0,
+          "run": "never_ran",
+          "published": false,
+          "note": "box stopped when the vast.ai account ran out of credit",
+          "valid": null
+        },
+        {
+          "arm": "sw_s800_lr4_mx50",
+          "train_scale": 800,
+          "lr_mult": 4,
+          "mixup": 0.5,
+          "run": "new",
+          "published": false,
+          "note": null,
+          "valid": {
+            "mAP_50_95": 0.7061284780502319,
+            "mAP_50": 0.9659707546234131,
+            "mAP_75": 0.8028593063354492,
+            "per_class_ap50": {
+              "player": 0.9841688871383667,
+              "ball": 0.8834304213523865,
+              "referee": 0.997237503528595,
+              "rim": 0.9988134503364563,
+              "number": 0.966203510761261
+            }
+          },
+          "cost_source": "meta.json",
+          "cost_usd": 0.376,
+          "box_hours": 0.922,
+          "gpu": "RTX 4090",
+          "selected_epoch": 287
+        }
+      ]
     }
   ],
   "fixes": [
@@ -7387,11 +8560,27 @@
       "applies_to": [
         "yolo26m_640_e1",
         "yolo26m_640_default",
-        "YOLO26m"
+        "YOLO26m",
+        "yolo26m_e1b"
       ],
       "note": null,
       "source": "published (results/latency/trt_fp16_toboxes.json)",
       "gpu_ms": 5.84912,
+      "gpu_runs_ms": [],
+      "published": true
+    },
+    {
+      "key": "yolox_640_published",
+      "label": "YOLOX-M @640 (published engine)",
+      "input": "640x640",
+      "status": "current",
+      "applies_to": [
+        "yolox_640",
+        "yolox_e1"
+      ],
+      "note": null,
+      "source": "published (results/latency/trt_fp16_toboxes.json)",
+      "gpu_ms": 5.68115,
       "gpu_runs_ms": [],
       "published": true
     },
@@ -7415,7 +8604,8 @@
       "input": "1280x1280",
       "status": "current",
       "applies_to": [
-        "yolo26m_1280"
+        "yolo26m_1280",
+        "yolo26m_e1b_1280"
       ],
       "note": null,
       "source": "yolo26m/latency_trt_t4.json",
@@ -7424,6 +8614,25 @@
         19.654208183288574,
         20.156240463256836
       ],
+      "e2e_ms": null,
+      "pytorch_ms": null,
+      "val_pytorch": null,
+      "val_trt": null,
+      "published": false
+    },
+    {
+      "key": "yolox_1280",
+      "label": "YOLOX-M @1280 (yolox_1280_s0)",
+      "input": "1280x1280",
+      "status": "current",
+      "applies_to": [
+        "yolox_1280",
+        "yolox_e1_1280"
+      ],
+      "note": "pending: the T4 box has not run yet (no T4 offer at launch)",
+      "source": "yolox/latency_trt_t4.json",
+      "gpu_ms": null,
+      "gpu_runs_ms": [],
       "e2e_ms": null,
       "pytorch_ms": null,
       "val_pytorch": null,
@@ -7763,6 +8972,23 @@
   "missing": [
     "owlv2: owlv2/peft_seed1/meta.json",
     "owlv2: owlv2/peft_seed2/meta.json",
-    "owlv2: owlv2/full_seed1/meta.json"
+    "owlv2: owlv2/full_seed1/meta.json",
+    "yolo26m: yolo26m/yolo26m_e1b_s0 (no test.json/meta.json)",
+    "yolo26m: yolo26m/yolo26m_e1b_s1 (no test.json/meta.json)",
+    "yolo26m: yolo26m/yolo26m_e1b_s2 (no test.json/meta.json)",
+    "yolo26m: yolo26m/yolo26m_e1b_1280_s0 (no test.json/meta.json)",
+    "yolo26m: yolo26m/yolo26m_e1b_1280_s1 (no test.json/meta.json)",
+    "yolo26m: yolo26m/yolo26m_e1b_1280_s2 (no test.json/meta.json)",
+    "yolox: yolox/yolox_e1_s0 (no test.json/meta.json)",
+    "yolox: yolox/yolox_e1_s1 (no test.json/meta.json)",
+    "yolox: yolox/yolox_e1_s2 (no test.json/meta.json)",
+    "yolox: yolox/yolox_e1_1280_s0 (no test.json/meta.json)",
+    "yolox: yolox/yolox_e1_1280_s1 (no test.json/meta.json)",
+    "yolox: yolox/yolox_e1_1280_s2 (no test.json/meta.json)",
+    "group yolox_e1 (YOLOX-M @640, tuned recipe (sw_s800_lr4_mx50)): pending, 0 of 3 seeds scored",
+    "group yolox_e1_1280 (YOLOX-M @1280, tuned recipe x2): pending, 0 of 3 seeds scored",
+    "group yolo26m_e1b (YOLO26m @640, tuned recipe (sw_s800_lr1_mx50)): pending, 0 of 3 seeds scored",
+    "group yolo26m_e1b_1280 (YOLO26m @1280, tuned recipe x2): pending, 0 of 3 seeds scored",
+    "trt yolox_1280: GPU-compute median not found in yolox/latency_trt_t4.json"
   ]
 }

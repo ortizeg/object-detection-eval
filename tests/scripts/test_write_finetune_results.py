@@ -308,3 +308,27 @@ def test_copy_dump_plain_copy_ends_with_newline(tmp_path: Path) -> None:
     assert out.read_bytes() == b'{"a": []}\n'
     src.write_bytes(b'{"a": []}\n')
     assert wfr.copy_dump(src, tmp_path / "out", "x", 10_000).read_bytes() == b'{"a": []}\n'
+
+
+def test_pending_groups_skip_member_checks_and_are_listed() -> None:
+    manifest = wfr.load_manifest(_MANIFEST)
+    pending = [g for g in manifest.groups if g.pending]
+    assert pending, "stage-B groups are expected to be pending in the manifest"
+    group = pending[0]
+    refs = wfr.unresolved_refs(manifest, set())
+    assert not set(group.members) & set(refs)
+    notes = wfr.pending_group_notes(manifest, set())
+    assert any(group.key in n and "0 of 3" in n for n in notes)
+    done = wfr.pending_group_notes(manifest, set(group.members))
+    assert any(group.key in n and "remove `pending: true`" in n for n in done)
+
+
+def test_matched_search_grid_is_identical_across_models() -> None:
+    manifest = wfr.load_manifest(_MANIFEST)
+    grids = [
+        sorted((c.train_scale, c.lr_mult, c.mixup) for c in m.configs)
+        for m in manifest.matched_search
+    ]
+    assert len(grids) == 2 and grids[0] == grids[1] and len(grids[0]) == 12
+    for search in manifest.matched_search:
+        assert sum(c.published for c in search.configs) == 1

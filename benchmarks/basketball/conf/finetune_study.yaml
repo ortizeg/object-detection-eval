@@ -296,6 +296,15 @@ models:
       - {arm: yolo26m_frac25_d1, experiment: E3, label: "E1 recipe on frac25, draw 1"}
       - {arm: yolo26m_frac50_d0, experiment: E3, label: "E1 recipe on frac50, draw 0"}
       - {arm: yolo26m_frac50_d1, experiment: E3, label: "E1 recipe on frac50, draw 1"}
+      # Matched recipe search, stage B (val winner sw_s800_lr1_mx50: train 800, predict
+      # 640, lr0 x1, mixup 0.5; 3 seeds, test once). Listed now so the report's Pending
+      # section tracks them; rows appear as soon as their test.json + meta.json land.
+      - {arm: yolo26m_e1b_s0, experiment: E1, label: "tuned recipe (train 800, mixup 0.5), seed 0", input: "640 (train 800)"}
+      - {arm: yolo26m_e1b_s1, experiment: E1, label: "tuned recipe (train 800, mixup 0.5), seed 1", input: "640 (train 800)"}
+      - {arm: yolo26m_e1b_s2, experiment: E1, label: "tuned recipe (train 800, mixup 0.5), seed 2", input: "640 (train 800)"}
+      - {arm: yolo26m_e1b_1280_s0, experiment: E2, label: "tuned recipe x2 @1280, seed 0", input: "1280 (train 1600)"}
+      - {arm: yolo26m_e1b_1280_s1, experiment: E2, label: "tuned recipe x2 @1280, seed 1", input: "1280 (train 1600)"}
+      - {arm: yolo26m_e1b_1280_s2, experiment: E2, label: "tuned recipe x2 @1280, seed 2", input: "1280 (train 1600)"}
     # E1 val sweep (seed 0, 640). Selected on val; YOLO26m sweep configs were never
     # predicted on test.
     sweep:
@@ -327,6 +336,34 @@ models:
       - {arm: e1_lr1, label: "lr x1 (published recipe, retrained on merged5)"}
       - {arm: e1_lr2, label: "lr x2", selected: true}
       - {arm: e1_long, label: "160 epochs, milestones x4/3"}
+
+  # The third conventional baseline of FINAL_COMPARISON_640.md (with YOLO26m and
+  # DEIM-M). The 640 seeds are the taxonomy-ablation merged5 runs of the published
+  # recipe (train 800 multi-scale 640-960, predict 640), imported, not retrained.
+  - key: yolox
+    display: YOLOX-M
+    family: conventional detector
+    baseline: true
+    slug: yolox
+    resolution: "640"
+    licence: Apache-2.0
+    redistribution: permissive
+    arms: {}
+    extra:
+      - {arm: yolox_640_s0, experiment: E1, label: "published recipe, seed 0 (taxonomy-ablation run)", input: "640 (train 800, multi-scale 640-960)"}
+      - {arm: yolox_640_s1, experiment: E1, label: "published recipe, seed 1 (taxonomy-ablation run)", input: "640 (train 800, multi-scale 640-960)"}
+      - {arm: yolox_640_s2, experiment: E1, label: "published recipe, seed 2 (taxonomy-ablation run)", input: "640 (train 800, multi-scale 640-960)"}
+      - {arm: yolox_1280_s0, experiment: E2, label: "published recipe x2 @1280, seed 0", input: "1280 (train 1600, multi-scale 1280-1920)"}
+      - {arm: yolox_1280_s1, experiment: E2, label: "published recipe x2 @1280, seed 1", input: "1280 (train 1600, multi-scale 1280-1920)"}
+      - {arm: yolox_1280_s2, experiment: E2, label: "published recipe x2 @1280, seed 2", input: "1280 (train 1600, multi-scale 1280-1920)"}
+      # Matched recipe search, stage B (val winner sw_s800_lr4_mx50: train 800, predict
+      # 640, lr x4, mixup 0.5; 3 seeds, test once). Pending until test.json + meta.json land.
+      - {arm: yolox_e1_s0, experiment: E1, label: "tuned recipe (lr x4), seed 0", input: "640 (train 800, multi-scale 640-960)"}
+      - {arm: yolox_e1_s1, experiment: E1, label: "tuned recipe (lr x4), seed 1", input: "640 (train 800, multi-scale 640-960)"}
+      - {arm: yolox_e1_s2, experiment: E1, label: "tuned recipe (lr x4), seed 2", input: "640 (train 800, multi-scale 640-960)"}
+      - {arm: yolox_e1_1280_s0, experiment: E2, label: "tuned recipe x2 @1280, seed 0", input: "1280 (train 1600, multi-scale 1280-1920)"}
+      - {arm: yolox_e1_1280_s1, experiment: E2, label: "tuned recipe x2 @1280, seed 1", input: "1280 (train 1600, multi-scale 1280-1920)"}
+      - {arm: yolox_e1_1280_s2, experiment: E2, label: "tuned recipe x2 @1280, seed 2", input: "1280 (train 1600, multi-scale 1280-1920)"}
 
 # Whole-slug vast.ai spend (training boxes, failed rentals, T4 latency boxes), from the
 # sibling repo's plan docs. `complete: false` marks a total that is known to miss a box
@@ -430,6 +467,20 @@ costs:
     usd: 1.23
     complete: true
     source: "E6 (640 + matched jitter): peft_640aug_s0-s2 meta.json cost_usd 0.39 + 0.39 + 0.45 (three A6000 boxes); docs/plans/mmgdino.md about $1.23"
+  # Matched recipe search (YOLOX-M vs YOLO26m) and the YOLOX-M baseline. Six grid boxes
+  # (3 per model) never ran; none left a meta.json or box.json, so any charge for them
+  # is not in these totals. The YOLOX-M @640 seeds are imported taxonomy-ablation runs
+  # (meta.json train share 0.258 + 0.245 + 0.265, paid outside this study): not counted.
+  - slug: yolox
+    stage: round2
+    usd: 11.68
+    complete: false
+    source: "YOLOX-M: yolox_1280_s0-s2 meta.json cost_usd 2.12 + 2.20 + 1.36 = 5.68; nine sweep boxes sw_*/box.json cost_usd sum 6.00; no T4 box yet (no T4 offer at launch); the three boxes lost in the outage recorded no cost"
+  - slug: yolo26m
+    stage: round2
+    usd: 3.34
+    complete: false
+    source: "YOLO26m matched search: seven new sw_*/meta.json cost_usd sum 3.34 (the two reused E1 sweep arms are in the $11 above); the three boxes stopped by the credit outage recorded no cost"
   # ---- follow-ups: TensorRT boxes and the user-approved audit fixes
   - slug: llmdet
     stage: followup
@@ -493,12 +544,22 @@ groups:
   - {key: llmdet_peft_640aug, label: "LLMDet-large @640 + matched jitter (E6), light (peft)", input: "640x360 (long side 640)", members: [llmdet/peft_640aug_s0, llmdet/peft_640aug_s1, llmdet/peft_640aug_s2]}
   - {key: mmgdino_peft_640aug, label: "MM-Grounding-DINO-B @640 + matched jitter (E6), light (peft)", input: "640x360 (long side 640)", members: [mmgdino/peft_640aug_s0, mmgdino/peft_640aug_s1, mmgdino/peft_640aug_s2]}
   - {key: owlv2_peft, label: "OWLv2-L/14, light (peft)", input: "1008x1008", members: [owlv2/peft, owlv2/peft_seed1, owlv2/peft_seed2]}
+  - {key: yolox_640, label: "YOLOX-M @640, published recipe", input: "640", members: [yolox/yolox_640_s0, yolox/yolox_640_s1, yolox/yolox_640_s2]}
+  - {key: yolox_1280, label: "YOLOX-M @1280, published recipe x2", input: "1280", members: [yolox/yolox_1280_s0, yolox/yolox_1280_s1, yolox/yolox_1280_s2]}
+  # Matched recipe search, stage B: still training. When all three seeds of a group have
+  # landed, delete its `pending: true` and re-run `pixi run finetune-report`.
+  - {key: yolox_e1, label: "YOLOX-M @640, tuned recipe (sw_s800_lr4_mx50)", input: "640", members: [yolox/yolox_e1_s0, yolox/yolox_e1_s1, yolox/yolox_e1_s2], pending: true}
+  - {key: yolox_e1_1280, label: "YOLOX-M @1280, tuned recipe x2", input: "1280", members: [yolox/yolox_e1_1280_s0, yolox/yolox_e1_1280_s1, yolox/yolox_e1_1280_s2], pending: true}
+  - {key: yolo26m_e1b, label: "YOLO26m @640, tuned recipe (sw_s800_lr1_mx50)", input: "640", members: [yolo26m/yolo26m_e1b_s0, yolo26m/yolo26m_e1b_s1, yolo26m/yolo26m_e1b_s2], pending: true}
+  - {key: yolo26m_e1b_1280, label: "YOLO26m @1280, tuned recipe x2", input: "1280", members: [yolo26m/yolo26m_e1b_1280_s0, yolo26m/yolo26m_e1b_1280_s1, yolo26m/yolo26m_e1b_1280_s2], pending: true}
 
 # Which entries each report table shows, and which paired clustered deltas it quotes.
 tables:
   headline:
-    entries: [deimm_1280, yolo26m_1280, llmdet_peft, llmdet/full, yoloe_1280/yoloe_full, yoloworld/yoloworld_full, mmgdino_peft, sam3/full, deimm_640_e1, yolo26m_640_e1, yoloe_640/yoloe_full_640, llmdet_peft_640, llmdet/full_640_s0, mmgdino_peft_640]
+    entries: [deimm_1280, yolo26m_1280, yolox_1280, llmdet_peft, llmdet/full, yoloe_1280/yoloe_full, yoloworld/yoloworld_full, mmgdino_peft, sam3/full, deimm_640_e1, yolo26m_640_e1, yolox_640, yoloe_640/yoloe_full_640, llmdet_peft_640, llmdet/full_640_s0, mmgdino_peft_640]
     pairs:
+      - [yolo26m_1280, yolox_1280]
+      - [yolo26m_640_e1, yolox_640]
       - [deimm_1280, llmdet_peft]
       - [deimm_1280, llmdet/full]
       - [yolo26m_1280, llmdet_peft]
@@ -508,15 +569,20 @@ tables:
       - [llmdet_peft, yolo26m_640_e1]
       - [llmdet_peft, deimm_640_e1]
   e1:
-    entries: [YOLO26m, yolo26m_640_default, yolo26m_640_e1, DEIM-M, deimm_640_e1, llmdet_peft]
+    entries: [YOLO26m, yolo26m_640_default, yolo26m_640_e1, DEIM-M, deimm_640_e1, yolox_640, llmdet_peft]
     pairs:
       - [yolo26m_640_e1, yolo26m_640_default]
       - [yolo26m_640_e1, YOLO26m]
       - [deimm_640_e1, DEIM-M]
+      # YOLOX-M: both YOLO26m 640 recipes (the default-recipe seeds are the same
+      # taxonomy-ablation set as the YOLOX-M seeds) and DEIM-M.
+      - [yolo26m_640_default, yolox_640]
+      - [yolo26m_640_e1, yolox_640]
+      - [deimm_640_e1, yolox_640]
       - [llmdet_peft, yolo26m_640_e1]
       - [llmdet_peft, deimm_640_e1]
   e2:
-    entries: [yolo26m_640_e1, yolo26m_1280, deimm_640_e1, deimm_1280, llmdet_peft_640, llmdet_peft_640aug, llmdet_peft, llmdet/full_640_s0, llmdet/full, mmgdino_peft_640, mmgdino_peft_640aug, mmgdino_peft, yoloe_640/yoloe_full_640, yoloe_1280/yoloe_full, yoloe_640/yoloe_peft_640, yoloe_1280/yoloe_peft]
+    entries: [yolo26m_640_e1, yolo26m_1280, deimm_640_e1, deimm_1280, yolox_640, yolox_1280, llmdet_peft_640, llmdet_peft_640aug, llmdet_peft, llmdet/full_640_s0, llmdet/full, mmgdino_peft_640, mmgdino_peft_640aug, mmgdino_peft, yoloe_640/yoloe_full_640, yoloe_1280/yoloe_full, yoloe_640/yoloe_peft_640, yoloe_1280/yoloe_peft]
     pairs:
       - [yolo26m_1280, yolo26m_640_e1]
       - [deimm_1280, deimm_640_e1]
@@ -540,6 +606,32 @@ tables:
       - [mmgdino_peft_640aug, deimm_640_e1]
       - [yoloe_640/yoloe_full_640, yolo26m_640_e1]
       - [yoloe_1280/yoloe_full, yolo26m_1280]
+      # YOLOX-M, the third conventional baseline: 640 vs 1280, vs the other two
+      # baselines at 1280, and vs the grounding models wherever YOLO26m / DEIM-M are.
+      - [yolox_1280, yolox_640]
+      - [yolo26m_1280, yolox_1280]
+      - [deimm_1280, yolox_1280]
+      - [yolox_1280, llmdet_peft]
+      - [yolox_1280, llmdet/full]
+      - [yolox_1280, mmgdino_peft]
+      - [llmdet_peft_640, yolox_640]
+      - [llmdet/full_640_s0, yolox_640]
+      - [mmgdino_peft_640, yolox_640]
+      - [llmdet_peft_640aug, yolox_640]
+      - [mmgdino_peft_640aug, yolox_640]
+  # Matched recipe search, stage B: each model's val-selected recipe, 3 seeds, at 640 and
+  # x2 at 1280, next to its published-recipe seeds. Pending groups are listed under the
+  # table until they land.
+  matched:
+    entries: [yolo26m_640_default, yolox_640, yolo26m_e1b, yolox_e1, yolo26m_1280, yolox_1280, yolo26m_e1b_1280, yolox_e1_1280]
+    pairs:
+      - [yolo26m_640_default, yolox_640]
+      - [yolo26m_e1b, yolox_e1]
+      - [yolo26m_e1b_1280, yolox_e1_1280]
+      - [yolox_e1, yolox_640]
+      - [yolo26m_e1b, yolo26m_640_e1]
+      - [yolox_e1_1280, yolox_1280]
+      - [yolo26m_e1b_1280, yolo26m_1280]
   e3:
     entries: []
     pairs:
@@ -560,6 +652,45 @@ parity:
   - {label: "MM-Grounding-DINO-B, light (peft)", low: mmgdino_peft_640, high: mmgdino_peft}
   - {label: "LLMDet-large, light (peft), E6 matched jitter at 640", low: llmdet_peft_640aug, high: llmdet_peft}
   - {label: "MM-Grounding-DINO-B, light (peft), E6 matched jitter at 640", low: mmgdino_peft_640aug, high: mmgdino_peft}
+  - {label: "YOLOX-M (published recipe; 1280 trains at 1600)", low: yolox_640, high: yolox_1280}
+  - {label: "YOLOX-M (tuned recipe, stage B)", low: yolox_e1, high: yolox_e1_1280}
+  - {label: "YOLO26m (tuned recipe, stage B)", low: yolo26m_e1b, high: yolo26m_e1b_1280}
+
+# Matched recipe search, YOLOX-M vs YOLO26m (section 5): the identical grid for both,
+# train scale {640, 800 (predicted at 640)} x lr {x1, x2, x4 of the published recipe}
+# x mixup {0, 0.5}, seed 0, val only. Every cell is listed, including the three per
+# model that never ran. `published: true` marks the model's published recipe.
+matched_search:
+  - model: yolox
+    predict_size: 640
+    configs:
+      - {arm: sw_s640_lr1_mx0, train_scale: 640, lr_mult: 1, mixup: 0.0, run: never_ran, note: "box lost to a network outage during setup"}
+      - {arm: sw_s640_lr1_mx50, train_scale: 640, lr_mult: 1, mixup: 0.5, run: new}
+      - {arm: sw_s640_lr2_mx0, train_scale: 640, lr_mult: 2, mixup: 0.0, run: new}
+      - {arm: sw_s640_lr2_mx50, train_scale: 640, lr_mult: 2, mixup: 0.5, run: never_ran, note: "box lost to a network outage during setup"}
+      - {arm: sw_s640_lr4_mx0, train_scale: 640, lr_mult: 4, mixup: 0.0, run: new}
+      - {arm: sw_s640_lr4_mx50, train_scale: 640, lr_mult: 4, mixup: 0.5, run: never_ran, note: "box lost to a network outage during setup"}
+      - {arm: sw_s800_lr1_mx0, train_scale: 800, lr_mult: 1, mixup: 0.0, run: new}
+      - {arm: sw_s800_lr1_mx50, train_scale: 800, lr_mult: 1, mixup: 0.5, run: new, published: true}
+      - {arm: sw_s800_lr2_mx0, train_scale: 800, lr_mult: 2, mixup: 0.0, run: new}
+      - {arm: sw_s800_lr2_mx50, train_scale: 800, lr_mult: 2, mixup: 0.5, run: new}
+      - {arm: sw_s800_lr4_mx0, train_scale: 800, lr_mult: 4, mixup: 0.0, run: new}
+      - {arm: sw_s800_lr4_mx50, train_scale: 800, lr_mult: 4, mixup: 0.5, run: new}
+  - model: yolo26m
+    predict_size: 640
+    configs:
+      - {arm: yolo26m_e1_lr1, train_scale: 640, lr_mult: 1, mixup: 0.0, run: reused, published: true, note: "E1 sweep arm, identical recipe"}
+      - {arm: sw_s640_lr1_mx50, train_scale: 640, lr_mult: 1, mixup: 0.5, run: new}
+      - {arm: yolo26m_e1_lr2, train_scale: 640, lr_mult: 2, mixup: 0.0, run: reused, note: "E1 sweep winner, identical recipe"}
+      - {arm: sw_s640_lr2_mx50, train_scale: 640, lr_mult: 2, mixup: 0.5, run: new}
+      - {arm: sw_s640_lr4_mx0, train_scale: 640, lr_mult: 4, mixup: 0.0, run: new}
+      - {arm: sw_s640_lr4_mx50, train_scale: 640, lr_mult: 4, mixup: 0.5, run: never_ran, note: "box stopped when the vast.ai account ran out of credit"}
+      - {arm: sw_s800_lr1_mx0, train_scale: 800, lr_mult: 1, mixup: 0.0, run: never_ran, note: "box stopped when the vast.ai account ran out of credit"}
+      - {arm: sw_s800_lr1_mx50, train_scale: 800, lr_mult: 1, mixup: 0.5, run: new}
+      - {arm: sw_s800_lr2_mx0, train_scale: 800, lr_mult: 2, mixup: 0.0, run: new}
+      - {arm: sw_s800_lr2_mx50, train_scale: 800, lr_mult: 2, mixup: 0.5, run: new}
+      - {arm: sw_s800_lr4_mx0, train_scale: 800, lr_mult: 4, mixup: 0.0, run: never_ran, note: "box stopped when the vast.ai account ran out of credit"}
+      - {arm: sw_s800_lr4_mx50, train_scale: 800, lr_mult: 4, mixup: 0.5, run: new}
 
 # E3 data scaling: one series per model. `full` is the 100% point (a seed group or a
 # row); the subset rows carry their image fraction and draw in meta.json.
@@ -594,7 +725,12 @@ trt:
     label: "YOLO26m @640 (published engine)"
     published: YOLO26m
     input: "640x640"
-    applies_to: [yolo26m_640_e1, yolo26m_640_default, YOLO26m]
+    applies_to: [yolo26m_640_e1, yolo26m_640_default, YOLO26m, yolo26m_e1b]
+  - key: yolox_640_published
+    label: "YOLOX-M @640 (published engine)"
+    published: YOLOX-M
+    input: "640x640"
+    applies_to: [yolox_640, yolox_e1]
   - key: deimm_640_published
     label: "DEIM-M @640 (published engine)"
     published: DEIM-M
@@ -606,7 +742,15 @@ trt:
     input: "1280x1280"
     gpu_ms: [reported_median_ms]
     gpu_runs: [runs]
-    applies_to: [yolo26m_1280]
+    applies_to: [yolo26m_1280, yolo26m_e1b_1280]
+  - key: yolox_1280
+    label: "YOLOX-M @1280 (yolox_1280_s0)"
+    file: yolox/latency_trt_t4.json
+    input: "1280x1280"
+    gpu_ms: [reported_median_ms]
+    gpu_runs: [runs]
+    note: "pending: the T4 box has not run yet (no T4 offer at launch)"
+    applies_to: [yolox_1280, yolox_e1_1280]
   - key: deimm_640
     label: "DEIM-M @640 (e1_lr2)"
     file: deimm/latency_t4/trt_deimm_e1_lr2_640.json

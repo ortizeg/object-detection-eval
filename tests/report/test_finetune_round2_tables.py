@@ -17,6 +17,8 @@ from object_detection_eval.report.finetune import (
     entry_table,
     fixes_table,
     ladder_table,
+    matched_search_summary,
+    matched_search_table,
     pair_table,
     parity_table,
     render_scaling_png,
@@ -353,3 +355,106 @@ def test_clip_table_escapes_pipes_and_lists_groups() -> None:
     header = table.splitlines()[0]
     assert "game-1 07_41" in header and header.count("|") == 3
     assert "FM light (seed mean) | 0.800" in table
+
+
+def _search(model: str, cells: list[tuple[str, float | None, bool]]) -> dict[str, Any]:
+    configs = []
+    for arm, val, published in cells:
+        metrics = None if val is None else _metrics(val)
+        if metrics is not None:
+            metrics["per_class_ap50"] = {**metrics["per_class_ap50"], "ball": val + 0.2}
+        configs.append(
+            {
+                "arm": arm,
+                "train_scale": 640,
+                "lr_mult": 1,
+                "mixup": 0.5,
+                "run": "never_ran" if val is None else "new",
+                "published": published,
+                "note": "outage" if val is None else None,
+                "valid": metrics,
+                "cost_usd": None if val is None else 0.5,
+            }
+        )
+    return {"model_key": model, "predict_size": 640, "configs": configs}
+
+
+def _with_search() -> FinetuneResults:
+    return _results().model_copy(
+        update={
+            "matched_search": FinetuneResults.model_validate(
+                {
+                    "references": [],
+                    "rows": [],
+                    "models": {},
+                    "costs": [],
+                    "matched_search": [
+                        _search(
+                            "base", [("a", 0.650, True), ("b", 0.670, False), ("c", None, False)]
+                        ),
+                        _search("fm", [("x", 0.690, True), ("y", 0.712, False)]),
+                    ],
+                }
+            ).matched_search
+        }
+    )
+
+
+def test_matched_search_table_marks_best_published_and_never_ran() -> None:
+    table = matched_search_table(_with_search(), "base")
+    lines = table.splitlines()
+    assert len(lines) == 2 + 3
+    assert "`a` (published recipe)" in lines[2]
+    assert "`b` (**best on val**)" in lines[3] and "+2.0" in lines[3]
+    assert "0.870" in lines[3]  # ball AP50
+    assert "never ran: outage" in lines[4]
+    assert matched_search_table(_with_search(), "nope").startswith("_No matched")
+
+
+def test_matched_search_summary_gain_and_gap() -> None:
+    table = matched_search_summary(_with_search())
+    assert "| Base-M | 2 / 3 | 0.650 (0.850) | `b` | 0.670 (0.870) | +2.0 | 0.870 |" in table
+    assert "+2.2" in table  # FM-L gain 0.712 - 0.690
+    assert "FM-L - Base-M: +4.0 pt at each model's published recipe, +4.2 pt" in table
+
+
+def test_pending_groups_are_left_out_and_named() -> None:
+    pending = {"key": "fm_new", "label": "FM new recipe", "input": "800", "members": ["fm/z"]}
+    tables = {
+        "headline": {
+            "entries": ["base_640", "fm_new"],
+            "pairs": [["fm_peft", "base_640"], ["fm_new", "base_640"]],
+        },
+        "only": {"entries": ["fm_new"], "pairs": [["fm_new", "base_640"]]},
+    }
+    results = _results().model_copy(
+        update={
+            "pending_groups": FinetuneResults.model_validate(
+                {"references": [], "rows": [], "models": {}, "costs": [], "groups": [pending]}
+            ).groups,
+            "tables": FinetuneResults.model_validate(
+                {"references": [], "rows": [], "models": {}, "costs": [], "tables": tables}
+            ).tables,
+            "parity": [ParityEntry(label="new", low="base_640", high="fm_new")],
+        }
+    )
+    entries = entry_table(results, _boot(), "headline")
+    assert len(entries.split("\n\n")[0].splitlines()) == 2 + 1
+    assert "Pending, still training" in entries and "FM new recipe" in entries
+    pairs = pair_table(results, _boot(), "headline")
+    assert "+0.067" in pairs and "FM new recipe" in pairs
+    assert entry_table(results, _boot(), "only").startswith("_Pending")
+    assert pair_table(results, _boot(), "only").startswith("_Pending")
+    parity = parity_table(results, _boot())
+    assert parity.split("\n\n")[0].count("\n") == 1  # header + separator, no row
+    assert "FM new recipe" in parity
+
+
+def test_configured_but_untimed_engine_reads_pending() -> None:
+    results = _results()
+    untimed = results.trt_latency[0].model_copy(
+        update={"key": "new", "gpu_ms": None, "applies_to": ["fm/full"]}
+    )
+    results = results.model_copy(update={"trt_latency": [*results.trt_latency, untimed]})
+    table = entry_table(results, _boot(), "headline")
+    assert "| pending |" in table.splitlines()[4]

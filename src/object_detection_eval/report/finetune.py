@@ -198,6 +198,44 @@ class ParityEntry(BaseModel):
     high: str
 
 
+class MatchedConfigEntry(BaseModel):
+    """One cell of the matched recipe-search grid, scored on val (``None``: never ran)."""
+
+    model_config = _LOOSE
+
+    arm: str
+    train_scale: int
+    lr_mult: int
+    mixup: float
+    run: str
+    published: bool = False
+    note: str | None = None
+    valid: SplitMetrics | None = None
+    cost_usd: float | None = None
+    box_hours: float | None = None
+    gpu: str | None = None
+
+
+class MatchedSearchModel(BaseModel):
+    """One model's matched recipe-search grid."""
+
+    model_config = _LOOSE
+
+    model_key: str
+    predict_size: int
+    configs: list[MatchedConfigEntry]
+
+    def ran(self) -> list[MatchedConfigEntry]:
+        return [c for c in self.configs if c.valid is not None]
+
+    def best(self) -> MatchedConfigEntry | None:
+        ran = self.ran()
+        return max(ran, key=lambda c: c.valid.map_50_95) if ran else None  # type: ignore[union-attr]
+
+    def published(self) -> MatchedConfigEntry | None:
+        return next((c for c in self.ran() if c.published), None)
+
+
 class FixEntry(BaseModel):
     """An audit-driven recipe fix: the arm before and the arm after."""
 
@@ -276,9 +314,11 @@ class FinetuneResults(BaseModel):
     published_trt_fp16_ms: dict[str, float] = Field(default_factory=dict)
     sweeps: list[SweepEntry] = Field(default_factory=list)
     groups: list[GroupEntry] = Field(default_factory=list)
+    pending_groups: list[GroupEntry] = Field(default_factory=list)
     tables: dict[str, TableEntry] = Field(default_factory=dict)
     scaling: list[ScalingSeries] = Field(default_factory=list)
     parity: list[ParityEntry] = Field(default_factory=list)
+    matched_search: list[MatchedSearchModel] = Field(default_factory=list)
     fixes: list[FixEntry] = Field(default_factory=list)
     audits: list[AuditEntry] = Field(default_factory=list)
     trt_latency: list[TrtEntry] = Field(default_factory=list)
@@ -832,6 +872,23 @@ def resolve_entry(
     raise KeyError(msg)
 
 
+def _pending_keys(results: FinetuneResults) -> set[str]:
+    return {g.key for g in results.pending_groups}
+
+
+def _pending_note(results: FinetuneResults, keys: Sequence[str]) -> str:
+    """A line naming the pending (still training) groups a table had to leave out."""
+    labels = {g.key: g.label for g in results.pending_groups}
+    names = list(dict.fromkeys(labels[k] for k in keys if k in labels))
+    if not names:
+        return ""
+    return (
+        "\n\n_Pending, still training (not in this table yet): "
+        + "; ".join(names)
+        + ". Re-running `pixi run finetune-report` after they land fills them in._"
+    )
+
+
 def _mean_sd(values: Sequence[float]) -> str:
     if not values:
         return _EM_DASH
@@ -861,6 +918,17 @@ def trt_for(results: FinetuneResults, key: str) -> TrtEntry | None:
     return None
 
 
+def _trt_cell(results: FinetuneResults, key: str) -> str:
+    """TRT GPU time of ``key``; ``pending`` when its engine is configured but not timed."""
+    trt = trt_for(results, key)
+    if trt is None and any(
+        t.status == "current" and key in t.applies_to and t.gpu_ms is None
+        for t in results.trt_latency
+    ):
+        return "pending"
+    return _trt_text(trt)
+
+
 def _trt_text(trt: TrtEntry | None) -> str:
     if trt is None:
         return "not timed"
@@ -886,6 +954,11 @@ def entry_table(
     spec = results.tables.get(table)
     if spec is None or not spec.entries:
         return f"_No entries configured for table `{table}`._"
+    pending = _pending_keys(results)
+    note = _pending_note(results, [k for k in spec.entries if k in pending])
+    entries = [k for k in spec.entries if k not in pending]
+    if not entries:
+        return note.strip()
     header = [
         "Model / configuration",
         "Input",
@@ -897,7 +970,7 @@ def entry_table(
         "T4 TensorRT fp16 GPU (ms)",
     ]
     body = []
-    for key in spec.entries:
+    for key in entries:
         e = resolve_entry(results, key, clustered)
         body.append(
             [
@@ -908,10 +981,10 @@ def entry_table(
                 _mean_sd(e.test_values()),
                 _entry_ci(clustered, key),
                 *(_f3(e.class_ap50(c)) for c in classes),
-                _trt_text(trt_for(results, key)),
+                _trt_cell(results, key),
             ]
         )
-    return _table(header, body)
+    return _table(header, body) + note
 
 
 def pair_table(results: FinetuneResults, clustered: FinetuneBootstrap | None, table: str) -> str:
@@ -921,9 +994,14 @@ def pair_table(results: FinetuneResults, clustered: FinetuneBootstrap | None, ta
         return f"_No pairs configured for table `{table}`._"
     if clustered is None:
         return _BOOTSTRAP_ABSENT
+    pending = _pending_keys(results)
+    note = _pending_note(results, [k for pair in spec.pairs for k in pair if k in pending])
+    pairs = [(a, b) for a, b in spec.pairs if not {a, b} & pending]
+    if not pairs:
+        return note.strip()
     header = ["A", "B", "Test A - B [clustered 95% CI]", "Clips A ahead", "Reading"]
     body = []
-    for a, b in spec.pairs:
+    for a, b in pairs:
         delta = clustered.pairs.get(f"{a} - {b}")
         body.append(
             [
@@ -934,7 +1012,7 @@ def pair_table(results: FinetuneResults, clustered: FinetuneBootstrap | None, ta
                 _EM_DASH if delta is None else _reading(delta),
             ]
         )
-    return _table(header, body)
+    return _table(header, body) + note
 
 
 def parity_table(results: FinetuneResults, clustered: FinetuneBootstrap | None) -> str:
@@ -951,8 +1029,13 @@ def parity_table(results: FinetuneResults, clustered: FinetuneBootstrap | None) 
         "T4 TRT fp16 GPU @640 (ms)",
         "T4 TRT fp16 GPU @higher input (ms)",
     ]
+    pending = _pending_keys(results)
+    lines = [p for p in results.parity if not {p.low, p.high} & pending]
+    note = _pending_note(
+        results, [k for p in results.parity for k in (p.low, p.high) if k in pending]
+    )
     body = []
-    for line in results.parity:
+    for line in lines:
         low = resolve_entry(results, line.low, clustered)
         high = resolve_entry(results, line.high, clustered)
         lows, highs = low.test_values(), high.test_values()
@@ -967,11 +1050,11 @@ def parity_table(results: FinetuneResults, clustered: FinetuneBootstrap | None) 
                 high.input,
                 _mean_sd(highs),
                 delta,
-                _trt_text(trt_for(results, line.low)),
-                _trt_text(trt_for(results, line.high)),
+                _trt_cell(results, line.low),
+                _trt_cell(results, line.high),
             ]
         )
-    return _table(header, body)
+    return _table(header, body) + note
 
 
 def _reading(delta: PairDelta) -> str:
@@ -1068,6 +1151,123 @@ def sweep_table(results: FinetuneResults) -> str:
         for s in results.sweeps
     ]
     return _table(header, body)
+
+
+def _search_for(results: FinetuneResults, model_key: str) -> MatchedSearchModel | None:
+    return next((m for m in results.matched_search if m.model_key == model_key), None)
+
+
+def _pt(value: float) -> str:
+    """A val difference in mAP points (x100), signed."""
+    return f"{100 * value:+.1f}"
+
+
+def matched_search_table(results: FinetuneResults, model_key: str) -> str:
+    """One model's matched recipe-search grid: every cell, val mAP and ball AP50."""
+    search = _search_for(results, model_key)
+    if search is None:
+        return f"_No matched search configured for `{model_key}`._"
+    best, published = search.best(), search.published()
+    header = [
+        "Train scale (predict)",
+        "lr",
+        "mixup",
+        "Configuration",
+        "Val mAP@50:95",
+        "Δ vs published recipe (val pt)",
+        "Val ball AP50",
+        "Run",
+        "Box $",
+    ]
+    body = []
+    for c in search.configs:
+        tags = []
+        if c.published:
+            tags.append("published recipe")
+        if best is not None and c.arm == best.arm:
+            tags.append("**best on val**")
+        name = f"`{c.arm}`" + (f" ({', '.join(tags)})" if tags else "")
+        if c.valid is None:
+            val = delta = ball = _EM_DASH
+            run = "never ran" + (f": {c.note}" if c.note else "")
+        else:
+            val = f"{c.valid.map_50_95:.3f}"
+            delta = (
+                _EM_DASH
+                if published is None or c.published
+                else _pt(c.valid.map_50_95 - published.valid.map_50_95)  # type: ignore[union-attr]
+            )
+            ball = _f3(c.valid.per_class_ap50.get("ball"))
+            run = c.run + (f": {c.note}" if c.note else "")
+        body.append(
+            [
+                f"{c.train_scale} ({search.predict_size})",
+                f"x{c.lr_mult}",
+                f"{c.mixup:g}",
+                name,
+                val,
+                delta,
+                ball,
+                run,
+                _EM_DASH if c.cost_usd is None else f"{c.cost_usd:.2f}",
+            ]
+        )
+    return _table(header, body)
+
+
+def matched_search_summary(results: FinetuneResults) -> str:
+    """Per model: grid coverage, published recipe vs best cell on val, and the val gap."""
+    if not results.matched_search:
+        return "_No matched search configured._"
+    header = [
+        "Model",
+        "Cells run / grid",
+        "Published recipe: val (ball AP50)",
+        "Best cell",
+        "Best: val (ball AP50)",
+        "Gain (val pt)",
+        "Best ball AP50 in grid",
+    ]
+    body = []
+    bests: dict[str, float] = {}
+    pubs: dict[str, float] = {}
+    for search in results.matched_search:
+        display = results.models[search.model_key].display
+        best, published = search.best(), search.published()
+        ran = search.ran()
+        balls = [c.valid.per_class_ap50.get("ball", 0.0) for c in ran if c.valid]
+
+        def _vb(c: MatchedConfigEntry | None) -> str:
+            if c is None or c.valid is None:
+                return _EM_DASH
+            return f"{c.valid.map_50_95:.3f} ({_f3(c.valid.per_class_ap50.get('ball'))})"
+
+        if best is not None and best.valid is not None:
+            bests[display] = best.valid.map_50_95
+        if published is not None and published.valid is not None:
+            pubs[display] = published.valid.map_50_95
+        gain = _EM_DASH
+        if best is not None and published is not None:
+            gain = _pt(best.valid.map_50_95 - published.valid.map_50_95)  # type: ignore[union-attr]
+        body.append(
+            [
+                display,
+                f"{len(ran)} / {len(search.configs)}",
+                _vb(published),
+                _EM_DASH if best is None else f"`{best.arm}`",
+                _vb(best),
+                gain,
+                _f3(max(balls)) if balls else _EM_DASH,
+            ]
+        )
+    table = _table(header, body)
+    if len(bests) == 2 and len(pubs) == 2:
+        (a, b) = sorted(bests, key=lambda k: -bests[k])
+        table += (
+            f"\n\nVal gap {a} - {b}: {_pt(pubs[a] - pubs[b])} pt at each model's published "
+            f"recipe, {_pt(bests[a] - bests[b])} pt between the best cells."
+        )
+    return table
 
 
 def _ladder_levels(results: FinetuneResults, key: str) -> dict[str, list[FinetuneRow]]:

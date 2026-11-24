@@ -151,12 +151,18 @@ class CostSpec(_Frozen):
 
 
 class GroupSpec(_Frozen):
-    """Seeds of one configuration, scored as their per-draw mean by the bootstrap."""
+    """Seeds of one configuration, scored as their per-draw mean by the bootstrap.
+
+    ``pending: true`` marks a group whose runs are still training: it is kept out of
+    the bootstrap and every table (each of which then names it as pending), and the
+    report's Pending section lists it. Delete the flag once its seeds have landed.
+    """
 
     key: str
     label: str
     input: str
     members: list[str]
+    pending: bool = False
 
 
 class TableSpec(_Frozen):
@@ -170,6 +176,30 @@ class ParitySpec(_Frozen):
     label: str
     low: str
     high: str
+
+
+class MatchedConfig(_Frozen):
+    """One cell of a matched recipe-search grid (seed 0, val only).
+
+    ``run``: ``new`` (trained for this search), ``reused`` (an earlier run with the
+    identical recipe) or ``never_ran`` (the box was lost; ``note`` says why).
+    """
+
+    arm: str
+    train_scale: int
+    lr_mult: int
+    mixup: float
+    run: Literal["new", "reused", "never_ran"]
+    published: bool = False
+    note: str | None = None
+
+
+class MatchedSearchSpec(_Frozen):
+    """One model's grid in the matched recipe search (identical grid for every model)."""
+
+    model: str
+    predict_size: int
+    configs: list[MatchedConfig]
 
 
 class ScalingSpec(_Frozen):
@@ -231,6 +261,7 @@ class StudyManifest(_Frozen):
     tables: dict[str, TableSpec] = Field(default_factory=dict)
     scaling: list[ScalingSpec] = Field(default_factory=list)
     parity: list[ParitySpec] = Field(default_factory=list)
+    matched_search: list[MatchedSearchSpec] = Field(default_factory=list)
     fixes: list[FixSpec] = Field(default_factory=list)
     audits: list[AuditSpec] = Field(default_factory=list)
     trt: list[TrtSpec] = Field(default_factory=list)
@@ -614,10 +645,14 @@ def _value(spec: ValuePath | None, base_file: Path | None, results: Path) -> Any
 
 def unresolved_refs(manifest: StudyManifest, row_ids: set[str]) -> list[str]:
     """Every report reference (group member, table entry, pair side, series point,
-    fix, TensorRT target) that names neither a scored row, a group nor a reference."""
+    fix, TensorRT target) that names neither a scored row, a group nor a reference.
+
+    Members of a ``pending`` group are not checked: they are still training, and the
+    group is reported as pending instead.
+    """
     groups = {g.key for g in manifest.groups}
     known = row_ids | groups | set(manifest.references)
-    refs: list[str] = [m for g in manifest.groups for m in g.members]
+    refs: list[str] = [m for g in manifest.groups if not g.pending for m in g.members]
     for table in manifest.tables.values():
         refs += table.entries + [side for pair in table.pairs for side in pair]
     for series in manifest.scaling:
@@ -660,6 +695,68 @@ def trt_records(
         if record["gpu_ms"] is None:
             missing.append(f"trt {spec.key}: GPU-compute median not found in {record['source']}")
         out.append(record)
+    return out
+
+
+def pending_group_notes(manifest: StudyManifest, row_ids: set[str]) -> list[str]:
+    """One Pending line per ``pending`` group (and a reminder once all its seeds landed)."""
+    out = []
+    for group in manifest.groups:
+        if not group.pending:
+            continue
+        absent = [m for m in group.members if m not in row_ids]
+        if absent:
+            out.append(
+                f"group {group.key} ({group.label}): pending, "
+                f"{len(group.members) - len(absent)} of {len(group.members)} seeds scored"
+            )
+        else:
+            out.append(
+                f"group {group.key}: every seed is scored; remove `pending: true` "
+                "from finetune_study.yaml"
+            )
+    return out
+
+
+def matched_records(
+    specs: list[MatchedSearchSpec],
+    manifest: StudyManifest,
+    results: Path,
+    gt_valid: Path,
+    missing: list[str],
+) -> list[dict[str, Any]]:
+    """Score every configuration of the matched recipe search on val.
+
+    Cost and hours come from the arm's ``meta.json``, else its ``box.json`` (the
+    YOLOX sweep boxes wrote only the latter).
+    """
+    slugs = {m.key: m.slug for m in manifest.models}
+    out = []
+    for spec in specs:
+        configs = []
+        for cfg in spec.configs:
+            record: dict[str, Any] = {**cfg.model_dump(), "valid": None}
+            arm_dir = results / slugs[spec.model] / cfg.arm
+            if cfg.run != "never_ran":
+                if not (arm_dir / "valid.json").is_file():
+                    missing.append(f"{spec.model}: matched search {cfg.arm}/valid.json")
+                else:
+                    record["valid"] = score_vlm_metrics(arm_dir / "valid.json", gt_valid)
+                meta: dict[str, Any] = {}
+                for name in ("meta.json", "box.json"):
+                    if (arm_dir / name).is_file():
+                        meta = _read_json(arm_dir / name)
+                        record["cost_source"] = name
+                        break
+                cost, _ = train_cost(meta)
+                record.update(
+                    cost_usd=cost,
+                    box_hours=meta.get("box_hours"),
+                    gpu=meta.get("gpu"),
+                    selected_epoch=meta.get("selected_epoch"),
+                )
+            configs.append(record)
+        out.append({"model_key": spec.model, "predict_size": spec.predict_size, "configs": configs})
     return out
 
 
@@ -926,10 +1023,12 @@ def build_results(
                 "latency_t4": latency,
             }
 
+    scored_ids = {r["row_id"] for r in rows}
     missing.extend(
         f"report reference {ref!r} names no scored row or group"
-        for ref in unresolved_refs(manifest, {r["row_id"] for r in rows})
+        for ref in unresolved_refs(manifest, scored_ids)
     )
+    missing.extend(pending_group_notes(manifest, scored_ids))
     published = _published_trt(published_trt_path)
     anchors = []
     for fname, name in _ANCHORS.items():
@@ -962,10 +1061,14 @@ def build_results(
         "latency_anchor_t4": anchors,
         "published_trt_fp16_ms": published,
         "sweeps": sweeps,
-        "groups": [g.model_dump() for g in manifest.groups],
+        "groups": [g.model_dump() for g in manifest.groups if not g.pending],
+        "pending_groups": [g.model_dump() for g in manifest.groups if g.pending],
         "tables": {k: v.model_dump() for k, v in manifest.tables.items()},
         "scaling": [s.model_dump() for s in manifest.scaling],
         "parity": [p.model_dump() for p in manifest.parity],
+        "matched_search": matched_records(
+            manifest.matched_search, manifest, results, gt["valid"], missing
+        ),
         "fixes": [f.model_dump() for f in manifest.fixes],
         "audits": audit_records(manifest.audits, results, missing),
         "trt_latency": trt_records(manifest.trt, results, published, missing),
