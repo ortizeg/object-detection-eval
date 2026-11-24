@@ -311,14 +311,13 @@ def test_copy_dump_plain_copy_ends_with_newline(tmp_path: Path) -> None:
 
 
 def test_pending_groups_skip_member_checks_and_are_listed() -> None:
-    manifest = wfr.load_manifest(_MANIFEST)
-    pending = [g for g in manifest.groups if g.pending]
-    assert pending, "stage-B groups are expected to be pending in the manifest"
-    group = pending[0]
+    base = wfr.load_manifest(_MANIFEST)
+    group = base.groups[0].model_copy(update={"pending": True})
+    manifest = base.model_copy(update={"groups": [group, *base.groups[1:]]})
     refs = wfr.unresolved_refs(manifest, set())
     assert not set(group.members) & set(refs)
     notes = wfr.pending_group_notes(manifest, set())
-    assert any(group.key in n and "0 of 3" in n for n in notes)
+    assert any(group.key in n and f"0 of {len(group.members)}" in n for n in notes)
     done = wfr.pending_group_notes(manifest, set(group.members))
     assert any(group.key in n and "remove `pending: true`" in n for n in done)
 

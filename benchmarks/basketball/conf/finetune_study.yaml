@@ -297,8 +297,7 @@ models:
       - {arm: yolo26m_frac50_d0, experiment: E3, label: "E1 recipe on frac50, draw 0"}
       - {arm: yolo26m_frac50_d1, experiment: E3, label: "E1 recipe on frac50, draw 1"}
       # Matched recipe search, stage B (val winner sw_s800_lr1_mx50: train 800, predict
-      # 640, lr0 x1, mixup 0.5; 3 seeds, test once). Listed now so the report's Pending
-      # section tracks them; rows appear as soon as their test.json + meta.json land.
+      # 640, lr0 x1, mixup 0.5; 3 seeds, test once; A100, unlike the 4090 E1/E2 arms).
       - {arm: yolo26m_e1b_s0, experiment: E1, label: "tuned recipe (train 800, mixup 0.5), seed 0", input: "640 (train 800)"}
       - {arm: yolo26m_e1b_s1, experiment: E1, label: "tuned recipe (train 800, mixup 0.5), seed 1", input: "640 (train 800)"}
       - {arm: yolo26m_e1b_s2, experiment: E1, label: "tuned recipe (train 800, mixup 0.5), seed 2", input: "640 (train 800)"}
@@ -357,7 +356,7 @@ models:
       - {arm: yolox_1280_s1, experiment: E2, label: "published recipe x2 @1280, seed 1", input: "1280 (train 1600, multi-scale 1280-1920)"}
       - {arm: yolox_1280_s2, experiment: E2, label: "published recipe x2 @1280, seed 2", input: "1280 (train 1600, multi-scale 1280-1920)"}
       # Matched recipe search, stage B (val winner sw_s800_lr4_mx50: train 800, predict
-      # 640, lr x4, mixup 0.5; 3 seeds, test once). Pending until test.json + meta.json land.
+      # 640, lr x4, mixup 0.5; 3 seeds, test once).
       - {arm: yolox_e1_s0, experiment: E1, label: "tuned recipe (lr x4), seed 0", input: "640 (train 800, multi-scale 640-960)"}
       - {arm: yolox_e1_s1, experiment: E1, label: "tuned recipe (lr x4), seed 1", input: "640 (train 800, multi-scale 640-960)"}
       - {arm: yolox_e1_s2, experiment: E1, label: "tuned recipe (lr x4), seed 2", input: "640 (train 800, multi-scale 640-960)"}
@@ -467,20 +466,17 @@ costs:
     usd: 1.23
     complete: true
     source: "E6 (640 + matched jitter): peft_640aug_s0-s2 meta.json cost_usd 0.39 + 0.39 + 0.45 (three A6000 boxes); docs/plans/mmgdino.md about $1.23"
-  # Matched recipe search (YOLOX-M vs YOLO26m) and the YOLOX-M baseline. Six grid boxes
-  # (3 per model) never ran; none left a meta.json or box.json, so any charge for them
-  # is not in these totals. The YOLOX-M @640 seeds are imported taxonomy-ablation runs
-  # (meta.json train share 0.258 + 0.245 + 0.265, paid outside this study): not counted.
+  # Matched recipe search (YOLOX-M vs YOLO26m) and the YOLOX-M baseline.
   - slug: yolox
     stage: round2
-    usd: 11.68
-    complete: false
-    source: "YOLOX-M: yolox_1280_s0-s2 meta.json cost_usd 2.12 + 2.20 + 1.36 = 5.68; nine sweep boxes sw_*/box.json cost_usd sum 6.00; no T4 box yet (no T4 offer at launch); the three boxes lost in the outage recorded no cost"
+    usd: 58.22
+    complete: true
+    source: "docs/plans/yolox.md, vast invoices for all 27 instances: published x2 @1280 ~$5.9, stage-A sweep ~$19.7 (of which $10.7 = 3 boxes that never trained), stage B $33.8 (~$26 of it finished boxes left idling), T4 $1.45. The imported @640 seeds are not included"
   - slug: yolo26m
     stage: round2
-    usd: 3.34
+    usd: 13.5
     complete: false
-    source: "YOLO26m matched search: seven new sw_*/meta.json cost_usd sum 3.34 (the two reused E1 sweep arms are in the $11 above); the three boxes stopped by the credit outage recorded no cost"
+    source: "docs/plans/yolo26m.md, matched search: sweep ~$6 (7 logged sw_* arms $3.34 + 3 skipped arms and failed boots) + stage B ~$7.5 (e1b meta.json $7.11 + one replaced box), about $13-14"
   # ---- follow-ups: TensorRT boxes and the user-approved audit fixes
   - slug: llmdet
     stage: followup
@@ -546,18 +542,30 @@ groups:
   - {key: owlv2_peft, label: "OWLv2-L/14, light (peft)", input: "1008x1008", members: [owlv2/peft, owlv2/peft_seed1, owlv2/peft_seed2]}
   - {key: yolox_640, label: "YOLOX-M @640, published recipe", input: "640", members: [yolox/yolox_640_s0, yolox/yolox_640_s1, yolox/yolox_640_s2]}
   - {key: yolox_1280, label: "YOLOX-M @1280, published recipe x2", input: "1280", members: [yolox/yolox_1280_s0, yolox/yolox_1280_s1, yolox/yolox_1280_s2]}
-  # Matched recipe search, stage B: still training. When all three seeds of a group have
-  # landed, delete its `pending: true` and re-run `pixi run finetune-report`.
-  - {key: yolox_e1, label: "YOLOX-M @640, tuned recipe (sw_s800_lr4_mx50)", input: "640", members: [yolox/yolox_e1_s0, yolox/yolox_e1_s1, yolox/yolox_e1_s2], pending: true}
-  - {key: yolox_e1_1280, label: "YOLOX-M @1280, tuned recipe x2", input: "1280", members: [yolox/yolox_e1_1280_s0, yolox/yolox_e1_1280_s1, yolox/yolox_e1_1280_s2], pending: true}
-  - {key: yolo26m_e1b, label: "YOLO26m @640, tuned recipe (sw_s800_lr1_mx50)", input: "640", members: [yolo26m/yolo26m_e1b_s0, yolo26m/yolo26m_e1b_s1, yolo26m/yolo26m_e1b_s2], pending: true}
-  - {key: yolo26m_e1b_1280, label: "YOLO26m @1280, tuned recipe x2", input: "1280", members: [yolo26m/yolo26m_e1b_1280_s0, yolo26m/yolo26m_e1b_1280_s1, yolo26m/yolo26m_e1b_1280_s2], pending: true}
+  # Matched recipe search, stage B: each model's val winner, 3 seeds, test once. (A group
+  # can carry `pending: true` while its seeds are still training.)
+  - {key: yolox_e1, label: "YOLOX-M @640, tuned recipe (sw_s800_lr4_mx50)", input: "640", members: [yolox/yolox_e1_s0, yolox/yolox_e1_s1, yolox/yolox_e1_s2]}
+  - {key: yolox_e1_1280, label: "YOLOX-M @1280, tuned recipe x2", input: "1280", members: [yolox/yolox_e1_1280_s0, yolox/yolox_e1_1280_s1, yolox/yolox_e1_1280_s2]}
+  - {key: yolo26m_e1b, label: "YOLO26m @640, tuned recipe (sw_s800_lr1_mx50)", input: "640", members: [yolo26m/yolo26m_e1b_s0, yolo26m/yolo26m_e1b_s1, yolo26m/yolo26m_e1b_s2]}
+  - {key: yolo26m_e1b_1280, label: "YOLO26m @1280, tuned recipe x2", input: "1280", members: [yolo26m/yolo26m_e1b_1280_s0, yolo26m/yolo26m_e1b_1280_s1, yolo26m/yolo26m_e1b_1280_s2]}
 
 # Which entries each report table shows, and which paired clustered deltas it quotes.
 tables:
   headline:
-    entries: [deimm_1280, yolo26m_1280, yolox_1280, llmdet_peft, llmdet/full, yoloe_1280/yoloe_full, yoloworld/yoloworld_full, mmgdino_peft, sam3/full, deimm_640_e1, yolo26m_640_e1, yolox_640, yoloe_640/yoloe_full_640, llmdet_peft_640, llmdet/full_640_s0, mmgdino_peft_640]
+    entries: [yolo26m_e1b_1280, deimm_1280, yolo26m_1280, yolox_1280, yolox_e1_1280, llmdet_peft, llmdet/full, yoloe_1280/yoloe_full, yoloworld/yoloworld_full, mmgdino_peft, sam3/full, yolo26m_e1b, deimm_640_e1, yolo26m_640_e1, yolox_e1, yolox_640, yoloe_640/yoloe_full_640, llmdet_peft_640, llmdet/full_640_s0, mmgdino_peft_640]
     pairs:
+      # Matched recipe search, stage B: the tuned YOLO26m @1280 against the best
+      # foundation models at their native inputs, and the tuned baselines head to head.
+      - [yolo26m_e1b_1280, llmdet_peft]
+      - [yolo26m_e1b_1280, llmdet/full]
+      - [yolo26m_e1b_1280, yoloe_1280/yoloe_full]
+      - [yolo26m_e1b_1280, yoloworld/yoloworld_full]
+      - [yolo26m_e1b_1280, mmgdino_peft]
+      - [yolo26m_e1b_1280, deimm_1280]
+      - [yolo26m_e1b_1280, yolox_e1_1280]
+      - [deimm_1280, yolox_e1_1280]
+      - [yolo26m_e1b, yolox_e1]
+      - [deimm_640_e1, yolox_e1]
       - [yolo26m_1280, yolox_1280]
       - [yolo26m_640_e1, yolox_640]
       - [deimm_1280, llmdet_peft]
@@ -582,7 +590,7 @@ tables:
       - [llmdet_peft, yolo26m_640_e1]
       - [llmdet_peft, deimm_640_e1]
   e2:
-    entries: [yolo26m_640_e1, yolo26m_1280, deimm_640_e1, deimm_1280, yolox_640, yolox_1280, llmdet_peft_640, llmdet_peft_640aug, llmdet_peft, llmdet/full_640_s0, llmdet/full, mmgdino_peft_640, mmgdino_peft_640aug, mmgdino_peft, yoloe_640/yoloe_full_640, yoloe_1280/yoloe_full, yoloe_640/yoloe_peft_640, yoloe_1280/yoloe_peft]
+    entries: [yolo26m_640_e1, yolo26m_1280, yolo26m_e1b, yolo26m_e1b_1280, deimm_640_e1, deimm_1280, yolox_640, yolox_1280, yolox_e1, yolox_e1_1280, llmdet_peft_640, llmdet_peft_640aug, llmdet_peft, llmdet/full_640_s0, llmdet/full, mmgdino_peft_640, mmgdino_peft_640aug, mmgdino_peft, yoloe_640/yoloe_full_640, yoloe_1280/yoloe_full, yoloe_640/yoloe_peft_640, yoloe_1280/yoloe_peft]
     pairs:
       - [yolo26m_1280, yolo26m_640_e1]
       - [deimm_1280, deimm_640_e1]
@@ -632,6 +640,10 @@ tables:
       - [yolo26m_e1b, yolo26m_640_e1]
       - [yolox_e1_1280, yolox_1280]
       - [yolo26m_e1b_1280, yolo26m_1280]
+      - [yolo26m_e1b_1280, yolo26m_e1b]
+      - [yolox_e1_1280, yolox_e1]
+      - [deimm_640_e1, yolox_e1]
+      - [deimm_1280, yolox_e1_1280]
   e3:
     entries: []
     pairs:
@@ -664,12 +676,12 @@ matched_search:
   - model: yolox
     predict_size: 640
     configs:
-      - {arm: sw_s640_lr1_mx0, train_scale: 640, lr_mult: 1, mixup: 0.0, run: never_ran, note: "box lost to a network outage during setup"}
+      - {arm: sw_s640_lr1_mx0, train_scale: 640, lr_mult: 1, mixup: 0.0, run: never_ran, note: "box never started training (setup lost its connection) and idled until the overnight credit stop"}
       - {arm: sw_s640_lr1_mx50, train_scale: 640, lr_mult: 1, mixup: 0.5, run: new}
       - {arm: sw_s640_lr2_mx0, train_scale: 640, lr_mult: 2, mixup: 0.0, run: new}
-      - {arm: sw_s640_lr2_mx50, train_scale: 640, lr_mult: 2, mixup: 0.5, run: never_ran, note: "box lost to a network outage during setup"}
+      - {arm: sw_s640_lr2_mx50, train_scale: 640, lr_mult: 2, mixup: 0.5, run: never_ran, note: "box never started training (setup lost its connection) and idled until the overnight credit stop"}
       - {arm: sw_s640_lr4_mx0, train_scale: 640, lr_mult: 4, mixup: 0.0, run: new}
-      - {arm: sw_s640_lr4_mx50, train_scale: 640, lr_mult: 4, mixup: 0.5, run: never_ran, note: "box lost to a network outage during setup"}
+      - {arm: sw_s640_lr4_mx50, train_scale: 640, lr_mult: 4, mixup: 0.5, run: never_ran, note: "box never started training (setup lost its connection) and idled until the overnight credit stop"}
       - {arm: sw_s800_lr1_mx0, train_scale: 800, lr_mult: 1, mixup: 0.0, run: new}
       - {arm: sw_s800_lr1_mx50, train_scale: 800, lr_mult: 1, mixup: 0.5, run: new, published: true}
       - {arm: sw_s800_lr2_mx0, train_scale: 800, lr_mult: 2, mixup: 0.0, run: new}
@@ -726,10 +738,13 @@ trt:
     published: YOLO26m
     input: "640x640"
     applies_to: [yolo26m_640_e1, yolo26m_640_default, YOLO26m, yolo26m_e1b]
-  - key: yolox_640_published
-    label: "YOLOX-M @640 (published engine)"
-    published: YOLOX-M
+  - key: yolox_640
+    label: "YOLOX-M @640 (published ONNX), scaled to the reference T4"
+    file: yolox/latency_trt_t4.json
     input: "640x640"
+    gpu_ms: [scaled_to_reference_box_ms, "640"]
+    gpu_runs: ["640", runs]
+    note: "measured 5.20 ms on a T4 about 11% faster than the anchor box; x 5.84/5.20 = the anchor re-time (published GCP T4: 5.68)"
     applies_to: [yolox_640, yolox_e1]
   - key: deimm_640_published
     label: "DEIM-M @640 (published engine)"
@@ -744,12 +759,12 @@ trt:
     gpu_runs: [runs]
     applies_to: [yolo26m_1280, yolo26m_e1b_1280]
   - key: yolox_1280
-    label: "YOLOX-M @1280 (yolox_1280_s0)"
+    label: "YOLOX-M @1280 (yolox_e1_1280_s0), scaled to the reference T4"
     file: yolox/latency_trt_t4.json
     input: "1280x1280"
-    gpu_ms: [reported_median_ms]
-    gpu_runs: [runs]
-    note: "pending: the T4 box has not run yet (no T4 offer at launch)"
+    gpu_ms: [scaled_to_reference_box_ms, "1280"]
+    gpu_runs: ["1280", runs]
+    note: "measured 16.83 ms on the same faster T4, scaled by 5.84/5.20; one graph for every 1280 arm"
     applies_to: [yolox_1280, yolox_e1_1280]
   - key: deimm_640
     label: "DEIM-M @640 (e1_lr2)"

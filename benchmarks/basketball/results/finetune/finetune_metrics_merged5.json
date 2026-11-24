@@ -5418,6 +5418,402 @@
       "sibling_test_map_50_95": 0.6841561198234558
     },
     {
+      "row_id": "yolo26m/yolo26m_e1b_s0",
+      "model_key": "yolo26m",
+      "model": "YOLO26m",
+      "family": "conventional detector",
+      "slug": "yolo26m",
+      "experiment": "E1",
+      "input": "640 (train 800)",
+      "arm": "yolo26m_e1b_s0",
+      "role": "extra",
+      "base_arm": "yolo26m_e1b_s0",
+      "label": "tuned recipe (train 800, mixup 0.5), seed 0",
+      "seed": 0,
+      "image_size": null,
+      "model_id": "yolo26m.pt (COCO-pretrained, Ultralytics release v8.4.0)",
+      "selected_epoch": 241,
+      "epochs_run": 300,
+      "optimizer_steps": 2175,
+      "gpu": "A100 PCIE",
+      "meta_note": null,
+      "trainable_params": 21780598,
+      "total_params": 21780598,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 0.902,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.658,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_e1b_s0_valid.json.gz",
+          "sha256_json": "9ee1f831a016aba40c4cf53bb47b337a1615b38dc7881faee8e5437eea5fd23a"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_e1b_s0_test.json.gz",
+          "sha256_json": "abb87125b3c0222079aced127b00188d373150ba49660781686c618682bfb469"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7178992033004761,
+        "mAP_50": 0.9640287756919861,
+        "mAP_75": 0.8252300024032593,
+        "per_class_ap50": {
+          "player": 0.9862096309661865,
+          "ball": 0.8662346005439758,
+          "referee": 1.0,
+          "rim": 1.0,
+          "number": 0.9676997661590576
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7277094125747681,
+        "mAP_50": 0.9533488750457764,
+        "mAP_75": 0.8421291708946228,
+        "per_class_ap50": {
+          "player": 0.9862347841262817,
+          "ball": 0.8319696187973022,
+          "referee": 0.9957163333892822,
+          "rim": 1.0,
+          "number": 0.9528235197067261
+        }
+      },
+      "sibling_test_map_50_95": 0.7277094125747681
+    },
+    {
+      "row_id": "yolo26m/yolo26m_e1b_s1",
+      "model_key": "yolo26m",
+      "model": "YOLO26m",
+      "family": "conventional detector",
+      "slug": "yolo26m",
+      "experiment": "E1",
+      "input": "640 (train 800)",
+      "arm": "yolo26m_e1b_s1",
+      "role": "extra",
+      "base_arm": "yolo26m_e1b_s1",
+      "label": "tuned recipe (train 800, mixup 0.5), seed 1",
+      "seed": 1,
+      "image_size": null,
+      "model_id": "yolo26m.pt (COCO-pretrained, Ultralytics release v8.4.0)",
+      "selected_epoch": 288,
+      "epochs_run": 300,
+      "optimizer_steps": 2175,
+      "gpu": "A100 PCIE",
+      "meta_note": null,
+      "trainable_params": 21780598,
+      "total_params": 21780598,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 0.794,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.619,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_e1b_s1_valid.json.gz",
+          "sha256_json": "68ddb07cad136e06e2e47e675e6ce010fe9bf3776bba81b023c8b9b36816d71e"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_e1b_s1_test.json.gz",
+          "sha256_json": "6e1b40cc7424f491bda83b026ad67c3f28cb143fa1f3f9f1b1f8244a56dc755b"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7021909356117249,
+        "mAP_50": 0.9552736282348633,
+        "mAP_75": 0.8054010272026062,
+        "per_class_ap50": {
+          "player": 0.9852140545845032,
+          "ball": 0.8411603569984436,
+          "referee": 0.9926537871360779,
+          "rim": 1.0,
+          "number": 0.9573400020599365
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7286661267280579,
+        "mAP_50": 0.956989049911499,
+        "mAP_75": 0.8533616065979004,
+        "per_class_ap50": {
+          "player": 0.9859613180160522,
+          "ball": 0.8560332655906677,
+          "referee": 0.9947586059570312,
+          "rim": 0.9996840357780457,
+          "number": 0.948508083820343
+        }
+      },
+      "sibling_test_map_50_95": 0.7286661267280579
+    },
+    {
+      "row_id": "yolo26m/yolo26m_e1b_s2",
+      "model_key": "yolo26m",
+      "model": "YOLO26m",
+      "family": "conventional detector",
+      "slug": "yolo26m",
+      "experiment": "E1",
+      "input": "640 (train 800)",
+      "arm": "yolo26m_e1b_s2",
+      "role": "extra",
+      "base_arm": "yolo26m_e1b_s2",
+      "label": "tuned recipe (train 800, mixup 0.5), seed 2",
+      "seed": 2,
+      "image_size": null,
+      "model_id": "yolo26m.pt (COCO-pretrained, Ultralytics release v8.4.0)",
+      "selected_epoch": 273,
+      "epochs_run": 300,
+      "optimizer_steps": 2175,
+      "gpu": "A100 PCIE",
+      "meta_note": null,
+      "trainable_params": 21780598,
+      "total_params": 21780598,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 0.894,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.66,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_e1b_s2_valid.json.gz",
+          "sha256_json": "775ae0c7da2df1f206f63270d80ff7bc3494bc97d3283c63aae45067b89f9eb7"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_e1b_s2_test.json.gz",
+          "sha256_json": "59a03e0fbc4d3125f44b561a650736039171d4dac41183f80153e3cf9f55e152"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.710132360458374,
+        "mAP_50": 0.9582288861274719,
+        "mAP_75": 0.8161816000938416,
+        "per_class_ap50": {
+          "player": 0.9826635122299194,
+          "ball": 0.8447188138961792,
+          "referee": 0.9964705109596252,
+          "rim": 0.9997958540916443,
+          "number": 0.967495858669281
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7307135462760925,
+        "mAP_50": 0.961969792842865,
+        "mAP_75": 0.8705132603645325,
+        "per_class_ap50": {
+          "player": 0.9879701733589172,
+          "ball": 0.8798539638519287,
+          "referee": 0.995719850063324,
+          "rim": 0.9993702173233032,
+          "number": 0.9469349384307861
+        }
+      },
+      "sibling_test_map_50_95": 0.7307135462760925
+    },
+    {
+      "row_id": "yolo26m/yolo26m_e1b_1280_s0",
+      "model_key": "yolo26m",
+      "model": "YOLO26m",
+      "family": "conventional detector",
+      "slug": "yolo26m",
+      "experiment": "E2",
+      "input": "1280 (train 1600)",
+      "arm": "yolo26m_e1b_1280_s0",
+      "role": "extra",
+      "base_arm": "yolo26m_e1b_1280_s0",
+      "label": "tuned recipe x2 @1280, seed 0",
+      "seed": 0,
+      "image_size": null,
+      "model_id": "yolo26m.pt (COCO-pretrained, Ultralytics release v8.4.0)",
+      "selected_epoch": 249,
+      "epochs_run": 300,
+      "optimizer_steps": 2175,
+      "gpu": "A100 SXM4",
+      "meta_note": null,
+      "trainable_params": 21780598,
+      "total_params": 21780598,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 2.321,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 2.145,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_e1b_1280_s0_valid.json.gz",
+          "sha256_json": "cecbb07da7b2cf9b5d6186fe5b6306cf4ce42c31b44cee009f7b6c17678aa06d"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_e1b_1280_s0_test.json.gz",
+          "sha256_json": "5aefd28dc5c20cbbca7052c66a9fd69d75cd5c1b69025c43bb57fbb126392a5b"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7644920945167542,
+        "mAP_50": 0.9814718961715698,
+        "mAP_75": 0.8749029636383057,
+        "per_class_ap50": {
+          "player": 0.9845916628837585,
+          "ball": 0.9715213775634766,
+          "referee": 0.9952643513679504,
+          "rim": 1.0,
+          "number": 0.955981969833374
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7764086723327637,
+        "mAP_50": 0.9693775773048401,
+        "mAP_75": 0.905002236366272,
+        "per_class_ap50": {
+          "player": 0.9886407256126404,
+          "ball": 0.934066116809845,
+          "referee": 0.9887476563453674,
+          "rim": 0.999057412147522,
+          "number": 0.9363758563995361
+        }
+      },
+      "sibling_test_map_50_95": 0.7764086723327637
+    },
+    {
+      "row_id": "yolo26m/yolo26m_e1b_1280_s1",
+      "model_key": "yolo26m",
+      "model": "YOLO26m",
+      "family": "conventional detector",
+      "slug": "yolo26m",
+      "experiment": "E2",
+      "input": "1280 (train 1600)",
+      "arm": "yolo26m_e1b_1280_s1",
+      "role": "extra",
+      "base_arm": "yolo26m_e1b_1280_s1",
+      "label": "tuned recipe x2 @1280, seed 1",
+      "seed": 1,
+      "image_size": null,
+      "model_id": "yolo26m.pt (COCO-pretrained, Ultralytics release v8.4.0)",
+      "selected_epoch": 204,
+      "epochs_run": 300,
+      "optimizer_steps": 2175,
+      "gpu": "A100 SXM4",
+      "meta_note": null,
+      "trainable_params": 21780598,
+      "total_params": 21780598,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 2.154,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 1.332,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_e1b_1280_s1_valid.json.gz",
+          "sha256_json": "c755cc785609194bf2c7f7e790bd41b4788d36f5b974e457e0a3c2100d182655"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_e1b_1280_s1_test.json.gz",
+          "sha256_json": "b9981377678a459bd19790f8f1aaf31a5b6ef85f982ed5b53be922c2ea759d60"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7611058950424194,
+        "mAP_50": 0.9805139899253845,
+        "mAP_75": 0.8699713349342346,
+        "per_class_ap50": {
+          "player": 0.9876481890678406,
+          "ball": 0.9527312517166138,
+          "referee": 0.998823881149292,
+          "rim": 1.0,
+          "number": 0.963366687297821
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7858094573020935,
+        "mAP_50": 0.9775002002716064,
+        "mAP_75": 0.9237099289894104,
+        "per_class_ap50": {
+          "player": 0.989153265953064,
+          "ball": 0.9344033002853394,
+          "referee": 0.9955235123634338,
+          "rim": 0.9994766712188721,
+          "number": 0.9689444303512573
+        }
+      },
+      "sibling_test_map_50_95": 0.7858094573020935
+    },
+    {
+      "row_id": "yolo26m/yolo26m_e1b_1280_s2",
+      "model_key": "yolo26m",
+      "model": "YOLO26m",
+      "family": "conventional detector",
+      "slug": "yolo26m",
+      "experiment": "E2",
+      "input": "1280 (train 1600)",
+      "arm": "yolo26m_e1b_1280_s2",
+      "role": "extra",
+      "base_arm": "yolo26m_e1b_1280_s2",
+      "label": "tuned recipe x2 @1280, seed 2",
+      "seed": 2,
+      "image_size": null,
+      "model_id": "yolo26m.pt (COCO-pretrained, Ultralytics release v8.4.0)",
+      "selected_epoch": 230,
+      "epochs_run": 300,
+      "optimizer_steps": 2175,
+      "gpu": "A100 SXM4",
+      "meta_note": null,
+      "trainable_params": 21780598,
+      "total_params": 21780598,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 2.357,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 1.699,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_e1b_1280_s2_valid.json.gz",
+          "sha256_json": "1f589d29bd7e504c4d04d8ed6566a73f27bd737745ec9998fe503ee67438bc24"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolo26m_yolo26m_e1b_1280_s2_test.json.gz",
+          "sha256_json": "54feec6e374c0322817a91ab34d430e435efbcd22df9e61726f959802d94530d"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7682138085365295,
+        "mAP_50": 0.9818019866943359,
+        "mAP_75": 0.8744310736656189,
+        "per_class_ap50": {
+          "player": 0.9876191020011902,
+          "ball": 0.9610573649406433,
+          "referee": 0.9886941909790039,
+          "rim": 1.0,
+          "number": 0.9716391563415527
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7895281910896301,
+        "mAP_50": 0.9721980690956116,
+        "mAP_75": 0.9065808057785034,
+        "per_class_ap50": {
+          "player": 0.9877507090568542,
+          "ball": 0.933806300163269,
+          "referee": 0.9866635203361511,
+          "rim": 1.0,
+          "number": 0.9527696967124939
+        }
+      },
+      "sibling_test_map_50_95": 0.7895281910896301
+    },
+    {
       "row_id": "deimm/e1_s0",
       "model_key": "deimm",
       "model": "DEIM-M",
@@ -6208,6 +6604,402 @@
         }
       },
       "sibling_test_map_50_95": 0.7556227445602417
+    },
+    {
+      "row_id": "yolox/yolox_e1_s0",
+      "model_key": "yolox",
+      "model": "YOLOX-M",
+      "family": "conventional detector",
+      "slug": "yolox",
+      "experiment": "E1",
+      "input": "640 (train 800, multi-scale 640-960)",
+      "arm": "yolox_e1_s0",
+      "role": "extra",
+      "base_arm": "yolox_e1_s0",
+      "label": "tuned recipe (lr x4), seed 0",
+      "seed": 0,
+      "image_size": null,
+      "model_id": "yolox_m.pth (official COCO, release 0.1.1rc0, sha256 60076992...)",
+      "selected_epoch": 175,
+      "epochs_run": 200,
+      "optimizer_steps": 5800,
+      "gpu": "A100 SXM4 40GB",
+      "meta_note": null,
+      "trainable_params": 25282000,
+      "total_params": 25282000,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 0.837,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 5.783,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolox_yolox_e1_s0_valid.json.gz",
+          "sha256_json": "a6bb349195a32becc7644512b8e00b5af4eae1edffeac551b810776781fb012b"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolox_yolox_e1_s0_test.json.gz",
+          "sha256_json": "7cafa6a9d1a5b6948403302b0cf58bb8dead2a6bbf2f46f8ae7832ada2adb02b"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.6644226908683777,
+        "mAP_50": 0.9494531154632568,
+        "mAP_75": 0.764538586139679,
+        "per_class_ap50": {
+          "player": 0.9401916861534119,
+          "ball": 0.8704968094825745,
+          "referee": 0.9899615049362183,
+          "rim": 1.0,
+          "number": 0.9466156959533691
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.6851421594619751,
+        "mAP_50": 0.9432287216186523,
+        "mAP_75": 0.8038106560707092,
+        "per_class_ap50": {
+          "player": 0.9502937197685242,
+          "ball": 0.8457805514335632,
+          "referee": 0.9884011745452881,
+          "rim": 1.0,
+          "number": 0.9316681623458862
+        }
+      },
+      "sibling_test_map_50_95": 0.6851421594619751
+    },
+    {
+      "row_id": "yolox/yolox_e1_s1",
+      "model_key": "yolox",
+      "model": "YOLOX-M",
+      "family": "conventional detector",
+      "slug": "yolox",
+      "experiment": "E1",
+      "input": "640 (train 800, multi-scale 640-960)",
+      "arm": "yolox_e1_s1",
+      "role": "extra",
+      "base_arm": "yolox_e1_s1",
+      "label": "tuned recipe (lr x4), seed 1",
+      "seed": 1,
+      "image_size": null,
+      "model_id": "yolox_m.pth (official COCO, release 0.1.1rc0, sha256 60076992...)",
+      "selected_epoch": 177,
+      "epochs_run": 200,
+      "optimizer_steps": 5800,
+      "gpu": "A100 PCIE 40GB",
+      "meta_note": null,
+      "trainable_params": 25282000,
+      "total_params": 25282000,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 0.497,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.471,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolox_yolox_e1_s1_valid.json.gz",
+          "sha256_json": "313f27da4de76321cc729fd4d055894f69696ef1f614ed1d738f06e83189d2cc"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolox_yolox_e1_s1_test.json.gz",
+          "sha256_json": "40cf72ba913a8a6f5b92495fc603b267197a6e3493f92618eb2dade051e97ce3"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.6729920506477356,
+        "mAP_50": 0.9533196091651917,
+        "mAP_75": 0.7620428204536438,
+        "per_class_ap50": {
+          "player": 0.9398900270462036,
+          "ball": 0.89568692445755,
+          "referee": 0.9794249534606934,
+          "rim": 1.0,
+          "number": 0.9515963196754456
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.6999331116676331,
+        "mAP_50": 0.9443833827972412,
+        "mAP_75": 0.8192567229270935,
+        "per_class_ap50": {
+          "player": 0.9498223066329956,
+          "ball": 0.8507753014564514,
+          "referee": 0.9894716143608093,
+          "rim": 1.0,
+          "number": 0.9318477511405945
+        }
+      },
+      "sibling_test_map_50_95": 0.6999331116676331
+    },
+    {
+      "row_id": "yolox/yolox_e1_s2",
+      "model_key": "yolox",
+      "model": "YOLOX-M",
+      "family": "conventional detector",
+      "slug": "yolox",
+      "experiment": "E1",
+      "input": "640 (train 800, multi-scale 640-960)",
+      "arm": "yolox_e1_s2",
+      "role": "extra",
+      "base_arm": "yolox_e1_s2",
+      "label": "tuned recipe (lr x4), seed 2",
+      "seed": 2,
+      "image_size": null,
+      "model_id": "yolox_m.pth (official COCO, release 0.1.1rc0, sha256 60076992...)",
+      "selected_epoch": 178,
+      "epochs_run": 200,
+      "optimizer_steps": 5800,
+      "gpu": "A100 PCIE 40GB",
+      "meta_note": null,
+      "trainable_params": 25282000,
+      "total_params": 25282000,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 0.694,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 0.502,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolox_yolox_e1_s2_valid.json.gz",
+          "sha256_json": "c0045f6e96278c6abcd43d9db65b6e70eeaef927e5fde8358b5a6477c793b096"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolox_yolox_e1_s2_test.json.gz",
+          "sha256_json": "afcbc5c735c5b568acdf78615cb6d4f92850876152471cb0c4d253d60dc5182e"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.6614382266998291,
+        "mAP_50": 0.9491351842880249,
+        "mAP_75": 0.7421323657035828,
+        "per_class_ap50": {
+          "player": 0.948364794254303,
+          "ball": 0.8789585828781128,
+          "referee": 0.9693071842193604,
+          "rim": 1.0,
+          "number": 0.9490454196929932
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.6909621953964233,
+        "mAP_50": 0.9429664015769958,
+        "mAP_75": 0.7930759191513062,
+        "per_class_ap50": {
+          "player": 0.9499309659004211,
+          "ball": 0.8538359999656677,
+          "referee": 0.9898875951766968,
+          "rim": 1.0,
+          "number": 0.921177327632904
+        }
+      },
+      "sibling_test_map_50_95": 0.6909621953964233
+    },
+    {
+      "row_id": "yolox/yolox_e1_1280_s0",
+      "model_key": "yolox",
+      "model": "YOLOX-M",
+      "family": "conventional detector",
+      "slug": "yolox",
+      "experiment": "E2",
+      "input": "1280 (train 1600, multi-scale 1280-1920)",
+      "arm": "yolox_e1_1280_s0",
+      "role": "extra",
+      "base_arm": "yolox_e1_1280_s0",
+      "label": "tuned recipe x2 @1280, seed 0",
+      "seed": 0,
+      "image_size": null,
+      "model_id": "yolox_m.pth (official COCO, release 0.1.1rc0, sha256 60076992...)",
+      "selected_epoch": 174,
+      "epochs_run": 200,
+      "optimizer_steps": 5800,
+      "gpu": "A100 SXM4 80GB",
+      "meta_note": null,
+      "trainable_params": 25282000,
+      "total_params": 25282000,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 1.505,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 12.904,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolox_yolox_e1_1280_s0_valid.json.gz",
+          "sha256_json": "4ede8eda64fb246ae52b7e5ea7a9c7ae1678a439b3c6f7ebe16fe79ab06b09b2"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolox_yolox_e1_1280_s0_test.json.gz",
+          "sha256_json": "e74e05142fd482c5e09e8e32da4246d9f0250a3ef445a470a6a3bf47448bc6e8"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7384238243103027,
+        "mAP_50": 0.9560734033584595,
+        "mAP_75": 0.8479490876197815,
+        "per_class_ap50": {
+          "player": 0.9490916728973389,
+          "ball": 0.9248062968254089,
+          "referee": 0.9405940771102905,
+          "rim": 1.0,
+          "number": 0.965874969959259
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7461689114570618,
+        "mAP_50": 0.9591699242591858,
+        "mAP_75": 0.8654198050498962,
+        "per_class_ap50": {
+          "player": 0.9500739574432373,
+          "ball": 0.91222083568573,
+          "referee": 0.9893755316734314,
+          "rim": 1.0,
+          "number": 0.9441794157028198
+        }
+      },
+      "sibling_test_map_50_95": 0.7461689114570618
+    },
+    {
+      "row_id": "yolox/yolox_e1_1280_s1",
+      "model_key": "yolox",
+      "model": "YOLOX-M",
+      "family": "conventional detector",
+      "slug": "yolox",
+      "experiment": "E2",
+      "input": "1280 (train 1600, multi-scale 1280-1920)",
+      "arm": "yolox_e1_1280_s1",
+      "role": "extra",
+      "base_arm": "yolox_e1_1280_s1",
+      "label": "tuned recipe x2 @1280, seed 1",
+      "seed": 1,
+      "image_size": null,
+      "model_id": "yolox_m.pth (official COCO, release 0.1.1rc0, sha256 60076992...)",
+      "selected_epoch": 173,
+      "epochs_run": 200,
+      "optimizer_steps": 5800,
+      "gpu": "A100 SXM4 80GB",
+      "meta_note": null,
+      "trainable_params": 25282000,
+      "total_params": 25282000,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 1.365,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 12.771,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolox_yolox_e1_1280_s1_valid.json.gz",
+          "sha256_json": "fc7c2d23ee7a743c47d518290bbd10826598ed8f5c47d79c95c115a4b8cf8e04"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolox_yolox_e1_1280_s1_test.json.gz",
+          "sha256_json": "9f457d491804272f45a3bd7d9234dd7d2d7ebc909ef4f9cda3a9351b7b70127c"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7414101958274841,
+        "mAP_50": 0.9635198712348938,
+        "mAP_75": 0.8490076661109924,
+        "per_class_ap50": {
+          "player": 0.9501480460166931,
+          "ball": 0.9209308624267578,
+          "referee": 0.9702265858650208,
+          "rim": 1.0,
+          "number": 0.9762938618659973
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7389344573020935,
+        "mAP_50": 0.945609986782074,
+        "mAP_75": 0.8657258152961731,
+        "per_class_ap50": {
+          "player": 0.9397086501121521,
+          "ball": 0.8844890594482422,
+          "referee": 0.9793989062309265,
+          "rim": 1.0,
+          "number": 0.9244533777236938
+        }
+      },
+      "sibling_test_map_50_95": 0.7389344573020935
+    },
+    {
+      "row_id": "yolox/yolox_e1_1280_s2",
+      "model_key": "yolox",
+      "model": "YOLOX-M",
+      "family": "conventional detector",
+      "slug": "yolox",
+      "experiment": "E2",
+      "input": "1280 (train 1600, multi-scale 1280-1920)",
+      "arm": "yolox_e1_1280_s2",
+      "role": "extra",
+      "base_arm": "yolox_e1_1280_s2",
+      "label": "tuned recipe x2 @1280, seed 2",
+      "seed": 2,
+      "image_size": null,
+      "model_id": "yolox_m.pth (official COCO, release 0.1.1rc0, sha256 60076992...)",
+      "selected_epoch": 145,
+      "epochs_run": 200,
+      "optimizer_steps": 5800,
+      "gpu": "A100 SXM4 80GB",
+      "meta_note": null,
+      "trainable_params": 25282000,
+      "total_params": 25282000,
+      "trainable_fraction": 1.0,
+      "train_gpu_hours": 1.079,
+      "train_gpu_hours_key": "train_hours",
+      "train_cost_usd": 1.265,
+      "train_cost_key": "cost_usd",
+      "full_type": null,
+      "full_type_note": null,
+      "box_shared": null,
+      "dumps": {
+        "valid": {
+          "path": "benchmarks/basketball/results/finetune/yolox_yolox_e1_1280_s2_valid.json.gz",
+          "sha256_json": "27caf9eb7614042b9cee269c80d7884b9619815b3a796640711bfbadc3c3d41e"
+        },
+        "test": {
+          "path": "benchmarks/basketball/results/finetune/yolox_yolox_e1_1280_s2_test.json.gz",
+          "sha256_json": "2d7f7305184d0dac0e4e234f540bd5c385e5a8d1ce35d2cd0f323256b57d49f1"
+        }
+      },
+      "valid": {
+        "mAP_50_95": 0.7397558093070984,
+        "mAP_50": 0.9703055620193481,
+        "mAP_75": 0.8257637023925781,
+        "per_class_ap50": {
+          "player": 0.9599396586418152,
+          "ball": 0.9157759547233582,
+          "referee": 1.0,
+          "rim": 1.0,
+          "number": 0.9758121371269226
+        }
+      },
+      "test": {
+        "mAP_50_95": 0.7522596716880798,
+        "mAP_50": 0.9675230383872986,
+        "mAP_75": 0.8756491541862488,
+        "per_class_ap50": {
+          "player": 0.9498916268348694,
+          "ball": 0.9349799752235413,
+          "referee": 0.9899212718009949,
+          "rim": 1.0,
+          "number": 0.9628221988677979
+        }
+      },
+      "sibling_test_map_50_95": 0.7522596716880798
     }
   ],
   "models": {
@@ -7023,16 +7815,16 @@
     },
     {
       "slug": "yolox",
-      "usd": 11.68,
-      "complete": false,
-      "source": "YOLOX-M: yolox_1280_s0-s2 meta.json cost_usd 2.12 + 2.20 + 1.36 = 5.68; nine sweep boxes sw_*/box.json cost_usd sum 6.00; no T4 box yet (no T4 offer at launch); the three boxes lost in the outage recorded no cost",
+      "usd": 58.22,
+      "complete": true,
+      "source": "docs/plans/yolox.md, vast invoices for all 27 instances: published x2 @1280 ~$5.9, stage-A sweep ~$19.7 (of which $10.7 = 3 boxes that never trained), stage B $33.8 (~$26 of it finished boxes left idling), T4 $1.45. The imported @640 seeds are not included",
       "stage": "round2"
     },
     {
       "slug": "yolo26m",
-      "usd": 3.34,
+      "usd": 13.5,
       "complete": false,
-      "source": "YOLO26m matched search: seven new sw_*/meta.json cost_usd sum 3.34 (the two reused E1 sweep arms are in the $11 above); the three boxes stopped by the credit outage recorded no cost",
+      "source": "docs/plans/yolo26m.md, matched search: sweep ~$6 (7 logged sw_* arms $3.34 + 3 skipped arms and failed boots) + stage B ~$7.5 (e1b meta.json $7.11 + one replaced box), about $13-14",
       "stage": "round2"
     },
     {
@@ -7481,9 +8273,7 @@
         "yolox/yolox_1280_s2"
       ],
       "pending": false
-    }
-  ],
-  "pending_groups": [
+    },
     {
       "key": "yolox_e1",
       "label": "YOLOX-M @640, tuned recipe (sw_s800_lr4_mx50)",
@@ -7493,7 +8283,7 @@
         "yolox/yolox_e1_s1",
         "yolox/yolox_e1_s2"
       ],
-      "pending": true
+      "pending": false
     },
     {
       "key": "yolox_e1_1280",
@@ -7504,7 +8294,7 @@
         "yolox/yolox_e1_1280_s1",
         "yolox/yolox_e1_1280_s2"
       ],
-      "pending": true
+      "pending": false
     },
     {
       "key": "yolo26m_e1b",
@@ -7515,7 +8305,7 @@
         "yolo26m/yolo26m_e1b_s1",
         "yolo26m/yolo26m_e1b_s2"
       ],
-      "pending": true
+      "pending": false
     },
     {
       "key": "yolo26m_e1b_1280",
@@ -7526,23 +8316,28 @@
         "yolo26m/yolo26m_e1b_1280_s1",
         "yolo26m/yolo26m_e1b_1280_s2"
       ],
-      "pending": true
+      "pending": false
     }
   ],
+  "pending_groups": [],
   "tables": {
     "headline": {
       "entries": [
+        "yolo26m_e1b_1280",
         "deimm_1280",
         "yolo26m_1280",
         "yolox_1280",
+        "yolox_e1_1280",
         "llmdet_peft",
         "llmdet/full",
         "yoloe_1280/yoloe_full",
         "yoloworld/yoloworld_full",
         "mmgdino_peft",
         "sam3/full",
+        "yolo26m_e1b",
         "deimm_640_e1",
         "yolo26m_640_e1",
+        "yolox_e1",
         "yolox_640",
         "yoloe_640/yoloe_full_640",
         "llmdet_peft_640",
@@ -7550,6 +8345,46 @@
         "mmgdino_peft_640"
       ],
       "pairs": [
+        [
+          "yolo26m_e1b_1280",
+          "llmdet_peft"
+        ],
+        [
+          "yolo26m_e1b_1280",
+          "llmdet/full"
+        ],
+        [
+          "yolo26m_e1b_1280",
+          "yoloe_1280/yoloe_full"
+        ],
+        [
+          "yolo26m_e1b_1280",
+          "yoloworld/yoloworld_full"
+        ],
+        [
+          "yolo26m_e1b_1280",
+          "mmgdino_peft"
+        ],
+        [
+          "yolo26m_e1b_1280",
+          "deimm_1280"
+        ],
+        [
+          "yolo26m_e1b_1280",
+          "yolox_e1_1280"
+        ],
+        [
+          "deimm_1280",
+          "yolox_e1_1280"
+        ],
+        [
+          "yolo26m_e1b",
+          "yolox_e1"
+        ],
+        [
+          "deimm_640_e1",
+          "yolox_e1"
+        ],
         [
           "yolo26m_1280",
           "yolox_1280"
@@ -7641,10 +8476,14 @@
       "entries": [
         "yolo26m_640_e1",
         "yolo26m_1280",
+        "yolo26m_e1b",
+        "yolo26m_e1b_1280",
         "deimm_640_e1",
         "deimm_1280",
         "yolox_640",
         "yolox_1280",
+        "yolox_e1",
+        "yolox_e1_1280",
         "llmdet_peft_640",
         "llmdet_peft_640aug",
         "llmdet_peft",
@@ -7824,6 +8663,22 @@
         [
           "yolo26m_e1b_1280",
           "yolo26m_1280"
+        ],
+        [
+          "yolo26m_e1b_1280",
+          "yolo26m_e1b"
+        ],
+        [
+          "yolox_e1_1280",
+          "yolox_e1"
+        ],
+        [
+          "deimm_640_e1",
+          "yolox_e1"
+        ],
+        [
+          "deimm_1280",
+          "yolox_e1_1280"
         ]
       ]
     },
@@ -7959,7 +8814,7 @@
           "mixup": 0.0,
           "run": "never_ran",
           "published": false,
-          "note": "box lost to a network outage during setup",
+          "note": "box never started training (setup lost its connection) and idled until the overnight credit stop",
           "valid": null
         },
         {
@@ -8021,7 +8876,7 @@
           "mixup": 0.5,
           "run": "never_ran",
           "published": false,
-          "note": "box lost to a network outage during setup",
+          "note": "box never started training (setup lost its connection) and idled until the overnight credit stop",
           "valid": null
         },
         {
@@ -8057,7 +8912,7 @@
           "mixup": 0.5,
           "run": "never_ran",
           "published": false,
-          "note": "box lost to a network outage during setup",
+          "note": "box never started training (setup lost its connection) and idled until the overnight credit stop",
           "valid": null
         },
         {
@@ -8570,19 +9425,26 @@
       "published": true
     },
     {
-      "key": "yolox_640_published",
-      "label": "YOLOX-M @640 (published engine)",
+      "key": "yolox_640",
+      "label": "YOLOX-M @640 (published ONNX), scaled to the reference T4",
       "input": "640x640",
       "status": "current",
       "applies_to": [
         "yolox_640",
         "yolox_e1"
       ],
-      "note": null,
-      "source": "published (results/latency/trt_fp16_toboxes.json)",
-      "gpu_ms": 5.68115,
-      "gpu_runs_ms": [],
-      "published": true
+      "note": "measured 5.20 ms on a T4 about 11% faster than the anchor box; x 5.84/5.20 = the anchor re-time (published GCP T4: 5.68)",
+      "source": "yolox/latency_trt_t4.json",
+      "gpu_ms": 5.84,
+      "gpu_runs_ms": [
+        5.183215856552124,
+        5.195775985717773
+      ],
+      "e2e_ms": null,
+      "pytorch_ms": null,
+      "val_pytorch": null,
+      "val_trt": null,
+      "published": false
     },
     {
       "key": "deimm_640_published",
@@ -8622,17 +9484,20 @@
     },
     {
       "key": "yolox_1280",
-      "label": "YOLOX-M @1280 (yolox_1280_s0)",
+      "label": "YOLOX-M @1280 (yolox_e1_1280_s0), scaled to the reference T4",
       "input": "1280x1280",
       "status": "current",
       "applies_to": [
         "yolox_1280",
         "yolox_e1_1280"
       ],
-      "note": "pending: the T4 box has not run yet (no T4 offer at launch)",
+      "note": "measured 16.83 ms on the same faster T4, scaled by 5.84/5.20; one graph for every 1280 arm",
       "source": "yolox/latency_trt_t4.json",
-      "gpu_ms": null,
-      "gpu_runs_ms": [],
+      "gpu_ms": 18.913,
+      "gpu_runs_ms": [
+        16.737407684326172,
+        16.827872276306152
+      ],
       "e2e_ms": null,
       "pytorch_ms": null,
       "val_pytorch": null,
@@ -8972,23 +9837,6 @@
   "missing": [
     "owlv2: owlv2/peft_seed1/meta.json",
     "owlv2: owlv2/peft_seed2/meta.json",
-    "owlv2: owlv2/full_seed1/meta.json",
-    "yolo26m: yolo26m/yolo26m_e1b_s0 (no test.json/meta.json)",
-    "yolo26m: yolo26m/yolo26m_e1b_s1 (no test.json/meta.json)",
-    "yolo26m: yolo26m/yolo26m_e1b_s2 (no test.json/meta.json)",
-    "yolo26m: yolo26m/yolo26m_e1b_1280_s0 (no test.json/meta.json)",
-    "yolo26m: yolo26m/yolo26m_e1b_1280_s1 (no test.json/meta.json)",
-    "yolo26m: yolo26m/yolo26m_e1b_1280_s2 (no test.json/meta.json)",
-    "yolox: yolox/yolox_e1_s0 (no test.json/meta.json)",
-    "yolox: yolox/yolox_e1_s1 (no test.json/meta.json)",
-    "yolox: yolox/yolox_e1_s2 (no test.json/meta.json)",
-    "yolox: yolox/yolox_e1_1280_s0 (no test.json/meta.json)",
-    "yolox: yolox/yolox_e1_1280_s1 (no test.json/meta.json)",
-    "yolox: yolox/yolox_e1_1280_s2 (no test.json/meta.json)",
-    "group yolox_e1 (YOLOX-M @640, tuned recipe (sw_s800_lr4_mx50)): pending, 0 of 3 seeds scored",
-    "group yolox_e1_1280 (YOLOX-M @1280, tuned recipe x2): pending, 0 of 3 seeds scored",
-    "group yolo26m_e1b (YOLO26m @640, tuned recipe (sw_s800_lr1_mx50)): pending, 0 of 3 seeds scored",
-    "group yolo26m_e1b_1280 (YOLO26m @1280, tuned recipe x2): pending, 0 of 3 seeds scored",
-    "trt yolox_1280: GPU-compute median not found in yolox/latency_trt_t4.json"
+    "owlv2: owlv2/full_seed1/meta.json"
   ]
 }
